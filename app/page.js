@@ -1,101 +1,57 @@
+"use client"
 import Image from "next/image";
+import { useEffect, useState } from 'react';
+
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const headings = [
+    "Support Your Favorite Creators",
+    "Get Exclusive Perks"
+  ];
+  const animationDuration =10000; // Match CSS animation duration (4 seconds)
+  const [textIndex, setTextIndex] = useState(0);
+  const [key, setKey] = useState(0); // Key to restart animation
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTextIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % headings.length;
+        setKey((prevKey) => prevKey + 1); // Force re-render to restart animation
+        return nextIndex;
+      });
+    }, animationDuration); // Match with the CSS duration
+
+    return () => clearInterval(interval);
+  }, [headings.length, animationDuration]);
+
+  return (<>
+<video className="absolute top-0 left-0 w-full h-full object-cover"
+   src="/vid.mp4"
+   autoPlay={true}
+   loop={true}
+   muted={true}/>
+<div className="relative z-0 min-h-screen flex items-center justify-center px-6 py-12">
+
+  <div className="relative text-center z-10 px-4 md:px-16">
+  <h1
+        key={key} // Unique key for restarting animation
+        className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white mb-6 overflow-hidden whitespace-nowrap border-r-4 border-white animate-typing"
+      >
+        {headings[textIndex]}
+      </h1>
+
+    <p className="text-lg sm:text-xl text-white max-w-3xl mx-auto opacity-80 mt-4 animate-fadeIn delay-200">
+      Join a community that empowers Instagram creators. Support them directly, access exclusive content, and help them grow.
+    </p>
+
+    <a
+      href="/signup"
+      className="px-8 py-3 mt-8 text-white bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 rounded-md text-xl font-semibold transition duration-300 ease-in-out hover:from-pink-600 hover:via-purple-600 hover:to-orange-600 inline-block animate-fadeIn delay-400"
+    >
+      Get Started
+    </a>
+  </div>
+</div>
+</>
   );
 }
