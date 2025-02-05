@@ -4,7 +4,7 @@ import { FaUser } from "react-icons/fa";
 import Router from "next/navigation";
 import { FaUserCircle } from "react-icons/fa";
 import Link from "next/link";
-import PaymentPage from "@/component/PaymentPage";
+import PaymentPage from "@/components/PaymentPage";
 import React from 'react'
 
 const Username = ({params}) => {

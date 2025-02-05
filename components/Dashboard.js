@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import { useSession, signIn, signOut } from "next-auth/react"
-import "./globals.css";
+import "../app/globals.css";
 import { useRouter } from 'next/navigation'
 import { fetchuser, updateProfile } from '@/actions/useractions'
 import { ToastContainer, toast } from 'react-toastify';

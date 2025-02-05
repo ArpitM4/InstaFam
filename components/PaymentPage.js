@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import Script from 'next/script'
 import { useSession } from 'next-auth/react'
-import "./globals.css";
+import "../app/globals.css";
 import { FaUserCircle } from "react-icons/fa";
 import { fetchuser, fetchpayments, initiate } from '@/actions/useractions'
 import { useSearchParams } from 'next/navigation'
