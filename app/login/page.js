@@ -28,7 +28,7 @@ const Login = () => {
 
         {/* Social Media Login Buttons */}
         <div className="space-y-6">
-          <button className="w-full max-w-lg flex items-center justify-center bg-white text-blue-600 rounded-md px-28 py-5 text-xl shadow-md hover:shadow-xl transition">
+          <button onClick={() => {signIn("google")}} className="w-full max-w-lg flex items-center justify-center bg-white text-blue-600 rounded-md px-28 py-5 text-xl shadow-md hover:shadow-xl transition">
             <FaGoogle className="mr-3 text-2xl" /> Google
           </button>
           <button   onClick={() => {
