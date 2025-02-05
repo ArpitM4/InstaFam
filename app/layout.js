@@ -1,8 +1,8 @@
 
 import "./globals.css";
-import Navbar from "@/Components/Navbar";
-import Footer from "@/Components/Footer";
-import SessionWrapper from "@/Components/SessionWrapper";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import SessionWrapper from "@/components/SessionWrapper";
 
 export const metadata = {
   title: "InstaFam",
