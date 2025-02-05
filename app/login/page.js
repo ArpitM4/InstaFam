@@ -12,7 +12,7 @@ const Login = () => {
   const router = useRouter();
   useEffect(() => {
     if (session) {
-      router.push('/'); // Redirect to home page if session exists
+      router.push('/dashboard'); // Redirect to home page if session exists
     }
   }, [session, router]); // Dependency array ensures effect runs when session changes
   return (

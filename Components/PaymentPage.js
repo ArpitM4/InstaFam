@@ -20,9 +20,9 @@ const PaymentPage = ({ username }) => {
     const searchParams = useSearchParams()
     const router = useRouter()
 
-    // useEffect(() => {
-    //     getData()
-    // }, [])
+    useEffect(() => {
+        getData()
+    }, [])
 
     useEffect(() => {
         if(searchParams.get("paymentdone") == "true"){
@@ -47,18 +47,19 @@ const PaymentPage = ({ username }) => {
         setPaymentform({ ...paymentform, [e.target.name]: e.target.value })
     }
 
-    // const getData = async () => {
-    //     let u = await fetchuser(username)
-    //     setcurrentUser(u)
-    //     let dbpayments = await fetchpayments(username)
-    //     setPayments(dbpayments) 
-    // }
+    const getData = async () => {
+        let u = await fetchuser(username)
+        setcurrentUser(u)
+        let dbpayments = await fetchpayments(username)
+        setPayments(dbpayments) 
+        // console.log("here",dbpayments,u)
+    }
 
 
     const pay = async (amount) => {
         // Get the order Id 
         let a = await initiate(amount, username, paymentform)
-        console.log(a)
+        // console.log(a)
         let orderId = a.id
         var options = {
             // "key": currentUser.razorpayid, // Enter the Key ID generated from the Dashboard
@@ -93,7 +94,7 @@ const PaymentPage = ({ username }) => {
            {/* Banner Section */}
            <div  className="relative mt-3 w-full max-w-full h-64 shadow-md "
          style={{
-           backgroundImage: `url('https://picsum.photos/1600/400')`, // Replace with your dynamic image URL
+           backgroundImage: `url(${currentUser.coverpic?currentUser.coverpic:"https://picsum.photos/1600/400"})`, // Replace with your dynamic image URL
            backgroundSize: 'cover',
            backgroundPosition: 'center',
          }}>
@@ -103,8 +104,8 @@ const PaymentPage = ({ username }) => {
          <div className="absolute bottom-0 left-0 right-0 flex items-center z-10 justify-center transform translate-y-1/3">
            <div className="w-32 h-32 z-10 bg-white rounded-full shadow-lg border-4 border-white">
              <img
-               src="https://picsum.photos/200" // Replace with the dynamic profile picture source
-               alt="Creator"
+               src={currentUser.profilepic?currentUser.profilepic:"https://picsum.photos/200"} // Replace with the dynamic profile picture source
+              //  src="https://picsum.photos/200"
                className="w-full h-full object-cover rounded-full"
              />
            </div>
@@ -130,45 +131,20 @@ const PaymentPage = ({ username }) => {
            <div className="w-full max-w-5xl mt-20 flex flex-col md:flex-row gap-8">
              {/* Leaderboard */}
              <div className="flex-1 bg-white rounded-lg shadow-md p-6">
-         <h2 className="text-2xl font-bold text-gray-800 mb-4">Top Donations</h2>
-         <ol className="list-decimal list-inside text-lg text-gray-700">
-           <li className="flex items-center justify-between py-2">
-             <div className="flex items-center space-x-2">
-               <FaUserCircle className="text-blue-500 text-2xl" />
-               <span>Donor 1</span>
-             </div>
-             <span>$500</span>
-           </li>
-           <li className="flex items-center justify-between py-2">
-             <div className="flex items-center space-x-2">
-               <FaUserCircle className="text-blue-500 text-2xl" />
-               <span>Donor 2</span>
-             </div>
-             <span>$350</span>
-           </li>
-           <li className="flex items-center justify-between py-2">
-             <div className="flex items-center space-x-2">
-               <FaUserCircle className="text-blue-500 text-2xl" />
-               <span>Donor 3</span>
-             </div>
-             <span>$250</span>
-           </li>
-           <li className="flex items-center justify-between py-2">
-             <div className="flex items-center space-x-2">
-               <FaUserCircle className="text-blue-500 text-2xl" />
-               <span>Donor 4</span>
-             </div>
-             <span>$150</span>
-           </li>
-           <li className="flex items-center justify-between py-2">
-             <div className="flex items-center space-x-2">
-               <FaUserCircle className="text-blue-500 text-2xl" />
-               <span>Donor 5</span>
-             </div>
-             <span>$100</span>
-           </li>
-         </ol>
-       </div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Top Donations</h2>
+                  {payments.length == 0 && <li className='list-none'>No payments yet</li>}
+                  <ol className="list-decimal list-inside text-lg text-gray-700">
+
+                    {payments.map((p,i)=>{ return <li className="flex items-center justify-between py-2">
+                      <div className="flex items-center space-x-2">
+                        <FaUserCircle className="text-blue-500 text-2xl" />
+                        <span>{p.name}</span>
+                      </div>
+                      <span>${p.amount}</span>
+                    </li>})}
+              
+                  </ol>
+           </div>
        
              {/* Form Section */}
         <div className="flex-1 bg-white rounded-lg shadow-md p-6">
@@ -225,6 +201,7 @@ const PaymentPage = ({ username }) => {
            {/* Pay Button */}
            <div>
              <button
+                          onClick={() => pay(Number.parseInt(paymentform.amount)*100)}
                type="submit"
                className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition"
              >

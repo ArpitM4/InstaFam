@@ -1,4 +1,4 @@
-// "use client"
+"use client"
 import React from 'react'
 
 
@@ -23,7 +23,8 @@ const Footer = () => {
           <li><a href="/" className="hover:text-purple-500">Home</a></li>
           <li><a href="/about" className="hover:text-purple-500">About Us</a></li>
           <li><a href="/contact" className="hover:text-purple-500">Contact</a></li>
-          <li><a href="/faq" className="hover:text-purple-500">FAQ</a></li>
+          <li><a href="/terms" className="hover:text-purple-500">Terms of Service</a></li>
+          <li><a href="/faqs" className="hover:text-purple-500">FAQ</a></li>
         </ul>
       </div>
 

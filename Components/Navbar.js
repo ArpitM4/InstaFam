@@ -13,7 +13,7 @@ const Navbar = () => {
   const { data: session } = useSession();
   if (session) {sign = "true"  }
 
-  {console.log(sign)}
+  // {console.log(sign)}
      return (
       <nav className="absolute bg-white bg-opacity-30 backdrop-blur-lg shadow-md py-4 z-30 w-full">
       <div className=" container mx-auto pl-4 flex items-center justify-between">
@@ -52,7 +52,7 @@ const Navbar = () => {
           {sign === "false" ? (
           <div>
             <Link href="/login"
-              className="px-4 py-2 text-white hover:text-white border border-gray-300 rounded-md hover:bg-gray-800 transition">
+              className="px-4 py-2 mx-4 text-white hover:text-white border border-gray-300 rounded-md hover:bg-gray-800 transition">
             <button>Log In</button>
             </Link>
             <Link href="/signup"
