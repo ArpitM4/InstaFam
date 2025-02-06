@@ -8,15 +8,23 @@ export default function Contact() {
           Contact Us
         </h1>
         <p className="text-lg lg:text-xl text-center max-w-4xl mx-auto leading-relaxed">
-          We’d love to hear from you! Whether you have questions, feedback, or just want to say hi, 
-          feel free to get in touch with us.
+        Last updated on 06-02-2025 11:03:26
+        <br></br>
+        <br></br>
+You may contact us using the information below:
+
+Merchant Legal entity name: ARPIT MAURYA
+Registered Address: Bawana Rd, Delhi Technological University, Shahbad Daulatpur Village, Rohini, New Delhi, Delhi, 110042, New Delhi, Delhi, PIN: 110042
+Operational Address: Bawana Rd, Delhi Technological University, Shahbad Daulatpur Village, Rohini, New Delhi, Delhi, 110042, New Delhi, Delhi, PIN: 110042
+Telephone No: 7982432872
+E-Mail ID: support@instafam.social
         </p>
         <div className="mt-12 text-center">
           <h2 className="text-3xl font-bold mb-6">Get in Touch</h2>
           <p className="text-lg lg:text-xl mb-4">
             <span className="font-bold text-blue-200">Email:</span> 
-            <a href="mailto:arpitmaurya1506@gmail.com" className="underline text-blue-300 hover:text-blue-400 ml-2">
-              support@instafam.com
+            <a href="mailto:asupport@instafam.social" className="underline text-blue-300 hover:text-blue-400 ml-2">
+            support@instafam.social
             </a>
           </p>
           <p className="text-lg lg:text-xl mb-4">

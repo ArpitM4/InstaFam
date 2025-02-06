@@ -56,7 +56,7 @@ const Navbar = () => {
               className="px-4 py-2 mx-4 text-white hover:text-white border border-gray-300 rounded-md hover:bg-gray-800 transition">
             <button>Log In</button>
             </Link>
-            <Link href="/signup"
+            <Link href="/login"
               className="px-4 py-2 text-white bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 rounded-md hover:from-pink-600 hover:via-purple-600 hover:to-orange-600 transition">
             Sign Up
             </Link>

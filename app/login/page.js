@@ -36,7 +36,7 @@ const Login = () => {
               }}  className="w-full max-w-lg flex items-center justify-center bg-white text-gray-800 rounded-md px-10 py-5 text-xl shadow-md hover:shadow-xl transition">
             <FaGithub className="mr-3 text-2xl" /> GitHub
           </button>
-          <button className="w-full max-w-lg flex items-center justify-center bg-blue-700 text-white rounded-md px-10 py-5 text-xl shadow-md hover:shadow-xl transition">
+          {/* <button className="w-full max-w-lg flex items-center justify-center bg-blue-700 text-white rounded-md px-10 py-5 text-xl shadow-md hover:shadow-xl transition">
             <FaFacebookF className="mr-3 text-2xl" /> Facebook
           </button>
           <button className="w-full max-w-lg flex items-center justify-center bg-orange-500 text-white rounded-md px-10 py-5 text-xl shadow-md hover:shadow-xl transition">
@@ -44,7 +44,7 @@ const Login = () => {
           </button>
           <button className="w-full max-w-lg flex items-center justify-center bg-blue-800 text-white rounded-md px-10 py-5 text-xl shadow-md hover:shadow-xl transition">
             <FaLinkedinIn className="mr-3 text-2xl" /> LinkedIn
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
