@@ -153,7 +153,7 @@ const Dashboard = () => {
   </div>
 
   {/* Razorpay Credentials */}
-  <div>
+  {/* <div>
     <label htmlFor="razorpayid" className="block text-gray-700 font-medium mb-1">
       Razorpay ID
     </label>
@@ -181,7 +181,7 @@ const Dashboard = () => {
       placeholder="Enter Razorpay Secret"
       className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
     />
-  </div>
+  </div> */}
 
   {/* Save Button */}
   <div>
