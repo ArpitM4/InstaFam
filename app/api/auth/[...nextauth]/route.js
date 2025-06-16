@@ -1,54 +1,66 @@
-import NextAuth from 'next-auth'
-import GitHubProvider from 'next-auth/providers/github'
-import mongoose, { connect } from 'mongoose'
-import FacebookProvider from 'next-auth/providers/facebook'
-import GoogleProvider from 'next-auth/providers/google'
-import EmailProvider from 'next-auth/providers/email'
-import connectDB from '@/db/ConnectDb'
-import Payment from '@/models/Payment'
-import User  from '@/models/User'
+import NextAuth from 'next-auth';
+import GitHubProvider from 'next-auth/providers/github';
+import GoogleProvider from 'next-auth/providers/google';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import bcrypt from 'bcryptjs';
+import connectDB from '@/db/ConnectDb';
+import User from '@/models/User';
 
 export const authoptions = NextAuth({
   providers: [
-    // GitHub Provider
     GitHubProvider({
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
     }),
-    // Google Provider
     GoogleProvider({
       clientId: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
     }),
-  ],
-  callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      if (account.provider === 'github' || account.provider === 'google') {
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
         await connectDB();
 
-        // Check if the user already exists
-        const currentUser = await User.findOne({ email: user.email });
+        const user = await User.findOne({ email: credentials.email });
+        if (!user || !user.password) return null;
 
-        if (!currentUser) {
-          // Create a new user
+        const isValid = await bcrypt.compare(credentials.password, user.password);
+        if (!isValid) return null;
+
+        return { id: user._id, email: user.email, name: user.username };
+      }
+    })
+  ],
+  callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === 'google' || account?.provider === 'github') {
+        await connectDB();
+        const existing = await User.findOne({ email: user.email });
+        if (!existing) {
           await User.create({
             email: user.email,
             username: user.email.split('@')[0],
           });
         }
-
-        return true;
-        
       }
-      return false;
+      return true;
     },
     async session({ session }) {
-      // Fetch user details from the database
+      await connectDB();
       const dbUser = await User.findOne({ email: session.user.email });
       session.user.name = dbUser?.username || session.user.name;
+      session.user.id = dbUser?._id;
       return session;
     },
   },
+  session: {
+    strategy: "jwt"
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 });
 
 export { authoptions as GET, authoptions as POST };

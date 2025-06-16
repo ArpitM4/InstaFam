@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import Script from 'next/script'
 import { useSession } from 'next-auth/react'
+import Razorpay from "razorpay";
 import "../app/globals.css";
 import { FaUserCircle } from "react-icons/fa";
 import { fetchuser, fetchpayments, initiate } from '@/actions/useractions'
@@ -11,6 +12,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Bounce } from 'react-toastify';
 import { useRouter } from 'next/navigation'
 import { notFound } from "next/navigation"
+
+// In your return JSX:
+
 
 const PaymentPage = ({ username }) => {
     // const { data: session } = useSession()
@@ -57,58 +61,71 @@ const PaymentPage = ({ username }) => {
     }
 
 
+  
     const pay = async (amount) => {
-        // Get the order Id 
-        let a = await initiate(amount, username, paymentform)
-        // console.log(a)
-        let orderId = a.id
-        var options = {
-            // "key": currentUser.razorpayid, // Enter the Key ID generated from the Dashboard
-            "key": process.env.NEXT_PUBLIC_KEY_ID, // Enter the Key ID generated from the Dashboard
-            "amount": amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-            "currency": "INR",
-            "name": "InstaFam", //your business name
-            "description": "Test Transaction",
-            "image": "https://example.com/your_logo",
-            "order_id": orderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-            "callback_url": `${process.env.NEXT_PUBLIC_URL}/api/razorpay`,
-            "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
-                "name": "Arpit Maurya", //your customer's name
-                "email": "gaurav.kumar@example.com",
-                "contact": "9000090000" //Provide the customer's phone number for better conversion rates 
-            },
-            "notes": {
-                "address": "Razorpay Corporate Office"
-            },
-            "theme": {
-                "color": "#3399cc"
-            }
-        }
+  if (typeof window === "undefined" || typeof window.Razorpay === "undefined") {
+    toast.error("Razorpay SDK not loaded yet.");
+    return;
+  }
 
-        var rzp1 = new Razorpay(options);
-        rzp1.open();
-    }
+  let a = await initiate(amount, username, paymentform);
+  let orderId = a.id;
+
+  const options = {
+    key_id: process.env.NEXT_PUBLIC_KEY_ID,
+    key: process.env.NEXT_PUBLIC_KEY_ID,
+    amount: amount,
+    currency: "INR",
+    name: "InstaFam",
+    description: "Test Transaction",
+    image: "https://example.com/your_logo",
+    order_id: orderId,
+    callback_url: `${process.env.NEXT_PUBLIC_URL}/api/razorpay`,
+    prefill: {
+      name: "Arpit Maurya",
+      email: "gaurav.kumar@example.com",
+      contact: "9000090000",
+    },
+    notes: {
+      address: "Razorpay Corporate Office",
+    },
+    theme: {
+      color: "#3399cc",
+    },
+  };
+
+  const rzp1 = new window.Razorpay(options);
+  rzp1.open();
+};
+
 
     
     return (<>
+    <Script
+  src="https://checkout.razorpay.com/v1/checkout.js"
+  strategy="beforeInteractive"
+/>
        <div className="min-h-screen bg-gradient-to-r from-purple-500 via-blue-900 to-pink-500 flex flex-col items-center  py-12">
            {/* Banner Section */}
-           <div  className="relative mt-3 w-full max-w-full h-64 shadow-md "
-         style={{
-           backgroundImage: `url(${currentUser.coverpic?currentUser.coverpic:"https://picsum.photos/1600/400"})`, // Replace with your dynamic image URL
-           backgroundSize: 'cover',
-           backgroundPosition: 'center',
-         }}>
+          <div
+  className="relative mt-3 w-full max-w-full h-64 shadow-md"
+  style={{
+    backgroundImage: `url(${currentUser?.coverpic || "https://picsum.photos/1600/400"})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  }}
+>
+
        
          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
        
          <div className="absolute bottom-0 left-0 right-0 flex items-center z-10 justify-center transform translate-y-1/3">
            <div className="w-32 h-32 z-10 bg-white rounded-full shadow-lg border-4 border-white">
-             <img
-               src={currentUser.profilepic?currentUser.profilepic:"https://picsum.photos/200"} // Replace with the dynamic profile picture source
-              //  src="https://picsum.photos/200"
-               className="w-full h-full object-cover rounded-full"
-             />
+          <img
+  src={currentUser?.profilepic || "https://picsum.photos/200"}
+  className="w-full h-full object-cover rounded-full"
+/>
+
            </div>
          </div>
        </div>
@@ -122,7 +139,7 @@ const PaymentPage = ({ username }) => {
            <p className="text-sm text-white">
              <span className="font-semibold text-white">9,719</span> membersㅤ
              <span className="font-semibold text-white"> 82</span> posts ㅤ
-             <span className="font-semibold text-white">$15,450</span>
+             <span className="font-semibold text-white">₹15,450</span>
            </p>
          </div>
        </div>
@@ -141,7 +158,7 @@ const PaymentPage = ({ username }) => {
                         <FaUserCircle className="text-blue-500 text-2xl" />
                         <span>{p.name}</span>
                       </div>
-                      <span>${p.amount}</span>
+                      <span>₹{p.amount}</span>
                     </li>})}
               
                   </ol>
@@ -201,18 +218,21 @@ const PaymentPage = ({ username }) => {
        
            {/* Pay Button */}
            <div>
-             <button
-                          onClick={() => pay(Number.parseInt(paymentform.amount)*100)}
-               type="submit"
-               className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition"
-             >
-               Pay
-             </button>
+<button
+  onClick={(e) => {
+    e.preventDefault(); // ✅ prevent form submission
+    pay(Number.parseInt(paymentform.amount));
+  }}
+  type="button" // ✅ important
+  className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition"
+>
+  Pay
+</button>
            </div>
          </form>
        
          {/* Quick Amount Buttons */}
-         <div className="mt-4 flex justify-center space-x-4">
+         {/* <div className="mt-4 flex justify-center space-x-4">
            <button
              onClick={() => pay(10000)}
              className="px-4 py-2 bg-gray-100 border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-200 transition"
@@ -231,7 +251,7 @@ const PaymentPage = ({ username }) => {
            >
              $30
            </button>
-         </div>
+         </div> */}
        </div>
        
            </div>

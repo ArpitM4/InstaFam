@@ -11,13 +11,13 @@ export const initiate = async (amount, to_username, paymentform) => {
 
     // Create a Razorpay instance
     const instance = new Razorpay({
-      key_id: process.env.KEY_ID,
+      key_id: "rzp_test_1r5dqNijLlcnau",
       key_secret: process.env.KEY_SECRET,
     });
 
     // Prepare Razorpay order options
     const options = {
-      amount: Number.parseInt(amount) * 100, // Convert amount to paise (Razorpay expects amount in smallest currency unit)
+      amount: Number.parseInt(amount)*100, // Convert amount to paise (Razorpay expects amount in smallest currency unit)
       currency: "INR",
     };
 
@@ -42,17 +42,32 @@ export const initiate = async (amount, to_username, paymentform) => {
 };
 
 export const fetchuser = async (username) => {
+  if (!username) return null;  // Avoid searching with undefined
+
   await connectDb();
   let u = await User.findOne({ username: username });
+  
+  if (!u) return null;
+
   let user = u.toObject({ flattenObjectIds: true });
   return user;
 };
 
 export const fetchpayments = async (username) => {
   await connectDb();
-  // find all payments sorted by decreasing order of amount and flatten objects
+
+  // Find and lean
   let p = await Payment.find({ to_user: username }).sort({ amount: -1 }).lean();
-  return p;
+
+  // Sanitize
+  const safePayments = p.map(payment => ({
+    ...payment,
+    _id: payment._id.toString(),
+    createdAt: payment.createdAt?.toISOString(),
+    updatedAt: payment.updatedAt?.toISOString(),
+  }));
+
+  return safePayments;
 };
 
 
