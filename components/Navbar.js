@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { FaUser } from "react-icons/fa";
@@ -14,13 +15,14 @@ const Navbar = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/search?q=${searchQuery}`);
+      router.push(`/search/${searchQuery}`);
     }
   };
 
   return (
     <nav className="absolute bg-white bg-opacity-30 backdrop-blur-lg shadow-md py-4 z-30 w-full">
       <div className="container mx-auto pl-4 flex items-center justify-between">
+        {/* Logo */}
         <Link href="/">
           <span
             className="text-3xl rubik-vinyl-regula font-extrabold bg-gradient-to-r from-pink-600 via-purple-700 to-pink-600 bg-clip-text text-transparent"
@@ -41,21 +43,21 @@ const Navbar = () => {
           />
           <button
             type="submit"
-                className="px-4 py-2 mx-4 text-white hover:text-white border border-gray-300 rounded-md hover:bg-gray-800 transition"
+            className="px-4 py-2 text-white border border-gray-300 rounded-md hover:bg-gray-800 transition"
           >
             Search
           </button>
         </form>
 
-        {/* Desktop Call-to-Action Buttons */}
+        {/* Desktop Auth Buttons */}
         <div className="hidden md:flex space-x-4">
           {!session ? (
-            <div>
+            <>
               <Link
                 href="/login"
-                className="px-4 py-2 mx-4 text-white hover:text-white border border-gray-300 rounded-md hover:bg-gray-800 transition"
+                className="px-4 py-2 text-white border border-gray-300 rounded-md hover:bg-gray-800 transition"
               >
-                <button>Log In</button>
+                Log In
               </Link>
               <Link
                 href="/signup"
@@ -63,26 +65,26 @@ const Navbar = () => {
               >
                 Sign Up
               </Link>
-            </div>
+            </>
           ) : (
             <div className="relative inline-block text-left group">
-              <button className="px-4 py-2 flex items-center text-white hover:text-white border border-none rounded-md transition">
+              <button className="px-4 py-2 flex items-center text-white border-none rounded-md transition">
                 <FaUser className="mr-2 text-xl" />
                 {session.user.name}
               </button>
               <div className="absolute right-0 w-48 bg-black/20 backdrop-blur-md border border-gray-300 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-10">
-                <Link href="/earnings">
-                  <button className="block px-6 py-3 text-white w-full text-left hover:bg-gray-800 transition">Earnings</button>
+                <Link href="/earnings" className="block px-6 py-3 text-white hover:bg-gray-800 transition">
+                  Earnings
                 </Link>
-                <Link href="/dashboard">
-                  <button className="block px-6 py-3 text-white w-full text-left hover:bg-gray-800 transition">Dashboard</button>
+                <Link href="/dashboard" className="block px-6 py-3 text-white hover:bg-gray-800 transition">
+                  Dashboard
                 </Link>
-                <Link href={`/${session.user.name}`}>
-                  <button className="block px-6 py-3 text-white w-full text-left hover:bg-gray-800 transition">Your Page</button>
+                <Link href={`/${session.user.name}`} className="block px-6 py-3 text-white hover:bg-gray-800 transition">
+                  Your Page
                 </Link>
                 <button
                   onClick={signOut}
-                  className="block px-6 py-3 text-white w-full text-left hover:bg-gray-800 transition"
+                  className="block w-full text-left px-6 py-3 text-white hover:bg-gray-800 transition"
                 >
                   Logout
                 </button>
@@ -104,12 +106,7 @@ const Navbar = () => {
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16m-7 6h7"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
           </svg>
         </button>
       </div>
