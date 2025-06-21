@@ -51,6 +51,8 @@ const Dashboard = () => {
 
   return (
       <>
+
+              <div id="stars3"></div>
           <ToastContainer
               position="top-right"
               autoClose={5000}
@@ -63,8 +65,9 @@ const Dashboard = () => {
               pauseOnHover
               theme="light"
           />
-    <div className="min-h-screen  bg-gradient-to-r from-purple-500 via-blue-500 to-pink-500 bg-opacity-70 backdrop-blur-lg flex flex-col items-center py-12 px-6">
+    <div id='stardiv'  className="min-h-screen flex flex-col items-center py-12 px-6 ">
       {/* Page Heading */}
+              
       <h1 className="text-4xl mt-10 font-bold text-white mb-8">Your Dashboard</h1>
 
       {/* Form Container */}
