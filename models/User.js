@@ -12,6 +12,7 @@ const UserSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
   razorpayid: { type: String },
   razorpaysecret: { type: String },
+  followers: { type: Number, default: 10 }
 });
 
 export default mongoose.models.User || model("User", UserSchema);
