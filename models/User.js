@@ -12,7 +12,19 @@ const UserSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
   razorpayid: { type: String },
   razorpaysecret: { type: String },
-  followers: { type: Number, default: 10 }
+  followers: { type: Number, default: 10 },
+  
+  accountType: {
+  type: String,
+  enum: ["User", "Creator","VCreator"],
+  default: "User",},
+
+   paymentInfo: {
+    phone: String,
+    upi: String
+  }
+
+
 });
 
 export default mongoose.models.User || model("User", UserSchema);

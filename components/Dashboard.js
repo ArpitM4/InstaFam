@@ -1,42 +1,58 @@
-"use client"
-import React, { useEffect, useState } from 'react'
-import { useSession, signIn, signOut } from "next-auth/react"
-import "../app/globals.css";
-import { useRouter } from 'next/navigation'
-import { fetchuser, updateProfile } from '@/actions/useractions'
+"use client";
+
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { fetchuser, updatePaymentInfo } from "@/actions/useractions";
+import { Bounce } from "react-toastify";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Bounce } from 'react-toastify';
+
+
 
 const Dashboard = () => {
-  const { data: session, update } = useSession()
-  const router = useRouter()
-  const [form, setform] = useState({})
+const { data: session, status } = useSession();
+  const router = useRouter();
+  const [form, setForm] = useState(null);
 
-  useEffect(() => {
-      // console.log(session)
+useEffect(() => {
+  if (status === "loading") return; // Wait until session is loaded
 
-      if (!session) {
-          router.push('/login')
-      }
-      else {
-          getData()
-      }
-  }, [])
+  if (!session) {
+    router.push("/login");
+  } else {
+    getData();
+  }
+}, [session, status]);
 
   const getData = async () => {
-      let u = await fetchuser(session.user.name)
-      setform(u)
-  }
+    const user = await fetchuser(session.user.name);
+    setForm(user);
+  };
 
   const handleChange = (e) => {
-      setform({ ...form, [e.target.name]: e.target.value })
-  }
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      paymentInfo: {
+        ...prev.paymentInfo,
+        [name]: value,
+      },
+    }));
+  };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  console.log("Form Submit Triggered"); // Debug check
 
-      let a = await updateProfile(e, session.user.name)
-      toast('Profile Updated', {
+  const phone = form.paymentInfo?.phone || "";
+  const upi = form.paymentInfo?.upi || "";
+
+  try {
+    const res = await updatePaymentInfo({ phone, upi }, session.user.name);
+    // console.log("DB Update Response:", res); // Debug DB result
+
+   toast('Profile Updated', {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -47,158 +63,99 @@ const Dashboard = () => {
           theme: "light",
           transition: Bounce,
           });
+
+  } catch (err) {
+    console.error("Update failed:", err);
+    toast.error("Something went wrong!");
   }
+};
 
-  return (
-      <>
 
-              <div id="stars3"></div>
-          <ToastContainer
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-          />
-    <div id='stardiv'  className="min-h-screen flex flex-col items-center py-12 px-6 ">
-      {/* Page Heading */}
-              
-      <h1 className="text-4xl mt-10 font-bold text-white mb-8">Your Dashboard</h1>
+  if (!form) return <div className="text-white p-10">Loading...</div>;
 
-      {/* Form Container */}
-      <form
-  action={handleSubmit}
-  className="w-full max-w-lg bg-white bg-opacity-90 rounded-lg shadow-md p-6 space-y-6"
->
-  {/* Name Input */}
-  <div>
-    <label htmlFor="name" className="block text-gray-700 font-medium mb-1">
-      Name
-    </label>
-    <input
-      type="text"
-      id="name"
-      name="name"
-      value={form.name || ""}
-      onChange={handleChange}
-      placeholder="Enter your name"
-      className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-    />
-  </div>
+  return (<>
+    <ToastContainer
+                      position="top-right"
+                      autoClose={5000}
+                      hideProgressBar={false}
+                      newestOnTop={false}
+                      closeOnClick
+                      rtl={false}
+                      pauseOnFocusLoss
+                      draggable
+                      pauseOnHover
+                      theme="light"
+                  />
+    <div className="min-h-screen flex text-white bg-black py-20">
+       
+      <aside className="w-64 bg-black/30 backdrop-blur-lg border-r border-white/10 p-6 space-y-4">
+        <h2 className="text-xl font-bold">Creator Dashboard</h2>
+        <nav className="space-y-2">
+          <a href="#verify" className="block hover:text-pink-400">Verification</a>
+          <a href="#earnings" className="block hover:text-pink-400">Earnings</a>
+          <a href="#history" className="block hover:text-pink-400">History</a>
+          <a href="#payment" className="block hover:text-pink-400">Payment Info</a>
+        </nav>
+      </aside>
 
-  {/* Email Input */}
-  <div>
-    <label htmlFor="email" className="block text-gray-700 font-medium mb-1">
-      Email
-    </label>
-    <input
-      type="email"
-      id="email"
-      name="email"
-      value={form.email || ""}
-      onChange={handleChange}
-      placeholder="Enter your email"
-      className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-    />
-  </div>
+      <main className="flex-1 p-8 space-y-12">
+        {/* Sections */}
+        <section id="verify" className="pb-4 border-b border-white/30">
+          <h3 className="text-2xl font-semibold mb-2">Instagram Verification</h3>
+          <p>Status: {form.verified ? "✅ Verified" : "❌ Not Verified"}</p>
+          {!form.verified && (
+            <button className="mt-2 px-4 py-2 bg-pink-600 rounded hover:bg-pink-700">
+              Verify Now
+            </button>
+          )}
+        </section>
 
-  {/* Username Input */}
-  <div>
-    <label htmlFor="username" className="block text-gray-700 font-medium mb-1">
-      Username
-    </label>
-    <input
-      type="text"
-      id="username"
-      name="username"
-      value={form.username || ""}
-      onChange={handleChange}
-      placeholder="Choose a username"
-      className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-    />
-  </div>
+        <section id="earnings" className="pb-4 border-b border-white/30">
+          <h3 className="text-2xl font-semibold mb-2">This Month’s Earnings</h3>
+          <p className="text-3xl font-bold text-green-400">₹{form.earnings || 0}</p>
+        </section>
 
-  {/* Profile Picture Input */}
-  <div>
-    <label htmlFor="profilepic" className="block text-gray-700 font-medium mb-1">
-      Profile Picture
-    </label>
-    <input
-      type="text"
-      id="profilepic"
-      name="profilepic"
-      value={form.profilepic || ""}
-      onChange={handleChange}
-      placeholder="Enter profile picture URL"
-      className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-    />
-  </div>
+        <section id="history" className="pb-4 border-b border-white/30">
+          <h3 className="text-2xl font-semibold mb-4">Payment History</h3>
+          <ul className="space-y-2">
+            {(form.history || []).map((item, index) => (
+              <li key={index} className="border border-white/20 rounded p-4">
+                <span className="font-semibold">{item.month}</span> — ₹{item.amount}
+              </li>
+            ))}
+          </ul>
+        </section>
 
-  {/* Cover Picture Input */}
-  <div>
-    <label htmlFor="coverpic" className="block text-gray-700 font-medium mb-1">
-      Cover Picture
-    </label>
-    <input
-      type="text"
-      id="coverpic"
-      name="coverpic"
-      value={form.coverpic || ""}
-      onChange={handleChange}
-      placeholder="Enter cover picture URL"
-      className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-    />
-  </div>
-
-  {/* Razorpay Credentials */}
-  {/* <div>
-    <label htmlFor="razorpayid" className="block text-gray-700 font-medium mb-1">
-      Razorpay ID
-    </label>
-    <input
-      type="text"
-      id="razorpayid"
-      name="razorpayid"
-      value={form.razorpayid || ""}
-      onChange={handleChange}
-      placeholder="Enter Razorpay ID"
-      className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-    />
-  </div>
-
-  <div>
-    <label htmlFor="razorpaysecret" className="block text-gray-700 font-medium mb-1">
-      Razorpay Secret
-    </label>
-    <input
-      type="text"
-      id="razorpaysecret"
-      name="razorpaysecret"
-      value={form.razorpaysecret || ""}
-      onChange={handleChange}
-      placeholder="Enter Razorpay Secret"
-      className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-    />
-  </div> */}
-
-  {/* Save Button */}
-  <div>
-    <button
-      type="submit"
-      className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition"
-    >
-      Save
-    </button>
-  </div>
-</form>
-
-    </div>
-    </>
+        <section id="payment">
+          <h3 className="text-2xl font-semibold mb-4">Update Payment Info</h3>
+          <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+            <div>
+              <label className="block mb-1">Phone Number</label>
+              <input
+                type="text"
+                name="phone"
+                value={form.paymentInfo?.phone || ""}
+                onChange={handleChange}
+                className="w-full p-2 rounded bg-white text-black"
+              />
+            </div>
+            <div>
+              <label className="block mb-1">UPI ID</label>
+              <input
+                type="text"
+                name="upi"
+                value={form.paymentInfo?.upi || ""}
+                onChange={handleChange}
+                className="w-full p-2 rounded bg-white text-black"
+              />
+            </div>
+            <button type="submit" className="bg-pink-600 px-6 py-2 rounded hover:bg-pink-700">
+              Save
+            </button>
+          </form>
+        </section>
+      </main>
+    </div></>
   );
 };
 

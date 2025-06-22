@@ -1,24 +1,29 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { FaUser } from "react-icons/fa";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { fetchuser } from "@/actions/useractions"; // make sure this is working
 
 const Navbar = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [accountType, setAccountType] = useState(null);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search/${searchQuery}`);
-      setMobileMenuOpen(false);
-    }
-  };
+  // Fetch accountType from DB
+  useEffect(() => {
+    const getUserInfo = async () => {
+      if (session?.user?.name) {
+        const user = await fetchuser(session.user.name);
+        setAccountType(user?.accountType);
+      }
+    };
+    getUserInfo();
+  }, [session]);
 
   return (
     <nav className="absolute bg-white bg-opacity-30 backdrop-blur-lg shadow-md py-4 z-30 w-full">
@@ -33,39 +38,12 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* Desktop Search */}
-        <form onSubmit={handleSearch} className="hidden md:flex items-center space-x-2">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search creators..."
-            className="px-3 py-2 rounded-md bg-white bg-opacity-70 backdrop-blur-sm border border-gray-300 text-black placeholder-gray-500 focus:outline-none focus:ring focus:border-blue-400"
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 text-white border border-gray-300 rounded-md hover:bg-gray-800 transition"
-          >
-            Search
-          </button>
-        </form>
-
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex space-x-4">
           {!session ? (
             <>
-              <Link
-                href="/login"
-                className="px-4 py-2 text-white border border-gray-300 rounded-md hover:bg-gray-800 transition"
-              >
-                Log In
-              </Link>
-              <Link
-                href="/signup"
-                className="px-4 py-2 text-white bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 rounded-md hover:from-pink-600 hover:via-purple-600 hover:to-orange-600 transition"
-              >
-                Sign Up
-              </Link>
+              <Link href="/login" className="px-4 py-2 text-white border border-gray-300 rounded-md hover:bg-gray-800 transition">Log In</Link>
+              <Link href="/signup" className="px-4 py-2 text-white bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 rounded-md hover:from-pink-600 hover:via-purple-600 hover:to-orange-600 transition">Sign Up</Link>
             </>
           ) : (
             <div className="relative inline-block text-left group">
@@ -74,15 +52,12 @@ const Navbar = () => {
                 {session.user.name}
               </button>
               <div className="absolute right-0 w-48 bg-black/20 backdrop-blur-md border border-gray-300 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-10">
-                <Link href="/earnings" className="block px-6 py-3 text-white hover:bg-gray-800 transition">Earnings</Link>
-                <Link href="/dashboard" className="block px-6 py-3 text-white hover:bg-gray-800 transition">Dashboard</Link>
+                {accountType === "Creator" && (
+                  <Link href="/dashboard" className="block px-6 py-3 text-white hover:bg-gray-800 transition">Creator Dashboard</Link>
+                )}
+                <Link href="/account" className="block px-6 py-3 text-white hover:bg-gray-800 transition">Account</Link>
                 <Link href={`/${session.user.name}`} className="block px-6 py-3 text-white hover:bg-gray-800 transition">Your Page</Link>
-                <button
-                  onClick={signOut}
-                  className="block w-full text-left px-6 py-3 text-white hover:bg-gray-800 transition"
-                >
-                  Logout
-                </button>
+                <button onClick={signOut} className="block w-full text-left px-6 py-3 text-white hover:bg-gray-800 transition">Logout</button>
               </div>
             </div>
           )}
@@ -103,52 +78,19 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden px-4 pt-4 pb-6 space-y-4 bg-white/20 backdrop-blur-lg">
-          {/* Mobile Search */}
-          <form onSubmit={handleSearch} className="flex items-center space-x-2">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search creators..."
-              className="flex-1 px-3 py-2 rounded-md bg-white bg-opacity-80 backdrop-blur border border-gray-300 text-black placeholder-gray-500 focus:outline-none focus:ring focus:border-blue-400"
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 text-white border border-gray-300 rounded-md hover:bg-gray-800 transition"
-            >
-              Search
-            </button>
-          </form>
-
           {!session ? (
             <>
-              <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="block text-white">
-                Log In
-              </Link>
-              <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="block text-white">
-                Sign Up
-              </Link>
+              <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="block text-white">Log In</Link>
+              <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="block text-white">Sign Up</Link>
             </>
           ) : (
             <>
-              <Link href="/earnings" onClick={() => setMobileMenuOpen(false)} className="block text-white">
-                Earnings
-              </Link>
-              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block text-white">
-                Dashboard
-              </Link>
-              <Link href={`/${session.user.name}`} onClick={() => setMobileMenuOpen(false)} className="block text-white">
-                Your Page
-              </Link>
-              <button
-                onClick={() => {
-                  signOut();
-                  setMobileMenuOpen(false);
-                }}
-                className="block text-white"
-              >
-                Logout
-              </button>
+              {accountType === "Creator" && (
+                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block text-white">Creator Dashboard</Link>
+              )}
+              <Link href="/account" onClick={() => setMobileMenuOpen(false)} className="block text-white">Account</Link>
+              <Link href={`/${session.user.name}`} onClick={() => setMobileMenuOpen(false)} className="block text-white">Your Page</Link>
+              <button onClick={() => { signOut(); setMobileMenuOpen(false); }} className="block text-white">Logout</button>
             </>
           )}
         </div>

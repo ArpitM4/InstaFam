@@ -1,13 +1,5 @@
-import Dashboard from '@/components/Dashboard'
+import Dashboard from "@/components/Dashboard";
 
-const DashboardPage = () => {
-    return (
-        <Dashboard/>
-    )
+export default function DashboardPage() {
+  return <Dashboard />;
 }
-
-export default DashboardPage
-
-export const metadata = {
-    title: "Dashboard - InstaFam    ",
-  }
