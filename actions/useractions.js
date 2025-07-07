@@ -88,6 +88,10 @@ export const updateProfile = async (data, oldusername) => {
   await User.updateOne({ email: ndata.email }, ndata);
 };
 
+
+
+
+
 // actions/useractions.js
 export const updatePaymentInfo = async ({ phone, upi }, username) => {
   console.log("updatePaymentInfo called with:", phone, upi, username); // ← Add this

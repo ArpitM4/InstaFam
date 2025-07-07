@@ -40,7 +40,7 @@ const Login = () => {
 
         {/* Email/Password Login */}
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md space-y-4">
-          {error && <p className="text-red-600 text-sm">{error}</p>}
+          {error && <p className="text-red-600 text-sm">Incorrect Credentials </p>}
           <input
             className="w-full p-3 border rounded-md"
             type="email"

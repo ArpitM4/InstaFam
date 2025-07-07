@@ -8,12 +8,16 @@ import { Bounce } from "react-toastify";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { generateInstagramOTP } from "@/actions/useractions";
+import { fetchpayments } from "@/actions/useractions";
+
 
 
 const Dashboard = () => {
 
 const [otp, setOtp] = useState("");
 const [loading, setLoading] = useState(false);
+const [totalEarning, setTotalEarning] = useState(0);
+
 
 const handleGenerateOTP = async () => {
   setLoading(true);
@@ -32,12 +36,14 @@ const handleGenerateOTP = async () => {
 
 
 const { data: session, status } = useSession();
-  const router = useRouter();
-  const [form, setForm] = useState(null);
+const router = useRouter();
+const [form, setForm] = useState(null);
+const [payments, setPayments] = useState([]);
+
 
 useEffect(() => {
   if (status === "loading") return; // Wait until session is loaded
-
+  
   if (!session) {
     router.push("/login");
   } else {
@@ -45,10 +51,23 @@ useEffect(() => {
   }
 }, [session, status]);
 
-  const getData = async () => {
+const getData = async () => {
     const user = await fetchuser(session.user.name);
     setForm(user);
+    const payments = await fetchpayments(session.user.name);
+const total = payments.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+setTotalEarning(total);
+
   };
+
+
+useEffect(() => {
+  if (!session?.user?.name) return;
+
+  fetchpayments(session.user.name).then(setPayments);
+}, [session?.user?.name]);
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -60,6 +79,8 @@ useEffect(() => {
       },
     }));
   };
+
+
 
  const handleSubmit = async (e) => {
   e.preventDefault();
@@ -186,50 +207,91 @@ useEffect(() => {
 
 
 
-        <section id="earnings" className="pb-4 border-b border-white/30">
-          <h3 className="text-2xl font-semibold mb-2">This Month’s Earnings</h3>
-          <p className="text-3xl font-bold text-green-400">₹{form.earnings || 0}</p>
-        </section>
+<section id="earnings" className="pb-4 border-b border-white/30">
+  <h3 className="text-2xl font-semibold mb-2">Total Earning</h3>
+  <p className="text-3xl font-bold text-green-400">₹{totalEarning}</p>
+</section>
 
-        <section id="history" className="pb-4 border-b border-white/30">
-          <h3 className="text-2xl font-semibold mb-4">Payment History</h3>
-          <ul className="space-y-2">
-            {(form.history || []).map((item, index) => (
-              <li key={index} className="border border-white/20 rounded p-4">
-                <span className="font-semibold">{item.month}</span> — ₹{item.amount}
-              </li>
-            ))}
-          </ul>
-        </section>
+       <section id="history" className="pb-4 border-b border-white/30">
+  <h3 className="text-2xl font-semibold mb-4">Payment History</h3>
 
-        <section id="payment">
-          <h3 className="text-2xl font-semibold mb-4">Update Payment Info</h3>
-          <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+  <div className="max-h-64 overflow-y-auto pr-2 space-y-2">
+    {payments.length === 0 ? (
+      <p className="text-gray-300">No payments yet.</p>
+    ) : (
+      payments
+        .filter((p) => p.to_user === session.user.name)
+        .map((p) => (
+          <div
+            key={p.oid}
+            className="flex justify-between items-center p-3 bg-white/10 rounded-md"
+          >
             <div>
-              <label className="block mb-1">Phone Number</label>
-              <input
-                type="text"
-                name="phone"
-                value={form.paymentInfo?.phone || ""}
-                onChange={handleChange}
-                className="w-full p-2 rounded bg-white text-black"
-              />
+              <p className="text-sm text-gray-200">
+                <span className="font-semibold">{p.name}</span>
+                {" • "}
+                <span className="text-xs text-gray-400">
+                  {new Date(p.createdAt).toLocaleDateString()}
+                </span>
+              </p>
+              {p.message && (
+                <p className="text-xs text-gray-300 mt-1 italic">“{p.message}”</p>
+              )}
             </div>
-            <div>
-              <label className="block mb-1">UPI ID</label>
-              <input
-                type="text"
-                name="upi"
-                value={form.paymentInfo?.upi || ""}
-                onChange={handleChange}
-                className="w-full p-2 rounded bg-white text-black"
-              />
-            </div>
-            <button type="submit" className="bg-pink-600 px-6 py-2 rounded hover:bg-pink-700">
-              Save
-            </button>
-          </form>
-        </section>
+            <span className="text-lg font-bold text-green-400">₹{p.amount}</span>
+          </div>
+        ))
+    )}
+  </div>
+</section>
+
+
+
+       <section id="payment" className="pb-8 border-t border-white/20">
+  <h3 className="text-2xl font-semibold mb-4">Update Payment Info</h3>
+  <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+    <div>
+      <label className="block mb-1 text-gray-200">Phone Number</label>
+      <input
+        type="text"
+        name="phone"
+        value={form.paymentInfo?.phone || ""}
+        onChange={handleChange}
+        className="w-full p-2 rounded bg-white text-black"
+        placeholder="Enter your phone"
+      />
+    </div>
+    <div>
+      <label className="block mb-1 text-gray-200">UPI ID</label>
+      <input
+        type="text"
+        name="upi"
+        value={form.paymentInfo?.upi || ""}
+        onChange={handleChange}
+        className="w-full p-2 rounded bg-white text-black"
+        placeholder="you@bank"
+      />
+    </div>
+    <button
+      type="submit"
+      disabled={!form.instagram?.isVerified}
+      className={`px-6 py-2 rounded text-white transition ${
+        form.instagram?.isVerified
+          ? "bg-pink-600 hover:bg-pink-700"
+          : "bg-gray-500 cursor-not-allowed"
+      }`}
+    >
+      Save
+    </button>
+
+    {!form.instagram?.isVerified && (
+      <p className="mt-2 text-sm text-yellow-300">
+        Verify your Instagram username to update payment info.
+      </p>
+    )}
+  </form>
+</section>
+
       </main>
     </div></>
   );

@@ -11,7 +11,11 @@ import { Bounce } from 'react-toastify';
 const Account = () => {
   const { data: session, update } = useSession()
   const router = useRouter()
-  const [form, setform] = useState({})
+  // const [form, setform] = useState({})
+  const [form, setForm] = useState({
+  instagram: { isVerified: false }
+});
+
 
   useEffect(() => {
       // console.log(session)
@@ -24,10 +28,20 @@ const Account = () => {
       }
   }, [])
 
-  const getData = async () => {
-      let u = await fetchuser(session.user.name)
-      setform(u)
-  }
+ const getData = async () => {
+  const u = await fetchuser(session.user.name);
+  // Guarantee instagram key always exists:
+  setForm({
+    ...u,
+    instagram: {
+      otp: u.instagram?.otp ?? null,
+      otpGeneratedAt: u.instagram?.otpGeneratedAt ?? null,
+      isVerified: u.instagram?.isVerified ?? false
+    }
+  });
+};
+
+  
 
   const handleChange = (e) => {
       setform({ ...form, [e.target.name]: e.target.value })
@@ -109,20 +123,31 @@ const Account = () => {
   </div>
 
   {/* Username Input */}
-  <div>
-    <label htmlFor="username" className="block text-gray-700 font-medium mb-1">
-      Instagram Username
-    </label>
-    <input
-      type="text"
-      id="username"
-      name="username"
-      value={form.username || ""}
-      onChange={handleChange}
-      placeholder="Choose a username"
-      className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-    />
-  </div>
+{/* Username Input */}
+<div className="relative">
+  <label htmlFor="username" className="block text-gray-700 font-medium mb-1">
+    Instagram Username
+  </label>
+  <input
+    type="text"
+    id="username"
+    name="username"
+    value={form.username || ""}
+    onChange={handleChange}
+    placeholder="Choose a username"
+    disabled={form.instagram?.isVerified}                // ← disable when verified
+    className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none
+      ${form.instagram?.isVerified 
+        ? "bg-gray-200 text-gray-500 cursor-not-allowed" 
+        : "bg-white text-black"}`}
+  />
+  {form.instagram?.isVerified && (
+    <p className="mt-1 text-sm text-gray-500">
+      Your username is locked and cannot be changed after verification.
+    </p>
+  )}
+</div>
+
 
   {/* Profile Picture Input */}
   <div>
