@@ -75,11 +75,13 @@ export const updateProfile = async (data, oldusername) => {
   await connectDb();
   let ndata = Object.fromEntries(data);
 
-  // If the username is being updated, check if username is available
+  // Only check for conflict if username is being changed
   if (oldusername !== ndata.username) {
-    let u = await User.findOne({ username: ndata.username });
-    if (u) {
-      return { error: "Username already exists" };
+    let existingUser = await User.findOne({ username: ndata.username });
+
+    // ❌ If the username is already taken AND that user is verified → block it
+    if (existingUser && existingUser.instagram?.isVerified) {
+      return { error: "This verified username is already taken" };
     }
   }
 
@@ -103,3 +105,22 @@ console.log("Mongo Update Result:", res);
 };
 
 
+export const generateInstagramOTP = async (username) => {
+  await connectDb();
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpGeneratedAt = new Date();
+
+  await User.updateOne(
+    { username },
+    {
+      $set: {
+        "instagram.otp": otp,
+        "instagram.otpGeneratedAt": otpGeneratedAt,
+        "instagram.isVerified": false
+      }
+    }
+  );
+
+  return otp;
+};

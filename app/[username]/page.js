@@ -1,16 +1,16 @@
-"use client"
-import { useSession, signIn, signOut } from "next-auth/react";
-import { FaUser } from "react-icons/fa";
-import Router from "next/navigation";
-import { FaUserCircle } from "react-icons/fa";
-import Link from "next/link";
+// app/[username]/page.js (server component, no "use client")
 import PaymentPage from "@/components/PaymentPage";
-import React from 'react'
+import { fetchuser } from "@/actions/useractions";
+import { notFound } from "next/navigation";
 
-const Username = ({params}) => {
-  return (
-   <PaymentPage username={params.username}/>
-  )
-}
+const UsernamePage = async ({ params }) => {
+  const user = await fetchuser(params.username);
 
-export default Username
+  if (!user || !user.instagram?.isVerified) {
+    notFound(); // 🔥 Redirects to 404
+  }
+
+  return <PaymentPage username={params.username} />;
+};
+
+export default UsernamePage;

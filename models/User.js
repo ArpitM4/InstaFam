@@ -22,7 +22,14 @@ const UserSchema = new Schema({
    paymentInfo: {
     phone: String,
     upi: String
-  }
+  },
+  // Inside user schema
+instagram: {
+  otp: String,
+  otpGeneratedAt: Date,
+  isVerified: { type: Boolean, default: false }
+}
+
 
 
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from 'react';
 
 const SearchResults = ({ params }) => {
@@ -16,8 +17,40 @@ const SearchResults = ({ params }) => {
     fetchData();
   }, [query]);
 
+  const [searchQuery, setSearchQuery] = useState("");
+const router = useRouter();
+
+const handleSearch = (e) => {
+  e.preventDefault();
+  if (searchQuery.trim()) {
+    router.push(`/search/${searchQuery}`);
+  }
+};
+
+
   return (
     <div className="min-h-screen px-4 py-28 bg-black text-white">
+    <div className='mb-10'>  {/* Search Bar */}
+    <form
+      onSubmit={handleSearch}
+      className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 animate-fadeIn delay-300"
+    >
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Search creators..."
+        className="w-full sm:w-96 px-4 py-3 rounded-md bg-white/90 text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500"
+      />
+      <button
+        type="submit"
+        className="px-6 py-3 text-white bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 rounded-md hover:from-pink-600 hover:via-purple-600 hover:to-orange-600 transition"
+      >
+        Search
+      </button>
+    </form>
+    </div>
+
       <h1 className="text-3xl font-bold mb-8 text-center">
         Search Results for <span className="text-pink-400">"{query}"</span>
       </h1>

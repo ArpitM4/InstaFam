@@ -7,10 +7,30 @@ import { fetchuser, updatePaymentInfo } from "@/actions/useractions";
 import { Bounce } from "react-toastify";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { generateInstagramOTP } from "@/actions/useractions";
 
 
 const Dashboard = () => {
+
+const [otp, setOtp] = useState("");
+const [loading, setLoading] = useState(false);
+
+const handleGenerateOTP = async () => {
+  setLoading(true);
+  try {
+    const generated = await generateInstagramOTP(session.user.name);
+    setOtp(generated);
+    toast("OTP generated! DM it to @instafam_official.");
+  } catch (error) {
+    toast.error("Failed to generate OTP");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+
 const { data: session, status } = useSession();
   const router = useRouter();
   const [form, setForm] = useState(null);
@@ -100,15 +120,71 @@ useEffect(() => {
 
       <main className="flex-1 p-8 space-y-12">
         {/* Sections */}
-        <section id="verify" className="pb-4 border-b border-white/30">
-          <h3 className="text-2xl font-semibold mb-2">Instagram Verification</h3>
-          <p>Status: {form.verified ? "✅ Verified" : "❌ Not Verified"}</p>
-          {!form.verified && (
-            <button className="mt-2 px-4 py-2 bg-pink-600 rounded hover:bg-pink-700">
-              Verify Now
-            </button>
+        <section id="verify" className="pb-8 border-b border-white/20 space-y-4">
+          <h3 className="text-2xl font-semibold">Instagram Verification</h3>
+          <p className="text-white/80">
+            Status:{" "}
+            <span className={form?.instagram?.isVerified ? "text-green-400" : "text-red-400"}>
+              {form?.instagram?.isVerified ? "✅ Verified" : "❌ Not Verified"}
+            </span>
+          </p>
+
+          {/* Username Display */}
+          <div className="space-y-1">
+            <label className="text-sm text-white/70">Your Username ㅤ:ㅤㅤ </label>
+            <input
+              type="text"
+              readOnly
+              value={session?.user?.name}
+              className="px-4 py-2 rounded bg-gray-200 text-black cursor-not-allowed w-fit"
+            />
+          </div>
+
+          {/* Generate or Regenerate OTP Button */}
+          {!form?.instagram?.isVerified && (
+            <div className="space-y-4">
+              <button
+                className="px-5 py-2 bg-pink-600 rounded hover:bg-pink-700 text-sm font-medium"
+                onClick={handleGenerateOTP}
+                disabled={loading}
+              >
+                {otp ? "Regenerate OTP" : "Verify Now"}
+              </button>
+
+              {otp && (
+                <div className="bg-white/10 border border-white/20 p-4 rounded space-y-3">
+                  <p className="text-sm text-white/80">
+                    DM the following OTP to our official Instagram handle to verify:
+                  </p>
+
+                  <div className="flex items-center space-x-3">
+                    <span className="text-xl font-bold text-green-400 tracking-widest">{otp}</span>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(otp)}
+                      className="px-3 py-1 bg-pink-600 text-white text-sm rounded hover:bg-pink-700"
+                    >
+                      Copy
+                    </button>
+                  </div>
+
+                  <a
+                    href="https://www.instagram.com/_instafam_official/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block text-sm text-pink-400 underline hover:text-pink-500"
+                  >
+                    → Go to @_instafam_official on Instagram
+                  </a>
+                  <p>
+                    Your Account Will be verified within the next 24 hours after your dm.
+                  </p>
+                </div>
+              )}
+            </div>
           )}
         </section>
+
+
 
         <section id="earnings" className="pb-4 border-b border-white/30">
           <h3 className="text-2xl font-semibold mb-2">This Month’s Earnings</h3>
