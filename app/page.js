@@ -70,7 +70,7 @@ const handleSearch = (e) => {
       />
       <button
         type="submit"
-        className="px-6 py-3 text-white bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 rounded-md hover:from-pink-600 hover:via-purple-600 hover:to-orange-600 transition"
+        className="px-6 py-3 font-semibold text-white bg-gradient-to-r from-[#e10475] via-pink-600 to-[#e10475] rounded-md hover:from-pink-600 hover:via-purple-600 hover:to-[#e10475] transition"
       >
         Search
       </button>

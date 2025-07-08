@@ -28,42 +28,43 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full space-y-5">
-        <h2 className="text-2xl font-bold text-center">Create an Account</h2>
+    <div className="min-h-screen flex items-center justify-center bg-black px-4">
+  <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-lg shadow-lg max-w-md w-full p-6 space-y-5">
+    <h2 className="text-2xl font-bold text-white text-center">Create an Account</h2>
 
-        {error && <p className="text-red-600">{error}</p>}
+    {error && <p className="text-red-400 text-sm text-center">{error}</p>}
 
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full p-3 border rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Username"
-          className="w-full p-3 border rounded"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full p-3 border rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+    <input
+      type="email"
+      placeholder="Email"
+      className="w-full px-4 py-2 rounded bg-black text-white border border-white/20 focus:ring-2 focus:ring-[#fb0582] outline-none"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+    />
+    <input
+      type="text"
+      placeholder="Username"
+      className="w-full px-4 py-2 rounded bg-black text-white border border-white/20 focus:ring-2 focus:ring-[#fb0582] outline-none"
+      value={username}
+      onChange={(e) => setUsername(e.target.value)}
+    />
+    <input
+      type="password"
+      placeholder="Password"
+      className="w-full px-4 py-2 rounded bg-black text-white border border-white/20 focus:ring-2 focus:ring-[#fb0582] outline-none"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
 
-        <button
-          onClick={handleSignup}
-          className="w-full bg-purple-600 text-white py-3 rounded hover:bg-purple-700"
-        >
-          Sign Up
-        </button>
-      </div>
-    </div>
+    <button
+      onClick={handleSignup}
+      className="w-full bg-[#fb0582] text-white py-2 rounded-md font-semibold hover:bg-[#e10475] transition"
+    >
+      Sign Up
+    </button>
+  </div>
+</div>
+
   );
 };
 

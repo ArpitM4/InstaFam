@@ -32,57 +32,60 @@ const Login = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-r from-blue-500 via-pink-500 to-blue-500">
-      <div className="absolute top-0 left-0 w-full h-full bg-opacity-50 backdrop-blur-lg z-0"></div>
+    <div className="relative min-h-screen bg-black">
+  {/* Blur overlay */}
+  <div className="absolute top-0 left-0 w-full h-full bg-white/5 backdrop-blur-lg z-0" />
 
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 py-12 space-y-6">
-        <h1 className="text-4xl font-bold text-white mb-6">Login</h1>
+  <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12 space-y-8">
+    <h1 className="text-4xl font-bold text-white">Login</h1>
 
-        {/* Email/Password Login */}
-        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md space-y-4">
-          {error && <p className="text-red-600 text-sm">Incorrect Credentials </p>}
-          <input
-            className="w-full p-3 border rounded-md"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-          />
-          <input
-            className="w-full p-3 border rounded-md"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
-          <button
-            onClick={handleEmailLogin}
-            className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700"
-          >
-            Login with Email
-          </button>
-        </div>
+    {/* Email/Password Card */}
+    <div className="bg-white/10 border border-white/20 backdrop-blur-lg rounded-lg p-6 w-full max-w-md space-y-4 shadow-md">
+      {error && <p className="text-red-400 text-sm">Incorrect Credentials</p>}
 
-        {/* OR divider */}
-        <div className="text-white">OR</div>
-
-        {/* OAuth Buttons */}
-        <div className="space-y-4 w-full max-w-md">
-          <button
-            onClick={() => signIn("google")}
-            className="w-full flex items-center justify-center bg-white text-blue-600 rounded-md py-3 text-xl shadow-md hover:shadow-xl"
-          >
-            <FaGoogle className="mr-3 text-2xl" /> Google
-          </button>
-          <button
-            onClick={() => signIn("github")}
-            className="w-full flex items-center justify-center bg-white text-gray-800 rounded-md py-3 text-xl shadow-md hover:shadow-xl"
-          >
-            <FaGithub className="mr-3 text-2xl" /> GitHub
-          </button>
-        </div>
-      </div>
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        className="w-full px-4 py-2 rounded bg-black text-white border border-white/20 focus:ring-2 focus:ring-[#fb0582] outline-none"
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+        className="w-full px-4 py-2 rounded bg-black text-white border border-white/20 focus:ring-2 focus:ring-[#fb0582] outline-none"
+      />
+      <button
+        onClick={handleEmailLogin}
+        className="w-full bg-[#fb0582] hover:bg-[#e10475] text-white py-2 font-semibold rounded-md transition"
+      >
+        Login with Email
+      </button>
     </div>
+
+    {/* Divider */}
+    <div className="text-white opacity-70 font-medium">OR</div>
+
+    {/* OAuth Buttons */}
+    <div className="w-full max-w-md space-y-3">
+      <button
+        onClick={() => signIn("google")}
+        className="w-full flex items-center justify-center bg-white text-black font-medium rounded-md py-2 shadow hover:shadow-lg"
+      >
+        <FaGoogle className="mr-2 text-lg" /> Continue with Google
+      </button>
+      <button
+        onClick={() => signIn("github")}
+        className="w-full flex items-center justify-center bg-white text-black font-medium rounded-md py-2 shadow hover:shadow-lg"
+      >
+        <FaGithub className="mr-2 text-lg" /> Continue with GitHub
+      </button>
+    </div>
+  </div>
+</div>
+
   );
 };
 
