@@ -55,8 +55,11 @@ const Navbar = () => {
             {accountType === "Creator" && (
               <Link href="/dashboard" className="block px-6 py-3 hover:bg-[#333333]  hover:text-white  transition">Creator Dashboard</Link>
             )}
+
             <Link href="/account" className="block px-6 py-3 hover:bg-[#333333]   hover:text-white transition">Account</Link>
+              {accountType === "Creator" && (
             <Link href={`/${session.user.name}`} className="block px-6 py-3 hover:bg-[#333333]   hover:text-white transition">Your Page</Link>
+            )}
             <button onClick={signOut} className="block w-full text-left px-6 py-3 hover:bg-[#333333]  hover:text-white  transition">Logout</button>
           </div>
         </div>
