@@ -12,65 +12,66 @@ export default function FAQ() {
   const faqs = [
     {
       question: "What is InstaSupport?",
-      answer: "InstaSupport is a platform that allows fans to donate directly to their favorite Instagram creators, helping them sustain their passion and creativity.",
+      answer:
+        "InstaSupport is a platform that allows fans to donate directly to their favorite Instagram creators, helping them sustain their passion and creativity.",
     },
     {
       question: "How can I make a donation?",
-      answer: "To make a donation, navigate to the creator's page, enter your details, select the amount, and complete the payment using our secure gateway.",
+      answer:
+        "To make a donation, navigate to the creator's page, enter your details, select the amount, and complete the payment using our secure gateway.",
     },
     {
       question: "Is my payment information secure?",
-      answer: "Yes, all payments are processed securely using industry-standard encryption and payment protocols.",
+      answer:
+        "Yes, all payments are processed securely using industry-standard encryption and payment protocols.",
     },
     {
       question: "Can I request a refund?",
-      answer: "All donations are final and non-refundable. Please ensure you review all details before completing a donation.",
+      answer:
+        "All donations are final and non-refundable. Please ensure you review all details before completing a donation.",
     },
     {
       question: "How can I contact customer support?",
-      answer: "You can reach out to us via our Contact Us page or email us directly at arpitmaurya1506@gmail.com.",
+      answer:
+        "You can reach out to us via our Contact page or email us directly at support@instafam.social.",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-blue-900 text-white py-10">
-      <div className="container mt-10 mx-auto px-6 lg:px-20">
-        <h1 className="text-4xl lg:text-6xl font-extrabold text-center mb-8">
+    <div className="min-h-screen bg-black text-white py-16 px-4">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-4xl md:text-6xl font-extrabold text-center mb-10 text-[#fb0582]">
           Frequently Asked Questions
         </h1>
-        <div className="space-y-4 max-w-4xl mx-auto">
+
+        <div className="space-y-5">
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="bg-white bg-opacity-20 rounded-lg shadow-md overflow-hidden"
+              className="border border-white/20 rounded-xl overflow-hidden shadow-md bg-white/5 backdrop-blur-md"
             >
               {/* Question */}
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full text-left px-6 py-4 text-lg lg:text-xl font-bold flex justify-between items-center text-white"
+                className="w-full flex justify-between items-center text-left px-6 py-4 text-lg md:text-xl font-semibold text-[#dddbff] hover:bg-white/10 transition"
               >
                 <span>{faq.question}</span>
                 <svg
-                  className={`w-6 h-6 transform ${
+                  className={`w-6 h-6 text-[#fdcc03] transform ${
                     openIndex === index ? "rotate-180" : ""
-                  } transition-transform`}
+                  } transition-transform duration-200`}
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
 
               {/* Answer */}
               {openIndex === index && (
-                <div className="px-6 py-4 bg-white bg-opacity-10 text-white">
+                <div className="px-6 py-4 bg-black/40 text-white/90 border-t border-white/10 transition-all duration-300 ease-in-out">
                   {faq.answer}
                 </div>
               )}

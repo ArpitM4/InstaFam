@@ -2,70 +2,107 @@
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-blue-900 text-white py-10">
-      <div className="container mt-10 mx-auto px-6 lg:px-20">
-        <h1 className="text-4xl lg:text-6xl font-extrabold text-center mb-8">
+    <div className="min-h-screen bg-black text-white py-16 px-6">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-5xl font-bold text-center text-[#fb0582] mb-10">
           Privacy Policy
         </h1>
-        <p className="text-lg lg:text-xl text-center max-w-4xl mx-auto leading-relaxed">
-          Your privacy is critically important to us at{" "}
-          <span className="font-bold text-blue-200">InstaSupport</span>. This Privacy Policy explains how we collect, use, 
-          and protect your personal information.
+        <p className="text-center text-gray-300 text-lg max-w-3xl mx-auto mb-8">
+          Last updated on <span className="text-white">06-02-2025</span>
         </p>
+
+        <p className="text-lg text-white/80 mb-8 text-center max-w-3xl mx-auto">
+          Your privacy is critically important to us at <span className="font-bold text-white">InstaFam</span>. This Privacy Policy outlines how we collect, use, and protect your personal information when you use our platform.
+        </p>
+
+        {/* Section 1 */}
         <div className="mt-12">
-          <h2 className="text-3xl font-bold mb-6 text-center">Information We Collect</h2>
-          <ul className="list-disc list-inside text-lg lg:text-xl leading-relaxed max-w-4xl mx-auto space-y-4">
+          <h2 className="text-3xl font-semibold text-[#fdcc03] mb-4">1. Information We Collect</h2>
+          <ul className="list-disc list-inside text-white/90 space-y-4 pl-4">
             <li>
-              <span className="font-bold text-pink-200">Personal Information:</span> Name, email address, and other details 
-              provided during registration or donation.
+              <strong>Personal Information:</strong> Your name, email address, and any optional data shared while signing up or donating.
             </li>
             <li>
-              <span className="font-bold text-pink-200">Payment Information:</span> Securely processed through trusted 
-              payment gateways like Razorpay. We do not store sensitive payment details.
+              <strong>Payment Information:</strong> Processed securely via trusted gateways like Razorpay or PayU. We do not store card or UPI details.
             </li>
             <li>
-              <span className="font-bold text-pink-200">Usage Data:</span> Information about how you use our platform, 
-              including pages visited, interactions, and preferences.
+              <strong>Usage Data:</strong> Device/browser info, pages visited, search terms, IP address — to improve your experience.
             </li>
           </ul>
         </div>
+
+        {/* Section 2 */}
         <div className="mt-12">
-          <h2 className="text-3xl font-bold mb-6 text-center">How We Use Your Information</h2>
-          <p className="text-lg lg:text-xl text-center max-w-3xl mx-auto leading-relaxed">
-            We use the information collected to:
-          </p>
-          <ul className="list-disc list-inside text-lg lg:text-xl leading-relaxed max-w-4xl mx-auto space-y-4">
-            <li>Provide and improve our services.</li>
-            <li>Process donations and ensure they reach the intended creator.</li>
-            <li>Communicate updates, promotions, or important information.</li>
+          <h2 className="text-3xl font-semibold text-[#fdcc03] mb-4">2. How We Use Your Information</h2>
+          <ul className="list-disc list-inside text-white/90 space-y-4 pl-4">
+            <li>To provide and maintain our platform and features.</li>
+            <li>To process and confirm donations.</li>
+            <li>To send updates, promotional content, or transaction confirmations.</li>
+            <li>To improve user experience and ensure security.</li>
           </ul>
         </div>
+
+        {/* Section 3 */}
         <div className="mt-12">
-          <h2 className="text-3xl font-bold mb-6 text-center">Sharing Your Information</h2>
-          <p className="text-lg lg:text-xl text-center max-w-3xl mx-auto leading-relaxed">
-            We do not sell, trade, or rent your personal information to third parties. 
-            We may share limited information with trusted partners to process payments or improve our platform.
+          <h2 className="text-3xl font-semibold text-[#fdcc03] mb-4">3. Sharing Your Information</h2>
+          <p className="text-white/80">
+            We do <strong>not</strong> sell or rent your personal information. We only share limited data with trusted third parties involved in:
+          </p>
+          <ul className="list-disc list-inside text-white/90 mt-2 space-y-2 pl-4">
+            <li>Payment processing (e.g., PayU, Razorpay)</li>
+            <li>Hosting or analytics (e.g., Vercel, Google)</li>
+            <li>Compliance with legal requirements</li>
+          </ul>
+        </div>
+
+        {/* Section 4 */}
+        <div className="mt-12">
+          <h2 className="text-3xl font-semibold text-[#fdcc03] mb-4">4. Data Security</h2>
+          <p className="text-white/80">
+            We take your data seriously. All data is stored on secure, access-controlled servers with SSL encryption. Payment gateways used by us are PCI-DSS compliant.
           </p>
         </div>
+
+        {/* Section 5 */}
         <div className="mt-12">
-          <h2 className="text-3xl font-bold mb-6 text-center">Your Rights</h2>
-          <p className="text-lg lg:text-xl text-center max-w-3xl mx-auto leading-relaxed">
-            You have the right to access, update, or delete your personal information. 
-            For any requests, contact us at{" "}
-            <a href="/contact" className="underline text-blue-300 hover:text-blue-400">our support page</a>.
+          <h2 className="text-3xl font-semibold text-[#fdcc03] mb-4">5. Your Rights</h2>
+          <p className="text-white/80 mb-2">
+            You have the right to:
+          </p>
+          <ul className="list-disc list-inside text-white/90 pl-4 space-y-2">
+            <li>Request a copy of your stored personal data</li>
+            <li>Correct inaccurate information</li>
+            <li>Request deletion of your account and associated data</li>
+          </ul>
+          <p className="text-white/80 mt-4">
+            Email us at <a href="mailto:support@instafam.social" className="underline text-blue-400">support@instafam.social</a> for any requests.
           </p>
         </div>
+
+        {/* Section 6 */}
         <div className="mt-12">
-          <h2 className="text-3xl font-bold mb-6 text-center">Changes to This Policy</h2>
-          <p className="text-lg lg:text-xl text-center max-w-3xl mx-auto leading-relaxed">
-            We may update this Privacy Policy from time to time. Any changes will be communicated 
-            on this page with a revised date. Please review it periodically to stay informed.
+          <h2 className="text-3xl font-semibold text-[#fdcc03] mb-4">6. Cookies</h2>
+          <p className="text-white/80">
+            We use cookies for authentication, analytics, and improving user experience. You may disable cookies in your browser, but some features may not work as expected.
           </p>
         </div>
-        <div className="mt-12 text-center">
-          <p className="text-lg lg:text-xl">
-            If you have any questions or concerns about our Privacy Policy, reach out to us via 
-            our <a href="/contact" className="underline text-blue-300 hover:text-blue-400">Contact Page</a>.
+
+        {/* Section 7 */}
+        <div className="mt-12">
+          <h2 className="text-3xl font-semibold text-[#fdcc03] mb-4">7. Policy Updates</h2>
+          <p className="text-white/80">
+            We may revise this policy as needed. Changes will be posted here with a new date. Continued use of the platform indicates your acceptance of the updated policy.
+          </p>
+        </div>
+
+        {/* Section 8 */}
+        <div className="mt-12">
+          <h2 className="text-3xl font-semibold text-[#fdcc03] mb-4">8. Contact Us</h2>
+          <p className="text-white/80">
+            Legal Entity: <strong>ARPIT MAURYA</strong><br />
+            Email: <a href="mailto:support@instafam.social" className="underline text-blue-400">support@instafam.social</a><br />
+            Phone: <a href="tel:+917982432872" className="underline text-blue-400">+91 7982432872</a><br />
+            Address: Bawana Rd, Delhi Technological University, Shahbad Daulatpur Village, Rohini, New Delhi, Delhi 110042
           </p>
         </div>
       </div>

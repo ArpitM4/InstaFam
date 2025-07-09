@@ -22,11 +22,12 @@ const Footer = () => {
       <div className="space-y-4">
         <h3 className="text-xl font-semibold">Quick Links</h3>
         <ul className="space-y-2">
-          <li><a href="/" className="hover:text-purple-500">Home</a></li>
-          <li><a href="/about" className="hover:text-purple-500">About Us</a></li>
-          <li><a href="/contact" className="hover:text-purple-500">Contact</a></li>
-          <li><a href="/terms" className="hover:text-purple-500">Terms of Service</a></li>
-          <li><a href="/faqs" className="hover:text-purple-500">FAQ</a></li>
+          <li><a href="/" className="hover:text-pink-500">Home</a></li>
+          <li><a href="/about" className="hover:text-pink-500">About Us</a></li>
+          <li><a href="/contact" className="hover:text-pink-500">Contact</a></li>
+          <li><a href="/terms" className="hover:text-pink-500">Terms of Service</a></li>
+          <li><a href="/privacypolicy" className="hover:text-pink-500">Privacy Policy</a></li>
+          <li><a href="/faqs" className="hover:text-pink-500">FAQ</a></li>
         </ul>
       </div>
 
@@ -34,16 +35,16 @@ const Footer = () => {
       <div className="space-y-4">
         <h3 className="text-xl font-semibold">Follow Us</h3>
         <div className="flex space-x-6">
-          <a href="#" className="text-2xl hover:text-purple-500">
+          <a href="#" className="text-2xl hover:text-pink-500">
             <i className="fab fa-facebook-f"></i>
           </a>
-          <a href="#" className="text-2xl hover:text-purple-500">
+          <a href="#" className="text-2xl hover:text-pink-500">
             <i className="fab fa-twitter"></i>
           </a>
-          <a href="#" className="text-2xl hover:text-purple-500">
-            <i className="fab fa-instagram"></i>
+          <a target='blank' href="https://www.instagram.com/_instafam_official/" className="text-2xl hover:text-pink-500">
+            <i className="fab fa-instagram">Instagram</i>
           </a>
-          <a href="#" className="text-2xl hover:text-purple-500">
+          <a href="#" className="text-2xl hover:text-pink-500">
             <i className="fab fa-linkedin-in"></i>
           </a>
         </div>

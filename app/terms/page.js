@@ -2,50 +2,78 @@
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-blue-900 text-white py-10">
-    <div className="container  mt-10 mx-auto p-6 max-w-3xl">
-      <h1 className="text-5xl font-bold mb-4">Terms & Conditions</h1>
-      <p className="text-xl text-gray-500 mb-6">Last updated on 06-02-2025 10:59:19</p>
-      <p>
-        These Terms and Conditions, along with our privacy policy or other terms
-        (“Terms”), constitute a binding agreement by and between ARPIT MAURYA
-        (“Website Owner” or “we” or “us” or “our”) and you (“you” or “your”).
-      </p>
-      <p>
-        By using our website and availing the Services, you agree that you have
-        read and accepted these Terms (including the Privacy Policy). We
-        reserve the right to modify these Terms at any time.
-      </p>
-      <h2 className="text-xl font-semibold mt-4">User Responsibilities</h2>
-      <ul className="list-disc ml-6">
-        <li>You must provide true, accurate, and complete information.</li>
-        <li>
-          We do not provide any warranty for accuracy, completeness, or
-          performance of the Services.
-        </li>
-        <li>Your use of our Services is at your own risk.</li>
-      </ul>
-      <h2 className="text-xl font-semibold mt-4">Prohibited Activities</h2>
-      <ul className="list-disc ml-6">
-        <li>Unauthorized use of the Website may lead to action.</li>
-        <li>You must not use the Services for illegal or forbidden purposes.</li>
-      </ul>
-      <h2 className="text-xl font-semibold mt-4">Refund Policy</h2>
-      <p>
-        You may claim a refund if we are unable to provide the Service. Refund
-        requests must be made within the stipulated time.
-      </p>
-      <h2 className="text-xl font-semibold mt-4">Governing Law</h2>
-      <p>
-        These Terms shall be governed by the laws of India. Any disputes will be
-        subject to the exclusive jurisdiction of the courts in New Delhi, Delhi.
-      </p>
-      <h2 className="text-xl font-semibold mt-4">Contact Us</h2>
-      <p>
-        If you have any concerns or questions, please contact us through the
-        details provided on this website.
-      </p>
-    </div>
+    <div className="min-h-screen bg-black text-white py-20 px-6">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-5xl font-bold mb-4 text-[#fb0582]">Terms & Conditions</h1>
+        <p className="text-base text-gray-400 mb-6">
+          Last updated on 06-02-2025 10:59:19
+        </p>
+
+        <p className="mb-4">
+          These Terms and Conditions ("Agreement") govern your use of InstaFam ("Website", "we", "us", "our"), owned and operated by ARPIT MAURYA, having its registered address at Bawana Rd, Delhi Technological University, Shahbad Daulatpur Village, Rohini, New Delhi, Delhi 110042.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-2 text-[#fdcc03]">1. Acceptance of Terms</h2>
+        <p className="mb-4">
+          By accessing or using our services, you agree to be bound by this Agreement. If you do not agree, please do not use the website.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-2 text-[#fdcc03]">2. Services</h2>
+        <p className="mb-4">
+          InstaFam enables fans to support Instagram creators via voluntary monetary contributions ("donations"). We do not sell physical or digital goods or offer subscriptions.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-2 text-[#fdcc03]">3. Eligibility</h2>
+        <p className="mb-4">
+          You must be at least 18 years old or have legal parental/guardian consent to use this website. We reserve the right to refuse service to anyone for any reason at any time.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-2 text-[#fdcc03]">4. Payment Terms</h2>
+        <p className="mb-4">
+          All donations are processed via secure third-party payment gateways such as PayU. We do not store or process your card details directly. You must ensure that the payment information you provide is accurate.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-2 text-[#fdcc03]">5. Refund Policy</h2>
+        <p className="mb-4">
+          All donations made through our platform are final and non-refundable. However, in case of payment failure or accidental duplication, you may request a refund by contacting support@instafam.social within 3 days of the transaction.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-2 text-[#fdcc03]">6. Prohibited Activities</h2>
+        <ul className="list-disc list-inside mb-4 text-white/90">
+          <li>Misuse of the platform for fraudulent or illegal activities</li>
+          <li>Attempt to disrupt, harm or interfere with the security or integrity of our services</li>
+          <li>Use of stolen or unauthorised payment methods</li>
+        </ul>
+
+        <h2 className="text-xl font-semibold mt-6 mb-2 text-[#fdcc03]">7. Liability Disclaimer</h2>
+        <p className="mb-4">
+          We are not liable for the actions of any creator or donor. We do not guarantee the accuracy or reliability of content posted by users.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-2 text-[#fdcc03]">8. Privacy</h2>
+        <p className="mb-4">
+          Your use of the platform is subject to our Privacy Policy, which describes how we collect, store, and protect your data.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-2 text-[#fdcc03]">9. Governing Law</h2>
+        <p className="mb-4">
+          This Agreement shall be governed by and construed in accordance with the laws of India. Any disputes shall be resolved in the courts of New Delhi, Delhi.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-2 text-[#fdcc03]">10. Contact Information</h2>
+        <p className="mb-2">
+          Legal Entity: <strong>ARPIT MAURYA</strong><br />
+          Registered & Operational Address:<br />
+          Bawana Rd, Delhi Technological University,<br />
+          Shahbad Daulatpur Village, Rohini, New Delhi, Delhi 110042<br />
+          Email: <a className="text-blue-400 underline" href="mailto:support@instafam.social">support@instafam.social</a><br />
+          Phone: <a className="text-blue-400 underline" href="tel:+917982432872">+91 7982432872</a>
+        </p>
+
+        <p className="mt-8 text-sm text-white/60">
+          If you have any questions regarding these Terms & Conditions, please contact us using the information provided above.
+        </p>
+      </div>
     </div>
   );
 }

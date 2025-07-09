@@ -2,77 +2,67 @@
 
 export default function Contact() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-blue-900 text-white py-10">
-      <div className="container mt-10 mx-auto px-6 lg:px-20">
-        <h1 className="text-4xl lg:text-6xl font-extrabold text-center mb-8">
+    <div className="min-h-screen bg-black text-white py-16 px-4">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-4xl md:text-6xl font-extrabold text-center mb-8 text-[#fb0582]">
           Contact Us
         </h1>
-        <p className="text-lg lg:text-xl text-center max-w-4xl mx-auto leading-relaxed">
-        Last updated on 06-02-2025 11:03:26
-        <br></br>
-        <br></br>
-You may contact us using the information below:
 
-Merchant Legal entity name: ARPIT MAURYA
-Registered Address: Bawana Rd, Delhi Technological University, Shahbad Daulatpur Village, Rohini, New Delhi, Delhi, 110042, New Delhi, Delhi, PIN: 110042
-Operational Address: Bawana Rd, Delhi Technological University, Shahbad Daulatpur Village, Rohini, New Delhi, Delhi, 110042, New Delhi, Delhi, PIN: 110042
-Telephone No: 7982432872
-E-Mail ID: support@instafam.social
+        <p className="text-lg md:text-xl text-center text-white/80 max-w-4xl mx-auto leading-relaxed mb-12">
+          Last updated on 06-02-2025 11:03:26
+          <br /><br />
+          You may contact us using the information below:
+          <br /><br />
+          <span className="text-[#fdcc03] font-bold">Merchant Legal Entity Name:</span> ARPIT MAURYA
+          <br />
+          <span className="text-[#fdcc03] font-bold">Registered Address:</span> Bawana Rd, Delhi Technological University, Shahbad Daulatpur Village, Rohini, New Delhi, Delhi, 110042
+          <br />
+          <span className="text-[#fdcc03] font-bold">Operational Address:</span> Same as above
+          <br />
+          <span className="text-[#fdcc03] font-bold">Phone:</span> <a href="tel:7982432872" className="text-[#dddbff] underline hover:text-[#fb0582]">+91 7982432872</a>
+          <br />
+          <span className="text-[#fdcc03] font-bold">Email:</span> <a href="mailto:support@instafam.social" className="text-[#dddbff] underline hover:text-[#fb0582]">support@instafam.social</a>
         </p>
-        <div className="mt-12 text-center">
-          <h2 className="text-3xl font-bold mb-6">Get in Touch</h2>
-          <p className="text-lg lg:text-xl mb-4">
-            <span className="font-bold text-blue-200">Email:</span> 
-            <a href="mailto:asupport@instafam.social" className="underline text-blue-300 hover:text-blue-400 ml-2">
-            support@instafam.social
-            </a>
-          </p>
-          <p className="text-lg lg:text-xl mb-4">
-            <span className="font-bold text-blue-200">Phone:</span> 
-            <a href="tel:7982432872" className="underline text-blue-300 hover:text-blue-400 ml-2">
-              +91 7982432872
-            </a>
-          </p>
-        </div>
-        <div className="mt-12">
-          <h2 className="text-3xl font-bold mb-6 text-center">Send Us a Message</h2>
+
+        <div className="text-center mt-10">
+          <h2 className="text-3xl font-bold mb-6 text-[#dddbff]">Send Us a Message</h2>
           <form className="max-w-3xl mx-auto space-y-6">
             {/* Name Input */}
             <div>
-              <label htmlFor="name" className="block text-gray-300 font-medium mb-2">
+              <label htmlFor="name" className="block font-medium mb-1 text-white/70">
                 Name
               </label>
               <input
                 type="text"
                 id="name"
                 placeholder="Enter your name"
-                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full px-4 py-3 bg-black border border-white/20 rounded-lg text-white placeholder-white/40 focus:ring-2 focus:ring-[#fb0582] outline-none"
               />
             </div>
 
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-gray-300 font-medium mb-2">
+              <label htmlFor="email" className="block font-medium mb-1 text-white/70">
                 Email
               </label>
               <input
                 type="email"
                 id="email"
                 placeholder="Enter your email"
-                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full px-4 py-3 bg-black border border-white/20 rounded-lg text-white placeholder-white/40 focus:ring-2 focus:ring-[#fb0582] outline-none"
               />
             </div>
 
             {/* Message Input */}
             <div>
-              <label htmlFor="message" className="block text-gray-300 font-medium mb-2">
+              <label htmlFor="message" className="block font-medium mb-1 text-white/70">
                 Message
               </label>
               <textarea
                 id="message"
                 rows="4"
                 placeholder="Write your message"
-                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full px-4 py-3 bg-black border border-white/20 rounded-lg text-white placeholder-white/40 focus:ring-2 focus:ring-[#fb0582] outline-none"
               ></textarea>
             </div>
 
@@ -80,7 +70,7 @@ E-Mail ID: support@instafam.social
             <div>
               <button
                 type="submit"
-                className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition"
+                className="w-full bg-[#fb0582] hover:bg-[#e10475] text-white font-bold py-3 px-4 rounded-lg transition"
               >
                 Send Message
               </button>
