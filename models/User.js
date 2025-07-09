@@ -6,8 +6,8 @@ const UserSchema = new Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String }, // ✅ Add this line for email-password users
   name: { type: String },
-  profilepic: { type: String },
-  coverpic: { type: String },
+  profilepic: { type: String,default:"https://picsum.photos/200", },
+  coverpic: { type: String,default:"https://picsum.photos/1600/400" },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   razorpayid: { type: String },
