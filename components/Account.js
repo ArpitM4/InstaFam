@@ -9,75 +9,69 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Bounce } from 'react-toastify';
 
 const Account = () => {
-  const { data: session, update } = useSession()
-  const router = useRouter()
-  // const [form, setform] = useState({})
-const [form, setForm] = useState({
-  name: "",
-  email: "",
-  username: "",
-  profilepic: "",
-  coverpic: "",
-  accountType: "User",
-  instagram: { isVerified: false },
-});
+  const { data: session, update } = useSession();
+  const router = useRouter();
 
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    username: "",
+    profilepic: "",
+    coverpic: "",
+    accountType: "User",
+    instagram: { isVerified: false },
+  });
+
+  const [loading, setLoading] = useState(true); // ✅ NEW
 
   useEffect(() => {
-      // console.log(session)
-
-      if (!session) {
-          router.push('/login')
-      }
-      else {
-          getData()
-      }
-  }, [])
-
- const getData = async () => {
-  const u = await fetchuser(session.user.name);
-  // Guarantee instagram key always exists:
-  setForm({
-    ...u,
-    instagram: {
-      otp: u.instagram?.otp ?? null,
-      otpGeneratedAt: u.instagram?.otpGeneratedAt ?? null,
-      isVerified: u.instagram?.isVerified ?? false
+    if (!session) {
+      router.push('/login');
+    } else {
+      getData();
     }
-  });
-};
+  }, [session]);
 
-  
+  const getData = async () => {
+    const u = await fetchuser(session.user.name);
+    setForm({
+      ...u,
+      instagram: {
+        otp: u.instagram?.otp ?? null,
+        otpGeneratedAt: u.instagram?.otpGeneratedAt ?? null,
+        isVerified: u.instagram?.isVerified ?? false,
+      },
+    });
+    setLoading(false); // ✅ done loading
+  };
 
   const handleChange = (e) => {
-      setForm({ ...form, [e.target.name]: e.target.value })
-  }
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
+    let a = await updateProfile(e, session.user.name);
+    await update();
+    toast('Profile Updated', {
+      position: "top-right",
+      autoClose: 5000,
+      theme: "light",
+      transition: Bounce,
+    });
+  };
 
-      let a = await updateProfile(e, session.user.name)
-      await update();
-      toast('Profile Updated', {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-          });
+  // ✅ Loading screen if still fetching data
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="text-center">
+          <div className="animate-spin h-12 w-12 rounded-full border-4 border-pink-500 border-t-transparent mb-4"></div>
+          <p className="text-lg font-semibold">Loading InstaFam...</p>
+        </div>
+      </div>
+    );
   }
 
-  
-  if (!form) return(<div className="min-h-screen flex items-center justify-center bg-black text-white">
-      <div className="text-center">
-        <div className="animate-spin h-12 w-12 rounded-full border-4 border-pink-500 border-t-transparent mb-4"></div>
-        <p className="text-lg font-semibold">Loading InstaFam...</p>
-      </div>
-    </div>)
-    
   return (
       <>
 
