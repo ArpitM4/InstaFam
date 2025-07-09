@@ -53,13 +53,18 @@ export const fetchuser = async (username) => {
   return user;
 };
 
-export const fetchpayments = async (username) => {
+export const fetchpayments = async (username, eventStart = null) => {
   await connectDb();
 
-  // Find and lean
-  let p = await Payment.find({ to_user: username }).sort({ amount: -1 }).lean();
+  const query = { to_user: username };
 
-  // Sanitize
+  // If eventStart is passed, filter by it
+  if (eventStart) {
+    query.createdAt = { $gte: new Date(eventStart) };
+  }
+
+  let p = await Payment.find(query).sort({ amount: -1 }).lean();
+
   const safePayments = p.map(payment => ({
     ...payment,
     _id: payment._id.toString(),
@@ -71,9 +76,10 @@ export const fetchpayments = async (username) => {
 };
 
 
+
 export const updateProfile = async (data, oldusername) => {
   await connectDb();
-  let ndata = Object.fromEntries(data);
+  let ndata = typeof data.entries === "function" ? Object.fromEntries(data) : data;
 
   // Only check for conflict if username is being changed
   if (oldusername !== ndata.username) {
@@ -84,8 +90,12 @@ export const updateProfile = async (data, oldusername) => {
       return { error: "This verified username is already taken" };
     }
   }
+  console.log("Received data:", ndata);
 
   await User.updateOne({ email: ndata.email }, ndata);
+  
+  return { success: true }; // ✅ Add this line
+
 };
 
 

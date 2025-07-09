@@ -92,7 +92,8 @@ const Navbar = () => {
             <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block hover:text-[#fb0582]">Creator Dashboard</Link>
           )}
           <Link href="/account" onClick={() => setMobileMenuOpen(false)} className="block hover:text-[#fb0582]">Account</Link>
-          <Link href={`/${session.user.name}`} onClick={() => setMobileMenuOpen(false)} className="block hover:text-[#fb0582]">Your Page</Link>
+                    {accountType === "Creator" && (
+          <Link href={`/${session.user.name}`} onClick={() => setMobileMenuOpen(false)} className="block hover:text-[#fb0582]">Your Page</Link>)}
           <button onClick={() => { signOut(); setMobileMenuOpen(false); }} className="block hover:text-[#fb0582]">Logout</button>
         </>
       )}

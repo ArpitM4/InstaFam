@@ -27,9 +27,18 @@ const UserSchema = new Schema({
 instagram: {
   otp: String,
   otpGeneratedAt: Date,
-  isVerified: { type: Boolean, default: false }
-}
+  isVerified: { type: Boolean, default: false },
 
+},
+description: { type: String, default: "Welcome to my Instafam" },
+leaderboard: {
+  isActive: Boolean,
+  startTime: Date,
+  durationHours: Number
+}
+,perk: { type: String, default: "" },
+eventStart: { type: Date, default: null },
+eventEnd: { type: Date, default: null },
 
 
 });
