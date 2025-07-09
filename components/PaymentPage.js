@@ -13,6 +13,8 @@ import { Bounce } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
 import { updateProfile } from "@/actions/useractions";
+import { loadRazorpayScript } from "@/utils/loadrazorpay"; // 🔥 Make sure path is correct
+
 
 
 
@@ -80,43 +82,36 @@ const getData = async () => {
 
 
   const pay = async (amount) => {
-    if (
-      typeof window === "undefined" ||
-      typeof window.Razorpay === "undefined"
-    ) {
-      toast.error("Razorpay SDK not loaded yet.");
-      return;
-    }
+  const isRazorpayReady = await loadRazorpayScript();
 
-    let a = await initiate(amount, username, paymentform);
-    let orderId = a.id;
+  if (!isRazorpayReady) {
+    toast.error("Failed to load Razorpay SDK. Please try again.");
+    return;
+  }
 
-    const options = {
-      key_id: process.env.NEXT_PUBLIC_KEY_ID,
-      key: process.env.NEXT_PUBLIC_KEY_ID,
-      amount: amount,
-      currency: "INR",
-      name: "InstaFam",
-      description: "Test Transaction",
-      image: "https://example.com/your_logo",
-      order_id: orderId,
-      callback_url: `${process.env.NEXT_PUBLIC_URL}/api/razorpay`,
-      prefill: {
-        name: "Arpit Maurya",
-        email: "gaurav.kumar@example.com",
-        contact: "9000090000",
-      },
-      notes: {
-        address: "Razorpay Corporate Office",
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
+  let a = await initiate(amount, username, paymentform);
+  let orderId = a.id;
 
-    const rzp1 = new window.Razorpay(options);
-    rzp1.open();
+  const options = {
+    key: process.env.NEXT_PUBLIC_KEY_ID,
+    amount: amount * 100,
+    currency: "INR",
+    name: "InstaFam",
+    description: "Support your favorite creator",
+    image: "/logo.png",
+    order_id: orderId,
+    callback_url: `${process.env.NEXT_PUBLIC_URL}/api/razorpay`,
+    prefill: {
+      name: paymentform.name,
+      email: "user@example.com",
+      contact: "9999999999",
+    },
+    theme: { color: "#fb0582" },
   };
+
+  const rzp = new window.Razorpay(options);
+  rzp.open();
+};
 
 // TIMER 
 const [timeLeft, setTimeLeft] = useState(null);
