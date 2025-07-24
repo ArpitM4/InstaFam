@@ -66,11 +66,11 @@ const handleSearch = (e) => {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder="Search creators..."
-        className="w-full sm:w-96 px-4 py-3 rounded-md bg-white/90 text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500"
+        className="w-full sm:w-96 px-4 py-3 rounded-md bg-secondary/90 text-black placeholder-black/60 focus:outline-none focus:ring-2 focus:ring-primary"
       />
       <button
         type="submit"
-        className="px-6 py-3 font-semibold text-white bg-gradient-to-r from-[#e10475] via-pink-600 to-[#e10475] rounded-md hover:from-pink-600 hover:via-purple-600 hover:to-[#e10475] transition"
+        className="px-6 py-3 font-semibold text-white bg-gradient-to-r from-primary via-primary/80 to-primary rounded-md hover:from-primary hover:via-secondary hover:to-primary transition"
       >
         Search
       </button>

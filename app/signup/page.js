@@ -28,37 +28,38 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4">
-  <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-lg shadow-lg max-w-md w-full p-6 space-y-5">
-    <h2 className="text-2xl font-bold text-white text-center">Create an Account</h2>
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+  <div className="bg-secondary/10 backdrop-blur-md border border-secondary/20 rounded-lg shadow-lg max-w-md w-full p-6 space-y-5">
+    <h2 className="text-2xl font-bold text-text text-center">Create an Account</h2>
 
-    {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+    {error && <p className="text-error text-sm text-center">{error}</p>}
 
     <input
       type="email"
       placeholder="Email"
-      className="w-full px-4 py-2 rounded bg-black text-white border border-white/20 focus:ring-2 focus:ring-[#fb0582] outline-none"
+      className="w-full px-4 py-2 rounded bg-background text-text border border-secondary/30 focus:ring-2 focus:ring-primary outline-none"
       value={email}
       onChange={(e) => setEmail(e.target.value)}
     />
+
     <input
       type="text"
       placeholder="Username"
-      className="w-full px-4 py-2 rounded bg-black text-white border border-white/20 focus:ring-2 focus:ring-[#fb0582] outline-none"
+      className="w-full px-4 py-2 rounded bg-background text-text border border-secondary/30 focus:ring-2 focus:ring-primary outline-none"
       value={username}
       onChange={(e) => setUsername(e.target.value)}
     />
     <input
       type="password"
       placeholder="Password"
-      className="w-full px-4 py-2 rounded bg-black text-white border border-white/20 focus:ring-2 focus:ring-[#fb0582] outline-none"
+      className="w-full px-4 py-2 rounded bg-background text-text border border-secondary/30 focus:ring-2 focus:ring-primary outline-none"
       value={password}
       onChange={(e) => setPassword(e.target.value)}
     />
 
     <button
       onClick={handleSignup}
-      className="w-full bg-[#fb0582] text-white py-2 rounded-md font-semibold hover:bg-[#e10475] transition"
+      className="w-full bg-primary text-text py-2 rounded-md font-semibold hover:bg-primary/80 transition"
     >
       Sign Up
     </button>

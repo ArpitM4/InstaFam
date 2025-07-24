@@ -38,9 +38,9 @@ export default function FAQ() {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white py-16 px-4">
+    <div className="min-h-screen bg-background text-text py-16 px-4">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-4xl md:text-6xl font-extrabold text-center mb-10 text-[#fb0582]">
+        <h1 className="text-4xl md:text-6xl font-extrabold text-center mb-10 text-primary">
           Frequently Asked Questions
         </h1>
 
@@ -48,16 +48,16 @@ export default function FAQ() {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="border border-white/20 rounded-xl overflow-hidden shadow-md bg-white/5 backdrop-blur-md"
+              className="border border-text/20 rounded-xl overflow-hidden shadow-md bg-text/5 backdrop-blur-md"
             >
               {/* Question */}
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full flex justify-between items-center text-left px-6 py-4 text-lg md:text-xl font-semibold text-[#dddbff] hover:bg-white/10 transition"
+                className="w-full flex justify-between items-center text-left px-6 py-4 text-lg md:text-xl font-semibold text-secondary hover:bg-text/10 transition"
               >
                 <span>{faq.question}</span>
                 <svg
-                  className={`w-6 h-6 text-[#fdcc03] transform ${
+                  className={`w-6 h-6 text-accent transform ${
                     openIndex === index ? "rotate-180" : ""
                   } transition-transform duration-200`}
                   xmlns="http://www.w3.org/2000/svg"
@@ -71,7 +71,7 @@ export default function FAQ() {
 
               {/* Answer */}
               {openIndex === index && (
-                <div className="px-6 py-4 bg-black/40 text-white/90 border-t border-white/10 transition-all duration-300 ease-in-out">
+                <div className="px-6 py-4 bg-background/40 text-text/90 border-t border-text/10 transition-all duration-300 ease-in-out">
                   {faq.answer}
                 </div>
               )}

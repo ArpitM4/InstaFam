@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from "react";
 import Script from "next/script";
 import { useSession } from "next-auth/react";
-import Razorpay from "razorpay";
+
 import "../app/globals.css";
 import { FaUserCircle } from "react-icons/fa";
-import { fetchuser, fetchpayments, initiate } from "@/actions/useractions";
+import { fetchuser, fetchpayments } from "@/actions/useractions";
 import { useSearchParams } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,7 +13,7 @@ import { Bounce } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
 import { updateProfile } from "@/actions/useractions";
-import { loadRazorpayScript } from "@/utils/loadrazorpay"; // 🔥 Make sure path is correct
+import { loadStripe } from '@stripe/stripe-js';
 
 
 
@@ -63,7 +63,7 @@ const PaymentPage = ({ username }) => {
         transition: Bounce,
       });
     }
-    router.push(`/${username}`);
+
   }, []);
   
   const handleChange = (e) => {
@@ -82,35 +82,32 @@ const getData = async () => {
 
 
   const pay = async (amount) => {
-  const isRazorpayReady = await loadRazorpayScript();
+    const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
-  if (!isRazorpayReady) {
-    toast.error("Failed to load Razorpay SDK. Please try again.");
-    return;
-  }
+    const response = await fetch('/api/stripe',
+     {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount, username, paymentform }),
+    });
 
-  let a = await initiate(amount, username, paymentform);
-  let orderId = a.id;
+    if (!response.ok) {
+      const errorText = await response.text();
+      toast.error(errorText || "An unknown error occurred");
+      return;
+    }
 
-  const options = {
-    key: process.env.NEXT_PUBLIC_KEY_ID,
-    amount: amount * 100,
-    currency: "INR",
-    name: "InstaFam",
-    description: "Support your favorite creator",
-    image: "/logo.png",
-    order_id: orderId,
-    callback_url: `${process.env.NEXT_PUBLIC_URL}/api/razorpay`,
-    prefill: {
-      name: paymentform.name,
-      email: "user@example.com",
-      contact: "9999999999",
-    },
-    theme: { color: "#fb0582" },
-  };
+    const session = await response.json();
 
-  const rzp = new window.Razorpay(options);
-  rzp.open();
+    const result = await stripe.redirectToCheckout({
+        sessionId: session.id,
+    });
+
+    if (result.error) {
+        toast.error(result.error.message);
+    }
 };
 
 // TIMER 
@@ -209,12 +206,9 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
       theme="light"
     />
 
-    <Script
-      src="https://checkout.razorpay.com/v1/checkout.js"
-      strategy="beforeInteractive"
-    />
+    
 
-    <div className="min-h-screen bg-black flex flex-col items-center py-12 px-2">
+    <div className="min-h-screen bg-background flex flex-col items-center py-12 px-2">
       {/* Banner */}
       <div
         className="relative mt-3 w-full max-w-full h-64 shadow-md"
@@ -224,9 +218,9 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
           backgroundPosition: "center",
         }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-40" />
+        <div className="absolute inset-0 bg-background/40" />
         <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center transform translate-y-1/3">
-          <div className="w-32 h-32 bg-white rounded-full shadow-lg border-4 border-white">
+          <div className="w-32 h-32 bg-text rounded-full shadow-lg border-4 border-text">
             <img
               src={currentUser?.profilepic || "https://picsum.photos/200"}
               alt="Profile"
@@ -237,14 +231,14 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
       </div>
 
       {/* Profile Info Box */}
-      <div className="relative mt-20 w-full max-w-md mx-auto p-6 bg-white/10 border border-white/20 backdrop-blur-md shadow-md rounded-lg">
-  <h1 className="text-xl font-bold text-white text-center">@{username}</h1>
+      <div className="relative mt-20 w-full max-w-md mx-auto p-6 bg-text/10 border border-text/20 backdrop-blur-md shadow-md rounded-lg">
+  <h1 className="text-xl font-bold text-text text-center">@{username}</h1>
 
   {/* Description */}
   {isOwner ? (
     <>
       <textarea
-        className="w-full mt-2 bg-black border border-white/20 text-white text-sm text-center rounded p-2 resize-none focus:ring-2 focus:ring-[#fb0582] outline-none"
+        className="w-full mt-2 bg-background border border-text/20 text-text text-sm text-center rounded p-2 resize-none focus:ring-2 focus:ring-primary outline-none"
         value={currentUser.description || ""}
         onFocus={() => setIsEditing(true)}
         onChange={(e) =>
@@ -264,24 +258,24 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
               setIsEditing(false);
             }
           }}
-          className="mt-2 bg-[#fb0582] hover:bg-[#e10475] text-white px-4 py-2 rounded text-sm font-semibold"
+          className="mt-2 bg-primary hover:bg-primary/80 text-text px-4 py-2 rounded text-sm font-semibold"
         >
           Save Description
         </button>
       )}
     </>
   ) : (
-    <p className="text-sm text-white/70 text-center mt-2">
+    <p className="text-sm text-text/70 text-center mt-2">
       {currentUser.description}
     </p>
   )}
 
   {/* Perk + Leaderboard */}
   {(currentUser.perk || payments.length > 0) && (
-    <div className="mt-6 bg-white/5 border border-white/20 p-4 rounded-lg">
+    <div className="mt-6 bg-text/5 border border-text/20 p-4 rounded-lg">
       {currentUser.perk && (
-        <div className="text-white/90 text-sm text-center mb-3">
-          🎁 <span className="font-semibold text-[#fcca03]">Top 5 Donor Perk:</span> {currentUser.perk}
+        <div className="text-text/90 text-sm text-center mb-3">
+          🎁 <span className="font-semibold text-accent">Top 5 Donor Perk:</span> {currentUser.perk}
         </div>
       )}
 
@@ -305,7 +299,7 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
           if (!res?.error) toast.success("Perk saved!");
         }}
         placeholder="Set your perk for top donors"
-        className="w-full px-3 py-2 bg-black border border-white/20 text-white rounded focus:ring-2 focus:ring-[#fb0582] outline-none"
+        className="w-full px-3 py-2 bg-background border border-text/20 text-text rounded focus:ring-2 focus:ring-primary outline-none"
       />
 
      <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
@@ -314,19 +308,19 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
     placeholder="Duration in days"
     value={eventDuration}
     onChange={(e) => setEventDuration(e.target.value)}
-    className="w-full sm:min-w-[180px] sm:flex-1 px-3 py-2 bg-black border border-white/20 text-white rounded focus:ring-2 focus:ring-[#fb0582] outline-none"
+    className="w-full sm:min-w-[180px] sm:flex-1 px-3 py-2 bg-background border border-text/20 text-text rounded focus:ring-2 focus:ring-primary outline-none"
   />
 
   <button
     onClick={handleStartEvent}
-    className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-semibold"
+    className="w-full sm:w-auto bg-success hover:bg-success/80 text-text px-4 py-2 rounded text-sm font-semibold"
   >
     Start Event
   </button>
 
   <button
     onClick={handleEndEvent}
-    className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-semibold"
+    className="w-full sm:w-auto bg-error hover:bg-error/80 text-text px-4 py-2 rounded text-sm font-semibold"
   >
     End Event
   </button>
@@ -338,8 +332,8 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
 
   {/* Event Timer */}
   {currentUser.eventEnd && timeLeft && (
-    <div className="mt-4 text-center bg-[#1f1f1f] border border-[#fb0582]/30 text-white/80 text-sm py-2 px-3 rounded-md shadow-sm">
-      ⏳ <span className="font-semibold text-[#fb0582]">Event is live!</span> Ends in: <span className="font-semibold">{timeLeft}</span>
+    <div className="mt-4 text-center bg-background/80 border border-primary/30 text-text/80 text-sm py-2 px-3 rounded-md shadow-sm">
+      ⏳ <span className="font-semibold text-primary">Event is live!</span> Ends in: <span className="font-semibold">{timeLeft}</span>
     </div>
   )}
 </div>
@@ -350,12 +344,12 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
 
     <div className="w-full max-w-5xl mt-12 flex flex-col md:flex-row gap-8 px-2">
       {/* Leaderboard */}
-<div className={`flex-1 bg-white/10 border border-white/20 text-white rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""}`}>
-  <h2 className="text-2xl font-bold mb-4 text-[#dddbff]">Leaderboard</h2>
+<div className={`flex-1 bg-text/10 border border-text/20 text-text rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""}`}>
+  <h2 className="text-2xl font-bold mb-4 text-secondary">Leaderboard</h2>
   {payments.length === 0 ? (
-    <p className="text-gray-300">No payments yet</p>
+    <p className="text-text/60">No payments yet</p>
   ) : (
-    <ol className="list-decimal list-inside text-white/80 space-y-2">
+    <ol className="list-decimal list-inside text-text/80 space-y-2">
       {Object.entries(
         payments.reduce((acc, p) => {
           acc[p.name] = (acc[p.name] || 0) + p.amount;
@@ -364,10 +358,10 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
       ).map(([name, total], i) => (
         <li key={i} className="flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <FaUserCircle className="text-[#fcca03] text-2xl" />
+            <FaUserCircle className="text-accent text-2xl" />
             <span>{name}</span>
           </div>
-          <span className="text-white font-medium">₹{total}</span>
+          <span className="text-text font-medium">${total}</span>
         </li>
       ))}
     </ol>
@@ -375,8 +369,8 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
 </div>
 
 {/* Donation Form */}
-<div className={`flex-1 bg-white/10 border border-white/20 text-white rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""}`}>
-  <h2 className="text-2xl font-bold mb-4 text-[#dddbff]">Donate</h2>
+<div className={`flex-1 bg-text/10 border border-text/20 text-text rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""}`}>
+  <h2 className="text-2xl font-bold mb-4 text-secondary">Donate</h2>
   <form className="space-y-4">
     <div>
       <label className="block text-sm font-medium mb-1">Your Name</label>
@@ -385,7 +379,7 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
         name="name"
         value={session?.user?.name || ""}
         readOnly
-        className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-white/20 cursor-not-allowed"
+        className="w-full px-4 py-2 rounded bg-background/80 text-text border border-text/20 cursor-not-allowed"
       />
     </div>
 
@@ -397,7 +391,7 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
         value={paymentform.message}
         placeholder="Write a message..."
         rows="3"
-        className="w-full px-4 py-2 rounded bg-black border border-white/20 text-white focus:ring-2 focus:ring-[#fb0582] outline-none"
+        className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none"
       />
     </div>
 
@@ -409,7 +403,7 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
         value={paymentform.amount}
         onChange={handleChange}
         placeholder="Enter amount"
-        className="w-full px-4 py-2 rounded bg-black border border-white/20 text-white focus:ring-2 focus:ring-[#fb0582] outline-none"
+        className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none"
       />
     </div>
 
@@ -419,7 +413,7 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
         e.preventDefault();
         pay(Number.parseInt(paymentform.amount));
       }}
-      className="w-full bg-[#fb0582] hover:bg-[#e10475] transition text-white font-semibold py-2 rounded-md"
+      className="w-full bg-primary hover:bg-primary/80 transition text-text font-semibold py-2 rounded-md"
     >
       Pay
     </button>

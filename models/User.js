@@ -10,8 +10,7 @@ const UserSchema = new Schema({
   coverpic: { type: String,default:"https://picsum.photos/1600/400" },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-  razorpayid: { type: String },
-  razorpaysecret: { type: String },
+  
   followers: { type: Number, default: 10 },
   
   accountType: {

@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 import connectDB from '@/db/ConnectDb';
 import User from '@/models/User';
 
-export const authoptions = NextAuth({
+export const authOptions = NextAuth({
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID,
@@ -63,4 +63,4 @@ export const authoptions = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
 });
 
-export { authoptions as GET, authoptions as POST };
+export { authOptions as GET, authOptions as POST };

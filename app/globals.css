@@ -4,6 +4,34 @@
 
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Playwrite+AU+SA:wght@100..400&family=Rubik+Vinyl&display=swap');
 
+/* Theme Variables */
+:root {
+  /* Light Mode - Default */
+  --text: #040406;
+  --background: #ffffff;
+  --primary: #fb0582;
+  --secondary: #020024;
+  --accent: #ffbb00;
+  --success: #22c55e;
+  --error: #ef4444;
+}
+
+[data-theme='dark'] {
+  --text: #ffffff;
+  --background: #000000;
+  --primary: #fb0582;
+  --secondary: #dddbff;
+  --accent: #fdcc03;
+  --success: #22c55e;
+  --error: #ef4444;
+}
+
+body {
+  color: var(--text);
+  background-color: var(--background);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 .rubik-vinyl-regular {
   font-family: "Rubik Vinyl", serif;
   font-weight: 400;
@@ -35,7 +63,7 @@
   display: inline-block;
   white-space: nowrap;
   overflow: hidden;
-  border-right: 4px solid white;
+  border-right: 4px solid var(--text);
   animation: typing 9s steps(30, end), blink 0.7s step-end infinite;
   width: 0; /* Start with no width */
 }

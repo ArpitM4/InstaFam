@@ -3,9 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { FaUser } from "react-icons/fa";
+import { FaMoon, FaSun } from "react-icons/fa";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { fetchuser } from "@/actions/useractions"; // make sure this is working
+import { useTheme } from "@/context/ThemeContext";
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -13,6 +15,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [accountType, setAccountType] = useState(null);
+  const { theme, toggleTheme, ThemeToggle } = useTheme();
 
   // Fetch accountType from DB
   useEffect(() => {
@@ -26,24 +29,25 @@ const Navbar = () => {
   }, [session]);
 
   return (
-    <nav className="absolute bg-black shadow-md py-2 z-30 w-full border-y-2 border-y-[#333333]">
+    <nav className="absolute bg-black shadow-md py-2 z-30 w-full border-b-2  border-white">
   <div className="container mx-auto px-4 flex items-center justify-between">
     {/* Logo */}
-<Link href="/" className="block w-[110px] md:w-[200px] lg:w-[200px] xl:w-[150px]">
-  <img
-    src="/Text.png"
-    alt="InstaFam Logo"
-    className="w-full h-auto"
-  />
-</Link>
-
+    <Link href="/" className="block w-[110px] md:w-[200px] lg:w-[200px] xl:w-[150px]">
+      <img
+        src="/Text.png"
+        alt="InstaFam Logo"
+        className="w-full h-auto"
+      />
+    </Link>
 
     {/* Desktop Auth Buttons */}
-    <div className="hidden md:flex space-x-4">
+
+    {/* Desktop Auth Buttons */}
+    <div className="hidden md:flex items-center space-x-4">
       {!session ? (
         <>
-          <Link href="/login" className="px-4 py-2 text-white border border-gray-500 rounded-md hover:bg-[#333333]  transition">Log In</Link>
-          <Link href="/signup" className="px-4 py-2 text-white bg-[#fb0480] rounded-md hover:bg-[#fb0582] hover:text-white transition">Sign Up</Link>
+          <Link href="/login" className="px-4 py-2 text-white border border-secondary rounded-md hover:bg-secondary/20 transition">Log In</Link>
+          <Link href="/signup" className="px-4 py-2 text-white bg-primary rounded-md hover:bg-primary/80 transition">Sign Up</Link>
         </>
       ) : (
         <div className="relative inline-block text-left group">
@@ -51,19 +55,24 @@ const Navbar = () => {
             <FaUser className="mr-2 text-xl" />
             {session.user.name}
           </button>
-          <div className="absolute right-0 w-48 bg-[#000000] text-white border border-[#fb0480] rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-10">
+          <div className="absolute right-0 w-48 bg-black text-white border border-white rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-10">
             {accountType === "Creator" && (
-              <Link href="/dashboard" className="block px-6 py-3 hover:bg-[#333333]  hover:text-white  transition">Creator Dashboard</Link>
+              <Link href="/dashboard" className="block px-6 py-3 hover:bg-secondary/20 transition">Creator Dashboard</Link>
             )}
 
-            <Link href="/account" className="block px-6 py-3 hover:bg-[#333333]   hover:text-white transition">Account</Link>
+            <Link href="/account" className="block px-6 py-3 hover:bg-secondary/20 transition">Account</Link>
               {accountType === "Creator" && (
-            <Link href={`/${session.user.name}`} className="block px-6 py-3 hover:bg-[#333333]   hover:text-white transition">Your Page</Link>
+            <Link href={`/${session.user.name}`} className="block px-6 py-3 hover:bg-secondary/20 transition">Your Page</Link>
             )}
-            <button onClick={signOut} className="block w-full text-left px-6 py-3 hover:bg-[#333333]  hover:text-white  transition">Logout</button>
+            <button onClick={signOut} className="block w-full text-left px-6 py-3 hover:bg-secondary/20 transition">Logout</button>
           </div>
         </div>
       )}
+      
+      {/* Theme Toggle Button */}
+      <div className="ml-2">
+        <ThemeToggle />
+      </div>
     </div>
 
     {/* Mobile Menu Toggle */}
@@ -80,27 +89,32 @@ const Navbar = () => {
 
   {/* Mobile Menu */}
   {mobileMenuOpen && (
-    <div className="md:hidden px-4 pt-4 pb-6 space-y-4 bg-[#000000] text-white border-t border-[#fb0582]">
+    <div className="md:hidden px-4 pt-4 pb-6 space-y-4 bg-black text-white border-t border-white">
       {!session ? (
         <>
-          <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="block hover:text-[#fb0582]">Log In</Link>
-          <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="block hover:text-[#fb0582]">Sign Up</Link>
+          <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Log In</Link>
+          <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Sign Up</Link>
         </>
       ) : (
         <>
           {accountType === "Creator" && (
-            <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block hover:text-[#fb0582]">Creator Dashboard</Link>
+            <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Creator Dashboard</Link>
           )}
-          <Link href="/account" onClick={() => setMobileMenuOpen(false)} className="block hover:text-[#fb0582]">Account</Link>
+          <Link href="/account" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Account</Link>
                     {accountType === "Creator" && (
-          <Link href={`/${session.user.name}`} onClick={() => setMobileMenuOpen(false)} className="block hover:text-[#fb0582]">Your Page</Link>)}
-          <button onClick={() => { signOut(); setMobileMenuOpen(false); }} className="block hover:text-[#fb0582]">Logout</button>
+          <Link href={`/${session.user.name}`} onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Your Page</Link>)}
+          <button onClick={() => { signOut(); setMobileMenuOpen(false); }} className="block hover:text-primary">Logout</button>
         </>
       )}
+      
+      {/* Mobile Theme Toggle */}
+      <div className="pt-2 flex items-center">
+        <span className="mr-2 text-white">Theme:</span>
+        <ThemeToggle />
+      </div>
     </div>
   )}
 </nav>
-
   );
 };
 

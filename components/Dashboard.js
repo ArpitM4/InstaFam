@@ -112,9 +112,9 @@ useEffect(() => {
 };
 
 
-  if (!form) return(<div className="min-h-screen flex items-center justify-center bg-black text-white">
+  if (!form) return(<div className="min-h-screen flex items-center justify-center bg-background text-text">
       <div className="text-center">
-        <div className="animate-spin h-12 w-12 rounded-full border-4 border-pink-500 border-t-transparent mb-4"></div>
+        <div className="animate-spin h-12 w-12 rounded-full border-4 border-primary border-t-transparent mb-4"></div>
         <p className="text-lg font-semibold">Loading InstaFam...</p>
       </div>
     </div>)
@@ -132,15 +132,15 @@ useEffect(() => {
                       pauseOnHover
                       theme="light"
                   />
-    <div className="min-h-screen pt-20 bg-black text-white flex flex-col md:flex-row">
+    <div className="min-h-screen pt-20 bg-background text-text flex flex-col md:flex-row">
   {/* Sidebar */}
-<aside className="hidden md:block w-64 bg-black/30 backdrop-blur-lg border-r border-white/10 p-6 space-y-4">
+<aside className="hidden md:block w-64 bg-background/30 backdrop-blur-lg border-r border-text/10 p-6 space-y-4">
   <h2 className="text-xl font-bold">Creator Dashboard</h2>
   <nav className="space-y-2">
-    <a href="#verify" className="block hover:text-[#fb0582]">Verification</a>
-    <a href="#earnings" className="block hover:text-[#fb0582]">Earnings</a>
-    <a href="#history" className="block hover:text-[#fb0582]">History</a>
-    <a href="#payment" className="block hover:text-[#fb0582]">Payment Info</a>
+    <a href="#verify" className="block hover:text-primary">Verification</a>
+    <a href="#earnings" className="block hover:text-primary">Earnings</a>
+    <a href="#history" className="block hover:text-primary">History</a>
+    <a href="#payment" className="block hover:text-primary">Payment Info</a>
   </nav>
 </aside>
 
@@ -148,29 +148,29 @@ useEffect(() => {
   {/* Main Content */}
   <main className="flex-1 p-4 md:p-8 space-y-12">
     {/* Verification Section */}
-    <section id="verify" className="pb-8 border-b border-white/20 space-y-4">
+    <section id="verify" className="pb-8 border-b border-text/20 space-y-4">
       <h3 className="text-2xl font-semibold">Instagram Verification</h3>
-      <p className="text-white/80">
+      <p className="text-text/80">
         Status:{" "}
-        <span className={form?.instagram?.isVerified ? "text-green-400" : "text-red-400"}>
+        <span className={form?.instagram?.isVerified ? "text-success" : "text-error"}>
           {form?.instagram?.isVerified ? "✅ Verified" : "❌ Not Verified"}
         </span>
       </p>
 
       <div className="space-y-1">
-        <label className="text-sm text-white/70">Your Username:</label>
+        <label className="text-sm text-text/70">Your Username:</label>
         <input
           type="text"
           readOnly
           value={session?.user?.name}
-          className="px-4 py-2 rounded bg-white text-black cursor-not-allowed w-full max-w-xs"
+          className="px-4 py-2 rounded bg-text text-background cursor-not-allowed w-full max-w-xs"
         />
       </div>
 
       {!form?.instagram?.isVerified && (
         <div className="space-y-4">
           <button
-            className="px-5 py-2 bg-[#fb0582] rounded hover:bg-pink-700 text-sm font-medium"
+            className="px-5 py-2 bg-primary rounded hover:bg-primary/80 text-sm font-medium"
             onClick={handleGenerateOTP}
             disabled={loading}
           >
@@ -178,16 +178,16 @@ useEffect(() => {
           </button>
 
           {otp && (
-            <div className="bg-white/10 border border-white/20 p-4 rounded space-y-3">
-              <p className="text-sm text-white/80">
+            <div className="bg-text/10 border border-text/20 p-4 rounded space-y-3">
+              <p className="text-sm text-text/80">
                 DM the following OTP to our official Instagram handle to verify:
               </p>
 
               <div className="flex items-center space-x-3">
-                <span className="text-xl font-bold text-green-400 tracking-widest">{otp}</span>
+                <span className="text-xl font-bold text-success tracking-widest">{otp}</span>
                 <button
                   onClick={() => navigator.clipboard.writeText(otp)}
-                  className="px-3 py-1 bg-[#fb0582] text-white text-sm rounded hover:bg-pink-700"
+                  className="px-3 py-1 bg-primary text-text text-sm rounded hover:bg-primary/80"
                 >
                   Copy
                 </button>
@@ -197,11 +197,11 @@ useEffect(() => {
                 href="https://www.instagram.com/_instafam_official/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block text-sm text-[#fb0582] underline hover:text-pink-500"
+                className="inline-block text-sm text-primary underline hover:text-primary/80"
               >
                 → Go to @_instafam_official on Instagram
               </a>
-              <p className="text-[#dddbff]">Your account will be verified within 24 hours after your DM.</p>
+              <p className="text-secondary">Your account will be verified within 24 hours after your DM.</p>
             </div>
           )}
         </div>
@@ -209,39 +209,39 @@ useEffect(() => {
     </section>
 
     {/* Earnings */}
-    <section id="earnings" className="pb-4 border-b border-white/30">
+    <section id="earnings" className="pb-4 border-b border-text/30">
       <h3 className="text-2xl font-semibold mb-2">Total Earnings</h3>
-      <p className="text-3xl font-bold text-green-400">₹{totalEarning}</p>
+      <p className="text-3xl font-bold text-success">${totalEarning}</p>
     </section>
 
     {/* History */}
-    <section id="history" className="pb-4 border-b border-white/30">
+    <section id="history" className="pb-4 border-b border-text/30">
       <h3 className="text-2xl font-semibold mb-4">Payment History</h3>
 
       <div className="max-h-64 overflow-y-auto pr-2 space-y-2">
         {payments.length === 0 ? (
-          <p className="text-gray-300">No payments yet.</p>
+          <p className="text-text/60">No payments yet.</p>
         ) : (
           payments
             .filter((p) => p.to_user === session.user.name)
             .map((p) => (
               <div
                 key={p.oid}
-                className="flex justify-between items-center p-3 bg-white/10 rounded-md"
+                className="flex justify-between items-center p-3 bg-text/10 rounded-md"
               >
                 <div>
-                  <p className="text-sm text-gray-200">
+                  <p className="text-sm text-text/80">
                     <span className="font-semibold">{p.name}</span>
                     {" • "}
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-text/60">
                       {new Date(p.createdAt).toLocaleDateString()}
                     </span>
                   </p>
                   {p.message && (
-                    <p className="text-xs text-gray-300 mt-1 italic">“{p.message}”</p>
+                    <p className="text-xs text-text/60 mt-1 italic">“{p.message}”</p>
                   )}
                 </div>
-                <span className="text-lg font-bold text-green-400">₹{p.amount}</span>
+                <span className="text-lg font-bold text-success">${p.amount}</span>
               </div>
             ))
         )}
@@ -249,45 +249,45 @@ useEffect(() => {
     </section>
 
     {/* Payment Info */}
-    <section id="payment" className="pb-8 border-t border-white/20">
+    <section id="payment" className="pb-8 border-t border-text/20">
       <h3 className="text-2xl font-semibold mb-4">Update Payment Info</h3>
       <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
         <div>
-          <label className="block mb-1 text-gray-200">Phone Number</label>
+          <label className="block mb-1 text-text/80">Phone Number</label>
           <input
             type="text"
             name="phone"
             value={form.paymentInfo?.phone || ""}
             onChange={handleChange}
-            className="w-full p-2 rounded bg-white text-black"
+            className="w-full p-2 rounded bg-text text-background"
             placeholder="Enter your phone"
           />
         </div>
         <div>
-          <label className="block mb-1 text-gray-200">UPI ID</label>
+          <label className="block mb-1 text-text/80">UPI ID</label>
           <input
             type="text"
             name="upi"
             value={form.paymentInfo?.upi || ""}
             onChange={handleChange}
-            className="w-full p-2 rounded bg-white text-black"
+            className="w-full p-2 rounded bg-text text-background"
             placeholder="you@bank"
           />
         </div>
         <button
           type="submit"
           disabled={!form.instagram?.isVerified}
-          className={`px-6 py-2 rounded text-white transition ${
+          className={`px-6 py-2 rounded text-text transition ${
             form.instagram?.isVerified
-              ? "bg-[#fb0582] hover:bg-pink-700"
-              : "bg-gray-500 cursor-not-allowed"
+              ? "bg-primary hover:bg-primary/80"
+              : "bg-text/30 cursor-not-allowed"
           }`}
         >
           Save
         </button>
 
         {!form.instagram?.isVerified && (
-          <p className="mt-2 text-sm text-[#fdcc03]">
+          <p className="mt-2 text-sm text-accent">
             Verify your Instagram username to update payment info.
           </p>
         )}

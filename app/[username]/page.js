@@ -9,7 +9,7 @@ const UsernamePage = async ({ params }) => {
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+      <div className="min-h-screen flex items-center justify-center bg-background text-text">
         <p className="text-xl text-center">You must be logged in to access this page.</p>
       </div>
     );

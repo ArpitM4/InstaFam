@@ -63,9 +63,9 @@ const Account = () => {
   // ✅ Loading screen if still fetching data
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+      <div className="min-h-screen flex items-center justify-center bg-background text-text">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 rounded-full border-4 border-pink-500 border-t-transparent mb-4"></div>
+          <div className="animate-spin h-12 w-12 rounded-full border-4 border-primary border-t-transparent mb-4"></div>
           <p className="text-lg font-semibold">Loading InstaFam...</p>
         </div>
       </div>
@@ -88,18 +88,18 @@ const Account = () => {
               pauseOnHover
               theme="light"
           />
-    <div id="stardiv" className="min-h-screen flex pt-24 flex-col items-center py-16 px-4 bg-black text-white">
+    <div id="stardiv" className="min-h-screen flex pt-24 flex-col items-center py-16 px-4 bg-background text-text">
   {/* Page Heading */}
-  <h1 className="text-4xl font-bold mb-10 text-[#ffffff]">Account Settings</h1>
+  <h1 className="text-4xl font-bold mb-10 text-text">Account Settings</h1>
 
   {/* Form Container */}
   <form
     action={handleSubmit}
-    className="w-full max-w-xl bg-white/10 border border-white/20 rounded-xl shadow-md p-8 space-y-6 backdrop-blur-md"
+    className="w-full max-w-xl bg-secondary/10 border border-secondary/20 rounded-xl shadow-md p-8 space-y-6 backdrop-blur-md"
   >
     {/* Name */}
     <div>
-      <label htmlFor="name" className="block text-sm font-semibold text-white mb-1">Name</label>
+      <label htmlFor="name" className="block text-sm font-semibold text-text mb-1">Name</label>
       <input
         type="text"
         id="name"
@@ -107,13 +107,13 @@ const Account = () => {
         value={form.name || ""}
         onChange={handleChange}
         placeholder="Enter your name"
-        className="w-full px-4 py-2 rounded bg-black text-white border border-white/20 focus:ring-2 focus:ring-[#fb0582] outline-none"
+        className="w-full px-4 py-2 rounded bg-background text-text border border-secondary/30 focus:ring-2 focus:ring-primary outline-none"
       />
     </div>
 
     {/* Email */}
     <div>
-      <label htmlFor="email" className="block text-sm font-semibold text-white mb-1">Email</label>
+      <label htmlFor="email" className="block text-sm font-semibold text-text mb-1">Email</label>
       <input
         type="email"
         id="email"
@@ -121,13 +121,13 @@ const Account = () => {
         value={form.email || ""}
         onChange={handleChange}
         placeholder="Enter your email"
-        className="w-full px-4 py-2 rounded bg-black text-white border border-white/20 focus:ring-2 focus:ring-[#fb0582] outline-none"
+        className="w-full px-4 py-2 rounded bg-background text-text border border-secondary/30 focus:ring-2 focus:ring-primary outline-none"
       />
     </div>
 
     {/* Instagram Username */}
     <div>
-      <label htmlFor="username" className="block text-sm font-semibold text-white mb-1">Instagram Username</label>
+      <label htmlFor="username" className="block text-sm font-semibold text-text mb-1">Instagram Username</label>
       <input
         type="text"
         id="username"
@@ -136,20 +136,20 @@ const Account = () => {
         onChange={handleChange}
         placeholder="Choose a username"
         disabled={form.instagram?.isVerified}
-        className={`w-full px-4 py-2 rounded border focus:ring-2 focus:ring-[#fb0582] outline-none ${
+        className={`w-full px-4 py-2 rounded border focus:ring-2 focus:ring-primary outline-none ${
           form.instagram?.isVerified
-            ? "bg-gray-800 text-gray-400 border-white/20 cursor-not-allowed"
-            : "bg-black text-white border-white/20"
+            ? "bg-secondary/30 text-text/40 border-secondary/30 cursor-not-allowed"
+            : "bg-background text-text border-secondary/30"
         }`}
       />
       {form.instagram?.isVerified && (
-        <p className="mt-1 text-sm text-yellow-300">Your username is locked after verification.</p>
+        <p className="mt-1 text-sm text-accent">Your username is locked after verification.</p>
       )}
     </div>
 
     {/* Profile Picture */}
     <div>
-      <label htmlFor="profilepic" className="block text-sm font-semibold text-white mb-1">Profile Picture URL</label>
+      <label htmlFor="profilepic" className="block text-sm font-semibold text-text mb-1">Profile Picture URL</label>
       <input
         type="text"
         id="profilepic"
@@ -157,13 +157,13 @@ const Account = () => {
         value={form.profilepic || ""}
         onChange={handleChange}
         placeholder="Paste your profile pic URL"
-        className="w-full px-4 py-2 rounded bg-black text-white border border-white/20 focus:ring-2 focus:ring-[#fb0582] outline-none"
+        className="w-full px-4 py-2 rounded bg-background text-text border border-secondary/30 focus:ring-2 focus:ring-primary outline-none"
       />
     </div>
 
     {/* Cover Picture */}
     <div>
-      <label htmlFor="coverpic" className="block text-sm font-semibold text-white mb-1">Cover Picture URL</label>
+      <label htmlFor="coverpic" className="block text-sm font-semibold text-text mb-1">Cover Picture URL</label>
       <input
         type="text"
         id="coverpic"
@@ -171,19 +171,19 @@ const Account = () => {
         value={form.coverpic || ""}
         onChange={handleChange}
         placeholder="Paste your cover pic URL"
-        className="w-full px-4 py-2 rounded bg-black text-white border border-white/20 focus:ring-2 focus:ring-[#fb0582] outline-none"
+        className="w-full px-4 py-2 rounded bg-background text-text border border-secondary/30 focus:ring-2 focus:ring-primary outline-none"
       />
     </div>
 
     {/* Account Type */}
     <div>
-      <label htmlFor="accountType" className="block text-sm font-semibold text-white mb-1">Account Type</label>
+      <label htmlFor="accountType" className="block text-sm font-semibold text-text mb-1">Account Type</label>
       <select
         id="accountType"
         name="accountType"
         value={form.accountType || "User"}
         onChange={handleChange}
-        className="w-full px-4 py-2 rounded bg-black text-white border border-white/20 focus:ring-2 focus:ring-[#fb0582] outline-none"
+        className="w-full px-4 py-2 rounded bg-background text-text border border-secondary/30 focus:ring-2 focus:ring-primary outline-none"
       >
         <option value="User">User</option>
         <option value="Creator">Creator</option>
@@ -194,7 +194,7 @@ const Account = () => {
     <div>
       <button
         type="submit"
-        className="w-full bg-[#fb0582] hover:bg-[#e50475] transition text-white font-semibold py-2 rounded-md"
+        className="w-full bg-primary hover:bg-primary/80 transition text-text font-semibold py-2 rounded-md"
       >
         Save Changes
       </button>
