@@ -8,12 +8,19 @@
 :root {
   /* Light Mode - Default */
   --text: #040406;
-  --background: #ffffff;
+  --background: #fff5fc;
   --primary: #fb0582;
   --secondary: #020024;
   --accent: #ffbb00;
   --success: #22c55e;
   --error: #ef4444;
+  --bv1 : ;
+  --bv2 : ;
+    #stardiv{
+  height: 100%;
+  overflow: hidden;
+  background: radial-gradient(ellipse at bottom, #f7ebff 0%, #fff3d2 100%);
+}
 }
 
 [data-theme='dark'] {
@@ -24,6 +31,17 @@
   --accent: #fdcc03;
   --success: #22c55e;
   --error: #ef4444;
+    --bv1 : ;
+  --bv2 : ;
+
+  #stardiv{
+  height: 100%;
+  overflow: hidden;
+  background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+}
+
+
+
 }
 
 body {
@@ -72,6 +90,7 @@ body {
 #stardiv{
   height: 100%;
   overflow: hidden;
-  background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+  /* background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%); */
+  background: radial-gradient(ellipse at bottom, #f7ebff 0%, var(--background) 100%);
 }
 

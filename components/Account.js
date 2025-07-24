@@ -88,7 +88,10 @@ const Account = () => {
               pauseOnHover
               theme="light"
           />
-    <div id="stardiv" className="min-h-screen flex pt-24 flex-col items-center py-16 px-4 bg-background text-text">
+    <div
+      id="stardiv"
+      className="min-h-screen flex pt-24 flex-col items-center py-16 px-4 bg-background text-text"
+    >
   {/* Page Heading */}
   <h1 className="text-4xl font-bold mb-10 text-text">Account Settings</h1>
 
