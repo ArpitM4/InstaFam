@@ -44,6 +44,12 @@ const Navbar = () => {
 
     {/* Desktop Auth Buttons */}
     <div className="hidden md:flex items-center space-x-4">
+<Link
+  href="/explore"
+  className="px-4 py-2 text-white rounded-md hover:text-gray-200 transition"
+>
+  Explore
+</Link>
       {!session ? (
         <>
           <Link href="/login" className="px-4 py-2 text-white border border-secondary rounded-md hover:bg-secondary/20 transition">Log In</Link>
@@ -90,6 +96,7 @@ const Navbar = () => {
   {/* Mobile Menu */}
   {mobileMenuOpen && (
     <div className="md:hidden px-4 pt-4 pb-6 space-y-4 bg-black text-white border-t border-white">
+      <Link href="/explore" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Explore</Link>
       {!session ? (
         <>
           <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Log In</Link>

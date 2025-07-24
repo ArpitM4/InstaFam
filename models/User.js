@@ -38,6 +38,7 @@ leaderboard: {
 ,perk: { type: String, default: "" },
 eventStart: { type: Date, default: null },
 eventEnd: { type: Date, default: null },
+isReal: { type: Boolean, default: true },
 
 
 });

@@ -7,13 +7,13 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // 👈 Update
 const UsernamePage = async ({ params }) => {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-text">
-        <p className="text-xl text-center">You must be logged in to access this page.</p>
-      </div>
-    );
-  }
+  // if (!session) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-background text-text">
+  //       <p className="text-xl text-center">You must be logged in to access this page.</p>
+  //     </div>
+  //   );
+  // }
 
   const user = await fetchuser(params.username);
 

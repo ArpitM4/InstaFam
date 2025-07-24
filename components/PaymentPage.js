@@ -19,6 +19,7 @@ import { loadStripe } from '@stripe/stripe-js';
 
 
 // In your return JSX:
+// In your return JSX:
 
 const PaymentPage = ({ username }) => {
   const { data: session } = useSession()
@@ -369,6 +370,7 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
 </div>
 
 {/* Donation Form */}
+
 <div className={`flex-1 bg-text/10 border border-text/20 text-text rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""}`}>
   <h2 className="text-2xl font-bold mb-4 text-secondary">Donate</h2>
   <form className="space-y-4">
@@ -380,6 +382,7 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
         value={session?.user?.name || ""}
         readOnly
         className="w-full px-4 py-2 rounded bg-background/80 text-text border border-text/20 cursor-not-allowed"
+        disabled
       />
     </div>
 
@@ -392,6 +395,7 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
         placeholder="Write a message..."
         rows="3"
         className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none"
+        disabled={!session}
       />
     </div>
 
@@ -404,6 +408,7 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
         onChange={handleChange}
         placeholder="Enter amount"
         className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none"
+        disabled={!session}
       />
     </div>
 
@@ -411,11 +416,12 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
       type="button"
       onClick={(e) => {
         e.preventDefault();
-        pay(Number.parseInt(paymentform.amount));
+        if (session) pay(Number.parseInt(paymentform.amount));
       }}
       className="w-full bg-primary hover:bg-primary/80 transition text-text font-semibold py-2 rounded-md"
+      disabled={!session}
     >
-      Pay
+      {session ? "Pay" : "Login to Donate"}
     </button>
   </form>
 </div>
