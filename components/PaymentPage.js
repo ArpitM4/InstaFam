@@ -372,7 +372,7 @@ const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > 
 {/* Donation Form */}
 
 <div className={`flex-1 bg-text/10 border border-text/20 text-text rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""}`}>
-  <h2 className="text-2xl font-bold mb-4 text-secondary">Donate</h2>
+  <h2 className="text-2xl font-bold mb-4 text-secondary">Contribute</h2>
   <form className="space-y-4">
     <div>
       <label className="block text-sm font-medium mb-1">Your Name</label>
