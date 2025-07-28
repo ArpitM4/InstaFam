@@ -7,9 +7,6 @@ const nextConfig = {
     GITHUB_ID: process.env.GITHUB_ID,
     GITHUB_SECRET: process.env.GITHUB_SECRET,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET
   },
   images: {
     remotePatterns: [
@@ -25,12 +22,7 @@ const nextConfig = {
         port: "",
         pathname: "/a/**",
       },
-      {
-        protocol: "https",
-        hostname: "files.stripe.com",
-        port: "",
-        pathname: "/**",
-      }
+
     ],
   },
 };

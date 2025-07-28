@@ -1,6 +1,6 @@
 # InstaFam - Support Your Favorite Creators
 
-InstaFam is a full-stack web application built with Next.js that empowers fans to support their favorite Instagram creators through secure donations. It provides a seamless experience for both creators and their supporters, featuring user authentication, dynamic creator profiles, a secure payment system with Stripe, and a dedicated creator dashboard.
+InstaFam is a full-stack web application built with Next.js that empowers fans to support their favorite Instagram creators through secure donations. It provides a seamless experience for both creators and their supporters, featuring user authentication, dynamic creator profiles, a secure payment system with PayPal, and a dedicated creator dashboard.
 
 ---
 
@@ -14,7 +14,7 @@ InstaFam is a full-stack web application built with Next.js that empowers fans t
 
 ### For Fans (Logged-in Users)
 - **Secure Authentication**: Sign up/in with email & password, or use OAuth with Google and GitHub.
-- **Donate Securely**: Make donations to creators using Stripe.
+- **Donate Securely**: Make donations to creators using PayPal.
 - **Personalized Messages**: Leave a supportive message along with your donation.
 - **Leaderboard Recognition**: Get featured on the creator's public leaderboard.
 
@@ -35,7 +35,7 @@ InstaFam is a full-stack web application built with Next.js that empowers fans t
 - **Styling**: Tailwind CSS
 - **Authentication**: NextAuth.js
 - **Database**: MongoDB with Mongoose
-- **Payments**: Stripe
+- **Payments**: PayPal
 - **State Management**: React Hooks (`useState`, `useEffect`) & React Context API
 - **Deployment**: Vercel
 
@@ -49,7 +49,7 @@ Follow these instructions to get a local copy up and running.
 
 - Node.js (v18 or later)
 - A MongoDB instance (local or cloud-based like MongoDB Atlas)
-- A Stripe account to handle payments.
+- A PayPal account to handle payments.
 - Google & GitHub OAuth credentials for social logins.
 
 ### 1. Clone the Repository
@@ -87,10 +87,9 @@ GOOGLE_SECRET=your_google_client_secret
 GITHUB_ID=your_github_client_id
 GITHUB_SECRET=your_github_client_secret
 
-# Stripe API Keys
-STRIPE_SECRET_KEY=your_stripe_secret_key
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
-STRIPE_WEBHOOK_SECRET=your_stripe_webhook_signing_secret
+# PayPal API Keys
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=your_paypal_client_id
+PAYPAL_CLIENT_SECRET=your_paypal_client_secret
 
 # Razorpay (Optional, if you wish to use it)
 KEY_SECRET=your_razorpay_key_secret

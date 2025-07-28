@@ -21,7 +21,11 @@ const Signup = () => {
     const data = await res.json();
 
     if (!res.ok) {
-      setError(data.error || "Signup failed");
+      if (data.error && data.error.includes("Username already taken")) {
+        setError("Username already taken by a verified user");
+      } else {
+        setError(data.error || "Signup failed");
+      }
     } else {
       router.push("/login"); // redirect to login after successful signup
     }

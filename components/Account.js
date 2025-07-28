@@ -1,5 +1,34 @@
 "use client"
 import React, { useEffect, useState } from 'react'
+// Simple modal component
+function UsernameModal({ open, onSubmit, loading, error }) {
+  const [username, setUsername] = useState("");
+  useEffect(() => { if (!open) setUsername(""); }, [open]);
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div className="bg-white dark:bg-background p-8 rounded-lg shadow-lg w-full max-w-sm flex flex-col items-center">
+        <h2 className="text-xl font-bold mb-4 text-center">Choose a Username</h2>
+        <input
+          type="text"
+          className="w-full px-4 py-2 rounded border border-primary focus:ring-2 focus:ring-primary outline-none mb-2"
+          placeholder="Enter a username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          disabled={loading}
+        />
+        {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
+        <button
+          className="w-full bg-primary hover:bg-primary/80 text-white font-semibold py-2 rounded disabled:opacity-60"
+          onClick={() => onSubmit(username)}
+          disabled={loading || !username.trim()}
+        >
+          {loading ? "Checking..." : "Save Username"}
+        </button>
+      </div>
+    </div>
+  );
+}
 import { useSession, signIn, signOut } from "next-auth/react"
 import "../app/globals.css";
 import { useRouter } from 'next/navigation'
@@ -22,7 +51,10 @@ const Account = () => {
     instagram: { isVerified: false },
   });
 
-  const [loading, setLoading] = useState(true); // ✅ NEW
+  const [loading, setLoading] = useState(true);
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
+  const [modalError, setModalError] = useState("");
+  const [modalLoading, setModalLoading] = useState(false);
 
   useEffect(() => {
     if (!session) {
@@ -37,12 +69,33 @@ const Account = () => {
     setForm({
       ...u,
       instagram: {
-        otp: u.instagram?.otp ?? null,
-        otpGeneratedAt: u.instagram?.otpGeneratedAt ?? null,
-        isVerified: u.instagram?.isVerified ?? false,
+        otp: u && u.instagram ? u.instagram.otp ?? null : null,
+        otpGeneratedAt: u && u.instagram ? u.instagram.otpGeneratedAt ?? null : null,
+        isVerified: u && u.instagram ? u.instagram.isVerified ?? false : false,
       },
     });
-    setLoading(false); // ✅ done loading
+    setLoading(false);
+    // Show modal only if username is missing/empty (first login or never set)
+    if (!u.username || u.username.trim() === "") {
+      setShowUsernameModal(true);
+    }
+  };
+  // Modal username submit handler
+  const handleUsernameModal = async (username) => {
+    setModalLoading(true);
+    setModalError("");
+    // Try to update profile with new username
+    const res = await updateProfile({ ...form, username }, form.username);
+    if (res?.error) {
+      setModalError(res.error);
+      setModalLoading(false);
+    } else {
+      setShowUsernameModal(false);
+      setModalLoading(false);
+      setForm(f => ({ ...f, username }));
+      toast.success("Username set successfully!", { position: "top-right", autoClose: 3000 });
+      await getData(); // Refresh user data
+    }
   };
 
   const handleChange = (e) => {
@@ -73,7 +126,13 @@ const Account = () => {
   }
 
   return (
-      <>
+    <>
+      <UsernameModal
+        open={showUsernameModal}
+        onSubmit={handleUsernameModal}
+        loading={modalLoading}
+        error={modalError}
+      />
 
               <div id="stars3"></div>
           <ToastContainer

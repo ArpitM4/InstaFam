@@ -12,9 +12,16 @@ export async function POST(req) {
 
     await connectDB();
 
+    // Check for existing email
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return Response.json({ error: "User already exists" }, { status: 400 });
+    }
+
+    // Check for existing verified user with this username
+    const existingVerified = await User.findOne({ username, "instagram.isVerified": true });
+    if (existingVerified) {
+      return Response.json({ error: "Username already taken by a verified user" }, { status: 400 });
     }
 
     const hashedPassword = await hash(password, 10);
