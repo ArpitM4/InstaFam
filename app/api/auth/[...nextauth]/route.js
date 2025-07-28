@@ -43,7 +43,7 @@ export const authOptions = NextAuth({
         if (!existing) {
           await User.create({
             email: user.email,
-            username: user.email.split('@')[0],
+            username: "", // Start with blank username, user must set it after login
           });
         }
       }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils";
 import Payment from "@/models/Payment";
+import User from "@/models/User";
 import Razorpay from "razorpay";
 import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
@@ -17,7 +18,7 @@ export const POST = async (req) => {
     }
 
     // fetch the secret of the user who is getting the payment 
-    let user = await User.findOne({username: p.to_user})
+    let user = await User.findById(p.to_user)
     // const secret = user.razorpaysecret
     const secret = process.env.KEY_SECRET
 
@@ -27,7 +28,9 @@ export const POST = async (req) => {
     if(xx){
         // Update the payment status
         const updatedPayment = await Payment.findOneAndUpdate({oid: body.razorpay_order_id}, {done: "true"}, {new: true})
-        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL}/${updatedPayment.to_user}?paymentdone=true`)  
+        // If you want to redirect to username, fetch it
+        let redirectUsername = user?.username || updatedPayment.to_user;
+        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL}/${redirectUsername}?paymentdone=true`)
     }
 
     else{

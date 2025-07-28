@@ -6,14 +6,18 @@ import User from "@/models/User";
 
 
 
-export const fetchuser = async (username) => {
-  if (!username) return null;  // Avoid searching with undefined
-
+// Accepts either username or email, prefers email if it looks like one
+export const fetchuser = async (identifier) => {
+  if (!identifier) return null;
   await connectDb();
-  let u = await User.findOne({ username: username });
-  
+  let query = {};
+  if (identifier.includes('@')) {
+    query.email = identifier;
+  } else {
+    query.username = identifier;
+  }
+  let u = await User.findOne(query);
   if (!u) return null;
-
   let user = u.toObject({ flattenObjectIds: true });
   return user;
 };
@@ -55,12 +59,14 @@ export const updateProfile = async (data, oldusername) => {
       return { error: "This verified username is already taken" };
     }
   }
+  if (!ndata.username || ndata.username.trim() === "") {
+    delete ndata.username;
+  }
   console.log("Received data:", ndata);
-
   await User.updateOne({ email: ndata.email }, ndata);
-  
-  return { success: true }; // ✅ Add this line
-
+  // Return the updated user so the modal logic can use it immediately
+  const user = await User.findOne({ email: ndata.email });
+  return { success: true, user };
 };
 
 

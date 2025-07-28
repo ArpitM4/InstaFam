@@ -38,6 +38,7 @@ const handleGenerateOTP = async () => {
 const { data: session, status } = useSession();
 const router = useRouter();
 const [form, setForm] = useState(null);
+const [userId, setUserId] = useState(null);
 const [payments, setPayments] = useState([]);
 
 
@@ -51,21 +52,22 @@ useEffect(() => {
   }
 }, [session, status]);
 
+
 const getData = async () => {
-    const user = await fetchuser(session.user.name);
-    setForm(user);
-    const payments = await fetchpayments(session.user.name);
-const total = payments.reduce((acc, curr) => acc + (curr.amount || 0), 0);
-setTotalEarning(total);
+  const user = await fetchuser(session.user.name);
+  setForm(user);
+  setUserId(user?._id);
+  if (user?._id) {
+    const payments = await fetchpayments(user._id);
+    setPayments(payments);
+    const total = payments.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+    setTotalEarning(total);
+  }
+};
 
-  };
 
 
-useEffect(() => {
-  if (!session?.user?.name) return;
-
-  fetchpayments(session.user.name).then(setPayments);
-}, [session?.user?.name]);
+// Remove old effect, now handled in getData
 
 
 
@@ -121,17 +123,18 @@ useEffect(() => {
 
   return (<>
     <ToastContainer
-                      position="top-right"
-                      autoClose={5000}
-                      hideProgressBar={false}
-                      newestOnTop={false}
-                      closeOnClick
-                      rtl={false}
-                      pauseOnFocusLoss
-                      draggable
-                      pauseOnHover
-                      theme="light"
-                  />
+      position="top-right"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
+      style={{ top: 72 }} // Adjust this value to match your navbar height
+    />
     <div className="min-h-screen pt-20 bg-background text-text flex flex-col md:flex-row">
   {/* Sidebar */}
 <aside className="hidden md:block w-64 bg-background/30 backdrop-blur-lg border-r border-text/10 p-6 space-y-4">
@@ -223,7 +226,7 @@ useEffect(() => {
           <p className="text-text/60">No payments yet.</p>
         ) : (
           payments
-            .filter((p) => p.to_user === session.user.name)
+            .filter((p) => p.to_user === userId)
             .map((p) => (
               <div
                 key={p.oid}
@@ -295,8 +298,10 @@ useEffect(() => {
     </section>
   </main>
 </div>
+
+
 </>
   );
-};
+}
 
 export default Dashboard;

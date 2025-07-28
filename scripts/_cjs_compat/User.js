@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
 
 const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
-  username: { type: String, required: false, default: undefined },
+  username: { type: String, required: false, unique: true, sparse: true },
   password: { type: String },
   name: { type: String },
   profilepic: { type: String, default: "https://picsum.photos/200" },
@@ -14,30 +14,27 @@ const UserSchema = new Schema({
   accountType: {
     type: String,
     enum: ["User", "Creator", "VCreator"],
-    default: "User",
+    default: "User"
   },
   paymentInfo: {
     phone: String,
-    upi: String,
+    upi: String
   },
   instagram: {
     otp: String,
     otpGeneratedAt: Date,
-    isVerified: { type: Boolean, default: false },
+    isVerified: { type: Boolean, default: false }
   },
   description: { type: String, default: "Welcome to my Instafam" },
   leaderboard: {
     isActive: Boolean,
     startTime: Date,
-    durationHours: Number,
+    durationHours: Number
   },
   perk: { type: String, default: "" },
   eventStart: { type: Date, default: null },
   eventEnd: { type: Date, default: null },
-  isReal: { type: Boolean, default: true },
+  isReal: { type: Boolean, default: true }
 });
 
-// Ensure the username index only applies to non-empty usernames
-UserSchema.index({ username: 1 }, { unique: true, sparse: true, partialFilterExpression: { username: { $exists: true, $ne: "" } } });
-
-export default mongoose.models.User || model("User", UserSchema);
+module.exports = mongoose.models.User || model('User', UserSchema);

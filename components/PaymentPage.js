@@ -72,6 +72,7 @@ const PaymentPage = ({ username }) => {
 
   // --- State Management ---
   const [currentUser, setcurrentUser] = useState({});
+  const [userId, setUserId] = useState(null);
   const [payments, setPayments] = useState([]);
   const [paymentform, setPaymentform] = useState({ name: "", message: "", amount: "" });
   const [isEditing, setIsEditing] = useState(false);
@@ -87,7 +88,8 @@ const PaymentPage = ({ username }) => {
       const user = await fetchuser(username);
       if (user) {
         setcurrentUser(user);
-        const userPayments = await fetchpayments(username, user.eventStart);
+        setUserId(user._id);
+        const userPayments = await fetchpayments(user._id, user.eventStart);
         setPayments(userPayments);
       } else {
         console.error("User not found");
@@ -187,13 +189,17 @@ const PaymentPage = ({ username }) => {
       toast.error("Please enter a valid amount to donate.");
       return;
     }
+    if (!userId) {
+      toast.error("User not loaded.");
+      return;
+    }
     // Call backend to create order
     const res = await fetch('/api/paypal', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         amount: paymentform.amount,
-        username,
+        userId,
         paymentform: {
           name: paymentform.name,
           message: paymentform.message,
@@ -218,7 +224,7 @@ const PaymentPage = ({ username }) => {
         amount: details.purchase_units[0].amount.value,
         orderID: data.orderID,
         timestamp: new Date().toISOString(),
-        to_user: username,
+        to_user: userId,
       };
 
       // Send capture details to backend for saving
@@ -227,7 +233,7 @@ const PaymentPage = ({ username }) => {
 
       if (res.success) {
         // Refetch payments and update leaderboard
-        const updatedPayments = await fetchpayments(username);
+        const updatedPayments = await fetchpayments(userId);
         setPayments(updatedPayments);
         router.push(`/${username}?paymentdone=true`);
       } else {
@@ -251,6 +257,7 @@ const PaymentPage = ({ username }) => {
         draggable
         pauseOnHover
         theme="light"
+        style={{ top: 72 }} // Adjust this value to match your navbar height
       />
       <div className="min-h-screen bg-background text-text flex flex-col items-center py-12 px-2">
         
@@ -409,7 +416,7 @@ const PaymentPage = ({ username }) => {
                             <div className="text-center p-2 bg-red-900/50 text-white rounded-md">PayPal is not configured.</div>
                         ))
                     ) : (
-                        <button className="w-full bg-primary hover:bg-primary/80 transition text-text font-semibold py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <button className="w-full bg-primary hover:bg-primary/80 transition text-text font-semibold py-2 rounded-md" onClick={() => router.push('/login')}>
                             Login to Donate
                         </button>
                     )}

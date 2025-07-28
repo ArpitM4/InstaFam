@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import Payment from "@/models/Payment";
+import User from "@/models/User";
 import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
 
@@ -9,9 +10,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 export const POST = async (req) => {
     await connectDb();
     const data = await req.json();
-    const { amount, username, paymentform } = data;
+    const { amount, username, paymentform, userId } = data;
 
-    const user = await User.findOne({ username });
+    let user = null;
+    if (userId) {
+      user = await User.findById(userId);
+    } else if (username) {
+      user = await User.findOne({ username });
+    }
 
     try {
         const session = await stripe.checkout.sessions.create({
@@ -42,7 +48,7 @@ export const POST = async (req) => {
 
     const payment = new Payment({
         name: paymentform.name,
-        to_user: username,
+        to_user: user ? user._id : undefined,
         oid: session.id,
         message: paymentform.message,
         amount: amount,
