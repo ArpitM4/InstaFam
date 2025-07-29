@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
@@ -8,6 +8,7 @@ import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaSpinner } from "react-icons/fa";
 import { FaUserCircle } from "react-icons/fa";
+import { FaPen } from "react-icons/fa";
 import "../app/globals.css"; // Assuming your global styles are here
 
 import { fetchuser, fetchpayments, updateProfile } from "@/actions/useractions";
@@ -65,6 +66,11 @@ const savePayment = async (paymentDetails, captureDetails) => {
 
 
 const PaymentPage = ({ username }) => {
+  // --- Image Upload Refs ---
+  const profileInputRef = useRef();
+  const coverInputRef = useRef();
+  const [isUploadingProfile, setIsUploadingProfile] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
   // --- Hooks Initialization ---
   const { data: session } = useSession();
   const searchParams = useSearchParams();
@@ -161,9 +167,6 @@ const PaymentPage = ({ username }) => {
   const handleStartEvent = async () => {
     const durationMs = Number(eventDuration) * 24 * 60 * 60 * 1000;
     const start = new Date();
-    const end = new Date(Date.now() + durationMs);
-
-    const res = await updateProfile({ ...currentUser, eventStart: start, eventEnd: end }, username);
     if (res?.error) {
       toast.error(res.error);
     } else {
@@ -182,6 +185,59 @@ const PaymentPage = ({ username }) => {
     }
   };
   
+  // --- Image Upload Handlers ---
+  const handleProfileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setIsUploadingProfile(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", "profilepic");
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        setcurrentUser((prev) => ({ ...prev, profilepic: data.url }));
+        toast.success("Profile picture updated!");
+      } else {
+        toast.error(data.error || "Upload failed");
+      }
+    } catch (err) {
+      toast.error(err?.message || "Upload error");
+    } finally {
+      setIsUploadingProfile(false);
+    }
+  };
+
+  const handleCoverChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setIsUploadingCover(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", "coverpic");
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        setcurrentUser((prev) => ({ ...prev, coverpic: data.url }));
+        toast.success("Cover banner updated!");
+      } else {
+        toast.error(data.error || "Upload failed");
+      }
+    } catch (err) {
+      toast.error(err?.message || "Upload error");
+    } finally {
+      setIsUploadingCover(false);
+    }
+  };
+
   // --- PayPal Functions ---
   // Create order on backend, return orderID to PayPal
   const createOrder = async (data, actions) => {
@@ -259,29 +315,68 @@ const PaymentPage = ({ username }) => {
         theme="light"
         style={{ top: 72 }} // Adjust this value to match your navbar height
       />
-      <div className="min-h-screen bg-background text-text flex flex-col items-center py-12 px-2">
+      <div id="thisone" className="min-h-screen bg-background text-text flex flex-col items-center py-12 px-2">
         
         {/* Banner */}
 
         {/* Banner with full width and profile image overlapping bottom edge */}
-        <div className="relative w-full  mx-auto">
-          {/* Background image */}
+        <div className="relative w-full mx-auto">
+          {/* Background image with upload for owner and change banner button */}
           <div
-            className="w-full h-64 md:h-72 lg:h-80 bg-cover bg-center shadow-md"
-            style={{
-              backgroundImage: `url(${currentUser?.coverpic || "https://picsum.photos/1600/400"})`,
-            }}
+            className={`w-full h-64 md:h-72 lg:h-80 bg-cover bg-center shadow-md relative ${isOwner ? '' : ''}`}
+            style={{ backgroundImage: `url(${currentUser?.coverpic || "https://picsum.photos/1600/400"})` }}
           >
             <div className="absolute inset-0 bg-background/40" />
+            {isOwner && (
+              <>
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  ref={coverInputRef}
+                  onChange={handleCoverChange}
+                />
+                <button
+                  type="button"
+                  className={`absolute bottom-4 right-4 z-10 bg-primary text-text px-4 py-2 rounded-lg shadow hover:bg-primary/90 transition font-semibold text-sm flex items-center gap-2 ${isUploadingCover ? 'opacity-60 cursor-not-allowed' : ''}`}
+                  onClick={() => !isUploadingCover && coverInputRef.current.click()}
+                  disabled={isUploadingCover}
+                >
+                  {isUploadingCover ? <FaSpinner className="animate-spin text-text text-lg" /> : null}
+                  Change Banner
+                </button>
+              </>
+            )}
           </div>
-          {/* Profile image, centered and overlapping bottom edge */}
+          {/* Profile image, centered and overlapping bottom edge, with upload for owner */}
           <div className="absolute left-1/2 bottom-0 translate-x-[-50%] translate-y-1/2 flex justify-center items-center w-full pointer-events-none">
-            <div className="w-36 h-36 md:w-40 md:h-40 bg-text rounded-full shadow-lg border-4 border-text overflow-hidden flex items-center justify-center">
+            <div className={`w-36 h-36 md:w-40 md:h-40 bg-text rounded-full shadow-lg border-4 border-text overflow-hidden flex items-center justify-center relative ${isOwner ? 'group cursor-pointer' : ''}`}
+              onClick={isOwner && !isUploadingProfile ? () => profileInputRef.current.click() : undefined}
+              style={{ opacity: isUploadingProfile ? 0.6 : 1 }}
+            >
               <img
                 src={currentUser?.profilepic || "https://picsum.photos/200"}
                 alt="Profile"
                 className="w-full h-full object-cover rounded-full"
+                style={{ filter: isUploadingProfile ? 'blur(2px)' : 'none' }}
               />
+              {isOwner && (
+                <>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    ref={profileInputRef}
+                    onChange={handleProfileChange}
+                    disabled={isUploadingProfile}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-auto">
+                    <div className="bg-background/70 backdrop-blur-md rounded-full p-3 flex items-center justify-center">
+                      {isUploadingProfile ? <FaSpinner className="animate-spin text-primary text-xl" /> : <FaPen className="text-xl text-primary" />}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -356,31 +451,31 @@ const PaymentPage = ({ username }) => {
 
         <div className="w-full max-w-5xl mt-12 flex flex-col md:flex-row gap-8 px-2">
             {/* Leaderboard */}
-<div className={`flex-1 bg-text/10 border border-text/20 text-text rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""}`}>
-                <h2 className="text-2xl font-bold mb-4 text-secondary">Leaderboard</h2>
-                {payments.length === 0 ? (<p className="text-text/60">No payments yet</p>) : (
+<div className={`flex-1 bg-text/10 border border-text/20 text-text rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""} ${!session ? "blur-sm" : ""}`}> 
+              <h2 className="text-2xl font-bold mb-4 text-secondary">Leaderboard</h2>
+              {payments.length === 0 ? (<p className="text-text/60">No payments yet</p>) : (
                 <ol className="list-decimal list-inside text-text/80 space-y-2">
-                    {Object.entries(
-                        payments.reduce((acc, p) => {
-                            acc[p.name] = (acc[p.name] || 0) + p.amount;
-                            return acc;
-                        }, {})
-                    ).sort(([, a], [, b]) => b - a) // Sort by total amount descending
-                    .map(([name, total], i) => (
-                        <li key={i} className="flex justify-between items-center">
-                            <div className="flex items-center space-x-2">
-                                <FaUserCircle className="text-accent text-2xl" />
-                                <span>{name}</span>
-                            </div>
-                            <span className="text-text font-medium">${total}</span>
-                        </li>
-                    ))}
+                  {Object.entries(
+        payments.reduce((acc, p) => {
+          acc[p.name] = (acc[p.name] || 0) + p.amount;
+          return acc;
+        }, {})
+      ).sort(([, a], [, b]) => b - a)
+      .map(([name, total], i) => (
+        <li key={i} className="flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <FaUserCircle className="text-accent text-2xl" />
+            <span>{name}</span>
+          </div>
+          <span className="text-text font-medium">${total}</span>
+        </li>
+      ))}
                 </ol>
                 )}
             </div>
 
             {/* Donation Form */}
-            <div className={`flex-1 bg-text/10 border border-text/20 text-text rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""}`}>
+            <div className={`flex-1 bg-text/10 border border-text/20 text-text rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-100" : ""}`}>
                 <h2 className="text-2xl font-bold mb-4 text-secondary">Contribute</h2>
                 {isPaying && (
                   <div className="flex justify-center items-center mb-4">
@@ -395,11 +490,11 @@ const PaymentPage = ({ username }) => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Message</label>
-                        <textarea name="message" onChange={handleChange} value={paymentform.message} placeholder="Write a message..." rows="3" className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none" disabled={!session || isPaying}/>
+                        <textarea name="message" onChange={handleChange} value={paymentform.message} placeholder="Write a message..." rows="3" className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none" disabled={isPaying}/>
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Amount</label>
-                        <input type="number" name="amount" value={paymentform.amount} onChange={handleChange} placeholder="Enter amount" className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none" disabled={!session || isPaying}/>
+                        <input type="number" name="amount" value={paymentform.amount} onChange={handleChange} placeholder="Enter amount" className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none" disabled={isPaying}/>
                     </div>
                     {/* PayPal Button Logic */}
                     {session ? (
@@ -427,5 +522,7 @@ const PaymentPage = ({ username }) => {
     </>
   );
 };
+
+
 
 export default PaymentPage;

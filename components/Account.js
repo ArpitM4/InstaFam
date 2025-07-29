@@ -325,33 +325,7 @@ const Account = () => {
       )}
     </div>
 
-    {/* Profile Picture */}
-    <div>
-      <label htmlFor="profilepic" className="block text-sm font-semibold text-text mb-1">Profile Picture URL</label>
-      <input
-        type="text"
-        id="profilepic"
-        name="profilepic"
-        value={form.profilepic || ""}
-        onChange={handleChange}
-        placeholder="Paste your profile pic URL"
-        className="w-full px-4 py-2 rounded bg-background text-text border border-secondary/30 focus:ring-2 focus:ring-primary outline-none"
-      />
-    </div>
-
-    {/* Cover Picture */}
-    <div>
-      <label htmlFor="coverpic" className="block text-sm font-semibold text-text mb-1">Cover Picture URL</label>
-      <input
-        type="text"
-        id="coverpic"
-        name="coverpic"
-        value={form.coverpic || ""}
-        onChange={handleChange}
-        placeholder="Paste your cover pic URL"
-        className="w-full px-4 py-2 rounded bg-background text-text border border-secondary/30 focus:ring-2 focus:ring-primary outline-none"
-      />
-    </div>
+    {/* Profile Picture and Cover Picture inputs removed for file upload feature */}
 
     {/* Account Type */}
     <div>

@@ -11,6 +11,7 @@
   "dependencies": {
     "@paypal/react-paypal-js": "^8.8.3",
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.7.0",
     "dotenv": "^16.4.7",
     "fetch": "^1.1.0",
     "mongodb": "^6.13.0",
