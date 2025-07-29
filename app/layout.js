@@ -22,6 +22,7 @@ export default function RootLayout({ children }) {
             {children}
             <Footer />
           </ThemeProvider>
+          <Analytics/>
         </SessionWrapper> 
       </body>
     </html>
