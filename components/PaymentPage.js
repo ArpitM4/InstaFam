@@ -14,6 +14,7 @@ import "../app/globals.css"; // Assuming your global styles are here
 import { fetchuser, fetchpayments, updateProfile } from "@/actions/useractions";
 import PaymentProfileSection from "./PaymentProfileSection";
 import PaymentInteractionSection from "./PaymentInteractionSection";
+import VaultSection from "./VaultSection";
 
 // Save payment after capture (send captureDetails to backend)
 const savePayment = async (paymentDetails, captureDetails) => {
@@ -24,11 +25,8 @@ const savePayment = async (paymentDetails, captureDetails) => {
       body: JSON.stringify({
         orderID: paymentDetails.orderID,
         amount: paymentDetails.amount,
-        username: paymentDetails.to_user,
-        paymentform: {
-          name: paymentDetails.payerName,
-          message: paymentDetails.message,
-        },
+        to_user: paymentDetails.to_user,
+        message: paymentDetails.message,
         captureOnly: true,
         captureDetails
       })
@@ -42,7 +40,7 @@ const savePayment = async (paymentDetails, captureDetails) => {
         theme: "light",
         transition: Bounce,
       });
-      return { success: true };
+      return { success: true, paymentId: data.paymentId };
     } else {
       const errorMsg = data.capture && data.capture.status ? `Payment status: ${data.capture.status}` : (data.error || "Payment failed.");
       toast.error(`Payment error: ${errorMsg}`, {
@@ -87,6 +85,7 @@ const PaymentPage = ({ username }) => {
   const [eventDuration, setEventDuration] = useState("");
   const [timeLeft, setTimeLeft] = useState(null);
   const [isPaying, setIsPaying] = useState(false);
+  const [activeTab, setActiveTab] = useState('contribute');
 
   const isOwner = session?.user?.name === username;
 
@@ -250,31 +249,39 @@ const PaymentPage = ({ username }) => {
   const createOrder = async (data, actions) => {
     if (!paymentform.amount || Number(paymentform.amount) <= 0) {
       toast.error("Please enter a valid amount to donate.");
-      return;
+      throw new Error("Invalid amount");
     }
     if (!userId) {
       toast.error("User not loaded.");
-      return;
+      throw new Error("User not loaded");
     }
-    // Call backend to create order
-    const res = await fetch('/api/paypal', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        amount: paymentform.amount,
-        userId,
-        paymentform: {
-          name: paymentform.name,
-          message: paymentform.message,
-        }
-      })
-    });
-    const dataRes = await res.json();
-    if (dataRes.id) {
-      return dataRes.id;
-    } else {
-      toast.error("Could not create PayPal order.");
-      return;
+    
+    try {
+      // Call backend to create order
+      const res = await fetch('/api/paypal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: paymentform.amount,
+          to_user: userId,
+          message: paymentform.message
+        })
+      });
+      
+      const dataRes = await res.json();
+      console.log('PayPal order creation response:', dataRes); // Debug log
+      
+      if (dataRes.id) {
+        return dataRes.id;
+      } else {
+        console.error('PayPal order creation failed:', dataRes);
+        toast.error("Could not create PayPal order.");
+        throw new Error("Order creation failed");
+      }
+    } catch (error) {
+      console.error('Error creating PayPal order:', error);
+      toast.error("Failed to create payment order.");
+      throw error;
     }
   };
 
@@ -295,6 +302,13 @@ const PaymentPage = ({ username }) => {
       setIsPaying(false);
 
       if (res.success) {
+        // Points are already awarded in the PayPal route
+        if (res.pointsAwarded) {
+          toast.success(`Payment successful! You earned ${res.pointsAwarded} Fam Points! 🎉`);
+        } else {
+          toast.success('Payment successful!');
+        }
+
         // Refetch payments and update leaderboard
         const updatedPayments = await fetchpayments(userId);
         setPayments(updatedPayments);
@@ -343,18 +357,55 @@ const PaymentPage = ({ username }) => {
           timeLeft={timeLeft}
           handleSavePerk={handleSavePerk}
           setcurrentUser={setcurrentUser}
-        />
-        <PaymentInteractionSection
-          session={session}
           isEventActive={isEventActive}
-          payments={payments}
-          isPaying={isPaying}
-          paymentform={paymentform}
-          handleChange={handleChange}
-          createOrder={createOrder}
-          onApprove={onApprove}
-          router={router}
         />
+        
+        {/* NEW TAB NAVIGATION UI - Replaces the old InteractionSection placement */}
+        <div className="w-full max-w-5xl mt-12 border-b border-text/20">
+          <div className="flex justify-center items-center gap-8">
+            <button
+              onClick={() => setActiveTab('contribute')}
+              className={`px-4 py-3 text-lg font-semibold uppercase tracking-wider transition-colors duration-200 ${
+                activeTab === 'contribute'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
+              }`}
+            >
+              Contribute
+            </button>
+            <button
+              onClick={() => setActiveTab('vault')}
+              className={`px-4 py-3 text-lg font-semibold uppercase tracking-wider transition-colors duration-200 ${
+                activeTab === 'vault'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
+              }`}
+            >
+              {currentUser.username}'s Vault
+            </button>
+          </div>
+        </div>
+
+        {/* Conditionally Rendered Content */}
+        <div className="w-full flex justify-center">
+          {activeTab === 'contribute' && (
+            <PaymentInteractionSection
+              session={session}
+              isEventActive={isEventActive}
+              payments={payments}
+              isPaying={isPaying}
+              paymentform={paymentform}
+              handleChange={handleChange}
+              createOrder={createOrder}
+              onApprove={onApprove}
+              router={router}
+            />
+          )}
+
+          {activeTab === 'vault' && (
+            <VaultSection currentUser={currentUser} />
+          )}
+        </div>
       </div>
     </>
   );

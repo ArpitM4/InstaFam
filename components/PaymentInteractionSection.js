@@ -15,8 +15,27 @@ const PaymentInteractionSection = ({
 }) => {
   return (
     <div className="w-full max-w-5xl mt-12 flex flex-col md:flex-row gap-8 px-2">
+      {/* Leaderboard Disclaimer */}
+      <div className="w-full bg-success/10 border border-success/30 rounded-lg p-3 mb-4 md:hidden">
+        <div className="flex items-center gap-2">
+          <span className="text-success text-lg">💡</span>
+          <p className="text-success text-sm font-medium">
+            Multiple donations stack up! Keep contributing to climb higher on the leaderboard.
+          </p>
+        </div>
+      </div>
+
       {/* Leaderboard */}
       <div className={`flex-1 bg-text/10 border border-text/20 text-text rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""} ${!session ? "blur-sm" : ""}`}> 
+        {/* Desktop Disclaimer */}
+        <div className="hidden md:block bg-success/10 border border-success/30 rounded-lg p-3 mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-success text-lg">💡</span>
+            <p className="text-success text-sm font-medium">
+              Multiple donations stack up! Keep contributing to climb higher on the leaderboard.
+            </p>
+          </div>
+        </div>
         <h2 className="text-2xl font-bold mb-4 text-secondary">Leaderboard</h2>
         {payments.length === 0 ? (<p className="text-text/60">No payments yet</p>) : (
           <ol className="list-decimal list-inside text-text/80 space-y-2">
@@ -40,26 +59,31 @@ const PaymentInteractionSection = ({
       </div>
 
       {/* Donation Form */}
-      <div className={`flex-1 bg-text/10 border border-text/20 text-text rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-100" : ""}`}>
+      <div className={`flex-1 bg-text/10 border border-text/20 text-text rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""}`}>
         <h2 className="text-2xl font-bold mb-4 text-secondary">Contribute</h2>
+        {!isEventActive && (
+          <div className="text-center p-4 bg-text/10 border border-text/20 rounded-md mb-4">
+            <p className="text-text/60 text-sm">💤 No live events at the moment. Check back later!</p>
+          </div>
+        )}
         {isPaying && (
           <div className="flex justify-center items-center mb-4">
             <FaSpinner className="animate-spin text-primary text-3xl mr-2" />
             <span className="text-primary font-semibold">Processing payment...</span>
           </div>
         )}
-        <div className={`space-y-4 transition duration-200 ${isPaying ? 'pointer-events-none opacity-60 blur-sm' : ''}`}> 
+        <div className={`space-y-4 transition duration-200 ${isPaying || !isEventActive ? 'pointer-events-none opacity-60 blur-sm' : ''}`}> 
           <div>
             <label className="block text-sm font-medium mb-1">Your Name</label>
             <input type="text" name="name" value={session?.user?.name || ""} readOnly className="w-full px-4 py-2 rounded bg-background/80 text-text border border-text/20 cursor-not-allowed" disabled/>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Message</label>
-            <textarea name="message" onChange={handleChange} value={paymentform.message} placeholder="Write a message..." rows="3" className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none" disabled={isPaying}/>
+            <textarea name="message" onChange={handleChange} value={paymentform.message} placeholder="Write a message..." rows="3" className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none" disabled={isPaying || !isEventActive}/>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Amount</label>
-            <input type="number" name="amount" value={paymentform.amount} onChange={handleChange} placeholder="Enter amount" className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none" disabled={isPaying}/>
+            <input type="number" name="amount" value={paymentform.amount} onChange={handleChange} placeholder="Enter amount" className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none" disabled={isPaying || !isEventActive}/>
           </div>
           {/* PayPal Button Logic */}
           {session ? (
@@ -69,7 +93,7 @@ const PaymentInteractionSection = ({
                   style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay" }}
                   createOrder={createOrder}
                   onApprove={onApprove}
-                  disabled={!paymentform.amount || Number(paymentform.amount) <= 0 || isPaying}
+                  disabled={!paymentform.amount || Number(paymentform.amount) <= 0 || isPaying || !isEventActive}
                 />
               </PayPalScriptProvider>
             ) : (

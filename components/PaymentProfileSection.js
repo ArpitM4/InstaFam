@@ -21,6 +21,7 @@ const PaymentProfileSection = ({
   timeLeft,
   handleSavePerk,
   setcurrentUser,
+  isEventActive,
 }) => {
   return (
     <>
@@ -95,12 +96,17 @@ const PaymentProfileSection = ({
         {/* Description */}
         {isOwner ? (
           <>
-            <textarea
-              className="w-full mt-2 bg-background border border-text/20 text-text text-sm text-center rounded p-2 resize-none focus:ring-2 focus:ring-primary outline-none"
-              value={currentUser.description || ""}
-              onFocus={() => setIsEditing(true)}
-              onChange={(e) => setcurrentUser({ ...currentUser, description: e.target.value })}
-            />
+            <div className="relative">
+              <textarea
+                className="w-full mt-2 bg-background border border-text/20 text-text text-sm text-center rounded p-2 pb-8 resize-none focus:ring-2 focus:ring-primary outline-none"
+                value={currentUser.description || ""}
+                onClick={() => setIsEditing(true)}
+                onFocus={() => setIsEditing(true)}
+                onChange={(e) => setcurrentUser({ ...currentUser, description: e.target.value })}
+                placeholder="Add a description..."
+              />
+              <FaPen className="absolute bottom-3 right-3 text-text/40 text-xs pointer-events-none" />
+            </div>
             {isEditing && (
               <button onClick={handleSaveDescription} className="w-full mt-2 bg-primary hover:bg-primary/80 text-text px-4 py-2 rounded text-sm font-semibold">
                 Save Description
@@ -112,7 +118,7 @@ const PaymentProfileSection = ({
         )}
 
         {/* Perk Display */}
-        {(currentUser.perk || (currentUser.payments && currentUser.payments.length > 0)) && (
+        {isEventActive && (currentUser.perk || (currentUser.payments && currentUser.payments.length > 0)) && (
           <div className="mt-6 bg-text/5 border border-text/20 p-4 rounded-lg">
             {currentUser.perk && (
               <div className="text-text/90 text-sm text-center mb-3">

@@ -15,14 +15,25 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [accountType, setAccountType] = useState(null);
+  const [userPoints, setUserPoints] = useState(0);
   const { theme, toggleTheme, ThemeToggle } = useTheme();
 
-  // Fetch accountType from DB
+  // Fetch accountType and points from DB
   useEffect(() => {
     const getUserInfo = async () => {
       if (session?.user?.name) {
         const user = await fetchuser(session.user.name);
         setAccountType(user?.accountType);
+        // Fetch user points
+        try {
+          const pointsRes = await fetch('/api/points');
+          if (pointsRes.ok) {
+            const pointsData = await pointsRes.json();
+            setUserPoints(pointsData.totalPoints || 0);
+          }
+        } catch (error) {
+          console.error('Failed to fetch points:', error);
+        }
       }
     };
     getUserInfo();
@@ -56,23 +67,31 @@ const Navbar = () => {
           <Link href="/signup" className="px-4 py-2 text-white bg-primary rounded-md hover:bg-primary/80 transition">Sign Up</Link>
         </>
       ) : (
-        <div className="relative inline-block text-left group">
-          <button className="px-4 py-2 flex items-center text-white rounded-md transition">
-            <FaUser className="mr-2 text-xl" />
-            {session.user.name}
-          </button>
-          <div className="absolute right-0 w-48 bg-black text-white border border-white rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-10">
-            {accountType === "Creator" && (
-              <Link href="/dashboard" className="block px-6 py-3 hover:bg-secondary/20 transition">Creator Dashboard</Link>
-            )}
-
-            <Link href="/account" className="block px-6 py-3 hover:bg-secondary/20 transition">Account</Link>
+        <>
+          <div className="relative inline-block text-left group">
+            <button className="px-4 py-2 flex items-center text-white rounded-md transition">
+              <FaUser className="mr-2 text-xl" />
+              {session.user.name}
+            </button>
+            <div className="absolute right-0 w-48 bg-black text-white border border-white rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-10">
               {accountType === "Creator" && (
-            <Link href={`/${session.user.name}`} className="block px-6 py-3 hover:bg-secondary/20 transition">Your Page</Link>
-            )}
-            <button onClick={signOut} className="block w-full text-left px-6 py-3 hover:bg-secondary/20 transition">Logout</button>
+                <Link href="/dashboard" className="block px-6 py-3 hover:bg-secondary/20 transition">Creator Dashboard</Link>
+              )}
+
+              <Link href="/account" className="block px-6 py-3 hover:bg-secondary/20 transition">Account</Link>
+              <Link href="/my-fam-points" className="block px-6 py-3 hover:bg-secondary/20 transition">My Fam Points</Link>
+                {accountType === "Creator" && (
+              <Link href={`/${session.user.name}`} className="block px-6 py-3 hover:bg-secondary/20 transition">Your Page</Link>
+              )}
+              <button onClick={signOut} className="block w-full text-left px-6 py-3 hover:bg-secondary/20 transition">Logout</button>
+            </div>
           </div>
-        </div>
+          
+          {/* Fam Points Display */}
+          <Link href="/my-fam-points" className="px-3 py-2 text-white border border-primary rounded-md bg-primary/20 hover:bg-primary/30 transition cursor-pointer">
+            <span className="text-sm font-medium">⭐ {userPoints} Fam Points</span>
+          </Link>
+        </>
       )}
       
       {/* Theme Toggle Button */}
@@ -104,6 +123,11 @@ const Navbar = () => {
         </>
       ) : (
         <>
+          {/* Fam Points Display Mobile */}
+          <Link href="/my-fam-points" onClick={() => setMobileMenuOpen(false)} className="px-3 py-2 text-white border border-primary rounded-md bg-primary/20 hover:bg-primary/30 transition cursor-pointer mb-2 block">
+            <span className="text-sm font-medium">⭐ {userPoints} Fam Points</span>
+          </Link>
+          
           {accountType === "Creator" && (
             <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Creator Dashboard</Link>
           )}

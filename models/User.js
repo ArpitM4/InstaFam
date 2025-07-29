@@ -34,6 +34,7 @@ const UserSchema = new Schema({
   perk: { type: String, default: "" },
   eventStart: { type: Date, default: null },
   eventEnd: { type: Date, default: null },
+  points: { type: Number, default: 0 },
   isReal: { type: Boolean, default: true },
 });
 

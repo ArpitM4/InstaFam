@@ -32,14 +32,35 @@ export const fetchpayments = async (username, eventStart = null) => {
     query.createdAt = { $gte: new Date(eventStart) };
   }
 
-  let p = await Payment.find(query).sort({ amount: -1 }).lean();
+  let p = await Payment.find(query)
+    .populate('from_user', 'name username')
+    .sort({ amount: -1 })
+    .lean();
 
-  const safePayments = p.map(payment => ({
-    ...payment,
-    _id: payment._id.toString(),
-    createdAt: payment.createdAt?.toISOString(),
-    updatedAt: payment.updatedAt?.toISOString(),
-  }));
+  const safePayments = p.map(payment => {
+    // Ensure all nested ObjectIds are properly serialized
+    const serializedPayment = {
+      _id: payment._id.toString(),
+      to_user: payment.to_user.toString(),
+      oid: payment.oid,
+      message: payment.message,
+      amount: payment.amount,
+      done: payment.done,
+      createdAt: payment.createdAt?.toISOString(),
+      updatedAt: payment.updatedAt?.toISOString(),
+    };
+
+    // Handle populated from_user - only add serialized user ID and username
+    if (payment.from_user) {
+      serializedPayment.from_user = payment.from_user._id ? payment.from_user._id.toString() : null;
+      serializedPayment.name = payment.from_user.username || payment.from_user.name || 'Anonymous';
+    } else {
+      serializedPayment.from_user = null;
+      serializedPayment.name = 'Anonymous';
+    }
+
+    return serializedPayment;
+  });
 
   return safePayments;
 };

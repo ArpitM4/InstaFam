@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Payment from "@/models/Payment";
 import User from "@/models/User";
+import PointTransaction from "@/models/PointTransaction";
 import connectDB from "@/db/ConnectDb";
 
 const getAccessToken = async () => {
@@ -29,7 +30,10 @@ export async function POST(req) {
   if (!fanUser) {
     return NextResponse.json({ error: "Fan user not found." }, { status: 401 });
   }
+  
   const body = await req.json();
+  console.log('PayPal API received body:', body); // Debug log
+  
   const { amount, message, orderID, captureOnly, to_user } = body;
 
   const accessToken = await getAccessToken();
@@ -47,7 +51,7 @@ export async function POST(req) {
   if (captureOnly && orderID && body.captureDetails) {
     const captureData = body.captureDetails;
     if (captureData.status === "COMPLETED") {
-      await Payment.create({
+      const payment = await Payment.create({
         oid: orderID,
         amount: amount,
         to_user: toUserId,
@@ -55,13 +59,38 @@ export async function POST(req) {
         message: message,
         done: true,
       });
-      return NextResponse.json({ success: true, capture: captureData });
+
+      // Award Fam Points to the fan using the existing points system
+      // Calculate points earned (₹10 = 1 point, so amount * 0.1)
+      const pointsToAdd = Math.floor(amount * 0.1);
+      
+      // Update user's total points
+      await User.findByIdAndUpdate(fanUser._id, {
+        $inc: { points: pointsToAdd }
+      });
+
+      // Create point transaction record
+      await PointTransaction.create({
+        userId: fanUser._id,
+        points_earned: pointsToAdd,
+        source_payment_id: payment._id,
+        description: `Support payment of $${amount}`
+      });
+
+      return NextResponse.json({ 
+        success: true, 
+        capture: captureData, 
+        paymentId: payment._id,
+        pointsAwarded: pointsToAdd
+      });
     } else {
       return NextResponse.json({ error: "PayPal capture not completed", details: captureData }, { status: 400 });
     }
   }
 
   // Otherwise, create a new order (for initial payment intent)
+  console.log('Creating PayPal order with amount:', amount); // Debug log
+  
   const response = await fetch(`${process.env.PAYPAL_API_BASE}/v2/checkout/orders`, {
     method: "POST",
     headers: {
@@ -83,6 +112,15 @@ export async function POST(req) {
       ],
     }),
   });
+  
   const order = await response.json();
+  console.log('PayPal order creation response:', order); // Debug log
+  
+  if (order.id) {
+    console.log('Successfully created PayPal order with ID:', order.id);
+  } else {
+    console.error('PayPal order creation failed:', order);
+  }
+  
   return NextResponse.json(order);
 }
