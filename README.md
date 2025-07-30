@@ -1,53 +1,177 @@
-# InstaFam - Support Your Favorite Creators
+# InstaFam - Next.js Web Application Folder Structure
 
-InstaFam is a full-stack web application built with Next.js that empowers fans to support their favorite Instagram creators through secure donations. It provides a seamless experience for both creators and their supporters, featuring user authentication, dynamic creator profiles, a secure payment system with PayPal, and a dedicated creator dashboard.
+## 📁 **Root Directory Structure**
 
----
+```
+InstaFam/
+├── app/                          # Next.js 14 App Router
+├── components/                   # React Components
+├── models/                       # MongoDB Models
+├── actions/                      # Server Actions
+├── utils/                        # Utility Functions
+├── db/                          # Database Configuration
+├── public/                      # Static Assets
+├── styles/                      # CSS/Styling
+└── scripts/                     # Database Migration Scripts
+```
 
-## ✨ Features
+## 🚀 **App Directory (Next.js 14 App Router)**
 
-### For Everyone
-- **Explore Creators**: Discover a random selection of verified creators on the explore page.
-- **Search**: Find specific creators using the search bar.
-- **View Profiles**: Anyone can view a creator's public page, their description, and their donation leaderboard.
-- **Light/Dark Mode**: A theme toggler for a comfortable viewing experience.
+```
+app/
+├── api/                         # API Routes
+│   ├── auth/
+│   │   └── [...nextauth]/
+│   │       └── route.js         # NextAuth Configuration
+│   ├── notifications/
+│   │   ├── route.js            # Main notifications API
+│   │   ├── [id]/route.js       # Mark notification as read
+│   │   ├── mark-all-read/route.js
+│   │   └── followers/
+│   │       ├── event/route.js   # Notify followers of events
+│   │       └── vault/route.js   # Notify followers of vault items
+│   ├── users/
+│   │   └── [id]/
+│   │       └── follow/route.js  # Follow/Unfollow API
+│   ├── vault/
+│   │   ├── add/route.js        # Add vault items
+│   │   └── redeem/route.js     # Redeem vault items
+│   ├── explore/route.js        # Explore creators
+│   ├── search/route.js         # Search functionality
+│   └── payments/route.js       # Payment processing
+├── dashboard/                   # Dashboard Routes
+│   ├── page.js                 # General dashboard
+│   ├── payment/page.js         # Payment info
+│   ├── vault/page.js           # My vault
+│   └── requests/page.js        # Vault requests
+├── test-notifications/
+│   └── page.js                 # Notification testing
+├── test-follow/
+│   └── page.js                 # Follow system testing
+├── [username]/
+│   └── page.js                 # Creator profile pages
+├── login/page.js               # Login page
+├── my-fam-points/page.js       # User points page
+├── explore/page.js             # Explore creators
+├── search/page.js              # Search page
+├── layout.js                   # Root layout
+├── page.js                     # Home page
+└── globals.css                 # Global styles
+```
 
-### For Fans (Logged-in Users)
-- **Secure Authentication**: Sign up/in with email & password, or use OAuth with Google and GitHub.
-- **Donate Securely**: Make donations to creators using PayPal.
-- **Personalized Messages**: Leave a supportive message along with your donation.
-- **Leaderboard Recognition**: Get featured on the creator's public leaderboard.
+## 🧩 **Components Directory**
 
-### For Creators
-- **Creator Dashboard**: A central hub to manage your profile and finances.
-- **Instagram Verification**: A unique OTP-based system. Creators DM a generated OTP to the official InstaFam Instagram page to get a "verified" status, which makes them discoverable.
-- **Profile Customization**: Update your name, profile picture, cover photo, and a personal description.
-- **Event Management**: Launch special time-bound "Events" to drive donations. A live countdown timer is displayed on your page.
-- **Perk Management**: Set a custom "perk" to reward your top 5 donors.
-- **Earnings & History**: View your total earnings and a detailed history of all donations received.
-- **Payment Info**: Update your payment details (Phone/UPI) for payouts.
+```
+components/
+├── dashboard/                   # Dashboard Components
+│   ├── GeneralSettings.js      # Instagram verification
+│   ├── PaymentInfo.js          # Earnings & payment details
+│   ├── MyVault.js              # Vault items management
+│   └── VaultRequests.js        # Q&A system & redemptions
+├── Account.js                   # User account management
+├── Dashboard.js                 # Legacy dashboard (redirects)
+├── DashboardLayout.js          # Shared dashboard layout
+├── FollowButton.js             # Follow/unfollow functionality
+├── Footer.js                   # Site footer
+├── Navbar.js                   # Main navigation
+├── NotificationBell.js         # Notification dropdown
+├── PaymentInteractionSection.js # Payment UI components
+├── PaymentPage.js              # Creator profile/payment page
+├── PaymentProfileSection.js    # Profile display section
+├── SessionWrapper.js           # NextAuth session wrapper
+└── VaultSection.js             # Vault items display
+```
 
----
+## 🗃️ **Models Directory (MongoDB Schemas)**
 
-## 🛠️ Tech Stack
+```
+models/
+├── User.js                     # User schema with follow system
+├── Notification.js             # Notification system
+├── Payment.js                  # Payment transactions
+├── VaultItem.js               # Vault items/perks
+└── Redemption.js              # Vault redemptions
+```
 
-- **Framework**: Next.js 14 (App Router)
-- **Styling**: Tailwind CSS
-- **Authentication**: NextAuth.js
+## ⚡ **Actions Directory (Server Actions)**
+
+```
+actions/
+├── useractions.js             # User-related server actions
+└── notificationActions.js     # Notification server actions
+```
+
+## 🛠️ **Utils Directory**
+
+```
+utils/
+├── notificationHelpers.js     # Notification creation helpers
+└── notificationHelpers.js     # Follow system notifications
+```
+
+## 🗄️ **Database Configuration**
+
+```
+db/
+└── ConnectDb.js               # MongoDB connection setup
+```
+
+## 📋 **Key Features Implemented**
+
+### **Authentication System**
+- NextAuth with Google OAuth
+- Session management across app
+- Protected routes and API endpoints
+
+### **Notification System**
+- Real-time notification bell with unread counts
+- Creator-fan interaction notifications
+- Event and vault item notifications for followers
+- System/admin message capability
+
+### **Follow System**
+- Follow/unfollow functionality
+- Bi-directional following (followers/following arrays)
+- Privacy controls (follower counts hidden from public)
+- Automatic notifications for followers
+
+### **Dashboard System**
+- Route-based dashboard (/dashboard, /dashboard/payment, etc.)
+- Modular components (broken down from 1500+ lines)
+- Creator analytics and settings
+- Payment information management
+
+### **Vault System**
+- Vault item creation and management
+- Redemption system with Q&A functionality
+- Creator response system
+- Points-based economy
+
+### **Creator Profile System**
+- Dynamic creator pages (/{username})
+- Payment integration
+- Event management
+- Vault display and redemption
+
+## � **Technical Stack**
+
+- **Framework**: Next.js 14 with App Router
 - **Database**: MongoDB with Mongoose
-- **Payments**: PayPal
-- **State Management**: React Hooks (`useState`, `useEffect`) & React Context API
-- **Deployment**: Vercel
+- **Authentication**: NextAuth.js
+- **Styling**: Tailwind CSS (configured in globals.css)
+- **Notifications**: Custom real-time system with 30s polling
+- **Payment**: Razorpay integration
+- **Session Management**: NextAuth with custom callbacks
 
----
+## 📊 **Current Database Relations**
 
-## 🚀 Getting Started
+- **Users** have followers/following arrays
+- **Notifications** reference Users (recipient/sender)
+- **VaultItems** belong to Users (creators)
+- **Redemptions** link Users (fans) to VaultItems
+- **Payments** track transactions between Users
 
-Follow these instructions to get a local copy up and running.
-
-### Prerequisites
-
-- Node.js (v18 or later)
+This structure supports a full social media platform with creator monetization, fan engagement, and real-time notifications.
 - A MongoDB instance (local or cloud-based like MongoDB Atlas)
 - A PayPal account to handle payments.
 - Google & GitHub OAuth credentials for social logins.
