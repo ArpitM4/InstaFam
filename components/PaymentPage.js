@@ -178,6 +178,23 @@ const PaymentPage = ({ username }) => {
     } else {
       toast.success("Event started!");
       setcurrentUser({ ...currentUser, eventStart: start, eventEnd: end });
+      
+      // Notify followers about the new event
+      try {
+        await fetch('/api/notifications/followers/event', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            creatorId: currentUser._id,
+            creatorName: username
+          }),
+        });
+      } catch (error) {
+        console.error('Error notifying followers about event:', error);
+        // Don't show error to user as the event started successfully
+      }
     }
   };
 

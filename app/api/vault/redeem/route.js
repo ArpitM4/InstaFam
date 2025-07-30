@@ -5,6 +5,7 @@ import User from "@/models/User";
 import VaultItem from "@/models/VaultItem";
 import Redemption from "@/models/Redemption";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { notifyVaultRedeemed } from "@/utils/notificationHelpers";
 
 await connectDb();
 
@@ -79,6 +80,16 @@ export async function POST(request) {
     });
 
     await redemption.save();
+
+    // Send notification to creator for non-digital items that require action
+    if (!isDigitalFile) {
+      await notifyVaultRedeemed(
+        vaultItem.creatorId,
+        fan.name,
+        vaultItem.title,
+        redemption._id
+      );
+    }
 
     return NextResponse.json({ 
       success: true, 

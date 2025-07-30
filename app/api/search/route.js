@@ -15,7 +15,7 @@ export async function GET(req) {
   const users = await User.find({
     username: { $regex: q, $options: "i" },
     "instagram.isVerified": true, // Only verified profiles
-  }).select("username _id profilepic followers");
+  }).select("username _id profilepic");
 
   return Response.json(users);
 }

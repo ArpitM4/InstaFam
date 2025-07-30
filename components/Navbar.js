@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { fetchuser } from "@/actions/useractions"; // make sure this is working
 import { useTheme } from "@/context/ThemeContext";
+import NotificationBell from "./NotificationBell";
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -68,6 +69,9 @@ const Navbar = () => {
         </>
       ) : (
         <>
+          {/* Notification Bell */}
+          <NotificationBell />
+          
           <div className="relative inline-block text-left group">
             <button className="px-4 py-2 flex items-center text-white rounded-md transition">
               <FaUser className="mr-2 text-xl" />

@@ -48,7 +48,7 @@ const ExplorePage = () => {
               <p className="text-xl font-semibold hover:underline hover:text-primary transition">
                 @{user.username}
               </p>
-              <p className="text-sm text-text/70">Followers: {user.followers || 0}</p>
+              {/* Follower count hidden for privacy */}
             </Link>
           ))}
         </div>

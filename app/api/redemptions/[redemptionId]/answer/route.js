@@ -4,6 +4,7 @@ import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
 import Redemption from "@/models/Redemption";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { notifyCreatorAnswered } from "@/utils/notificationHelpers";
 
 await connectDb();
 
@@ -59,6 +60,14 @@ export async function POST(request, { params }) {
       { new: true }
     ).populate('fanId', 'username name')
      .populate('vaultItemId', 'title');
+
+    // Send notification to the fan
+    await notifyCreatorAnswered(
+      updatedRedemption.fanId._id,
+      creator.name,
+      updatedRedemption.vaultItemId.title,
+      redemptionId
+    );
 
     return NextResponse.json({ 
       success: true, 

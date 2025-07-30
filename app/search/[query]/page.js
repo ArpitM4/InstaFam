@@ -87,9 +87,7 @@ const SearchResults = ({ params }) => {
                     @{user.username}
                   </p>
                 </Link>
-                <p className="text-sm text-text/70">
-                  Followers: {user.followers || 0}
-                </p>
+                {/* Follower count hidden for privacy */}
               </div>
             </div>
           ))}

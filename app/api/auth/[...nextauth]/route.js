@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 import connectDB from '@/db/ConnectDb';
 import User from '@/models/User';
 
-export const authOptions = NextAuth({
+const nextAuthConfig = {
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID,
@@ -53,7 +53,7 @@ export const authOptions = NextAuth({
       await connectDB();
       const dbUser = await User.findOne({ email: session.user.email });
       session.user.name = dbUser?.username || session.user.name;
-      session.user.id = dbUser?._id;
+      session.user.id = dbUser?._id?.toString(); // Convert ObjectId to string
       return session;
     },
   },
@@ -61,6 +61,10 @@ export const authOptions = NextAuth({
     strategy: "jwt"
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+};
+
+export { nextAuthConfig };
+
+const authOptions = NextAuth(nextAuthConfig);
 
 export { authOptions as GET, authOptions as POST };

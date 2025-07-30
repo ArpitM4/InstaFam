@@ -3,13 +3,14 @@ import { getServerSession } from "next-auth";
 import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
 import VaultItem from "@/models/VaultItem";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
+import { notifyFollowersNewVaultItem } from "@/utils/notificationHelpers";
 
 await connectDb();
 
 export async function POST(request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(nextAuthConfig);
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -58,6 +59,25 @@ export async function POST(request) {
 
     await vaultItem.save();
 
+    // Notify followers about the new vault item
+    try {
+      const creatorWithFollowers = await User.findById(creator._id).populate('followersArray', '_id');
+      const followerIds = creatorWithFollowers.followersArray.map(follower => follower._id);
+      
+      if (followerIds.length > 0) {
+        await notifyFollowersNewVaultItem(
+          creator._id, 
+          creator.username || creator.name, 
+          vaultItem.title, 
+          vaultItem._id, 
+          followerIds
+        );
+      }
+    } catch (notificationError) {
+      console.error('Error notifying followers about new vault item:', notificationError);
+      // Don't fail the vault item creation if notification fails
+    }
+
     return NextResponse.json({ 
       success: true, 
       message: "Vault item added successfully",
@@ -72,7 +92,7 @@ export async function POST(request) {
 
 export async function GET(request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(nextAuthConfig);
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

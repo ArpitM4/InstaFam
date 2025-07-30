@@ -8,7 +8,7 @@ export async function GET(req) {
   const creators = await User.aggregate([
     { $match: { "instagram.isVerified": true, accountType: { $in: ["Creator", "VCreator"] } } },
     { $sample: { size: 20 } },
-    { $project: { username: 1, _id: 1, profilepic: 1, followers: 1 } }
+    { $project: { username: 1, _id: 1, profilepic: 1 } }
   ]);
 
   return Response.json(creators);

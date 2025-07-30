@@ -1,5 +1,6 @@
 import React from "react";
 import { FaPen, FaSpinner } from "react-icons/fa";
+import FollowButton from "./FollowButton";
 
 const PaymentProfileSection = ({
   username,
@@ -92,7 +93,35 @@ const PaymentProfileSection = ({
 
       {/* Profile Info Box */}
       <div className="relative mt-20 w-full max-w-md mx-auto p-6 bg-text/10 border border-text/20 backdrop-blur-md shadow-md rounded-lg">
-        <h1 className="text-xl font-bold text-text text-center">@{username}</h1>
+        <h1 className="text-xl font-bold text-text text-center mb-4">@{username}</h1>
+        
+        {/* Follower Count for Creator's Own Page */}
+        {isOwner && (
+          <div className="flex justify-center mb-2">
+            <span className="text-sm text-text/70 bg-text/5 px-3 py-1 rounded-full border border-text/10">
+              {(currentUser.followersArray?.length || currentUser.followers || 0).toLocaleString()} follower{(currentUser.followersArray?.length || currentUser.followers || 0) !== 1 ? 's' : ''}
+            </span>
+          </div>
+        )}
+        
+        {/* Follow Button */}
+        <div className="flex justify-center mb-4">
+          <FollowButton 
+            creatorId={currentUser._id}
+            creatorName={username}
+            initialFollowerCount={currentUser.followersArray?.length || currentUser.followers || 0}
+            showFollowerCount={false} // We're showing it separately above for creators
+            onFollowChange={(isFollowing, newCount) => {
+              // Update local state to reflect changes
+              setcurrentUser(prev => ({
+                ...prev,
+                followers: newCount,
+                followersArray: prev.followersArray || []
+              }));
+            }}
+          />
+        </div>
+        
         {/* Description */}
         {isOwner ? (
           <>
