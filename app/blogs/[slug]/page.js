@@ -1,8 +1,13 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import connectDB from "@/db/ConnectDb";
-import Blog from "@/models/Blog";
+import { useParams } from "next/navigation";
+import AdminBlogActions from "@/components/AdminBlogActions";
+
+// Force dynamic rendering for fresh blog content
+export const dynamic = 'force-dynamic';
 
 // Helper function to format date
 function formatDate(dateString) {
@@ -13,59 +18,49 @@ function formatDate(dateString) {
   });
 }
 
-// Server Component to fetch single blog
-async function getBlog(slug) {
-  try {
-    await connectDB();
-    
-    const blog = await Blog.findOne({ slug })
-      .populate('authorId', 'name username')
-      .lean();
-    
-    if (!blog) {
-      return null;
+const SingleBlogPage = () => {
+  const params = useParams();
+  const [blog, setBlog] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [notFoundError, setNotFoundError] = useState(false);
+
+  useEffect(() => {
+    if (params.slug) {
+      fetchBlog(params.slug);
     }
-    
-    // Convert MongoDB ObjectIds to strings for Next.js serialization
-    const serializedBlog = {
-      ...blog,
-      _id: blog._id.toString(),
-      authorId: {
-        ...blog.authorId,
-        _id: blog.authorId._id.toString()
-      },
-      createdAt: blog.createdAt.toISOString(),
-      updatedAt: blog.updatedAt.toISOString()
-    };
-    
-    return serializedBlog;
-  } catch (error) {
-    console.error('Error fetching blog:', error);
-    return null;
-  }
-}
+  }, [params.slug]);
 
-// Generate metadata for SEO
-export async function generateMetadata({ params }) {
-  const blog = await getBlog(params.slug);
-  
-  if (!blog) {
-    return {
-      title: 'Blog Not Found - Creator School',
-      description: 'The requested blog post could not be found.'
-    };
-  }
-  
-  return {
-    title: `${blog.title} - Creator School`,
-    description: blog.content.substring(0, 160) + (blog.content.length > 160 ? '...' : ''),
+  const fetchBlog = async (slug) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/blogs/${slug}`);
+      if (response.ok) {
+        const data = await response.json();
+        setBlog(data.blog);
+      } else if (response.status === 404) {
+        setNotFoundError(true);
+      } else {
+        console.error('Failed to fetch blog');
+      }
+    } catch (error) {
+      console.error('Error fetching blog:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
-}
 
-const SingleBlogPage = async ({ params }) => {
-  const blog = await getBlog(params.slug);
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background pt-20 text-text flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-text/70">Loading blog post...</p>
+        </div>
+      </div>
+    );
+  }
 
-  if (!blog) {
+  if (notFoundError || !blog) {
     notFound();
   }
 
@@ -88,9 +83,16 @@ const SingleBlogPage = async ({ params }) => {
 
         {/* Article Header */}
         <header className="mb-12 pb-8 border-b border-text/20">
-          <h1 className="text-4xl md:text-5xl font-bold text-primary mb-6 leading-tight">
-            {blog.title}
-          </h1>
+          <div className="flex justify-between items-start mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-primary leading-tight flex-1">
+              {blog.title}
+            </h1>
+            
+            {/* Admin Actions */}
+            <div className="ml-6">
+              <AdminBlogActions blog={blog} />
+            </div>
+          </div>
           
           {/* Author and Date Information */}
           <div className="flex items-center gap-6 text-text/70">

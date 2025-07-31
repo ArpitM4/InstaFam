@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/db/ConnectDb";
 import Blog from "@/models/Blog";
 import User from "@/models/User";
+import { revalidatePath } from 'next/cache';
 
 // Hardcoded admin emails - Update this array with your admin emails
 const ADMIN_EMAILS = ['arpitmahatpure@gmail.com', 'arpitmaurya1506@gmail.com']; // Add your admin emails here
@@ -101,6 +102,14 @@ export async function POST(request) {
 
     await newBlog.save();
 
+    // Revalidate the blogs page to show the new post immediately
+    try {
+      revalidatePath('/blogs');
+    } catch (revalidateError) {
+      console.log('Revalidation failed:', revalidateError);
+      // Continue anyway as the blog was created successfully
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Blog post created successfully',
@@ -111,6 +120,75 @@ export async function POST(request) {
     console.error('Error creating blog post:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to create blog post' },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE - Delete blog post (Admin Only)
+export async function DELETE(request) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Admin check
+    if (!ADMIN_EMAILS.includes(session.user.email)) {
+      return NextResponse.json(
+        { success: false, error: 'Access denied. Admin privileges required.' },
+        { status: 403 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const blogId = searchParams.get('id');
+
+    if (!blogId) {
+      return NextResponse.json(
+        { success: false, error: 'Blog ID is required' },
+        { status: 400 }
+      );
+    }
+
+    await connectDB();
+
+    // Find and delete the blog post
+    const deletedBlog = await Blog.findByIdAndDelete(blogId);
+
+    if (!deletedBlog) {
+      return NextResponse.json(
+        { success: false, error: 'Blog post not found' },
+        { status: 404 }
+      );
+    }
+
+    // Revalidate the blogs page to reflect the deletion immediately
+    try {
+      revalidatePath('/blogs');
+    } catch (revalidateError) {
+      console.log('Revalidation failed:', revalidateError);
+      // Continue anyway as the blog was deleted successfully
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Blog post deleted successfully',
+      deletedBlog: {
+        _id: deletedBlog._id,
+        title: deletedBlog.title,
+        slug: deletedBlog.slug
+      }
+    });
+
+  } catch (error) {
+    console.error('Error deleting blog post:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to delete blog post' },
       { status: 500 }
     );
   }

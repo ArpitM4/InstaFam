@@ -1,7 +1,14 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import connectDB from "@/db/ConnectDb";
-import Blog from "@/models/Blog";
+import AdminBlogActions from "@/components/AdminBlogActions";
+
+// Force dynamic rendering to always fetch fresh data
+export const dynamic = 'force-dynamic';
+
+// Alternatively, you can use revalidate instead of force-dynamic
+// export const revalidate = 0; // This will revalidate on every request
 
 // Helper function to format date
 function formatDate(dateString) {
@@ -18,37 +25,45 @@ function createExcerpt(content, maxLength = 150) {
   return content.substring(0, maxLength).trim() + '...';
 }
 
-// Server Component to fetch blogs
-async function getBlogs() {
-  try {
-    await connectDB();
-    
-    const blogs = await Blog.find({})
-      .populate('authorId', 'name username')
-      .sort({ createdAt: -1 })
-      .lean();
-    
-    // Convert MongoDB ObjectIds to strings for Next.js serialization
-    const serializedBlogs = blogs.map(blog => ({
-      ...blog,
-      _id: blog._id.toString(),
-      authorId: {
-        ...blog.authorId,
-        _id: blog.authorId._id.toString()
-      },
-      createdAt: blog.createdAt.toISOString(),
-      updatedAt: blog.updatedAt.toISOString()
-    }));
-    
-    return serializedBlogs;
-  } catch (error) {
-    console.error('Error fetching blogs:', error);
-    return [];
-  }
-}
+const BlogsPage = () => {
+  const [blogs, setBlogs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-const BlogsPage = async () => {
-  const blogs = await getBlogs();
+  useEffect(() => {
+    fetchBlogs();
+  }, []);
+
+  const fetchBlogs = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/blogs');
+      if (response.ok) {
+        const data = await response.json();
+        setBlogs(data.blogs || []);
+      } else {
+        console.error('Failed to fetch blogs');
+      }
+    } catch (error) {
+      console.error('Error fetching blogs:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteBlog = (deletedBlogId) => {
+    setBlogs(prevBlogs => prevBlogs.filter(blog => blog._id !== deletedBlogId));
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background pt-20 text-text flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-text/70">Loading Creator School...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pt-20 text-text py-8 px-4">
@@ -85,7 +100,7 @@ const BlogsPage = async () => {
             {blogs.map((blog, index) => (
               <article
                 key={blog._id}
-                className="group bg-dropdown-hover rounded-xl p-6 hover:bg-dropdown-hover/80 transition-colors"
+                className="group bg-dropdown-hover rounded-xl p-4 hover:bg-dropdown-hover/80 transition-colors"
               >
                 <Link href={`/blogs/${blog.slug}`} className="block">
                   <div className="space-y-3">
@@ -107,7 +122,7 @@ const BlogsPage = async () => {
                     </p>
                     
                     {/* Meta Information */}
-                    <div className="flex items-center justify-between pt-3 border-t border-text/10">
+                    <div className="flex items-center justify-between pt-3  border-text/10">
                       <div className="flex items-center gap-3 text-xs text-text/60">
                         <span className="font-medium">
                           {blog.authorId.name || blog.authorId.username}
@@ -116,13 +131,20 @@ const BlogsPage = async () => {
                         <span>{formatDate(blog.createdAt)}</span>
                       </div>
                       
-                      <div className="flex items-center gap-2 text-primary font-medium text-xs group-hover:gap-3 transition-all">
-                        Read More
-                        <span className="group-hover:translate-x-1 transition-transform">→</span>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 text-primary font-medium text-xs group-hover:gap-3 transition-all">
+                          Read More
+                          <span className="group-hover:translate-x-1 transition-transform">→</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </Link>
+                
+                {/* Admin Actions - Outside the Link */}
+                <div className="mt-4 border-text/20">
+                  <AdminBlogActions blog={blog} onDelete={handleDeleteBlog} />
+                </div>
               </article>
             ))}
           </div>
