@@ -5,27 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import SEO from "@/components/SEO";
 
-// Metadata for homepage
-export const metadata = {
-  title: 'InstaFam - Connect with Your Favorite Creators',
-  description: 'Join thousands of fans connecting with their favorite creators. Earn points, unlock exclusive content, support creators through donations, and access premium perks on the ultimate creator-fan platform.',
-  keywords: ['creator platform', 'fan engagement', 'exclusive content', 'creator support', 'social network', 'influencer platform', 'creator economy', 'fan community'],
-  openGraph: {
-    title: 'InstaFam - Connect with Your Favorite Creators',
-    description: 'Join thousands of fans connecting with their favorite creators. Earn points, unlock exclusive content, and support creators.',
-    url: 'https://instafam.vercel.app',
-    type: 'website',
-    images: [
-      {
-        url: '/og-home.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'InstaFam Homepage - Creator Community Platform',
-      }
-    ],
-  },
-};
-
 export default function Home() {
   const headings = ["Support Your Favorite Creators", "Get Exclusive Perks"];
   const animationDuration = 10000; // Match with CSS
