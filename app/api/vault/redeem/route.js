@@ -61,6 +61,11 @@ export async function POST(request) {
       $inc: { points: -vaultItem.pointCost }
     });
 
+    // Add earnings to creator (1 point = ₹1)
+    await User.findByIdAndUpdate(vaultItem.creatorId, {
+      $inc: { vaultEarningsBalance: vaultItem.pointCost }
+    });
+
     // Increment unlock count
     await VaultItem.findByIdAndUpdate(vaultItem._id, {
       $inc: { unlockCount: 1 }

@@ -38,6 +38,7 @@ const UserSchema = new Schema({
   eventStart: { type: Date, default: null },
   eventEnd: { type: Date, default: null },
   points: { type: Number, default: 0 },
+  vaultEarningsBalance: { type: Number, default: 0 },
   isReal: { type: Boolean, default: true },
 });
 

@@ -33,7 +33,7 @@ const PaymentInfo = () => {
       }
     } catch (error) {
       console.error('Error loading payment data:', error);
-      toast.error('Error loading payment information');
+      toast.error('Error loading payout information');
     } finally {
       setLoading(false);
     }
@@ -58,9 +58,9 @@ const PaymentInfo = () => {
 
     try {
       await updatePaymentInfo(session.user.name, phone, upi);
-      toast.success("Payment information updated successfully!");
+      toast.success("Payout information updated successfully!");
     } catch (error) {
-      toast.error("Failed to update payment information");
+      toast.error("Failed to update payout information");
       console.error(error);
     }
   };
@@ -76,8 +76,8 @@ const PaymentInfo = () => {
   return (
     <div className="space-y-12">
       <div className="pb-8">
-        <h1 className="text-2xl font-semibold text-text mb-3">Payment Information</h1>
-        <p className="text-text/60 text-sm">Manage your earnings and payment details</p>
+        <h1 className="text-2xl font-semibold text-text mb-3">Leaderboard Payout</h1>
+        <p className="text-text/60 text-sm">Manage your earnings and payout details</p>
       </div>
 
       {/* Earnings Section */}
@@ -93,7 +93,7 @@ const PaymentInfo = () => {
 
       {/* Payment History Section */}
       <section className="space-y-6">
-        <h3 className="text-lg font-medium text-text/90">Payment History</h3>
+        <h3 className="text-lg font-medium text-text/90">Donation History</h3>
         <div className="bg-dropdown-hover rounded-xl p-6">
           <div className="max-h-80 overflow-y-auto custom-scrollbar space-y-3">
             {payments.length === 0 ? (
@@ -129,7 +129,7 @@ const PaymentInfo = () => {
 
       {/* Payment Info Update Section */}
       <section className="space-y-6">
-        <h3 className="text-lg font-medium text-text/90">Update Payment Details</h3>
+        <h3 className="text-lg font-medium text-text/90">Update Payout Details</h3>
         <div className="bg-dropdown-hover rounded-xl p-6">
           <form onSubmit={handleSubmit} className="space-y-6 max-w-md">
             <div className="space-y-2">
@@ -163,12 +163,12 @@ const PaymentInfo = () => {
                   : "bg-text/20 cursor-not-allowed text-text/50"
               }`}
             >
-              Save Payment Details
+              Save Payout Details
             </button>
 
             {!form?.instagram?.isVerified && (
               <p className="text-sm text-text/60 bg-background/30 rounded-lg p-3">
-                Verify your Instagram account first to update payment information
+                Verify your Instagram account first to update payout information
               </p>
             )}
           </form>

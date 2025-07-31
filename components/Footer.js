@@ -24,6 +24,7 @@ const Footer = () => {
         <ul className="space-y-2 opacity-85">
           <li><a href="/" className="hover:underline">Home</a></li>
           <li><a href="/about" className="hover:underline">About Us</a></li>
+          <li><a href="/blogs" className="hover:underline">Creator School</a></li>
           <li><a href="/contact" className="hover:underline">Contact</a></li>
           <li><a href="/terms" className="hover:underline">Terms of Service</a></li>
           <li><a href="/privacypolicy" className="hover:underline">Privacy Policy</a></li>
