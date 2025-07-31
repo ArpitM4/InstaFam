@@ -15,6 +15,8 @@ export default {
         accent: "var(--accent)",
         success: "var(--success)",
         error: "var(--error)",
+        "dropdown-border": "var(--dropdown-border)",
+        "dropdown-hover": "var(--dropdown-hover)",
       },
     },
   },

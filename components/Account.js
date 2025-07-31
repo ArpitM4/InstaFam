@@ -66,10 +66,12 @@ import { fetchuser, updateProfile } from '@/actions/useractions'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bounce } from 'react-toastify';
+import { useTheme } from "@/context/ThemeContext";
 
 const Account = () => {
   const { data: session, update } = useSession();
   const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
 
   const [form, setForm] = useState({
     name: "",
@@ -172,7 +174,18 @@ const Account = () => {
   };
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    
+    // Handle theme change immediately
+    if (name === "theme") {
+      const newTheme = value.toLowerCase(); // Convert "Dark"/"Light" to "dark"/"light"
+      
+      // Update theme context by toggling if needed
+      if ((newTheme === 'dark' && theme === 'light') || (newTheme === 'light' && theme === 'dark')) {
+        toggleTheme();
+      }
+    }
   };
 
   // Validation state for form fields
@@ -220,6 +233,7 @@ const Account = () => {
 
   return (
     <>
+
 
       <UsernameModal
         open={showUsernameModal}
@@ -340,6 +354,36 @@ const Account = () => {
         <option value="User">User</option>
         <option value="Creator">Creator</option>
       </select>
+    </div>
+
+    {/* Theme Selection */}
+    <div>
+      <label className="block text-sm font-semibold text-text mb-3">Theme</label>
+      <div className="flex space-x-6">
+        <label className="flex items-center cursor-pointer">
+          <input
+            type="radio"
+            name="theme"
+            value="Dark"
+            checked={theme === 'dark'}
+            onChange={handleChange}
+            className="mr-2 text-primary focus:ring-2 focus:ring-primary"
+          />
+          <span className="text-text">Dark</span>
+        </label>
+        <label className="flex items-center cursor-pointer">
+          <input
+            type="radio"
+            name="theme"
+            value="Light"
+            checked={theme === 'light'}
+            onChange={handleChange}
+            className="mr-2 text-primary focus:ring-2 focus:ring-primary"
+          />
+          <span className="text-text">Light</span>
+        </label>
+      </div>
+      <div className="text-xs text-gray-400 mt-1">Choose your preferred theme.</div>
     </div>
 
     {/* Submit */}

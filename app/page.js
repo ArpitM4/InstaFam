@@ -75,6 +75,16 @@ const handleSearch = (e) => {
         Search
       </button>
     </form>
+
+    {/* Explore Link */}
+    <div className="pt-20 animate-fadeIn delay-400">
+      <Link 
+        href="/explore" 
+        className="text-white hover:text-white transition-colors duration-200 text-lg font-light animate-pulse-blink"
+      >
+        Explore Top Creators →
+      </Link>
+    </div>
   </div>
 </div>
 

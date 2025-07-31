@@ -24,35 +24,48 @@ const ExplorePage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen px-4 py-28 bg-background text-text">
-      <h1 className="text-3xl font-bold mb-8 text-pink-500 text-center">Explore Top Creators</h1>
-      {loading ? (
-        <div className="flex justify-center items-center mt-20">
-          <div className="w-12 h-12 border-4 border-primary border-dashed rounded-full animate-spin"></div>
+    <div className="min-h-screen px-6 py-28 bg-background text-text">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h1 className="text-2xl font-semibold text-text mb-4">Explore Creators</h1>
+          <p className="text-text/60 text-sm">Discover and support talented content creators</p>
         </div>
-      ) : creators.length === 0 ? (
-        <p className="text-text/60 text-center">No creators found.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-items-center">
-          {creators.map((user) => (
-            <Link
-              key={user._id}
-              href={`/${user.username}`}
-              className="w-full max-w-xs p-5 bg-secondary/10 border border-secondary/20 backdrop-blur-lg rounded-xl shadow-md flex flex-col items-center space-y-3 hover:scale-[1.03] transition cursor-pointer"
-            >
-              <img
-                src={user.profilepic || "https://picsum.photos/100"}
-                alt="profile"
-                className="w-20 h-20 rounded-full object-cover border border-primary/50 mb-2"
-              />
-              <p className="text-xl font-semibold hover:underline hover:text-primary transition">
-                @{user.username}
-              </p>
-              {/* Follower count hidden for privacy */}
-            </Link>
-          ))}
-        </div>
-      )}
+
+        {loading ? (
+          <div className="flex justify-center items-center mt-20">
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : creators.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-text/60">No creators found</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {creators.map((user) => (
+              <Link
+                key={user._id}
+                href={`/${user.username}`}
+                className="group bg-dropdown-hover rounded-2xl p-6 hover:bg-dropdown-hover/80 transition-all duration-300 hover:scale-[1.02]"
+              >
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="relative">
+                    <img
+                      src={user.profilepic || "https://picsum.photos/100"}
+                      alt="profile"
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-medium text-text group-hover:text-primary transition-colors">
+                      @{user.username}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -158,7 +158,7 @@ const NotificationBell = () => {
       <button
         ref={bellRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-text hover:text-primary transition-colors"
+        className="relative p-2 text-text hover:text-gray-400 transition-colors"
       >
         <svg
           className="w-6 h-6"
@@ -186,10 +186,10 @@ const NotificationBell = () => {
       {isOpen && (
         <div
           ref={dropdownRef}
-          className="absolute right-0 mt-2 w-80 bg-background border border-text/20 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden"
+          className="absolute right-0 mt-2 w-80 bg-black text-white border border-dropdown-border rounded-lg shadow-lg z-50 max-h-96 overflow-hidden"
         >
           {/* Header */}
-          <div className="p-4 border-b border-text/20 flex justify-between items-center">
+          <div className="p-4 border-b border-dropdown-border flex justify-between items-center">
             <h3 className="font-semibold text-lg">Notifications</h3>
             {unreadCount > 0 && (
               <button
@@ -202,23 +202,22 @@ const NotificationBell = () => {
           </div>
 
           {/* Notifications List */}
-          <div className="max-h-80 overflow-y-auto">
+          <div className="max-h-80 overflow-y-auto custom-scrollbar">
             {loading ? (
-              <div className="p-4 text-center text-text/60">
+              <div className="p-4 text-center text-white/60">
                 <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
                 Loading notifications...
               </div>
             ) : notifications.length === 0 ? (
-              <div className="p-4 text-center text-text/60">
-                <div className="text-4xl mb-2">🔔</div>
-                <p>No notifications yet</p>
+              <div className="p-8 text-center text-white/60">
+                <p className="text-sm">No notifications yet</p>
               </div>
             ) : (
               notifications.map((notification) => (
                 <div
                   key={notification._id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`p-4 border-b border-text/10 hover:bg-text/5 cursor-pointer transition-colors ${
+                  className={`p-4 border-b border-dropdown-border hover:bg-dropdown-hover cursor-pointer transition-colors ${
                     !notification.isRead ? 'bg-primary/5 border-l-4 border-l-primary' : ''
                   }`}
                 >
@@ -230,10 +229,10 @@ const NotificationBell = () => {
                       <p className="font-medium text-sm mb-1">
                         {notification.title}
                       </p>
-                      <p className="text-text/70 text-sm mb-2">
+                      <p className="text-white/70 text-sm mb-2">
                         {notification.message}
                       </p>
-                      <p className="text-text/50 text-xs">
+                      <p className="text-white/50 text-xs">
                         {formatTimeAgo(notification.createdAt)}
                       </p>
                     </div>
@@ -248,7 +247,7 @@ const NotificationBell = () => {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="p-3 border-t border-text/20 text-center">
+            <div className="p-3 border-t border-dropdown-border text-center">
               <button
                 onClick={() => {
                   setIsOpen(false);

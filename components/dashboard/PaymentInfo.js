@@ -74,109 +74,105 @@ const PaymentInfo = () => {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="border-b border-text/20 pb-6">
-        <h1 className="text-3xl font-bold text-primary mb-2">Payment Information</h1>
-        <p className="text-text/70">Manage your earnings and payment details</p>
+    <div className="space-y-12">
+      <div className="pb-8">
+        <h1 className="text-2xl font-semibold text-text mb-3">Payment Information</h1>
+        <p className="text-text/60 text-sm">Manage your earnings and payment details</p>
       </div>
 
       {/* Earnings Section */}
-      <section className="bg-text/5 border border-text/10 rounded-lg p-6">
-        <h3 className="text-2xl font-semibold mb-4">Total Earnings</h3>
-        <div className="flex items-center space-x-4">
-          <div className="text-4xl">💰</div>
-          <div>
-            <p className="text-3xl font-bold text-success">${totalEarning}</p>
+      <section className="space-y-6">
+        <h3 className="text-lg font-medium text-text/90">Total Earnings</h3>
+        <div className="bg-dropdown-hover rounded-xl p-8">
+          <div className="text-center">
+            <p className="text-4xl font-light text-text mb-2">${totalEarning}</p>
             <p className="text-text/60 text-sm">Total amount earned from donations</p>
           </div>
         </div>
       </section>
 
       {/* Payment History Section */}
-      <section className="bg-text/5 border border-text/10 rounded-lg p-6">
-        <h3 className="text-2xl font-semibold mb-4">Payment History</h3>
-        
-        <div className="max-h-64 overflow-y-auto space-y-1">
-          {payments.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-4xl mb-2">📋</div>
-              <p className="text-text/60">No payments yet.</p>
-            </div>
-          ) : (
-            payments
-              .filter((p) => p.to_user === userId)
-              .map((p, index) => (
-                <div
-                  key={p.oid}
-                  className={`flex justify-between items-center p-3 hover:bg-text/5 transition-colors ${
-                    index !== payments.filter((p) => p.to_user === userId).length - 1 
-                      ? 'border-b border-text/10' 
-                      : ''
-                  }`}
-                >
-                  <div>
-                    <p className="text-sm text-text/80">
-                      <span className="font-semibold">{p.name}</span>
-                      {" • "}
-                      <span className="text-xs text-text/60">
+      <section className="space-y-6">
+        <h3 className="text-lg font-medium text-text/90">Payment History</h3>
+        <div className="bg-dropdown-hover rounded-xl p-6">
+          <div className="max-h-80 overflow-y-auto custom-scrollbar space-y-3">
+            {payments.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-text/60 text-sm">No payments yet</p>
+              </div>
+            ) : (
+              payments
+                .filter((p) => p.to_user === userId)
+                .map((p, index) => (
+                  <div
+                    key={p.oid}
+                    className="flex justify-between items-start p-4 bg-background/30 rounded-lg hover:bg-background/50 transition-colors"
+                  >
+                    <div className="flex-1">
+                      <p className="font-medium text-text/90 text-sm">{p.name}</p>
+                      <p className="text-xs text-text/60 mt-1">
                         {new Date(p.createdAt).toLocaleDateString()}
-                      </span>
-                    </p>
-                    {p.message && (
-                      <p className="text-xs text-text/60 mt-1 italic">"{p.message}"</p>
-                    )}
+                      </p>
+                      {p.message && (
+                        <p className="text-xs text-text/60 mt-2 italic bg-background/50 rounded px-2 py-1">
+                          "{p.message}"
+                        </p>
+                      )}
+                    </div>
+                    <span className="text-lg font-medium text-success ml-4">${p.amount}</span>
                   </div>
-                  <span className="text-lg font-bold text-success">${p.amount}</span>
-                </div>
-              ))
-          )}
+                ))
+            )}
+          </div>
         </div>
       </section>
 
       {/* Payment Info Update Section */}
-      <section className="bg-text/5 border border-text/10 rounded-lg p-6">
-        <h3 className="text-2xl font-semibold mb-4">Update Payment Details</h3>
-        <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
-          <div>
-            <label className="block mb-2 text-text/80 font-medium">Phone Number</label>
-            <input
-              type="text"
-              name="phone"
-              value={form?.paymentInfo?.phone || ""}
-              onChange={handleChange}
-              className="w-full p-3 rounded-md bg-text text-background border border-text/20 focus:ring-2 focus:ring-primary outline-none"
-              placeholder="Enter your phone number"
-            />
-          </div>
-          <div>
-            <label className="block mb-2 text-text/80 font-medium">UPI ID</label>
-            <input
-              type="text"
-              name="upi"
-              value={form?.paymentInfo?.upi || ""}
-              onChange={handleChange}
-              className="w-full p-3 rounded-md bg-text text-background border border-text/20 focus:ring-2 focus:ring-primary outline-none"
-              placeholder="you@bank"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={!form?.instagram?.isVerified}
-            className={`px-6 py-3 rounded-md text-text font-medium transition ${
-              form?.instagram?.isVerified
-                ? "bg-primary hover:bg-primary/80"
-                : "bg-text/30 cursor-not-allowed"
-            }`}
-          >
-            Save Payment Details
-          </button>
+      <section className="space-y-6">
+        <h3 className="text-lg font-medium text-text/90">Update Payment Details</h3>
+        <div className="bg-dropdown-hover rounded-xl p-6">
+          <form onSubmit={handleSubmit} className="space-y-6 max-w-md">
+            <div className="space-y-2">
+              <label className="text-xs text-text/60 uppercase tracking-wide">Phone Number</label>
+              <input
+                type="text"
+                name="phone"
+                value={form?.paymentInfo?.phone || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-background/50 text-background border-0 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                placeholder="Enter your phone number"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs text-text/60 uppercase tracking-wide">UPI ID</label>
+              <input
+                type="text"
+                name="upi"
+                value={form?.paymentInfo?.upi || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-background/50 text-background border-0 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                placeholder="you@bank"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={!form?.instagram?.isVerified}
+              className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                form?.instagram?.isVerified
+                  ? "bg-primary hover:bg-primary/90 text-white"
+                  : "bg-text/20 cursor-not-allowed text-text/50"
+              }`}
+            >
+              Save Payment Details
+            </button>
 
-          {!form?.instagram?.isVerified && (
-            <p className="mt-2 text-sm text-accent">
-              ⚠️ Verify your Instagram account first to update payment information.
-            </p>
-          )}
-        </form>
+            {!form?.instagram?.isVerified && (
+              <p className="text-sm text-text/60 bg-background/30 rounded-lg p-3">
+                Verify your Instagram account first to update payment information
+              </p>
+            )}
+          </form>
+        </div>
       </section>
     </div>
   );

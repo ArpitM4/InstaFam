@@ -52,25 +52,25 @@ const DashboardLayout = ({ children }) => {
       {/* Desktop Layout */}
       <div className="hidden md:flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-background/30 backdrop-blur-lg border-r border-text/10 p-6 space-y-4 min-h-screen">
-          <h2 className="text-xl font-bold mb-6">Creator Dashboard</h2>
-          <nav className="space-y-2">
+        <aside className="w-64 bg-background/60 backdrop-blur-sm p-6 space-y-2 min-h-screen">
+          <h2 className="text-xl font-bold mb-8 text-text/90">Creator Dashboard</h2>
+          <nav className="space-y-1">
             <Link
               href="/dashboard"
-              className={`block w-full text-left p-3 rounded-md transition-colors ${
+              className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
                 isActive('/dashboard')
-                  ? 'bg-primary/20 text-primary border-l-4 border-primary'
-                  : 'hover:bg-text/10 hover:text-primary'
+                  ? 'bg-primary/10 text-primary font-medium shadow-sm'
+                  : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
               }`}
             >
               General
             </Link>
             <Link
               href="/dashboard/payment"
-              className={`block w-full text-left p-3 rounded-md transition-colors ${
+              className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
                 isActive('/dashboard/payment')
-                  ? 'bg-primary/20 text-primary border-l-4 border-primary'
-                  : 'hover:bg-text/10 hover:text-primary'
+                  ? 'bg-primary/10 text-primary font-medium shadow-sm'
+                  : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
               }`}
             >
               Payment Info
@@ -79,54 +79,64 @@ const DashboardLayout = ({ children }) => {
               <>
                 <Link
                   href="/dashboard/vault"
-                  className={`block w-full text-left p-3 rounded-md transition-colors ${
+                  className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
                     isActive('/dashboard/vault')
-                      ? 'bg-primary/20 text-primary border-l-4 border-primary'
-                      : 'hover:bg-text/10 hover:text-primary'
+                      ? 'bg-primary/10 text-primary font-medium shadow-sm'
+                      : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
                   }`}
                 >
                   My Vault
                 </Link>
                 <Link
                   href="/dashboard/requests"
-                  className={`block w-full text-left p-3 rounded-md transition-colors ${
+                  className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
                     isActive('/dashboard/requests')
-                      ? 'bg-primary/20 text-primary border-l-4 border-primary'
-                      : 'hover:bg-text/10 hover:text-primary'
+                      ? 'bg-primary/10 text-primary font-medium shadow-sm'
+                      : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
                   }`}
                 >
                   Vault Requests
                 </Link>
               </>
             )}
+            <div className="pt-4">
+              <Link
+                href={`/${session?.user?.name}`}
+                className="block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 hover:bg-dropdown-hover text-text/60 hover:text-text/80 text-sm"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Your Page
+              </Link>
+            </div>
           </nav>
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-4 md:p-8 pb-20">
+        <main className="flex-1 p-8 pb-20 bg-background">
           {children}
         </main>
       </div>
 
       {/* Mobile Navigation */}
-      <div className="md:hidden bg-background/30 backdrop-blur-lg border-b border-text/10 px-4 py-3">
-        <div className="flex space-x-1">
+      <div className="md:hidden bg-background/80 backdrop-blur-sm px-4 py-4 shadow-sm">
+        <div className="flex space-x-2 overflow-x-auto custom-scrollbar">
           <Link
             href="/dashboard"
-            className={`flex-1 py-3 px-4 text-center rounded-lg font-medium transition-colors ${
+            className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
               isActive('/dashboard')
-                ? 'bg-primary text-text'
-                : 'bg-text/10 text-text/70 hover:bg-text/20'
+                ? 'bg-primary/10 text-primary shadow-sm'
+                : 'bg-dropdown-hover text-text/70 hover:text-text'
             }`}
           >
             General
           </Link>
           <Link
             href="/dashboard/payment"
-            className={`flex-1 py-3 px-4 text-center rounded-lg font-medium transition-colors ${
+            className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
               isActive('/dashboard/payment')
-                ? 'bg-primary text-text'
-                : 'bg-text/10 text-text/70 hover:bg-text/20'
+                ? 'bg-primary/10 text-primary shadow-sm'
+                : 'bg-dropdown-hover text-text/70 hover:text-text'
             }`}
           >
             Payment
@@ -135,31 +145,39 @@ const DashboardLayout = ({ children }) => {
             <>
               <Link
                 href="/dashboard/vault"
-                className={`flex-1 py-3 px-4 text-center rounded-lg font-medium transition-colors ${
+                className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
                   isActive('/dashboard/vault')
-                    ? 'bg-primary text-text'
-                    : 'bg-text/10 text-text/70 hover:bg-text/20'
+                    ? 'bg-primary/10 text-primary shadow-sm'
+                    : 'bg-dropdown-hover text-text/70 hover:text-text'
                 }`}
               >
                 Vault
               </Link>
               <Link
                 href="/dashboard/requests"
-                className={`flex-1 py-3 px-4 text-center rounded-lg font-medium transition-colors ${
+                className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
                   isActive('/dashboard/requests')
-                    ? 'bg-primary text-text'
-                    : 'bg-text/10 text-text/70 hover:bg-text/20'
+                    ? 'bg-primary/10 text-primary shadow-sm'
+                    : 'bg-dropdown-hover text-text/70 hover:text-text'
                 }`}
               >
                 Requests
               </Link>
             </>
           )}
+          <Link
+            href={`/${session?.user?.name}`}
+            className="flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm bg-dropdown-hover text-text/60 hover:text-text/80"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Your Page
+          </Link>
         </div>
       </div>
 
       {/* Mobile Main Content */}
-      <main className="md:hidden p-4 pb-20">
+      <main className="md:hidden p-4 pb-20 bg-background">
         {children}
       </main>
     </div>

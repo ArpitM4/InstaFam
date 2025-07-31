@@ -14,6 +14,8 @@
   --accent: #ffbb00;
   --success: #22c55e;
   --error: #ef4444;
+  --dropdown-border: #e5e7eb; /* Light gray for light mode */
+  --dropdown-hover: #f3f4f6; /* Darker shade of white for light mode */
     #stardiv{
   height: 100%;
   overflow: hidden;
@@ -29,6 +31,8 @@
   --accent: #fdcc03;
   --success: #22c55e;
   --error: #ef4444;
+  --dropdown-border: #374151; /* Dark gray for dark mode */
+  --dropdown-hover: #212328; /* Dark hover background for dark mode */
     --bv1 : ;
   --bv2 : ;
 
@@ -75,6 +79,15 @@ body {
   }
 }
 
+@keyframes pulse-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
 .animate-typing {
   display: inline-block;
   white-space: nowrap;
@@ -82,6 +95,45 @@ body {
   border-right: 4px solid var(--text);
   animation: typing 9s steps(30, end), blink 0.7s step-end infinite;
   width: 0; /* Start with no width */
+}
+
+.animate-pulse-blink {
+  animation: pulse-blink 2s ease-in-out infinite;
+}
+
+/* Custom Scrollbar Styles */
+.custom-scrollbar,
+.vault-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--dropdown-border) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar,
+.vault-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track,
+.vault-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.vault-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--dropdown-border);
+  border-radius: 2px;
+  opacity: 0.7;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.vault-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--dropdown-hover);
+  opacity: 1;
+}
+
+.custom-scrollbar::-webkit-scrollbar-corner,
+.vault-scroll::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 /* Star Background */

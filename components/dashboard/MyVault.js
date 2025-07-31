@@ -152,37 +152,37 @@ const MyVault = () => {
 
   return (
     <div className="space-y-8">
-      <div className="border-b border-text/20 pb-6">
-        <h1 className="text-3xl font-bold text-primary mb-2">My Vault</h1>
-        <p className="text-text/70">Manage exclusive content for your fans to unlock with Fam Points</p>
+      <div className="pb-6">
+        <h1 className="text-2xl font-semibold text-text mb-2">My Vault</h1>
+        <p className="text-text/60">Manage exclusive content for your fans to unlock with Fam Points</p>
       </div>
 
       {/* Add New Vault Item Section */}
-      <section className="bg-text/5 border border-text/10 rounded-lg p-6">
-        <h3 className="text-2xl font-semibold mb-4">Add New Vault Item</h3>
-        <form onSubmit={handleAddVaultItem} className="space-y-4 max-w-2xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <section className="bg-dropdown-hover rounded-2xl p-6">
+        <h3 className="text-lg font-medium mb-6">Add New Vault Item</h3>
+        <form onSubmit={handleAddVaultItem} className="space-y-6 max-w-2xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block mb-2 text-text/80 font-medium">Title *</label>
+              <label className="block mb-2 text-text/70 font-medium text-sm">Title</label>
               <input
                 type="text"
                 name="title"
                 value={newVaultItem.title}
                 onChange={handleVaultItemChange}
-                className="w-full p-3 rounded-md bg-text text-background border border-text/20 focus:ring-2 focus:ring-primary outline-none"
+                className="w-full p-3 rounded-xl bg-background text-text focus:ring-2 focus:ring-primary outline-none transition-all"
                 placeholder="e.g., Exclusive Wallpaper Pack"
                 maxLength="100"
                 required
               />
             </div>
             <div>
-              <label className="block mb-2 text-text/80 font-medium">Point Cost *</label>
+              <label className="block mb-2 text-text/70 font-medium text-sm">Point Cost</label>
               <input
                 type="number"
                 name="pointCost"
                 value={newVaultItem.pointCost}
                 onChange={handleVaultItemChange}
-                className="w-full p-3 rounded-md bg-text text-background border border-text/20 focus:ring-2 focus:ring-primary outline-none"
+                className="w-full p-3 rounded-xl bg-background text-text focus:ring-2 focus:ring-primary outline-none transition-all"
                 placeholder="500"
                 min="1"
                 required
@@ -191,12 +191,12 @@ const MyVault = () => {
           </div>
           
           <div>
-            <label className="block mb-2 text-text/80 font-medium">Description *</label>
+            <label className="block mb-2 text-text/70 font-medium text-sm">Description</label>
             <textarea
               name="description"
               value={newVaultItem.description}
               onChange={handleVaultItemChange}
-              className="w-full p-3 rounded-md bg-text text-background border border-text/20 focus:ring-2 focus:ring-primary outline-none"
+              className="w-full p-3 rounded-xl bg-background text-text focus:ring-2 focus:ring-primary outline-none transition-all resize-none"
               placeholder={uploadMethod === 'none' 
                 ? "Describe the reward/perk fans will receive (e.g., 'Your name will be featured in my next video credits')" 
                 : "Describe what fans will get when they unlock this item..."
@@ -209,7 +209,7 @@ const MyVault = () => {
 
           {/* Content Source Selection */}
           <div className="mb-4">
-            <label className="block mb-3 text-text/80 font-medium">Content Source</label>
+            <label className="block mb-3 text-text/70 font-medium text-sm">Content Source</label>
             <div className="flex items-center gap-6 mb-4">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -218,9 +218,9 @@ const MyVault = () => {
                   value="upload"
                   checked={uploadMethod === 'upload'}
                   onChange={() => handleUploadMethodChange('upload')}
-                  className="w-4 h-4 text-primary bg-text border-text/30 focus:ring-primary focus:ring-2"
+                  className="w-4 h-4 text-primary bg-background focus:ring-primary focus:ring-2"
                 />
-                <span className="text-text/80">📁 Upload File</span>
+                <span className="text-text/70">Upload File</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -229,9 +229,9 @@ const MyVault = () => {
                   value="url"
                   checked={uploadMethod === 'url'}
                   onChange={() => handleUploadMethodChange('url')}
-                  className="w-4 h-4 text-primary bg-text border-text/30 focus:ring-primary focus:ring-2"
+                  className="w-4 h-4 text-primary bg-background focus:ring-primary focus:ring-2"
                 />
-                <span className="text-text/80">🔗 Link from URL</span>
+                <span className="text-text/70">Link from URL</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -240,24 +240,24 @@ const MyVault = () => {
                   value="none"
                   checked={uploadMethod === 'none'}
                   onChange={() => handleUploadMethodChange('none')}
-                  className="w-4 h-4 text-primary bg-text border-text/30 focus:ring-primary focus:ring-2"
+                  className="w-4 h-4 text-primary bg-background focus:ring-primary focus:ring-2"
                 />
-                <span className="text-text/80">⭐ Text-Based Reward</span>
+                <span className="text-text/70">Text-Based Reward</span>
               </label>
             </div>
 
             {/* Upload Method Content */}
             {uploadMethod === 'upload' ? (
               <div>
-                <label className="block mb-2 text-text/80 font-medium">Select File</label>
+                <label className="block mb-2 text-text/70 font-medium text-sm">Select File</label>
                 <input
                   type="file"
                   onChange={(e) => setSelectedFile(e.target.files[0])}
                   accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
-                  className="w-full text-sm text-text/70 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-text hover:file:bg-primary/80 file:cursor-pointer cursor-pointer"
+                  className="w-full text-sm text-text/70 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-primary file:text-text hover:file:bg-primary/80 file:cursor-pointer cursor-pointer"
                 />
                 {selectedFile && (
-                  <div className="mt-2 p-2 bg-primary/10 rounded-md text-sm">
+                  <div className="mt-3 p-3 bg-primary/10 rounded-xl text-sm">
                     <span className="text-primary font-medium">Selected: </span>
                     <span className="text-text/70">{selectedFile.name}</span>
                     <span className="text-text/50 ml-2">({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)</span>
@@ -266,37 +266,36 @@ const MyVault = () => {
               </div>
             ) : uploadMethod === 'url' ? (
               <div>
-                <label className="block mb-2 text-text/80 font-medium">File URL</label>
+                <label className="block mb-2 text-text/70 font-medium text-sm">File URL</label>
                 <input
                   type="url"
                   name="fileUrl"
                   value={newVaultItem.fileUrl}
                   onChange={handleVaultItemChange}
-                  className="w-full p-3 rounded-md bg-text text-background border border-text/20 focus:ring-2 focus:ring-primary outline-none"
+                  className="w-full p-3 rounded-xl bg-background text-text focus:ring-2 focus:ring-primary outline-none transition-all"
                   placeholder="https://res.cloudinary.com/..."
                 />
               </div>
             ) : (
-              <div className="p-4 bg-primary/10 rounded-md border border-primary/20">
+              <div className="p-4 bg-primary/10 rounded-xl">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xl">⭐</span>
                   <span className="font-medium text-primary">Text-Based Reward</span>
                 </div>
-                <p className="text-text/70 text-sm mb-3">
+                <p className="text-text/60 text-sm mb-4">
                   Perfect for recognition, influence, or access rewards that don't require file attachments.
                 </p>
                 
                 <div>
-                  <label className="block mb-2 text-text/80 font-medium">Reward Type</label>
+                  <label className="block mb-2 text-text/70 font-medium text-sm">Reward Type</label>
                   <select
                     name="perkType"
                     value={newVaultItem.perkType}
                     onChange={handleVaultItemChange}
-                    className="w-full p-3 rounded-md bg-text text-background border border-text/20 focus:ring-2 focus:ring-primary outline-none"
+                    className="w-full p-3 rounded-xl bg-background text-text focus:ring-2 focus:ring-primary outline-none transition-all"
                   >
-                    <option value="Recognition">🏆 Recognition</option>
-                    <option value="Influence">🗳️ Influence</option>
-                    <option value="AccessLink">🔗 Access Link</option>
+                    <option value="Recognition">Recognition</option>
+                    <option value="Influence">Influence</option>
+                    <option value="AccessLink">Access Link</option>
                   </select>
                 </div>
               </div>
@@ -305,12 +304,12 @@ const MyVault = () => {
 
           {uploadMethod !== 'none' && (
             <div>
-              <label className="block mb-2 text-text/80 font-medium">File Type</label>
+              <label className="block mb-2 text-text/70 font-medium text-sm">File Type</label>
               <select
                 name="fileType"
                 value={newVaultItem.fileType}
                 onChange={handleVaultItemChange}
-                className="w-full p-3 rounded-md bg-text text-background border border-text/20 focus:ring-2 focus:ring-primary outline-none"
+                className="w-full p-3 rounded-xl bg-background text-text focus:ring-2 focus:ring-primary outline-none transition-all"
               >
                 <option value="image">Image</option>
                 <option value="video">Video</option>
@@ -322,18 +321,18 @@ const MyVault = () => {
           )}
 
           {uploadMethod === 'none' && (
-            <div className="p-4 bg-text/5 border border-text/10 rounded-lg">
+            <div className="p-4 bg-dropdown-hover rounded-xl">
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   name="requiresFanInput"
                   checked={newVaultItem.requiresFanInput}
                   onChange={handleVaultItemChange}
-                  className="mt-1 w-4 h-4 text-primary bg-text border-text/30 rounded focus:ring-primary focus:ring-2"
+                  className="mt-1 w-4 h-4 text-primary bg-background rounded focus:ring-primary focus:ring-2"
                 />
                 <div>
-                  <span className="text-text/80 font-medium">This perk requires input from the fan</span>
-                  <p className="text-text/60 text-sm mt-1">
+                  <span className="text-text/70 font-medium">This perk requires input from the fan</span>
+                  <p className="text-text/50 text-sm mt-1">
                     Check this if fans need to provide information (like their name for credits, question for Q&A, etc.)
                   </p>
                 </div>
@@ -344,10 +343,10 @@ const MyVault = () => {
           <button
             type="submit"
             disabled={vaultLoading}
-            className={`px-6 py-3 rounded-md text-text font-medium transition ${
+            className={`px-6 py-3 rounded-xl text-text font-medium transition-all ${
               vaultLoading
                 ? "bg-text/30 cursor-not-allowed"
-                : "bg-primary hover:bg-primary/80"
+                : "bg-primary hover:bg-primary/80 hover:scale-105"
             }`}
           >
             {vaultLoading ? "Adding..." : "Add to Vault"}
@@ -356,20 +355,20 @@ const MyVault = () => {
       </section>
 
       {/* Vault Management Section */}
-      <section className="bg-text/5 border border-text/10 rounded-lg p-6">
+      <section className="bg-dropdown-hover rounded-2xl p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-semibold">Your Vault Management</h3>
+          <h3 className="text-lg font-medium">Your Vault Management</h3>
           
-          <div className="flex bg-text/10 rounded-lg p-1">
+          <div className="flex bg-background rounded-xl p-1">
             <button
               onClick={() => {
                 setActiveVaultTab('active');
                 loadVaultItems();
               }}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 activeVaultTab === 'active'
                   ? 'bg-primary text-text shadow-sm'
-                  : 'text-text/70 hover:text-text hover:bg-text/5'
+                  : 'text-text/60 hover:text-text hover:bg-dropdown-hover'
               }`}
             >
               Active Items ({vaultItems.length})
@@ -379,10 +378,10 @@ const MyVault = () => {
                 setActiveVaultTab('history');
                 loadVaultHistory();
               }}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 activeVaultTab === 'history'
                   ? 'bg-primary text-text shadow-sm'
-                  : 'text-text/70 hover:text-text hover:bg-text/5'
+                  : 'text-text/60 hover:text-text hover:bg-dropdown-hover'
               }`}
             >
               Vault History ({vaultHistoryItems.length})
@@ -394,49 +393,49 @@ const MyVault = () => {
         {activeVaultTab === 'active' && (
           <>
             {vaultLoading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin h-8 w-8 rounded-full border-2 border-primary border-t-transparent mx-auto mb-2"></div>
+              <div className="text-center py-12">
+                <div className="animate-spin h-8 w-8 rounded-full border-2 border-primary border-t-transparent mx-auto mb-3"></div>
                 <p className="text-text/60">Loading active vault items...</p>
               </div>
             ) : vaultItems.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="text-4xl mb-2">🗃️</div>
-                <p className="text-text/60">No active vault items yet. Add your first exclusive content above!</p>
+              <div className="text-center py-12">
+                <p className="text-text/60 mb-2">No active vault items yet</p>
+                <p className="text-text/40 text-sm">Add your first exclusive content above</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto vault-scroll">
                 {vaultItems.map((item) => (
-                  <div key={item._id} className="bg-background/50 border border-text/10 rounded-lg p-4 space-y-3">
+                  <div key={item._id} className="bg-background rounded-xl p-4 space-y-3 hover:bg-background/80 transition-all">
                     <div className="flex items-start justify-between">
-                      <h4 className="font-semibold text-lg truncate flex-1 mr-2">{item.title}</h4>
+                      <h4 className="font-medium text-base truncate flex-1 mr-2">{item.title}</h4>
                       <button
                         onClick={() => handleDeleteVaultItem(item._id)}
-                        className="text-orange-500 hover:text-orange-400 text-sm px-2 py-1 rounded"
+                        className="text-red-500 hover:text-red-400 text-sm px-2 py-1 rounded-lg hover:bg-red-500/10 transition-all"
                         title="Expire item (move to history)"
                       >
-                        ⏰
+                        Archive
                       </button>
                     </div>
                     
-                    <p className="text-text/70 text-sm line-clamp-2">{item.description}</p>
+                    <p className="text-text/60 text-sm line-clamp-2">{item.description}</p>
                     
                     <div className="flex items-center justify-between text-sm">
-                      <span className="bg-primary/20 text-primary px-2 py-1 rounded">
+                      <span className="bg-primary/20 text-blue-300 px-3 py-1 rounded-lg font-medium">
                         {item.pointCost} points
                       </span>
                       <div className="flex items-center gap-2">
-                        <span className="text-text/60">
+                        <span className="text-text/50 text-xs">
                           {item.fileType.toUpperCase()}
                         </span>
                         {item.requiresFanInput && (
-                          <span className="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-xs" title="Requires fan input">
-                            📝
+                          <span className="bg-blue-500/20 text-text px-2 py-1 rounded-lg text-xs" title="Requires fan input">
+                            Input Required
                           </span>
                         )}
                       </div>
                     </div>
                     
-                    <div className="text-xs text-text/60 flex justify-between">
+                    <div className="text-xs text-text/50 flex justify-between">
                       <span>{item.unlockCount} unlocks</span>
                       <span>{new Date(item.createdAt).toLocaleDateString()}</span>
                     </div>
@@ -451,45 +450,45 @@ const MyVault = () => {
         {activeVaultTab === 'history' && (
           <>
             {historyLoading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin h-8 w-8 rounded-full border-2 border-primary border-t-transparent mx-auto mb-2"></div>
+              <div className="text-center py-12">
+                <div className="animate-spin h-8 w-8 rounded-full border-2 border-primary border-t-transparent mx-auto mb-3"></div>
                 <p className="text-text/60">Loading vault history...</p>
               </div>
             ) : vaultHistoryItems.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="text-4xl mb-2">📚</div>
-                <p className="text-text/60">No expired vault items yet. Items you expire will appear here.</p>
+              <div className="text-center py-12">
+                <p className="text-text/60 mb-2">No expired vault items yet</p>
+                <p className="text-text/40 text-sm">Items you expire will appear here</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto vault-scroll">
                 {vaultHistoryItems.map((item) => (
-                  <div key={item._id} className="bg-background/30 border border-text/10 rounded-lg p-4 space-y-3 opacity-75">
+                  <div key={item._id} className="bg-background/60 rounded-xl p-4 space-y-3 opacity-75">
                     <div className="flex items-start justify-between">
-                      <h4 className="font-semibold text-lg truncate flex-1 mr-2">{item.title}</h4>
-                      <span className="text-red-400 text-sm px-2 py-1 rounded" title="Expired">
-                        ❌
+                      <h4 className="font-medium text-base truncate flex-1 mr-2">{item.title}</h4>
+                      <span className="text-red-400 text-xs px-2 py-1 rounded-lg bg-red-400/10" title="Expired">
+                        Expired
                       </span>
                     </div>
                     
-                    <p className="text-text/70 text-sm line-clamp-2">{item.description}</p>
+                    <p className="text-text/60 text-sm line-clamp-2">{item.description}</p>
                     
                     <div className="flex items-center justify-between text-sm">
-                      <span className="bg-text/20 text-text/60 px-2 py-1 rounded">
+                      <span className="bg-text/20 text-text/60 px-3 py-1 rounded-lg">
                         {item.pointCost} points
                       </span>
                       <div className="flex items-center gap-2">
-                        <span className="text-text/60">
+                        <span className="text-text/50 text-xs">
                           {item.fileType.toUpperCase()}
                         </span>
                         {item.requiresFanInput && (
-                          <span className="bg-text/20 text-text/60 px-2 py-1 rounded text-xs" title="Required fan input">
-                            📝
+                          <span className="bg-text/20 text-text/50 px-2 py-1 rounded-lg text-xs" title="Required fan input">
+                            Input Required
                           </span>
                         )}
                       </div>
                     </div>
                     
-                    <div className="text-xs text-text/60 flex justify-between">
+                    <div className="text-xs text-text/50 flex justify-between">
                       <span>{item.unlockCount} total unlocks</span>
                       <div className="text-right">
                         <div>Created: {new Date(item.createdAt).toLocaleDateString()}</div>
@@ -503,7 +502,7 @@ const MyVault = () => {
           </>
         )}
       </section>
-    </div>
+    </div>  
   );
 };
 

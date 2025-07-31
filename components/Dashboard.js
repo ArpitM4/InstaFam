@@ -1,22 +1,51 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { fetchuser } from "@/actions/useractions";
+import DashboardLayout from "@/components/DashboardLayout";
+import GeneralSettings from "@/components/dashboard/GeneralSettings";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Dashboard = () => {
-  const router = useRouter();
+  const { data: session } = useSession();
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    router.push('/dashboard');
-  }, [router]);
+    if (session) {
+      loadUser();
+    }
+  }, [session]);
+
+  const loadUser = async () => {
+    try {
+      const userData = await fetchuser(session.user.name);
+      setUser(userData);
+    } catch (error) {
+      console.error('Error loading user:', error);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background text-text">
-      <div className="text-center">
-        <div className="animate-spin h-12 w-12 rounded-full border-4 border-primary border-t-transparent mb-4"></div>
-        <p className="text-lg font-semibold">Redirecting to Dashboard...</p>
-      </div>
-    </div>
+    <>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        style={{ top: 72 }}
+      />
+      <DashboardLayout>
+        <GeneralSettings user={user} onUserUpdate={setUser} />
+      </DashboardLayout>
+    </>
   );
 };
 

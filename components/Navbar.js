@@ -41,8 +41,8 @@ const Navbar = () => {
   }, [session]);
 
   return (
-    <nav className="absolute bg-black shadow-md py-2 z-30 w-full border-b-2  border-white">
-  <div className="container mx-auto px-4 flex items-center justify-between">
+    <nav className="absolute bg-black shadow-md py-2 z-30 w-full border-b-2 border-dropdown-border">
+  <div className="mx-5 flex items-center justify-between">
     {/* Logo */}
     <Link href="/" className="block w-[110px] md:w-[200px] lg:w-[200px] xl:w-[150px]">
       <img
@@ -55,13 +55,7 @@ const Navbar = () => {
     {/* Desktop Auth Buttons */}
 
     {/* Desktop Auth Buttons */}
-    <div className="hidden md:flex items-center space-x-4">
-<Link
-  href="/explore"
-  className="px-4 py-2 text-white rounded-md hover:text-gray-200 transition"
->
-  Explore
-</Link>
+    <div className="hidden md:flex items-center space-x-1">
       {!session ? (
         <>
           <Link href="/login" className="px-4 py-2 text-white border border-secondary rounded-md hover:bg-secondary/20 transition">Log In</Link>
@@ -69,84 +63,67 @@ const Navbar = () => {
         </>
       ) : (
         <>
-          {/* Notification Bell */}
-          <NotificationBell />
+
           
-          <div className="relative inline-block text-left group">
+          <div className="relative inline-block pb text-left group">
             <button className="px-4 py-2 flex items-center text-white rounded-md transition">
               <FaUser className="mr-2 text-xl" />
               {session.user.name}
+              
             </button>
-            <div className="absolute right-0 w-48 bg-black text-white border border-white rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-10">
+            <div className="absolute pb-1 right-0 w-48 bg-black text-white border border-dropdown-border rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-10">
+              <Link href="/account" className="block px-6 py-3 hover:bg-dropdown-hover transition">Profile</Link>
+              <Link href="/my-fam-points" className="block px-6 py-3 hover:bg-dropdown-hover transition">My Fam Points</Link>
               {accountType === "Creator" && (
-                <Link href="/dashboard" className="block px-6 py-3 hover:bg-secondary/20 transition">Creator Dashboard</Link>
+                <Link href="/dashboard" className="block px-6 py-3 hover:bg-dropdown-hover transition">Creator Dashboard</Link>
               )}
-
-              <Link href="/account" className="block px-6 py-3 hover:bg-secondary/20 transition">Account</Link>
-              <Link href="/my-fam-points" className="block px-6 py-3 hover:bg-secondary/20 transition">My Fam Points</Link>
-                {accountType === "Creator" && (
-              <Link href={`/${session.user.name}`} className="block px-6 py-3 hover:bg-secondary/20 transition">Your Page</Link>
-              )}
-              <button onClick={signOut} className="block w-full text-left px-6 py-3 hover:bg-secondary/20 transition">Logout</button>
+              <div className="border-t border-dropdown-border my-1"></div>
+              <button onClick={signOut} className="block w-full text-left px-6 py-2 hover:bg-dropdown-hover transition">Logout</button>
             </div>
           </div>
           
-          {/* Fam Points Display */}
-          <Link href="/my-fam-points" className="px-3 py-2 text-white border border-primary rounded-md bg-primary/20 hover:bg-primary/30 transition cursor-pointer">
-            <span className="text-sm font-medium">⭐ {userPoints} Fam Points</span>
-          </Link>
+          {/* Notification Bell */}
+          <NotificationBell />
         </>
       )}
-      
-      {/* Theme Toggle Button */}
-      <div className="ml-2">
-        <ThemeToggle />
-      </div>
     </div>
 
-    {/* Mobile Menu Toggle */}
-    <button
-      className="md:hidden text-white focus:outline-none"
-      aria-label="Toggle Menu"
-      onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-    >
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-      </svg>
-    </button>
+    {/* Mobile Menu Toggle - Only show for logged in users */}
+    {session && (
+      <button
+        className="md:hidden text-white focus:outline-none"
+        aria-label="Toggle Menu"
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+      </button>
+    )}
+
+    {/* Mobile Auth Buttons for non-logged-in users */}
+    {!session && (
+      <div className="md:hidden flex space-x-2">
+        <Link href="/login" className="px-3 py-1.5 text-sm text-white border border-secondary rounded-md hover:bg-secondary/20 transition">Log In</Link>
+        <Link href="/signup" className="px-3 py-1.5 text-sm text-white bg-primary rounded-md hover:bg-primary/80 transition">Sign Up</Link>
+      </div>
+    )}
   </div>
 
-  {/* Mobile Menu */}
-  {mobileMenuOpen && (
+  {/* Mobile Menu - Only for logged in users */}
+  {mobileMenuOpen && session && (
     <div className="md:hidden px-4 pt-4 pb-6 space-y-4 bg-black text-white border-t border-white">
-      <Link href="/explore" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Explore</Link>
-      {!session ? (
-        <>
-          <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Log In</Link>
-          <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Sign Up</Link>
-        </>
-      ) : (
-        <>
-          {/* Fam Points Display Mobile */}
-          <Link href="/my-fam-points" onClick={() => setMobileMenuOpen(false)} className="px-3 py-2 text-white border border-primary rounded-md bg-primary/20 hover:bg-primary/30 transition cursor-pointer mb-2 block">
-            <span className="text-sm font-medium">⭐ {userPoints} Fam Points</span>
-          </Link>
-          
-          {accountType === "Creator" && (
-            <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Creator Dashboard</Link>
-          )}
-          <Link href="/account" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Account</Link>
-                    {accountType === "Creator" && (
-          <Link href={`/${session.user.name}`} onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Your Page</Link>)}
-          <button onClick={() => { signOut(); setMobileMenuOpen(false); }} className="block hover:text-primary">Logout</button>
-        </>
+      {/* Fam Points Display Mobile */}
+
+      <Link href="/account" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Profile</Link>
+            <Link href="/my-fam-points" onClick={() => setMobileMenuOpen(false)} className=" text-white border-primary rounded-md bg-primary/20 hover:bg-primary/30 transition cursor-pointer mb-2 block">
+        My Fam Points
+      </Link>
+      {accountType === "Creator" && (
+        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Creator Dashboard</Link>
       )}
-      
-      {/* Mobile Theme Toggle */}
-      <div className="pt-2 flex items-center">
-        <span className="mr-2 text-white">Theme:</span>
-        <ThemeToggle />
-      </div>
+      <div className="border-t border-dropdown-border"></div>
+      <button onClick={() => { signOut(); setMobileMenuOpen(false); }} className="block hover:text-primary">Logout</button>
     </div>
   )}
 </nav>
