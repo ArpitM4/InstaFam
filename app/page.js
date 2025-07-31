@@ -3,7 +3,28 @@ import "./globals.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import SEO from "@/components/SEO";
 
+// Metadata for homepage
+export const metadata = {
+  title: 'InstaFam - Connect with Your Favorite Creators',
+  description: 'Join thousands of fans connecting with their favorite creators. Earn points, unlock exclusive content, support creators through donations, and access premium perks on the ultimate creator-fan platform.',
+  keywords: ['creator platform', 'fan engagement', 'exclusive content', 'creator support', 'social network', 'influencer platform', 'creator economy', 'fan community'],
+  openGraph: {
+    title: 'InstaFam - Connect with Your Favorite Creators',
+    description: 'Join thousands of fans connecting with their favorite creators. Earn points, unlock exclusive content, and support creators.',
+    url: 'https://instafam.vercel.app',
+    type: 'website',
+    images: [
+      {
+        url: '/og-home.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'InstaFam Homepage - Creator Community Platform',
+      }
+    ],
+  },
+};
 
 export default function Home() {
   const headings = ["Support Your Favorite Creators", "Get Exclusive Perks"];
@@ -35,6 +56,15 @@ const handleSearch = (e) => {
 
   return (
     <>
+      <SEO 
+        title="InstaFam - Connect with Your Favorite Creators"
+        description="Join thousands of fans connecting with their favorite creators. Earn points, unlock exclusive content, support creators through donations, and access premium perks on the ultimate creator-fan platform."
+        keywords="creator platform, fan engagement, exclusive content, creator support, social network, influencer platform, creator economy, fan community, content creators, monetization"
+        url="https://instafam.vercel.app"
+        image="https://instafam.vercel.app/og-home.jpg"
+        type="website"
+      />
+      
       <video
         className="fixed top-0 left-0 w-full h-full object-cover -z-10"
         src="/vid.mp4"

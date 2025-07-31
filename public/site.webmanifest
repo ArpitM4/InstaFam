@@ -1,0 +1,77 @@
+{
+  "name": "InstaFam - Creator Community Platform",
+  "short_name": "InstaFam",
+  "description": "Connect with your favorite creators, earn points, and unlock exclusive content",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#FF1B6B",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["social", "entertainment", "lifestyle"],
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "InstaFam Desktop View"
+    },
+    {
+      "src": "/screenshot-mobile.png", 
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "InstaFam Mobile View"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Explore Creators",
+      "short_name": "Explore",
+      "description": "Discover amazing creators",
+      "url": "/explore",
+      "icons": [{ "src": "/icon-explore.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Creator School",
+      "short_name": "Learn",
+      "description": "Learn content creation",
+      "url": "/blogs",
+      "icons": [{ "src": "/icon-school.png", "sizes": "96x96" }]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui", "browser"]
+}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import AdminBlogActions from "@/components/AdminBlogActions";
+import SEO from "@/components/SEO";
 
 // Force dynamic rendering to always fetch fresh data
 export const dynamic = 'force-dynamic';
@@ -56,121 +57,222 @@ const BlogsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background pt-20 text-text flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-text/70">Loading Creator School...</p>
+      <>
+        <SEO 
+          title="Loading Creator School - Content Creation Education"
+          description="Loading creator education content, tutorials, and strategies for content creators and influencers."
+          keywords="creator education, content creation tutorials, influencer tips, loading"
+        />
+        <div className="min-h-screen bg-background pt-20 text-text flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-text/70">Loading Creator School...</p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20 text-text py-8 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="border-b border-text/20 pb-6 mb-12">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-primary mb-2">Creator School</h1>
-              <p className="text-text/70">Learn, grow, and master the art of content creation</p>
-            </div>
-            
-            {/* Admin Quick Access - Hidden link for admins */}
-            <Link 
-              href="/upload-blog" 
-              className="text-text/50 hover:text-primary text-sm transition-colors"
-            >
-              Admin Access
-            </Link>
-          </div>
-        </div>
-
-        {/* Blog Posts Grid */}
-        {blogs.length === 0 ? (
-          <div className="text-center py-16">
-            <h2 className="text-2xl font-bold text-primary mb-4">Coming Soon</h2>
-            <p className="text-text/70 max-w-md mx-auto">
-              We're working on creating amazing content to help you become a better creator. 
-              Stay tuned for insights, tips, and strategies!
-            </p>
-          </div>
-        ) : (
-          <div className="grid gap-6">
-            {blogs.map((blog, index) => (
-              <article
-                key={blog._id}
-                className="group bg-dropdown-hover rounded-xl p-4 hover:bg-dropdown-hover/80 transition-colors"
+    <>
+      <SEO 
+        title="Creator School - Learn Content Creation & Influencer Marketing"
+        description="Master content creation with InstaFam's Creator School. Free tutorials, proven strategies, and expert tips to grow your audience, increase engagement, and monetize your content as a successful creator."
+        keywords="creator school, content creation course, influencer marketing, social media strategy, creator education, content marketing tips, audience growth, monetization strategies, creator economy, influencer tips"
+        url="https://instafam.vercel.app/blogs"
+        image="https://instafam.vercel.app/og-creator-school.jpg"
+        type="website"
+      />
+      
+      <div className="min-h-screen bg-background pt-20 text-text py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Header with SEO-optimized structure */}
+          <header className="border-b border-text/20 pb-6 mb-12">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h1 className="text-4xl font-bold text-primary mb-2">Creator School</h1>
+                <p className="text-text/70 text-lg">Learn, grow, and master the art of content creation with expert tutorials and proven strategies</p>
+              </div>
+              
+              {/* Admin Quick Access - Hidden link for admins */}
+              <Link 
+                href="/upload-blog" 
+                className="text-text/50 hover:text-primary text-sm transition-colors"
+                aria-label="Admin access for blog content management"
               >
-                <Link href={`/blogs/${blog.slug}`} className="block">
-                  <div className="space-y-3">
-                    {/* Featured Badge for First Post */}
-                    {index === 0 && (
-                      <div className="inline-flex items-center px-3 py-1 bg-primary/20 text-primary rounded-full text-xs font-medium">
-                        ⭐ Featured
-                      </div>
-                    )}
-                    
-                    {/* Title */}
-                    <h2 className="text-xl font-semibold text-text group-hover:text-text/80 transition-colors leading-tight">
-                      {blog.title}
-                    </h2>
-                    
-                    {/* Excerpt */}
-                    <p className="text-text/70 leading-relaxed text-sm">
-                      {createExcerpt(blog.content, 120)}
-                    </p>
-                    
-                    {/* Meta Information */}
-                    <div className="flex items-center justify-between pt-3  border-text/10">
-                      <div className="flex items-center gap-3 text-xs text-text/60">
-                        <span className="font-medium">
-                          {blog.authorId.name || blog.authorId.username}
-                        </span>
-                        <span>•</span>
-                        <span>{formatDate(blog.createdAt)}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 text-primary font-medium text-xs group-hover:gap-3 transition-all">
-                          Read More
-                          <span className="group-hover:translate-x-1 transition-transform">→</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                
-                {/* Admin Actions - Outside the Link */}
-                <div className="mt-4 border-text/20">
-                  <AdminBlogActions blog={blog} onDelete={handleDeleteBlog} />
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
+                Admin Access
+              </Link>
+            </div>
+          </header>
 
-        {/* Call to Action */}
-        {blogs.length > 0 && (
-            <div className="mt-40 text-center bg-background py-2 border-t-gray-600 border-t-2 rounded-none">
-            <h3 className="text-xl font-bold text-text mb-4">
-              Want to Learn More?
-            </h3>
-            <p className="text-text/70 mb-6 max-w-xl mx-auto">
-              Join thousands of creators who are building their audience and growing their income. 
-              Start your journey today!
-            </p>
-            <Link
-              href="/explore"
-              className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-3 py-3 rounded-xl font-medium transition-colors"
-            >
-              Explore Creators
-              <span>🚀</span>
-            </Link>
-          </div>
-        )}
+          {/* Main content with proper semantic structure */}
+          <main role="main">
+            {/* JSON-LD for Blog section */}
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "Blog",
+                  "name": "InstaFam Creator School",
+                  "description": "Educational content for content creators and influencers",
+                  "url": "https://instafam.vercel.app/blogs",
+                  "publisher": {
+                    "@type": "Organization",
+                    "name": "InstaFam",
+                    "logo": {
+                      "@type": "ImageObject",
+                      "url": "https://instafam.vercel.app/logo.png"
+                    }
+                  }
+                })
+              }}
+            />
+
+            {blogs.length === 0 ? (
+              <section className="text-center py-16" aria-labelledby="coming-soon-heading">
+                <h2 id="coming-soon-heading" className="text-2xl font-bold text-primary mb-4">Coming Soon</h2>
+                <p className="text-text/70 max-w-md mx-auto">
+                  We're creating comprehensive educational content to help you become a successful creator. 
+                  Stay tuned for expert insights, proven strategies, and actionable tutorials!
+                </p>
+              </section>
+            ) : (
+              <section className="grid gap-6" aria-labelledby="articles-heading">
+                <h2 id="articles-heading" className="sr-only">Latest Creator Education Articles</h2>
+                {blogs.map((blog, index) => {
+                  const blogUrl = `https://instafam.vercel.app/blogs/${blog.slug}`;
+                  const publishDate = new Date(blog.createdAt).toISOString();
+                  
+                  return (
+                    <article
+                      key={blog._id}
+                      className="group bg-dropdown-hover rounded-xl p-4 hover:bg-dropdown-hover/80 transition-colors"
+                      itemScope
+                      itemType="https://schema.org/BlogPosting"
+                    >
+                      {/* Structured data for each blog post */}
+                      <script
+                        type="application/ld+json"
+                        dangerouslySetInnerHTML={{
+                          __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "BlogPosting",
+                            "headline": blog.title,
+                            "description": createExcerpt(blog.content, 160),
+                            "url": blogUrl,
+                            "datePublished": publishDate,
+                            "dateModified": new Date(blog.updatedAt).toISOString(),
+                            "author": {
+                              "@type": "Person",
+                              "name": blog.authorId.name || blog.authorId.username
+                            },
+                            "publisher": {
+                              "@type": "Organization",
+                              "name": "InstaFam",
+                              "logo": {
+                                "@type": "ImageObject",
+                                "url": "https://instafam.vercel.app/logo.png"
+                              }
+                            },
+                            "mainEntityOfPage": {
+                              "@type": "WebPage",
+                              "@id": blogUrl
+                            }
+                          })
+                        }}
+                      />
+                      
+                      <Link href={`/blogs/${blog.slug}`} className="block">
+                        <div className="space-y-3">
+                          {/* Featured Badge for First Post */}
+                          {index === 0 && (
+                            <div className="inline-flex items-center px-3 py-1 bg-primary/20 text-primary rounded-full text-xs font-medium">
+                              ⭐ Featured Article
+                            </div>
+                          )}
+                          
+                          {/* Title with proper heading hierarchy */}
+                          <h3 
+                            className="text-xl font-semibold text-text group-hover:text-text/80 transition-colors leading-tight"
+                            itemProp="headline"
+                          >
+                            {blog.title}
+                          </h3>
+                          
+                          {/* Excerpt with proper semantic meaning */}
+                          <p 
+                            className="text-text/70 leading-relaxed text-sm" 
+                            itemProp="description"
+                          >
+                            {createExcerpt(blog.content, 120)}
+                          </p>
+                          
+                          {/* Meta Information with structured data */}
+                          <div className="flex items-center justify-between pt-3 border-text/10">
+                            <div className="flex items-center gap-3 text-xs text-text/60">
+                              <span 
+                                className="font-medium" 
+                                itemProp="author" 
+                                itemScope 
+                                itemType="https://schema.org/Person"
+                              >
+                                <span itemProp="name">{blog.authorId.name || blog.authorId.username}</span>
+                              </span>
+                              <span aria-hidden="true">•</span>
+                              <time 
+                                dateTime={blog.createdAt}
+                                itemProp="datePublished"
+                                title={`Published on ${formatDate(blog.createdAt)}`}
+                              >
+                                {formatDate(blog.createdAt)}
+                              </time>
+                            </div>
+                            
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2 text-primary font-medium text-xs group-hover:gap-3 transition-all">
+                                <span>Read Article</span>
+                                <span className="group-hover:translate-x-1 transition-transform" aria-hidden="true">→</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      {/* Admin Actions - Outside the Link */}
+                      <div className="mt-4 border-text/20">
+                        <AdminBlogActions blog={blog} onDelete={handleDeleteBlog} />
+                      </div>
+                    </article>
+                  );
+                })}
+              </section>
+            )}
+          </main>
+
+          {/* Call to Action with better SEO structure */}
+          {blogs.length > 0 && (
+            <aside className="mt-40 text-center bg-background py-2 border-t-gray-600 border-t-2 rounded-none" role="complementary">
+              <h2 className="text-xl font-bold text-text mb-4">
+                Ready to Start Your Creator Journey?
+              </h2>
+              <p className="text-text/70 mb-6 max-w-xl mx-auto">
+                Join thousands of creators who are building their audience and growing their income. 
+                Explore our creator community and start earning today!
+              </p>
+              <Link
+                href="/explore"
+                className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-3 py-3 rounded-xl font-medium transition-colors"
+                aria-label="Explore creators and join the community"
+              >
+                Explore Creators
+                <span aria-hidden="true">🚀</span>
+              </Link>
+            </aside>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
