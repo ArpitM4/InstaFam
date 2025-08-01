@@ -233,8 +233,6 @@ const Account = () => {
 
   return (
     <>
-
-
       <UsernameModal
         open={showUsernameModal}
         onSubmit={handleUsernameModal}
@@ -248,156 +246,149 @@ const Account = () => {
         error={nameModalError}
       />
 
-              <div id="stars3"></div>
-          <ToastContainer
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-              style={{ top: 50 }} // Increased offset to ensure toasts never cover the navbar
-          />
-    <div
-      id="stardiv"
-      className="min-h-screen flex pt-24 flex-col items-center py-16 px-4 bg-background text-text"
-    >
-  {/* Page Heading */}
-  <h1 className="text-4xl font-bold mb-10 text-text">Account Settings</h1>
-
-  {/* Form Container */}
-  <form
-    onSubmit={handleSubmit}
-    className="w-full max-w-xl bg-secondary/10 border border-secondary/20 rounded-xl shadow-md p-8 space-y-6 backdrop-blur-md"
-  >
-    {/* Name (required) */}
-    <div>
-      <label htmlFor="name" className="block text-sm font-semibold text-text mb-1">
-        Name <span className="text-red-600">*</span>
-      </label>
-      <input
-        type="text"
-        id="name"
-        name="name"
-        value={form.name || ""}
-        onChange={handleChange}
-        placeholder="Enter your name"
-        className={`w-full px-4 py-2 rounded bg-background text-text border ${formErrors.name ? 'border-red-600' : 'border-secondary/30'} focus:ring-2 focus:ring-primary outline-none`}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        style={{ top: 50 }}
       />
-      {formErrors.name && (
-        <div className="text-red-600 text-xs mt-1">Name is required.</div>
-      )}
-    </div>
 
-    {/* Email (locked) */}
-    <div>
-      <label htmlFor="email" className="block text-sm font-semibold text-text mb-1">Email</label>
-      <input
-        type="email"
-        id="email"
-        name="email"
-        value={form.email || ""}
-        readOnly
-        tabIndex={-1}
-        disabled
-        placeholder="Enter your email"
-        className="w-full px-4 py-2 rounded bg-secondary/30 text-text/40 border border-secondary/30 cursor-not-allowed outline-none"
-      />
-      <div className="text-xs text-gray-400 mt-1">Email cannot be changed.</div>
-    </div>
+      <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8 pt-20">
+        <div className="w-full max-w-lg space-y-8">
+          {/* Header */}
+          <div className="text-center">
+            <h1 className="text-3xl font-light text-primary mb-3">Account Settings</h1>
+          </div>
 
-    {/* Instagram Username (required) */}
-    <div>
-      <label htmlFor="username" className="block text-sm font-semibold text-text mb-1">
-        Instagram Username <span className="text-red-600">*</span>
-      </label>
-      <input
-        type="text"
-        id="username"
-        name="username"
-        value={form.username || ""}
-        onChange={handleChange}
-        placeholder="Choose a username"
-        disabled={form.instagram?.isVerified}
-        className={`w-full px-4 py-2 rounded border focus:ring-2 focus:ring-primary outline-none ${
-          form.instagram?.isVerified
-            ? "bg-secondary/30 text-text/40 border-secondary/30 cursor-not-allowed"
-            : formErrors.username
-              ? "border-red-600 bg-background text-text"
-              : "bg-background text-text border-secondary/30"
-        }`}
-      />
-      {formErrors.username && (
-        <div className="text-red-600 text-xs mt-1">Username is required.</div>
-      )}
-      {form.instagram?.isVerified && (
-        <p className="mt-1 text-sm text-accent">Your username is locked after verification.</p>
-      )}
-    </div>
+          {/* Form Container */}
+          <div className="bg-dropdown-hover rounded-lg p-6 space-y-6 shadow-sm">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              
+              {/* Name Field */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-text/70">
+                  Name <span className="text-error">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name || ""}
+                  onChange={handleChange}
+                  placeholder="Enter your name"
+                  className={`w-full px-3 py-3 rounded-lg bg-background text-text placeholder-background focus:outline-none transition-all duration-200 border-0 ${
+                    formErrors.name ? 'ring-2 ring-error' : ''
+                  }`}
+                  required
+                />
+                {formErrors.name && (
+                  <p className="text-error text-xs">Name is required</p>
+                )}
+              </div>
 
-    {/* Profile Picture and Cover Picture inputs removed for file upload feature */}
+              {/* Email Field (Read-only) */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-text/70">Email</label>
+                <input
+                  type="email"
+                  value={form.email || ""}
+                  readOnly
+                  disabled
+                  className="w-full px-3 py-3 rounded-lg bg-background/30 text-text/50 placeholder-background cursor-not-allowed border-0"
+                />
+                <p className="text-text/50 text-xs">Email cannot be changed</p>
+              </div>
 
-    {/* Account Type */}
-    <div>
-      <label htmlFor="accountType" className="block text-sm font-semibold text-text mb-1">Account Type</label>
-      <select
-        id="accountType"
-        name="accountType"
-        value={form.accountType || "User"}
-        onChange={handleChange}
-        className="w-full px-4 py-2 rounded bg-background text-text border border-secondary/30 focus:ring-2 focus:ring-primary outline-none"
-      >
-        <option value="User">User</option>
-        <option value="Creator">Creator</option>
-      </select>
-    </div>
+              {/* Instagram Username */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-text/70">
+                  Instagram Username <span className="text-error">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="username"
+                  value={form.username || ""}
+                  onChange={handleChange}
+                  placeholder="Choose a username"
+                  disabled={form.instagram?.isVerified}
+                  className={`w-full px-3 py-3 rounded-lg transition-all duration-200 border-0 ${
+                    form.instagram?.isVerified
+                      ? "bg-background/30 text-text/50 cursor-not-allowed"
+                      : formErrors.username
+                        ? "bg-background text-text placeholder-background focus:outline-none ring-2 ring-error"
+                        : "bg-background text-text placeholder-background focus:outline-none"
+                  }`}
+                  required
+                />
+                {formErrors.username && (
+                  <p className="text-error text-xs">Username is required</p>
+                )}
+                {form.instagram?.isVerified && (
+                  <p className="text-accent text-xs">Username is locked after verification</p>
+                )}
+              </div>
 
-    {/* Theme Selection */}
-    <div>
-      <label className="block text-sm font-semibold text-text mb-3">Theme</label>
-      <div className="flex space-x-6">
-        <label className="flex items-center cursor-pointer">
-          <input
-            type="radio"
-            name="theme"
-            value="Dark"
-            checked={theme === 'dark'}
-            onChange={handleChange}
-            className="mr-2 text-primary focus:ring-2 focus:ring-primary"
-          />
-          <span className="text-text">Dark</span>
-        </label>
-        <label className="flex items-center cursor-pointer">
-          <input
-            type="radio"
-            name="theme"
-            value="Light"
-            checked={theme === 'light'}
-            onChange={handleChange}
-            className="mr-2 text-primary focus:ring-2 focus:ring-primary"
-          />
-          <span className="text-text">Light</span>
-        </label>
+              {/* Account Type */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-text/70">Account Type</label>
+                <select
+                  name="accountType"
+                  value={form.accountType || "User"}
+                  onChange={handleChange}
+                  className="w-full px-3 py-3 rounded-lg bg-background text-text focus:outline-none transition-all duration-200 border-0"
+                >
+                  <option value="User">User</option>
+                  <option value="Creator">Creator</option>
+                </select>
+              </div>
+
+              {/* Theme Selection */}
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-text/70">Theme</label>
+                <div className="flex space-x-6">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="theme"
+                      value="Dark"
+                      checked={theme === 'dark'}
+                      onChange={handleChange}
+                      className="mr-2 text-primary focus:ring-2 focus:ring-primary/50"
+                    />
+                    <span className="text-text/90">Dark</span>
+                  </label>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="theme"
+                      value="Light"
+                      checked={theme === 'light'}
+                      onChange={handleChange}
+                      className="mr-2 text-primary focus:ring-2 focus:ring-primary/50"
+                    />
+                    <span className="text-text/90">Light</span>
+                  </label>
+                </div>
+                <p className="text-text/50 text-xs">Choose your preferred theme</p>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+              >
+                Save Changes
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
-      <div className="text-xs text-gray-400 mt-1">Choose your preferred theme.</div>
-    </div>
-
-    {/* Submit */}
-    <div>
-      <button
-        type="submit"
-        className="w-full bg-primary hover:bg-primary/80 transition text-text font-semibold py-2 rounded-md"
-      >
-        Save Changes
-      </button>
-    </div>
-  </form>
-</div>
-
     </>
   );
 };

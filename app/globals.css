@@ -16,11 +16,6 @@
   --error: #ef4444;
   --dropdown-border: #e5e7eb; /* Light gray for light mode */
   --dropdown-hover: #f3f4f6; /* Darker shade of white for light mode */
-    #stardiv{
-  height: 100%;
-  overflow: hidden;
-  background: radial-gradient(ellipse at bottom, #f7ebff 0%, #fff3d2 100%);
-}
 }
 
 [data-theme='dark'] {
@@ -33,16 +28,6 @@
   --error: #ef4444;
   --dropdown-border: #374151; /* Dark gray for dark mode */
   --dropdown-hover: #212328; /* Dark hover background for dark mode */
-    --bv1 : ;
-  --bv2 : ;
-
-  #stardiv{
-  height: 100%;
-  overflow: hidden;
-  background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
-}
-
-
 
 }
 
@@ -136,13 +121,6 @@ body {
   background: transparent;
 }
 
-/* Star Background */
-#stardiv{
-  height: 100%;
-  overflow: hidden;
-  /* background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%); */
-  background: radial-gradient(ellipse at bottom, #f7ebff 0%, var(--background) 100%);
-}
 
 /* Google One Tap Animations */
 @keyframes slide-up {

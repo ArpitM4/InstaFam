@@ -44,11 +44,11 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8 pt-8">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 pb-8 pt-12">
       <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-light text-primary mb-3">Welcome back</h1>
+          <h1 className="text-3xl font-light text-primary mt-2 mb-3">Welcome back</h1>
           <p className="text-text/60">Sign in to your InstaFam account</p>
         </div>
 

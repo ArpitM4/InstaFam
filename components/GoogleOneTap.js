@@ -27,8 +27,12 @@ export default function GoogleOneTap() {
       } else if (res?.ok) {
         // Success! Wait a moment for session to update, then redirect
         setTimeout(() => {
+          setIsAuthenticating(false); // Clear loading state before redirect
           router.push('/account');
         }, 1000);
+      } else {
+        // Handle unexpected response
+        setIsAuthenticating(false);
       }
     } catch (error) {
       console.error("A critical error occurred in the One Tap callback:", error);
