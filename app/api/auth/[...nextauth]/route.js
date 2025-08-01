@@ -50,17 +50,27 @@ const nextAuthConfig = {
       return true;
     },
     async session({ session }) {
-      await connectDB();
-      const dbUser = await User.findOne({ email: session.user.email });
-      session.user.name = dbUser?.username || session.user.name;
-      session.user.id = dbUser?._id?.toString(); // Convert ObjectId to string
+      // Simplified session callback
+      try {
+        await connectDB();
+        const dbUser = await User.findOne({ email: session.user.email });
+        if (dbUser) {
+          session.user.name = dbUser.username || session.user.name;
+          session.user.id = dbUser._id?.toString();
+        }
+      } catch (error) {
+        console.error('Session callback error:', error);
+      }
       return session;
     },
   },
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
+  // Ensure NextAuth uses the correct URL based on environment
+  url: process.env.NEXTAUTH_URL,
 };
 
 export { nextAuthConfig };
