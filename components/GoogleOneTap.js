@@ -1,15 +1,20 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSession, signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function GoogleOneTap() {
   const { status } = useSession();
+  const router = useRouter();
   const initialized = useRef(false); // Use a ref to track if initialization has happened
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   // Define the callback handler as a separate function
   const handleCredentialResponse = async (response) => {
     try {
+      setIsAuthenticating(true);
+      
       const res = await signIn('googleonetap', {
         credential: response.credential,
         redirect: false, // This is crucial to prevent page reload
@@ -17,12 +22,17 @@ export default function GoogleOneTap() {
 
       if (res?.error) {
         console.error("One Tap Sign-In Error from NextAuth:", res.error);
+        setIsAuthenticating(false);
         // Optional: Add a toast notification for the user here if login fails
+      } else if (res?.ok) {
+        // Success! Wait a moment for session to update, then redirect
+        setTimeout(() => {
+          router.push('/account');
+        }, 1000);
       }
-      // On success, the useSession hook will automatically update,
-      // and your UI will change to the logged-in state. No reload needed.
     } catch (error) {
       console.error("A critical error occurred in the One Tap callback:", error);
+      setIsAuthenticating(false);
     }
   };
 
@@ -97,6 +107,13 @@ export default function GoogleOneTap() {
     }
   }, [status]);
 
-  // This component renders nothing to the page itself
-  return null; 
+  // This component renders nothing to the page itself, except loading state
+  return isAuthenticating ? (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000001]">
+      <div className="bg-dropdown-hover rounded-lg p-6 flex items-center space-x-3">
+        <div className="animate-spin h-5 w-5 rounded-full border-2 border-primary border-t-transparent"></div>
+        <span className="text-text">Signing you in...</span>
+      </div>
+    </div>
+  ) : null; 
 }
