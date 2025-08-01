@@ -11,7 +11,7 @@ export default function NotFound() {
       <SEO 
         title="Page Not Found - InstaFam"
         description="The page you are looking for could not be found. Explore InstaFam to discover amazing creators and exclusive content."
-        url="https://instafam.vercel.app/404"
+        url="https://www.instafam.social/404"
         type="website"
       />
       

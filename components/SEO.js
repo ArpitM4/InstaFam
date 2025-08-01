@@ -6,8 +6,8 @@ const SEO = ({
   title = "InstaFam - Connect with Your Favorite Creators",
   description = "Join InstaFam to connect with creators, earn points, unlock exclusive content, and support your favorite influencers through donations and premium perks.",
   keywords = "creators, influencers, exclusive content, fan community, creator support, social platform, content creators, fan engagement, creator economy",
-  image = "https://instafam.vercel.app/og-image.jpg",
-  url = "https://instafam.vercel.app",
+  image = "https://www.instafam.social/og-image.jpg",
+  url = "https://www.instafam.social",
   type = "website",
   twitterCard = "summary_large_image",
   author = "InstaFam Team"
@@ -79,19 +79,19 @@ const SEO = ({
             "@context": "https://schema.org",
             "@type": "WebSite",
             "name": "InstaFam",
-            "url": "https://instafam.vercel.app",
+            "url": "https://www.instafam.social",
             "description": description,
             "publisher": {
               "@type": "Organization",
               "name": "InstaFam",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://instafam.vercel.app/logo.png"
+                "url": "https://www.instafam.social/logo.png"
               }
             },
             "potentialAction": {
               "@type": "SearchAction",
-              "target": "https://instafam.vercel.app/explore?q={search_term_string}",
+              "target": "https://www.instafam.social/explore?q={search_term_string}",
               "query-input": "required name=search_term_string"
             }
           })

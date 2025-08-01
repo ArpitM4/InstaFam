@@ -39,8 +39,8 @@ const handleSearch = (e) => {
         title="InstaFam - Connect with Your Favorite Creators"
         description="Join thousands of fans connecting with their favorite creators. Earn points, unlock exclusive content, support creators through donations, and access premium perks on the ultimate creator-fan platform."
         keywords="creator platform, fan engagement, exclusive content, creator support, social network, influencer platform, creator economy, fan community, content creators, monetization"
-        url="https://instafam.vercel.app"
-        image="https://instafam.vercel.app/og-home.jpg"
+        url="https://www.instafam.social"
+        image="https://www.instafam.social/og-home.jpg"
         type="website"
       />
       

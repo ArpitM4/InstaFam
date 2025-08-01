@@ -30,7 +30,7 @@ export default function robots() {
         ],
       },
     ],
-    sitemap: 'https://instafam.vercel.app/sitemap.xml',
-    host: 'https://instafam.vercel.app',
+    sitemap: 'https://www.instafam.social/sitemap.xml',
+    host: 'https://www.instafam.social',
   };
 }

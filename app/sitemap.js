@@ -3,7 +3,7 @@ import Blog from "@/models/Blog";
 import User from "@/models/User";
 
 export default async function sitemap() {
-  const baseUrl = 'https://instafam.vercel.app';
+  const baseUrl = 'https://www.instafam.social';
   
   try {
     // Connect to database

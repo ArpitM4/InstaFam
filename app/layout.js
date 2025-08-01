@@ -11,7 +11,7 @@ import { ThemeProvider } from "@/context/ThemeContext";
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata = {
-  metadataBase: new URL('https://instafam.vercel.app'),
+  metadataBase: new URL('https://www.instafam.social'),
   title: {
     default: 'InstaFam - Connect with Your Favorite Creators',
     template: '%s | InstaFam'
@@ -23,7 +23,7 @@ export const metadata = {
     'creator economy', 'monetization', 'vault items', 'creator dashboard',
     'fan points', 'donations', 'premium content', 'influencer marketing'
   ],
-  authors: [{ name: 'InstaFam Team', url: 'https://instafam.vercel.app' }],
+  authors: [{ name: 'InstaFam Team', url: 'https://www.instafam.social' }],
   creator: 'InstaFam',
   publisher: 'InstaFam',
   formatDetection: {
@@ -36,7 +36,7 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://instafam.vercel.app',
+    url: 'https://www.instafam.social',
     siteName: 'InstaFam',
     title: 'InstaFam - Connect with Your Favorite Creators',
     description: 'Join thousands of fans connecting with their favorite creators. Earn points, unlock exclusive content, and support creators through donations and premium perks.',
@@ -93,7 +93,7 @@ export const metadata = {
     },
   },
   alternates: {
-    canonical: 'https://instafam.vercel.app',
+    canonical: 'https://www.instafam.social',
   },
   other: {
     'application-name': 'InstaFam',
@@ -125,10 +125,10 @@ export default function RootLayout({ children }) {
               "@context": "https://schema.org",
               "@type": "Organization",
               "name": "InstaFam",
-              "url": "https://instafam.vercel.app",
+              "url": "https://www.instafam.social",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://instafam.vercel.app/logo.png",
+                "url": "https://www.instafam.social/logo.png",
                 "width": 512,
                 "height": 512
               },
@@ -140,7 +140,7 @@ export default function RootLayout({ children }) {
               "contactPoint": {
                 "@type": "ContactPoint",
                 "contactType": "customer service",
-                "url": "https://instafam.vercel.app/contact",
+                "url": "https://www.instafam.social/contact",
                 "availableLanguage": "English"
               },
               "foundingDate": "2024",
@@ -163,7 +163,7 @@ export default function RootLayout({ children }) {
               "@context": "https://schema.org",
               "@type": "WebApplication",
               "name": "InstaFam",
-              "url": "https://instafam.vercel.app",
+              "url": "https://www.instafam.social",
               "description": "Connect with creators, earn points, unlock exclusive content",
               "applicationCategory": "SocialNetworkingApplication",
               "operatingSystem": "Web Browser",

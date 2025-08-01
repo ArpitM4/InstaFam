@@ -79,8 +79,8 @@ const BlogsPage = () => {
         title="Creator School - Learn Content Creation & Influencer Marketing"
         description="Master content creation with InstaFam's Creator School. Free tutorials, proven strategies, and expert tips to grow your audience, increase engagement, and monetize your content as a successful creator."
         keywords="creator school, content creation course, influencer marketing, social media strategy, creator education, content marketing tips, audience growth, monetization strategies, creator economy, influencer tips"
-        url="https://instafam.vercel.app/blogs"
-        image="https://instafam.vercel.app/og-creator-school.jpg"
+        url="https://www.instafam.social/blogs"
+        image="https://www.instafam.social/og-creator-school.jpg"
         type="website"
       />
       
@@ -116,13 +116,13 @@ const BlogsPage = () => {
                   "@type": "Blog",
                   "name": "InstaFam Creator School",
                   "description": "Educational content for content creators and influencers",
-                  "url": "https://instafam.vercel.app/blogs",
+                  "url": "https://www.instafam.social/blogs",
                   "publisher": {
                     "@type": "Organization",
                     "name": "InstaFam",
                     "logo": {
                       "@type": "ImageObject",
-                      "url": "https://instafam.vercel.app/logo.png"
+                      "url": "https://www.instafam.social/logo.png"
                     }
                   }
                 })
@@ -141,7 +141,7 @@ const BlogsPage = () => {
               <section className="grid gap-6" aria-labelledby="articles-heading">
                 <h2 id="articles-heading" className="sr-only">Latest Creator Education Articles</h2>
                 {blogs.map((blog, index) => {
-                  const blogUrl = `https://instafam.vercel.app/blogs/${blog.slug}`;
+                  const blogUrl = `https://www.instafam.social/blogs/${blog.slug}`;
                   const publishDate = new Date(blog.createdAt).toISOString();
                   
                   return (
@@ -172,7 +172,7 @@ const BlogsPage = () => {
                               "name": "InstaFam",
                               "logo": {
                                 "@type": "ImageObject",
-                                "url": "https://instafam.vercel.app/logo.png"
+                                "url": "https://www.instafam.social/logo.png"
                               }
                             },
                             "mainEntityOfPage": {
