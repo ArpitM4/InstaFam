@@ -44,22 +44,23 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8 pt-20">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8 pt-6">
       <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center">
-                  <p className="text-text/70">Sign in to your InstaFam account</p>
+          <h1 className="text-3xl font-light text-primary mb-3">Welcome back</h1>
+          <p className="text-text/60">Sign in to your InstaFam account</p>
         </div>
 
         {/* Login Form */}
-        <div className="bg-text/5 border border-text/10 rounded-lg p-6 space-y-6">
+        <div className="bg-dropdown-hover rounded-lg p-6 space-y-5 shadow-sm">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="bg-red-500/10 rounded-lg p-3">
               <div className="flex items-center">
-                <svg className="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="text-red-700 text-sm font-medium">{error}</p>
+                <p className="text-red-400 text-sm">{error}</p>
               </div>
             </div>
           )}
@@ -73,7 +74,7 @@ const Login = () => {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="w-full px-4 py-3 rounded-lg bg-background border border-text/10 text-text placeholder-text/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                className="w-full px-3 py-3 rounded-lg bg-background/50 text-text placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0"
                 required
               />
             </div>
@@ -86,7 +87,7 @@ const Login = () => {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="w-full px-4 py-3 rounded-lg bg-background border border-text/10 text-text placeholder-text/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                className="w-full px-3 py-3 rounded-lg bg-background/50 text-text placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0"
                 required
               />
             </div>
@@ -94,7 +95,7 @@ const Login = () => {
 
           <button
             onClick={handleEmailLogin}
-            className="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg font-medium transition-colors"
+            className="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"
           >
             Sign In
           </button>
@@ -106,7 +107,7 @@ const Login = () => {
             <div className="w-full border-t border-text/10"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-background text-text/60">Or continue with</span>
+            <span className="px-6 bg-background text-text/50">Or continue with</span>
           </div>
         </div>
 
@@ -114,7 +115,7 @@ const Login = () => {
         <div className="space-y-3">
           <button
             onClick={() => signIn("google", { callbackUrl: '/account' })}
-            className="w-full flex items-center justify-center gap-3 bg-background border border-text/10 hover:bg-text/5 text-text py-3 px-4 rounded-lg font-medium transition-colors"
+            className="w-full flex items-center justify-center gap-3 bg-dropdown-hover hover:bg-text/10 text-text py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm"
           >
             <FaGoogle className="text-lg text-red-500" />
             Continue with Google
@@ -122,7 +123,7 @@ const Login = () => {
           
           <button
             onClick={() => signIn("github", { callbackUrl: '/account' })}
-            className="w-full flex items-center justify-center gap-3 bg-background border border-text/10 hover:bg-text/5 text-text py-3 px-4 rounded-lg font-medium transition-colors"
+            className="w-full flex items-center justify-center gap-3 bg-dropdown-hover hover:bg-text/10 text-text py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm"
           >
             <FaGithub className="text-lg" />
             Continue with GitHub
@@ -131,7 +132,7 @@ const Login = () => {
 
         {/* Sign up link */}
         <div className="text-center">
-          <p className="text-text/60">
+          <p className="text-text/50">
             Don't have an account?{' '}
             <button
               onClick={() => router.push('/signup')}

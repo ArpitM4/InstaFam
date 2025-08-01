@@ -16,7 +16,7 @@ export default function GoogleOneTap() {
           position: relative !important;
         }
         #credential_picker_container {
-          top: 80px !important;
+          top: 65px !important;
         }
       `;
       document.head.appendChild(style);

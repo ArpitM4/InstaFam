@@ -87,8 +87,8 @@ const Navbar = () => {
         </div>
       ) : !session ? (
         <>
-          <Link href="/login" className="px-4 py-2 mx-3 text-white border border-secondary rounded-md hover:bg-secondary/20 transition">Log In</Link>
-          <Link href="/signup" className="px-4 py-2 text-white bg-primary rounded-md hover:bg-primary/80 transition">Sign Up</Link>
+          <Link href="/login" className="px-4 py-2 mx-3 text-white border border-secondary rounded-md hover:bg-gray-700/50 hover:border-gray-600 transition-all duration-200">Log In</Link>
+          <Link href="/signup" className="px-4 py-2 text-white bg-primary rounded-md hover:bg-primary/70 hover:scale-105 hover:shadow-xl transition-all duration-200">Sign Up</Link>
         </>
       ) : (
         <>
@@ -139,8 +139,8 @@ const Navbar = () => {
       </div>
     ) : !session && (
       <div className="md:hidden flex space-x-2">
-        <Link href="/login" className="px-3 py-1.5 text-sm text-white border border-secondary rounded-md hover:bg-secondary/20 transition">Log In</Link>
-        <Link href="/signup" className="px-3 py-1.5 text-sm text-white bg-primary rounded-md hover:bg-primary/80 transition">Sign Up</Link>
+        <Link href="/login" className="px-3 py-1.5 text-sm text-white border border-secondary rounded-md hover:bg-gray-700/50 hover:border-gray-600 transition-all duration-200">Log In</Link>
+        <Link href="/signup" className="px-3 py-1.5 text-sm text-white bg-primary rounded-md hover:bg-primary/70 hover:scale-105 hover:shadow-xl transition-all duration-200">Sign Up</Link>
       </div>
     )}
   </div>

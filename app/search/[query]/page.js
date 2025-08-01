@@ -36,7 +36,7 @@ const SearchResults = ({ params }) => {
   };
 
   return (
-    <div className="min-h-screen px-4 py-28 bg-background text-text">
+    <div className="min-h-screen px-4 py-14 bg-background text-text">
       {/* Search Bar */}
       <div className="mb-10">
         <form
@@ -59,7 +59,7 @@ const SearchResults = ({ params }) => {
         </form>
       </div>
 
-      <h1 className="text-3xl font-bold mb-8 text-center">
+      <h1 className="text-xl font-bold mb-8 text-center">
         Search Results for <span className="text-primary">"{query}"</span>
       </h1>
 

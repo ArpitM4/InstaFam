@@ -79,7 +79,7 @@ const handleSearch = (e) => {
       />
       <button
         type="submit"
-        className="px-6 py-3 font-semibold text-white bg-gradient-to-r from-primary via-primary/80 to-primary rounded-md hover:from-primary hover:via-secondary hover:to-primary transition"
+        className="px-6 py-3 font-semibold text-white bg-primary rounded-md hover:bg-primary/90 hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
       >
         Search
       </button>
