@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
 // Hardcoded admin emails - Update this array with your admin emails
-const ADMIN_EMAILS = ['arpitmahatpure@gmail.com', 'arpitmaurya1506@gmail.com']; // Add your admin emails here
+const ADMIN_EMAILS = ['arpitmahatpure@gmail.com', 'arpitmaurya1506@gmail.com', 'chiragbhandarlap@gmail.com']; // Add your admin emails here
 
 const UploadBlogPage = () => {
   const { data: session, status } = useSession();

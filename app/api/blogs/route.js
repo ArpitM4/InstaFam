@@ -7,7 +7,7 @@ import User from "@/models/User";
 import { revalidatePath } from 'next/cache';
 
 // Hardcoded admin emails - Update this array with your admin emails
-const ADMIN_EMAILS = ['arpitmahatpure@gmail.com', 'arpitmaurya1506@gmail.com']; // Add your admin emails here
+const ADMIN_EMAILS = ['arpitmahatpure@gmail.com', 'arpitmaurya1506@gmail.com', 'chiragbhandarlap@gmail.com']; // Add your admin emails here
 
 // Helper function to generate URL-friendly slug
 function generateSlug(title) {

@@ -87,7 +87,7 @@ const Navbar = () => {
         </div>
       ) : !session ? (
         <>
-          <Link href="/login" className="px-4 py-2 text-white border border-secondary rounded-md hover:bg-secondary/20 transition">Log In</Link>
+          <Link href="/login" className="px-4 py-2 mx-3 text-white border border-secondary rounded-md hover:bg-secondary/20 transition">Log In</Link>
           <Link href="/signup" className="px-4 py-2 text-white bg-primary rounded-md hover:bg-primary/80 transition">Sign Up</Link>
         </>
       ) : (

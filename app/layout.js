@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SessionWrapper from "@/components/SessionWrapper";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
+import GoogleOneTap from "@/components/GoogleOneTap";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/context/ThemeContext";
 
@@ -116,6 +117,11 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://vercel.live" />
+        <link rel="preconnect" href="https://accounts.google.com" />
+        
+        {/* Google Identity Services */}
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script src="https://apis.google.com/js/api.js" async defer></script>
         
         {/* JSON-LD Organization Schema */}
         <script
@@ -192,6 +198,7 @@ export default function RootLayout({ children }) {
           <ThemeProvider>
             <PerformanceMonitor />
             <Navbar />
+            <GoogleOneTap />
             <main role="main">
               {children}
             </main>
