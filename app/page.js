@@ -1,6 +1,6 @@
 "use client";
 import "./globals.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import SEO from "@/components/SEO";
@@ -10,6 +10,7 @@ export default function Home() {
   const animationDuration = 10000; // Match with CSS
   const [textIndex, setTextIndex] = useState(0);
   const [key, setKey] = useState(0);
+  const videoRef = useRef(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -21,6 +22,30 @@ export default function Home() {
     }, animationDuration);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // Set video playback speed to 3.5x
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      const setPlaybackRate = () => {
+        video.playbackRate = 1.2;
+      };
+      
+      // Set playback rate immediately if video is already loaded
+      if (video.readyState >= 1) {
+        setPlaybackRate();
+      }
+      
+      // Also set it when the video loads
+      video.addEventListener('loadeddata', setPlaybackRate);
+      video.addEventListener('canplay', setPlaybackRate);
+      
+      return () => {
+        video.removeEventListener('loadeddata', setPlaybackRate);
+        video.removeEventListener('canplay', setPlaybackRate);
+      };
+    }
   }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -45,6 +70,7 @@ const handleSearch = (e) => {
       />
       
       <video
+        ref={videoRef}
         className="fixed top-0 left-0 w-full h-full object-cover -z-10"
         src="/vid.mp4"
         autoPlay
