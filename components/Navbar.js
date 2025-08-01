@@ -101,13 +101,13 @@ const Navbar = () => {
               
             </button>
             <div className="absolute pb-1 right-0 w-48 bg-black text-white border border-dropdown-border rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-10">
-              <Link href="/account" className="block px-6 py-3 hover:bg-dropdown-hover transition">Profile</Link>
-              <Link href="/my-fam-points" className="block px-6 py-3 hover:bg-dropdown-hover transition">My Fam Points</Link>
+              <Link href="/account" className="block px-5 py-3 hover:bg-dropdown-hover transition">Profile</Link>
+              <Link href="/my-fam-points" className="block px-5 py-3 hover:bg-dropdown-hover transition">My Fam Points</Link>
               {accountType === "Creator" && (
-                <Link href="/dashboard" className="block px-6 py-3 hover:bg-dropdown-hover transition">Creator Dashboard</Link>
+                <Link href="/dashboard" className="block px-5 py-3 hover:bg-dropdown-hover transition">Creator Dashboard</Link>
               )}
               <div className="border-t border-dropdown-border my-1"></div>
-              <button onClick={signOut} className="block w-full text-left px-6 py-2 hover:bg-dropdown-hover transition">Logout</button>
+              <button onClick={signOut} className="block w-full text-left px-5 py-2 hover:bg-dropdown-hover transition">Logout</button>
             </div>
           </div>
           

@@ -37,17 +37,12 @@ export default function GoogleOneTap() {
               client_id: clientId,
               callback: async (response) => {
                 try {
-                  const result = await signIn('googleonetap', {
+                  // Use the normal signIn flow without redirect: false
+                  // This will handle the OAuth flow properly
+                  await signIn('googleonetap', {
                     credential: response.credential,
-                    redirect: false,
+                    callbackUrl: '/account'
                   });
-                  
-                  if (result?.ok) {
-                    // Successful sign-in, redirect to account page
-                    window.location.href = '/account';
-                  } else {
-                    console.error('Google One Tap sign-in failed:', result?.error);
-                  }
                 } catch (signInError) {
                   console.error('Google One Tap sign-in error:', signInError);
                 }
