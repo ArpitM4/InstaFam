@@ -10,6 +10,7 @@ export default function Home() {
   const animationDuration = 10000; // Match with CSS
   const [textIndex, setTextIndex] = useState(0);
   const [key, setKey] = useState(0);
+  const [videoLoaded, setVideoLoaded] = useState(false);
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -24,12 +25,13 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // Set video playback speed to 3.5x
+  // Set video playback speed to 1.2x
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
       const setPlaybackRate = () => {
         video.playbackRate = 1.2;
+        setVideoLoaded(true); // Mark video as loaded
       };
       
       // Set playback rate immediately if video is already loaded
@@ -69,9 +71,15 @@ const handleSearch = (e) => {
         type="website"
       />
       
+      {/* Fallback background image while video loads */}
+      <div 
+        className={`fixed top-0 left-0 w-full h-full object-cover -z-20 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ${videoLoaded ? 'opacity-0' : 'opacity-100'}`}
+        style={{ backgroundImage: 'url(/vid.png)' }}
+      />
+      
       <video
         ref={videoRef}
-        className="fixed top-0 left-0 w-full h-full object-cover -z-10"
+        className={`fixed top-0 left-0 w-full h-full object-cover -z-10 transition-opacity duration-1000 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
         src="/vid.mp4"
         autoPlay
         loop
