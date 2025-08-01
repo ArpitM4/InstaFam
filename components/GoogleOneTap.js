@@ -1,106 +1,56 @@
 "use client";
-import { useEffect } from 'react';
+
+import { useEffect, useRef } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 
 export default function GoogleOneTap() {
   const { status } = useSession();
+  const initialized = useRef(false); // Use a ref to track if initialization has happened
+
+  // Define the callback handler as a separate function
+  const handleCredentialResponse = async (response) => {
+    try {
+      const res = await signIn('googleonetap', {
+        credential: response.credential,
+        redirect: false, // This is crucial to prevent page reload
+      });
+
+      if (res?.error) {
+        console.error("One Tap Sign-In Error from NextAuth:", res.error);
+        // Optional: Add a toast notification for the user here if login fails
+      }
+      // On success, the useSession hook will automatically update,
+      // and your UI will change to the logged-in state. No reload needed.
+    } catch (error) {
+      console.error("A critical error occurred in the One Tap callback:", error);
+    }
+  };
 
   useEffect(() => {
-    // Only show Google One Tap for unauthenticated users
-    if (status === 'unauthenticated') {
-      // Add CSS to ensure navbar stays on top
-      const style = document.createElement('style');
-      style.textContent = `
-        nav, .navbar, header {
-          z-index: 1000000 !important;
-          position: relative !important;
-        }
-        #credential_picker_container {
-          top: 65px !important;
-        }
-      `;
-      document.head.appendChild(style);
+    // We only want this effect to run if the user is unauthenticated
+    // AND we haven't initialized the script yet.
+    if (status === 'unauthenticated' && !initialized.current) {
       
-      // Get client ID from environment variables
-      const clientId = process.env.NEXT_PUBLIC_GOOGLE_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-      
-      if (!clientId) {
-        console.error('Google Client ID not found in environment variables');
-        return;
-      }
+      // Check if the Google Identity Services library is available on the window object
+      if (window.google) {
+        // Mark as initialized so this doesn't run again on re-renders
+        initialized.current = true; 
+        
+        window.google.accounts.id.initialize({
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_ID,
+          callback: handleCredentialResponse, // Pass our handler function
+        });
 
-      // Initialize Google One Tap when script is loaded
-      const initializeGoogleOneTap = () => {
-        if (window.google?.accounts?.id) {
-          try {
-            window.google.accounts.id.initialize({
-              client_id: clientId,
-              callback: async (response) => {
-                try {
-                  const res = await signIn('googleonetap', {
-                    credential: response.credential,
-                    redirect: false,
-                  });
-
-                  if (res?.error) {
-                    console.error("One Tap Sign-In Error:", res.error);
-                    // Optional: Show a toast notification to the user
-                    // toast.error("Login failed. Please try again.");
-                  } else if (res?.ok) {
-                    // Successful sign-in - redirect to account page
-                    window.location.href = '/account';
-                  }
-                } catch (error) {
-                  console.error("Critical One Tap Error:", error);
-                }
-              },
-              auto_select: false,
-              cancel_on_tap_outside: false,
-              // Position the popup to avoid navbar overlap
-              ux_mode: 'popup',
-              context: 'signin'
-            });
-            
-            // Prompt the One Tap UI with custom positioning and delay
-            setTimeout(() => {
-              window.google.accounts.id.prompt({
-                moment_callback: (notification) => {
-                  // Handle different notification states
-                  if (notification.isNotDisplayed()) {
-                    // One Tap could not be displayed
-                    console.log('One Tap not displayed');
-                  } else if (notification.isSkippedMoment()) {
-                    // One Tap was skipped
-                    console.log('One Tap skipped');
-                  }
-                }
-              });
-            }, 1000); // 1 second delay to ensure page is fully loaded
-          } catch (error) {
-            console.error('Error initializing Google One Tap:', error);
+        // Prompt the One Tap UI to appear
+        window.google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            console.log('Google One Tap prompt was not displayed. This can happen if the user has disabled third-party cookies or has dismissed the prompt previously.');
           }
-        }
-      };
-
-      // Check if Google script is already loaded
-      if (window.google?.accounts?.id) {
-        initializeGoogleOneTap();
-      } else {
-        // Wait for Google script to load
-        let checkCount = 0;
-        const checkGoogleLoaded = setInterval(() => {
-          checkCount++;
-          
-          if (window.google?.accounts?.id) {
-            clearInterval(checkGoogleLoaded);
-            initializeGoogleOneTap();
-          } else if (checkCount >= 100) { // 10 seconds timeout
-            clearInterval(checkGoogleLoaded);
-          }
-        }, 100);
+        });
       }
     }
   }, [status]);
 
-  return null; // This component doesn't render anything
+  // This component renders nothing to the page itself
+  return null; 
 }
