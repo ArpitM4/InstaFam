@@ -10,6 +10,7 @@ const PaymentInfo = () => {
   const [form, setForm] = useState(null);
   const [userId, setUserId] = useState(null);
   const [payments, setPayments] = useState([]);
+  const [leaderboardPayments, setLeaderboardPayments] = useState([]);
   const [totalEarning, setTotalEarning] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -28,7 +29,14 @@ const PaymentInfo = () => {
       if (user?._id) {
         const payments = await fetchpayments(user._id);
         setPayments(payments);
-        const total = payments.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+        
+        // For now, treat all payments as leaderboard payments since paymentType field might not exist
+        // In the future, you can add paymentType field to distinguish between donation and leaderboard payments
+        const leaderboardPayments = payments.filter(p => p.to_user === user._id);
+        setLeaderboardPayments(leaderboardPayments);
+        
+        // Calculate total from all payments for now
+        const total = leaderboardPayments.reduce((acc, curr) => acc + (curr.amount || 0), 0);
         setTotalEarning(total);
       }
     } catch (error) {
@@ -65,6 +73,17 @@ const PaymentInfo = () => {
     }
   };
 
+  // Group payments by event (using existing structure)
+  const groupedPayments = leaderboardPayments.reduce((acc, payment) => {
+    // Since eventName might not exist, create groups based on date or use a default
+    const eventName = payment.eventName || payment.message || 'General Payments';
+    if (!acc[eventName]) {
+      acc[eventName] = [];
+    }
+    acc[eventName].push(payment);
+    return acc;
+  }, {});
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -86,42 +105,55 @@ const PaymentInfo = () => {
         <div className="bg-dropdown-hover rounded-xl p-8">
           <div className="text-center">
             <p className="text-4xl font-light text-text mb-2">${totalEarning}</p>
-            <p className="text-text/60 text-sm">Total amount earned from donations</p>
+            <p className="text-text/60 text-sm">Total amount earned from leaderboard events</p>
           </div>
         </div>
       </section>
 
-      {/* Payment History Section */}
+      {/* Leaderboard Payment History Section */}
       <section className="space-y-6">
-        <h3 className="text-lg font-medium text-text/90">Donation History</h3>
+        <h3 className="text-lg font-medium text-text/90">Leaderboard Event Payments</h3>
         <div className="bg-dropdown-hover rounded-xl p-6">
-          <div className="max-h-80 overflow-y-auto custom-scrollbar space-y-3">
-            {payments.length === 0 ? (
+          <div className="max-h-96 overflow-y-auto custom-scrollbar space-y-6">
+            {Object.keys(groupedPayments).length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-text/60 text-sm">No payments yet</p>
+                <p className="text-text/60 text-sm">No leaderboard payments yet</p>
               </div>
             ) : (
-              payments
-                .filter((p) => p.to_user === userId)
-                .map((p, index) => (
-                  <div
-                    key={p.oid}
-                    className="flex justify-between items-start p-4 bg-background/30 rounded-lg hover:bg-background/50 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <p className="font-medium text-text/90 text-sm">{p.name}</p>
-                      <p className="text-xs text-text/60 mt-1">
-                        {new Date(p.createdAt).toLocaleDateString()}
-                      </p>
-                      {p.message && (
-                        <p className="text-xs text-text/60 mt-2 italic bg-background/50 rounded px-2 py-1">
-                          "{p.message}"
-                        </p>
-                      )}
+              Object.entries(groupedPayments).map(([eventName, eventPayments]) => {
+                const eventTotal = eventPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+                return (
+                  <div key={eventName} className="border-l-4 border-primary pl-4">
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="font-medium text-text/90">{eventName}</h4>
+                      <span className="text-lg font-semibold text-success">${eventTotal}</span>
                     </div>
-                    <span className="text-lg font-medium text-success ml-4">${p.amount}</span>
+                    <div className="space-y-2">
+                      {eventPayments.map((p, index) => (
+                        <div
+                          key={`${eventName}-${index}`}
+                          className="flex justify-between items-center p-3 bg-background/30 rounded-lg hover:bg-background/50 transition-colors"
+                        >
+                          <div className="flex-1">
+                            <p className="text-sm text-text/90">
+                              {p.name || 'Payment'} {p.position ? `- #${p.position} Position` : ''}
+                            </p>
+                            <p className="text-xs text-text/60 mt-1">
+                              {new Date(p.createdAt).toLocaleDateString()}
+                            </p>
+                            {p.message && (
+                              <p className="text-xs text-text/60 mt-1 italic">
+                                "{p.message}"
+                              </p>
+                            )}
+                          </div>
+                          <span className="text-success font-medium ml-4">${p.amount}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))
+                );
+              })
             )}
           </div>
         </div>

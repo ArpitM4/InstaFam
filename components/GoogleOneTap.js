@@ -37,14 +37,24 @@ export default function GoogleOneTap() {
               client_id: clientId,
               callback: async (response) => {
                 try {
-                  // Use the normal signIn flow without redirect: false
-                  // This will handle the OAuth flow properly
-                  await signIn('googleonetap', {
+                  // Use redirect: false to prevent popup and handle response manually
+                  const result = await signIn('googleonetap', {
                     credential: response.credential,
-                    callbackUrl: '/account'
+                    redirect: false
                   });
+                  
+                  if (result?.ok && !result?.error) {
+                    // Successful sign-in, force reload to update session
+                    window.location.reload();
+                  } else {
+                    console.error('Google One Tap sign-in failed:', result?.error);
+                    // Fallback to regular Google OAuth if One Tap fails
+                    signIn('google', { callbackUrl: '/account' });
+                  }
                 } catch (signInError) {
                   console.error('Google One Tap sign-in error:', signInError);
+                  // Fallback to regular Google OAuth on error
+                  signIn('google', { callbackUrl: '/account' });
                 }
               },
               auto_select: false,
