@@ -1,9 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect, Suspense } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
+import dynamic from "next/dynamic";
+
+// Dynamically import SimpleMDE to avoid SSR issues
+const SimpleMdeReact = dynamic(() => import("react-simplemde-editor"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-64 bg-background border border-text/20 rounded-xl flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+        <p className="text-text/60 text-sm">Loading editor...</p>
+      </div>
+    </div>
+  ),
+});
+
+// Import SimpleMDE CSS
+import "easymde/dist/easymde.min.css";
+import ReactMarkdown from 'react-markdown';
 
 // Hardcoded admin emails - Update this array with your admin emails
 const ADMIN_EMAILS = ['arpitmahatpure@gmail.com', 'arpitmaurya1506@gmail.com', 'chiragbhandarlap@gmail.com']; // Add your admin emails here
@@ -11,14 +29,90 @@ const ADMIN_EMAILS = ['arpitmahatpure@gmail.com', 'arpitmaurya1506@gmail.com', '
 const UploadBlogPage = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingBlog, setIsLoadingBlog] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     content: ""
   });
+  
+  // Check if we're in edit mode
+  const editId = searchParams.get('edit');
+  const isEditMode = !!editId;
 
   // Check if user is admin
   const isAdmin = session?.user?.email && ADMIN_EMAILS.includes(session.user.email);
+
+  // Fetch blog data if in edit mode
+  useEffect(() => {
+    if (isEditMode && editId && isAdmin) {
+      fetchBlogForEdit(editId);
+    }
+  }, [isEditMode, editId, isAdmin]);
+
+  const fetchBlogForEdit = async (blogId) => {
+    try {
+      setIsLoadingBlog(true);
+      const response = await fetch(`/api/blogs/edit/${blogId}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setFormData({
+          title: data.blog.title,
+          content: data.blog.content
+        });
+      } else {
+        toast.error(data.error || "Failed to load blog for editing");
+        router.push('/blogs');
+      }
+    } catch (error) {
+      console.error('Error fetching blog for edit:', error);
+      toast.error("Error loading blog for editing");
+      router.push('/blogs');
+    } finally {
+      setIsLoadingBlog(false);
+    }
+  };
+
+  // SimpleMDE options
+  const simpleMdeOptions = useMemo(() => ({
+    placeholder: `Start writing your blog post here...
+
+Examples of what you can do:
+# Main Heading
+## Sub Heading
+**Bold text** and *italic text*
+- Bullet points
+1. Numbered lists
+> Quotes
+[Link text](https://example.com)
+\`inline code\` and code blocks
+
+Use the toolbar above for easy formatting!`,
+    spellChecker: false,
+    status: ["lines", "words", "cursor"],
+    tabSize: 2,
+    toolbar: [
+      "bold", "italic", "heading", "|",
+      "quote", "unordered-list", "ordered-list", "|",
+      "link", "image", "|",
+      "preview", "side-by-side", "fullscreen", "|",
+      "guide"
+    ],
+    shortcuts: {
+      "toggleBold": "Ctrl-B",
+      "toggleItalic": "Ctrl-I",
+      "drawLink": "Ctrl-K",
+      "togglePreview": "Ctrl-P",
+      "toggleSideBySide": "F9",
+      "toggleFullScreen": "F11"
+    },
+    renderingConfig: {
+      singleLineBreaks: false,
+      codeSyntaxHighlighting: true,
+    }
+  }), []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -39,40 +133,61 @@ const UploadBlogPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/blogs', {
-        method: 'POST',
+      const url = '/api/blogs';
+      const method = isEditMode ? 'PUT' : 'POST';
+      const body = isEditMode 
+        ? {
+            id: editId,
+            title: formData.title.trim(),
+            content: formData.content.trim()
+          }
+        : {
+            title: formData.title.trim(),
+            content: formData.content.trim()
+          };
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          title: formData.title.trim(),
-          content: formData.content.trim()
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        toast.success("Blog post created successfully!");
-        setFormData({ title: "", content: "" });
-        router.push('/blogs');
+        const successMessage = isEditMode ? "Blog post updated successfully!" : "Blog post created successfully!";
+        toast.success(successMessage);
+        
+        if (isEditMode) {
+          // Redirect to the updated blog post
+          router.push(`/blogs/${data.blog.slug}`);
+        } else {
+          // Clear form and redirect to blogs list for new posts
+          setFormData({ title: "", content: "" });
+          router.push('/blogs');
+        }
       } else {
-        toast.error(data.error || "Failed to create blog post");
+        const errorMessage = isEditMode ? "Failed to update blog post" : "Failed to create blog post";
+        toast.error(data.error || errorMessage);
       }
     } catch (error) {
-      console.error('Error creating blog post:', error);
-      toast.error("Error creating blog post");
+      console.error(`Error ${isEditMode ? 'updating' : 'creating'} blog post:`, error);
+      toast.error(`Error ${isEditMode ? 'updating' : 'creating'} blog post`);
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (status === "loading") {
+  if (status === "loading" || isLoadingBlog) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-text">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-text/70">Loading...</p>
+          <p className="text-text/70">
+            {isLoadingBlog ? "Loading blog for editing..." : "Loading..."}
+          </p>
         </div>
       </div>
     );
@@ -120,8 +235,12 @@ const UploadBlogPage = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="border-b border-text/20 pb-6 mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">Create New Blog Post</h1>
-          <p className="text-text/70">Share knowledge with the creator community</p>
+          <h1 className="text-3xl font-bold text-primary mb-2">
+            {isEditMode ? "Edit Blog Post" : "Create New Blog Post"}
+          </h1>
+          <p className="text-text/70">
+            {isEditMode ? "Update your blog post content" : "Share knowledge with the creator community"}
+          </p>
         </div>
 
         {/* Blog Creation Form */}
@@ -144,23 +263,21 @@ const UploadBlogPage = () => {
               />
             </div>
 
-            {/* Content Textarea */}
+            {/* Content Editor */}
             <div className="space-y-2">
               <label htmlFor="content" className="block text-lg font-medium text-text">
                 Blog Content
               </label>
-              <textarea
-                id="content"
-                name="content"
-                value={formData.content}
-                onChange={handleInputChange}
-                placeholder="Write your blog content here... You can use line breaks for formatting."
-                rows={15}
-                className="w-full px-4 py-3 bg-background border border-text/20 rounded-xl text-text placeholder-text/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-vertical"
-                disabled={isLoading}
-              />
+              <div className="markdown-editor">
+                <SimpleMdeReact
+                  value={formData.content}
+                  onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
+                  options={simpleMdeOptions}
+                />
+              </div>
               <p className="text-sm text-text/60">
-                Tip: Use line breaks to separate paragraphs and make your content more readable.
+                💡 <strong>Markdown Tips:</strong> Use **bold**, *italic*, # headings, &gt; quotes, [links](url), and `code`. 
+                Press F9 for side-by-side preview or F11 for fullscreen editing.
               </p>
             </div>
 
@@ -174,16 +291,22 @@ const UploadBlogPage = () => {
                 {isLoading ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Publishing...
+                    {isEditMode ? "Updating..." : "Publishing..."}
                   </>
                 ) : (
-                  'Publish Blog Post'
+                  isEditMode ? "Update Blog Post" : "Publish Blog Post"
                 )}
               </button>
               
               <button
                 type="button"
-                onClick={() => router.push('/blogs')}
+                onClick={() => {
+                  if (isEditMode) {
+                    router.back(); // Go back to the previous page (likely the blog post)
+                  } else {
+                    router.push('/blogs'); // Go to blogs list
+                  }
+                }}
                 disabled={isLoading}
                 className="bg-text/10 hover:bg-text/20 text-text px-8 py-3 rounded-xl font-medium transition-colors"
               >
@@ -197,15 +320,21 @@ const UploadBlogPage = () => {
         {(formData.title.trim() || formData.content.trim()) && (
           <div className="mt-8 bg-dropdown-hover rounded-xl p-8">
             <h3 className="text-xl font-bold text-primary mb-4">Preview</h3>
-            <div className="bg-background rounded-xl p-6 space-y-4">
-              {formData.title.trim() && (
-                <h4 className="text-2xl font-bold text-text">{formData.title}</h4>
-              )}
-              {formData.content.trim() && (
-                <div className="text-text/80 whitespace-pre-wrap leading-relaxed">
-                  {formData.content}
-                </div>
-              )}
+            <div className="bg-background rounded-xl p-6">
+              <article className="prose prose-invert lg:prose-xl max-w-none">
+                {formData.title.trim() && (
+                  <h1 className="text-4xl md:text-5xl font-bold text-primary leading-tight mb-6">
+                    {formData.title}
+                  </h1>
+                )}
+                {formData.content.trim() && (
+                  <div className="text-text/90">
+                    <ReactMarkdown>
+                      {formData.content}
+                    </ReactMarkdown>
+                  </div>
+                )}
+              </article>
             </div>
           </div>
         )}
@@ -214,4 +343,20 @@ const UploadBlogPage = () => {
   );
 };
 
-export default UploadBlogPage;
+// Wrapper component to handle Suspense for useSearchParams
+const UploadBlogPageWrapper = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-background text-text">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-text/70">Loading...</p>
+        </div>
+      </div>
+    }>
+      <UploadBlogPage />
+    </Suspense>
+  );
+};
+
+export default UploadBlogPageWrapper;

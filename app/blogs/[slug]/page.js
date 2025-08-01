@@ -5,6 +5,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useParams } from "next/navigation";
 import AdminBlogActions from "@/components/AdminBlogActions";
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 // Force dynamic rendering for fresh blog content
 export const dynamic = 'force-dynamic';
@@ -16,6 +19,28 @@ function formatDate(dateString) {
     month: 'long',
     day: 'numeric'
   });
+}
+
+// Helper function to calculate reading time
+function calculateReadingTime(content) {
+  // Remove markdown syntax and count words
+  const plainText = content
+    .replace(/#{1,6}\s+/g, '')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/`(.*?)`/g, '$1')
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+    .replace(/>\s+/g, '')
+    .replace(/[-*+]\s+/g, '')
+    .replace(/\d+\.\s+/g, '')
+    .replace(/\n+/g, ' ')
+    .trim();
+    
+  const words = plainText.split(/\s+/).length;
+  const avgWordsPerMinute = 200; // Average reading speed
+  const readingTime = Math.ceil(words / avgWordsPerMinute);
+  
+  return readingTime;
 }
 
 const SingleBlogPage = () => {
@@ -95,7 +120,7 @@ const SingleBlogPage = () => {
           </div>
           
           {/* Author and Date Information */}
-          <div className="flex items-center gap-6 text-text/70">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 text-text/70">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
                 <span className="text-primary font-bold text-lg">
@@ -110,25 +135,78 @@ const SingleBlogPage = () => {
               </div>
             </div>
             
-            <div className="h-8 w-px bg-text/20"></div>
+            <div className="hidden sm:block h-8 w-px bg-text/20"></div>
             
-            <div>
-              <p className="font-medium text-text">{formatDate(blog.createdAt)}</p>
-              <p className="text-sm text-text/60">Published</p>
+            <div className="flex items-center gap-6">
+              <div>
+                <p className="font-medium text-text">{formatDate(blog.createdAt)}</p>
+                <p className="text-sm text-text/60">Published</p>
+              </div>
+              
+              <div className="h-6 w-px bg-text/20"></div>
+              
+              <div>
+                <p className="font-medium text-text">{calculateReadingTime(blog.content)} min read</p>
+                <p className="text-sm text-text/60">Reading time</p>
+              </div>
             </div>
           </div>
         </header>
 
         {/* Article Content */}
-        <article className="prose prose-lg max-w-none">
+        <article className="prose prose-invert lg:prose-xl max-w-none">
           <div className="bg-dropdown-hover rounded-xl p-8 md:p-12">
-            <div className="text-text/90 leading-relaxed whitespace-pre-wrap text-lg">
-              {blog.content}
+            <div className="text-text/90 leading-relaxed">
+              <ReactMarkdown 
+                components={{
+                h1: ({children}) => <h1 className="text-3xl font-bold text-primary mb-6 mt-8 first:mt-0">{children}</h1>,
+                h2: ({children}) => <h2 className="text-2xl font-bold text-primary mb-4 mt-6">{children}</h2>,
+                h3: ({children}) => <h3 className="text-xl font-bold text-primary mb-3 mt-5">{children}</h3>,
+                h4: ({children}) => <h4 className="text-lg font-bold text-primary mb-2 mt-4">{children}</h4>,
+                p: ({children}) => <p className="text-text/90 mb-4 leading-relaxed">{children}</p>,
+                ul: ({children}) => <ul className="list-disc list-inside mb-4 text-text/90 space-y-2">{children}</ul>,
+                ol: ({children}) => <ol className="list-decimal list-inside mb-4 text-text/90 space-y-2">{children}</ol>,
+                li: ({children}) => <li className="text-text/90">{children}</li>,
+                blockquote: ({children}) => (
+                  <blockquote className="border-l-4 border-primary bg-dropdown-hover/50 p-4 my-6 italic text-text/80">
+                    {children}
+                  </blockquote>
+                ),
+                code: ({node, inline, className, children, ...props}) => {
+                  const match = /language-(\w+)/.exec(className || '');
+                  const language = match ? match[1] : '';
+                  
+                  return !inline && language ? (
+                    <SyntaxHighlighter
+                      style={oneDark}
+                      language={language}
+                      PreTag="div"
+                      className="rounded-lg !bg-dropdown-hover !p-4 !m-0 text-sm"
+                      {...props}
+                    >
+                      {String(children).replace(/\n$/, '')}
+                    </SyntaxHighlighter>
+                  ) : (
+                    <code className="bg-dropdown-hover text-accent px-2 py-1 rounded text-sm" {...props}>
+                      {children}
+                    </code>
+                  );
+                },
+                pre: ({children}) => <pre className="bg-dropdown-hover p-4 rounded-lg overflow-x-auto mb-4">{children}</pre>,
+                a: ({href, children}) => (
+                  <a href={href} className="text-primary hover:text-primary/80 underline transition-colors" target="_blank" rel="noopener noreferrer">
+                    {children}
+                  </a>
+                ),
+                strong: ({children}) => <strong className="font-bold text-accent">{children}</strong>,
+                em: ({children}) => <em className="italic text-secondary">{children}</em>,
+              }}
+              >
+                {blog.content}
+              </ReactMarkdown>
             </div>
           </div>
-        </article>
-
-        {/* Article Footer */}
+        </article>        {/* Article Footer */}
         <footer className="mt-12 pt-8 border-t border-text/20">
           <div className="bg-dropdown-hover rounded-xl p-6 md:p-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">

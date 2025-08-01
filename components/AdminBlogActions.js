@@ -54,9 +54,9 @@ const AdminBlogActions = ({ blog, onDelete }) => {
 
   return (
     <div className="flex items-center gap-2">
-      {/* Edit Button (placeholder for future implementation) */}
+      {/* Edit Button */}
       <button
-        onClick={() => toast.info("Edit functionality coming soon!")}
+        onClick={() => router.push(`/upload-blog?edit=${blog._id}`)}
         className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg text-xs font-medium hover:bg-blue-500/30 transition-colors"
         title="Edit blog post"
       >

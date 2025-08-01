@@ -20,10 +20,23 @@ function formatDate(dateString) {
   });
 }
 
-// Helper function to create excerpt
+// Helper function to create excerpt - strips markdown syntax
 function createExcerpt(content, maxLength = 150) {
-  if (content.length <= maxLength) return content;
-  return content.substring(0, maxLength).trim() + '...';
+  // Remove markdown syntax for a clean excerpt
+  const plainText = content
+    .replace(/#{1,6}\s+/g, '') // Remove heading markers
+    .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markers
+    .replace(/\*(.*?)\*/g, '$1') // Remove italic markers
+    .replace(/`(.*?)`/g, '$1') // Remove inline code markers
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove link markdown, keep text
+    .replace(/>\s+/g, '') // Remove blockquote markers
+    .replace(/[-*+]\s+/g, '') // Remove list markers
+    .replace(/\d+\.\s+/g, '') // Remove numbered list markers
+    .replace(/\n+/g, ' ') // Replace line breaks with spaces
+    .trim();
+    
+  if (plainText.length <= maxLength) return plainText;
+  return plainText.substring(0, maxLength).trim() + '...';
 }
 
 const BlogsPage = () => {

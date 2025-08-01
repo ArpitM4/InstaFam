@@ -153,3 +153,125 @@ body {
   animation: slide-down 0.5s ease-out;
 }
 
+/* SimpleMDE Dark Theme Customization */
+.markdown-editor .EasyMDEContainer .editor-toolbar {
+  background-color: var(--dropdown-hover);
+  border-color: var(--dropdown-border);
+  border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.markdown-editor .EasyMDEContainer .editor-toolbar button {
+  color: var(--text);
+  border: none;
+}
+
+.markdown-editor .EasyMDEContainer .editor-toolbar button:hover {
+  background-color: var(--primary);
+  color: white;
+}
+
+.markdown-editor .EasyMDEContainer .editor-toolbar button.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+.markdown-editor .EasyMDEContainer .CodeMirror {
+  background-color: var(--background);
+  color: var(--text);
+  border-color: var(--dropdown-border);
+  border-radius: 0 0 0.75rem 0.75rem;
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 1rem;
+}
+
+.markdown-editor .EasyMDEContainer .CodeMirror .CodeMirror-cursor {
+  border-left-color: var(--primary);
+}
+
+.markdown-editor .EasyMDEContainer .CodeMirror .CodeMirror-selected {
+  background-color: var(--primary);
+  opacity: 0.2;
+}
+
+.markdown-editor .EasyMDEContainer .CodeMirror .cm-header {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.markdown-editor .EasyMDEContainer .CodeMirror .cm-strong {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.markdown-editor .EasyMDEContainer .CodeMirror .cm-em {
+  color: var(--secondary);
+  font-style: italic;
+}
+
+.markdown-editor .EasyMDEContainer .CodeMirror .cm-link {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.markdown-editor .EasyMDEContainer .CodeMirror .cm-quote {
+  color: var(--text);
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.markdown-editor .EasyMDEContainer .editor-preview,
+.markdown-editor .EasyMDEContainer .editor-preview-side {
+  background-color: var(--background);
+  color: var(--text);
+  border-color: var(--dropdown-border);
+  padding: 1rem;
+}
+
+.markdown-editor .EasyMDEContainer .editor-preview h1,
+.markdown-editor .EasyMDEContainer .editor-preview h2,
+.markdown-editor .EasyMDEContainer .editor-preview h3,
+.markdown-editor .EasyMDEContainer .editor-preview h4,
+.markdown-editor .EasyMDEContainer .editor-preview h5,
+.markdown-editor .EasyMDEContainer .editor-preview h6,
+.markdown-editor .EasyMDEContainer .editor-preview-side h1,
+.markdown-editor .EasyMDEContainer .editor-preview-side h2,
+.markdown-editor .EasyMDEContainer .editor-preview-side h3,
+.markdown-editor .EasyMDEContainer .editor-preview-side h4,
+.markdown-editor .EasyMDEContainer .editor-preview-side h5,
+.markdown-editor .EasyMDEContainer .editor-preview-side h6 {
+  color: var(--primary);
+}
+
+.markdown-editor .EasyMDEContainer .editor-preview a,
+.markdown-editor .EasyMDEContainer .editor-preview-side a {
+  color: var(--primary);
+}
+
+.markdown-editor .EasyMDEContainer .editor-preview blockquote,
+.markdown-editor .EasyMDEContainer .editor-preview-side blockquote {
+  border-left-color: var(--primary);
+  background-color: var(--dropdown-hover);
+}
+
+.markdown-editor .EasyMDEContainer .editor-preview code,
+.markdown-editor .EasyMDEContainer .editor-preview-side code {
+  background-color: var(--dropdown-hover);
+  color: var(--accent);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+}
+
+.markdown-editor .EasyMDEContainer .editor-preview pre,
+.markdown-editor .EasyMDEContainer .editor-preview-side pre {
+  background-color: var(--dropdown-hover);
+  border: 1px solid var(--dropdown-border);
+}
+
+.markdown-editor .EasyMDEContainer .editor-statusbar {
+  background-color: var(--dropdown-hover);
+  color: var(--text);
+  border-color: var(--dropdown-border);
+  border-radius: 0 0 0.75rem 0.75rem;
+}
+

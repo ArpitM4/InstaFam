@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/db/ConnectDb";
 import Blog from "@/models/Blog";
 import User from "@/models/User";
@@ -44,7 +44,7 @@ export async function GET() {
 // POST - Create new blog post (Admin Only)
 export async function POST(request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(nextAuthConfig);
     
     if (!session) {
       return NextResponse.json(
@@ -125,10 +125,102 @@ export async function POST(request) {
   }
 }
 
+// PUT - Update blog post (Admin Only)
+export async function PUT(request) {
+  try {
+    const session = await getServerSession(nextAuthConfig);
+    
+    if (!session) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Admin check
+    if (!ADMIN_EMAILS.includes(session.user.email)) {
+      return NextResponse.json(
+        { success: false, error: 'Access denied. Admin privileges required.' },
+        { status: 403 }
+      );
+    }
+
+    const { id, title, content } = await request.json();
+
+    if (!id || !title || !content) {
+      return NextResponse.json(
+        { success: false, error: 'Blog ID, title, and content are required' },
+        { status: 400 }
+      );
+    }
+
+    await connectDB();
+
+    // Find the existing blog post
+    const existingBlog = await Blog.findById(id);
+    if (!existingBlog) {
+      return NextResponse.json(
+        { success: false, error: 'Blog post not found' },
+        { status: 404 }
+      );
+    }
+
+    // Generate new slug if title changed
+    let slug = existingBlog.slug;
+    if (existingBlog.title !== title.trim()) {
+      slug = generateSlug(title.trim());
+      
+      // Check if new slug already exists (excluding current blog)
+      const existingSlug = await Blog.findOne({ 
+        slug: slug,
+        _id: { $ne: id }
+      });
+      
+      if (existingSlug) {
+        slug = `${slug}-${Date.now()}`;
+      }
+    }
+
+    // Update the blog post
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      id,
+      {
+        title: title.trim(),
+        content: content.trim(),
+        slug: slug,
+        updatedAt: new Date()
+      },
+      { new: true }
+    ).populate('authorId', 'name username');
+
+    // Revalidate the blogs page to show the updated post immediately
+    try {
+      revalidatePath('/blogs');
+      revalidatePath(`/blogs/${slug}`);
+    } catch (revalidateError) {
+      console.log('Revalidation failed:', revalidateError);
+      // Continue anyway as the blog was updated successfully
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Blog post updated successfully',
+      blog: updatedBlog
+    });
+
+  } catch (error) {
+    console.error('Error updating blog post:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to update blog post' },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE - Delete blog post (Admin Only)
 export async function DELETE(request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(nextAuthConfig);
     
     if (!session) {
       return NextResponse.json(
