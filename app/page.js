@@ -52,11 +52,11 @@ const handleSearch = (e) => {
         muted
       />
 
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 md:px-12 py-12 text-center">
+      <div className="relative z-10 min-h-screen flex items-center justify-center px-3 sm:px-6 md:px-12 py-12 text-center">
   <div className="max-w-4xl w-full">
     <h1
       key={key}
-      className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 border-r-4 border-white whitespace-nowrap overflow-hidden animate-typing"
+      className="text-2xl sm:text-4xl md:text-6xl lg:text-6xl font-extrabold text-white mb-6 border-r-4 border-white whitespace-nowrap overflow-hidden animate-typing"
     >
       {headings[textIndex]}
     </h1>

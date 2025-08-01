@@ -82,6 +82,15 @@ body {
   width: 0; /* Start with no width */
 }
 
+/* For mobile screens, reduce font size to fit better */
+@media (max-width: 639px) {
+  .animate-typing {
+    white-space: nowrap;
+    width: 0;
+    animation: typing 9s steps(30, end), blink 0.7s step-end infinite;
+  }
+}
+
 .animate-pulse-blink {
   animation: pulse-blink 2s ease-in-out infinite;
 }
