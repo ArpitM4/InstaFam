@@ -92,20 +92,20 @@ const PaymentProfileSection = ({
       <div className="h-20" />
 
       {/* Profile Info Box */}
-      <div className="relative mt-20 w-full max-w-md mx-auto p-6 bg-text/10 border border-text/20 backdrop-blur-md shadow-md rounded-lg">
-        <h1 className="text-xl font-bold text-text text-center mb-4">@{username}</h1>
+      <div className="relative mt-20 w-full max-w-md mx-auto p-4 bg-dropdown-hover rounded-lg shadow-sm">
+        <h1 className="text-xl font-light text-primary text-center mb-3">@{username}</h1>
         
         {/* Follower Count for Creator's Own Page */}
         {isOwner && (
-          <div className="flex justify-center mb-2">
-            <span className="text-sm text-text/70 bg-text/5 px-3 py-1 rounded-full border border-text/10">
+          <div className="flex justify-center mb-3">
+            <span className="text-sm text-text/60 bg-background/50 px-3 py-1 rounded-lg">
               {(currentUser.followersArray?.length || currentUser.followers || 0).toLocaleString()} follower{(currentUser.followersArray?.length || currentUser.followers || 0) !== 1 ? 's' : ''}
             </span>
           </div>
         )}
         
         {/* Follow Button */}
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-1">
           <FollowButton 
             creatorId={currentUser._id}
             creatorName={username}
@@ -124,58 +124,63 @@ const PaymentProfileSection = ({
         
         {/* Description */}
         {isOwner ? (
-          <>
-            <div className="relative">
-              <textarea
-                className="w-full mt-2 bg-background border border-text/20 text-text text-sm text-center rounded p-2 pb-8 resize-none focus:ring-2 focus:ring-primary outline-none"
-                value={currentUser.description || ""}
-                onClick={() => setIsEditing(true)}
-                onFocus={() => setIsEditing(true)}
-                onChange={(e) => setcurrentUser({ ...currentUser, description: e.target.value })}
-                placeholder="Add a description..."
-              />
-              <FaPen className="absolute bottom-3 right-3 text-text/40 text-xs pointer-events-none" />
-            </div>
-            {isEditing && (
-              <button onClick={handleSaveDescription} className="w-full mt-2 bg-primary hover:bg-primary/80 text-text px-4 py-2 rounded text-sm font-semibold">
-                Save Description
-              </button>
-            )}
-          </>
+          <div className="relative">
+            <textarea
+              className="w-full mt-1 bg-background text-text text-sm text-center rounded-lg p-2 pb-6 resize-none focus:outline-none transition-all duration-200 border-0 placeholder-text/40"
+              value={currentUser.description || ""}
+              onChange={(e) => setcurrentUser({ ...currentUser, description: e.target.value })}
+              onBlur={handleSaveDescription}
+              placeholder="Add a description..."
+            />
+            <FaPen className="absolute bottom-2 right-2 text-text/40 text-xs pointer-events-none" />
+          </div>
         ) : (
-          <p className="text-sm text-text/70 text-center mt-2">{currentUser.description}</p>
+          <p className="text-sm text-text/60 text-center mt-2">{currentUser.description}</p>
         )}
 
-        {/* Perk Display */}
-        {isEventActive && (currentUser.perk || (currentUser.payments && currentUser.payments.length > 0)) && (
-          <div className="mt-6 bg-text/5 border border-text/20 p-4 rounded-lg">
-            {currentUser.perk && (
-              <div className="text-text/90 text-sm text-center mb-3">
-                🎁 <span className="font-semibold text-accent">Top 5 Donor Perk:</span> {currentUser.perk}
-              </div>
-            )}
+        {/* Perk Section - Combined Display and Edit */}
+        {isOwner && (
+          <div className="mt-4">
+            <div className="relative">
+              <input
+                type="text"
+                className="w-full bg-background text-text text-sm text-center rounded-lg p-3 pr-8 focus:outline-none transition-all duration-200 border-0 placeholder-text/40"
+                value={currentUser.perk || ""}
+                onClick={() => setIsEditing(true)}
+                onFocus={() => setIsEditing(true)}
+                onChange={(e) => setcurrentUser({ ...currentUser, perk: e.target.value })}
+                onBlur={handleSavePerk}
+                placeholder="Set your perk for top donors..."
+              />
+              <FaPen className="absolute top-1/2 right-3 transform -translate-y-1/2 text-text/40 text-xs pointer-events-none" />
+            </div>
+          </div>
+        )}
+
+        {/* Perk Display for Non-Owners */}
+        {!isOwner && isEventActive && currentUser.perk && (
+          <div className="mt-4 bg-black p-3 rounded-lg">
+            <div className="text-text/90 text-sm text-center">
+              🎁 <span className="font-medium text-primary/40">Top 5 Perk : </span> {currentUser.perk}
+            </div>
           </div>
         )}
 
         {/* Owner-only controls */}
         {isOwner && (
-          <div className="mt-4 space-y-2">
-            <input
-              type="text"
-              value={currentUser.perk || ""}
-              onChange={(e) => setcurrentUser({ ...currentUser, perk: e.target.value })}
-              onBlur={handleSavePerk}
-              placeholder="Set your perk for top donors"
-              className="w-full px-3 py-2 bg-background border border-text/20 text-text rounded focus:ring-2 focus:ring-primary outline-none"
-            />
+          <div className="mt-4 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
-              <input type="number" placeholder="Duration in days" value={eventDuration} onChange={(e) => setEventDuration(e.target.value)}
-                className="w-full sm:min-w-[180px] sm:flex-1 px-3 py-2 bg-background border border-text/20 text-text rounded focus:ring-2 focus:ring-primary outline-none"
+              <input 
+                type="number" 
+                placeholder="Duration in days" 
+                value={eventDuration} 
+                onChange={(e) => setEventDuration(e.target.value)}
+                className="w-full sm:min-w-[160px] sm:flex-1 px-3 py-2 bg-background text-text rounded-lg focus:outline-none transition-all duration-200 border-0 placeholder-text/40"
               />
-              <button onClick={handleStartEvent} className="w-full sm:w-auto bg-success hover:bg-success/80 text-text px-4 py-2 rounded text-sm font-semibold">
+              <button onClick={handleStartEvent} className="w-full sm:w-auto bg-success hover:bg-success/90 text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md">
                 Start Event
               </button>
-              <button onClick={handleEndEvent} className="w-full sm:w-auto bg-error hover:bg-error/80 text-text px-4 py-2 rounded text-sm font-semibold">
+              <button onClick={handleEndEvent} className="w-full sm:w-auto bg-error hover:bg-error/90 text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md">
                 End Event
               </button>
             </div>
@@ -184,8 +189,8 @@ const PaymentProfileSection = ({
 
         {/* Event Timer */}
         {currentUser.eventEnd && timeLeft && (
-          <div className="mt-4 text-center bg-background/80 border border-primary/30 text-text/80 text-sm py-2 px-3 rounded-md shadow-sm">
-            ⏳ <span className="font-semibold text-primary">Event is live!</span> Ends in: <span className="font-semibold">{timeLeft}</span>
+          <div className="mt-3 text-center bg-background/50 text-text/80 text-sm py-2 px-3 rounded-lg shadow-sm">
+            <span className="font-medium text-primary">Event is live!</span> Ends in: <span className="font-medium">{timeLeft}</span>
           </div>
         )}
       </div>

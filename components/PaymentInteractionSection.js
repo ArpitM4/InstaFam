@@ -13,30 +13,16 @@ const PaymentInteractionSection = ({
   onApprove,
   router,
 }) => {
-  return (
-    <div className="w-full max-w-5xl mt-12 flex flex-col md:flex-row gap-8 px-2">
+  return (<>
+    <div className="w-full max-w-5xl mt-8 flex flex-col md:flex-row gap-6 px-2">
       {/* Leaderboard Disclaimer */}
-      <div className="w-full bg-success/10 border border-success/30 rounded-lg p-3 mb-4 md:hidden">
-        <div className="flex items-center gap-2">
-          <span className="text-success text-lg">💡</span>
-          <p className="text-success text-sm font-medium">
-            Multiple donations stack up! Keep contributing to climb higher on the leaderboard.
-          </p>
-        </div>
-      </div>
+     
 
       {/* Leaderboard */}
-      <div className={`flex-1 bg-text/10 border border-text/20 text-text rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""} ${!session ? "blur-sm" : ""}`}> 
+      <div className={`flex-1 bg-dropdown-hover rounded-lg shadow-sm p-4 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""} ${!session ? "blur-sm" : ""}`}> 
         {/* Desktop Disclaimer */}
-        <div className="hidden md:block bg-success/10 border border-success/30 rounded-lg p-3 mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-success text-lg">💡</span>
-            <p className="text-success text-sm font-medium">
-              Multiple donations stack up! Keep contributing to climb higher on the leaderboard.
-            </p>
-          </div>
-        </div>
-        <h2 className="text-2xl font-bold mb-4 text-secondary">Leaderboard</h2>
+
+        <h2 className="text-2xl font-semibold text-primary mb-4">Leaderboard</h2>
         {payments.length === 0 ? (<p className="text-text/60">No payments yet</p>) : (
           <ol className="list-decimal list-inside text-text/80 space-y-2">
             {Object.entries(
@@ -46,10 +32,10 @@ const PaymentInteractionSection = ({
               }, {})
             ).sort(([, a], [, b]) => b - a)
             .map(([name, total], i) => (
-              <li key={i} className="flex justify-between items-center">
+              <li key={i} className="flex justify-between items-center bg-background/30 p-2 rounded-lg">
                 <div className="flex items-center space-x-2">
-                  <FaUserCircle className="text-accent text-2xl" />
-                  <span>{name}</span>
+                  <FaUserCircle className="text-primary text-xl" />
+                  <span className="font-medium">{name}</span>
                 </div>
                 <span className="text-text font-medium">${total}</span>
               </li>
@@ -59,10 +45,10 @@ const PaymentInteractionSection = ({
       </div>
 
       {/* Donation Form */}
-      <div className={`flex-1 bg-text/10 border border-text/20 text-text rounded-lg shadow-md p-6 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""}`}>
-        <h2 className="text-2xl font-bold mb-4 text-secondary">Contribute</h2>
+      <div className={`flex-1 bg-dropdown-hover rounded-lg shadow-sm p-4 mx-2 md:mx-0 ${!isEventActive ? "opacity-40 pointer-events-none" : ""}`}>
+        <h2 className="text-2xl font-semibold text-primary mb-4">Contribute</h2>
         {!isEventActive && (
-          <div className="text-center p-4 bg-text/10 border border-text/20 rounded-md mb-4">
+          <div className="text-center p-3 bg-background/30 rounded-lg mb-4">
             <p className="text-text/60 text-sm">💤 No live events at the moment. Check back later!</p>
           </div>
         )}
@@ -72,18 +58,41 @@ const PaymentInteractionSection = ({
             <span className="text-primary font-semibold">Processing payment...</span>
           </div>
         )}
-        <div className={`space-y-4 transition duration-200 ${isPaying || !isEventActive ? 'pointer-events-none opacity-60 blur-sm' : ''}`}> 
+        <div className={`space-y-3 transition duration-200 ${isPaying || !isEventActive ? 'pointer-events-none opacity-60 blur-sm' : ''}`}> 
           <div>
-            <label className="block text-sm font-medium mb-1">Your Name</label>
-            <input type="text" name="name" value={session?.user?.name || ""} readOnly className="w-full px-4 py-2 rounded bg-background/80 text-text border border-text/20 cursor-not-allowed" disabled/>
+            <label className="block text-sm font-medium text-text/70 mb-1">Your Name</label>
+            <input 
+              type="text" 
+              name="name" 
+              value={session?.user?.name || ""} 
+              readOnly 
+              className="w-full px-3 py-2 rounded-lg bg-background text-text placeholder-text/40 focus:outline-none transition-all duration-200 border-0 cursor-not-allowed" 
+              disabled
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Message</label>
-            <textarea name="message" onChange={handleChange} value={paymentform.message} placeholder="Write a message..." rows="3" className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none" disabled={isPaying || !isEventActive}/>
+            <label className="block text-sm font-medium text-text/70 mb-1">Message</label>
+            <textarea 
+              name="message" 
+              onChange={handleChange} 
+              value={paymentform.message} 
+              placeholder="Write a message..." 
+              rows="3" 
+              className="w-full px-3 py-2 rounded-lg bg-background text-text placeholder-text/40 focus:outline-none transition-all duration-200 border-0" 
+              disabled={isPaying || !isEventActive}
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Amount</label>
-            <input type="number" name="amount" value={paymentform.amount} onChange={handleChange} placeholder="Enter amount" className="w-full px-4 py-2 rounded bg-background border border-text/20 text-text focus:ring-2 focus:ring-primary outline-none" disabled={isPaying || !isEventActive}/>
+            <label className="block text-sm font-medium text-text/70 mb-1">Amount</label>
+            <input 
+              type="number" 
+              name="amount" 
+              value={paymentform.amount} 
+              onChange={handleChange} 
+              placeholder="Enter amount" 
+              className="w-full px-3 py-2 rounded-lg bg-background text-text placeholder-text/40 focus:outline-none transition-all duration-200 border-0" 
+              disabled={isPaying || !isEventActive}
+            />
           </div>
           {/* PayPal Button Logic */}
           {session ? (
@@ -97,16 +106,18 @@ const PaymentInteractionSection = ({
                 />
               </PayPalScriptProvider>
             ) : (
-              <div className="text-center p-2 bg-red-900/50 text-white rounded-md">PayPal is not configured.</div>
+              <div className="text-center p-3 bg-red-500/10 text-red-400 rounded-lg">PayPal is not configured.</div>
             ))
           ) : (
-            <button className="w-full bg-primary hover:bg-primary/80 transition text-text font-semibold py-2 rounded-md" onClick={() => router.push('/login')}>
+            <button className="w-full bg-primary hover:bg-primary/90 transition-all duration-200 text-white font-medium py-2 rounded-lg shadow-sm hover:shadow-md" onClick={() => router.push('/login')}>
               Login to Donate
             </button>
           )}
         </div>
       </div>
+             
     </div>
+    </>
   );
 };
 

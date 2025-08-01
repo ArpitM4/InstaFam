@@ -110,26 +110,26 @@ const VaultSection = ({ currentUser }) => {
     };
 
     modal.innerHTML = `
-      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+      <div class="bg-dropdown-hover rounded-lg p-6 max-w-md w-full mx-4">
+        <h3 class="text-xl font-light text-primary mb-4">
           Input Required: ${item.title}
         </h3>
-        <p class="text-gray-600 dark:text-gray-400 mb-4">
+        <p class="text-text/60 mb-4">
           ${item.description}
         </p>
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label class="block text-sm font-medium text-text/70 mb-2">
             Your Input:
           </label>
           <textarea 
             id="fanInput" 
-            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" 
+            class="w-full p-3 bg-background text-text rounded-lg focus:outline-none transition-all duration-200 border-0 placeholder-text/40" 
             rows="3" 
             placeholder="${getInputPlaceholder(item.perkType)}"
             maxlength="1000"
           ></textarea>
-          <div class="text-xs text-gray-500 mt-1">
-            <span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full">
+          <div class="text-xs text-text/60 mt-1">
+            <span class="bg-primary/20 text-primary px-2 py-1 rounded-lg">
               ${item.perkType}
             </span>
           </div>
@@ -137,13 +137,13 @@ const VaultSection = ({ currentUser }) => {
         <div class="flex gap-3">
           <button 
             onclick="this.closest('.fixed').remove()" 
-            class="flex-1 px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500"
+            class="flex-1 px-4 py-2 bg-background text-text rounded-lg hover:bg-background/80 transition-all duration-200"
           >
             Cancel
           </button>
           <button 
             onclick="window.submitFanInput('${item._id}')" 
-            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md"
           >
             Redeem (${item.pointCost} points)
           </button>
@@ -227,27 +227,27 @@ const VaultSection = ({ currentUser }) => {
     const info = statusInfo[status] || statusInfo['Pending'];
 
     modal.innerHTML = `
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md mx-4 text-center">
+      <div class="bg-dropdown-hover p-6 rounded-lg max-w-md mx-4 text-center">
         <div class="flex items-center justify-center mb-4">
           <span class="text-3xl mr-2">${info.icon}</span>
-          <h3 class="text-xl font-bold text-gray-900 dark:text-white">${info.title}</h3>
+          <h3 class="text-xl font-light text-primary">${info.title}</h3>
         </div>
-        <h4 class="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-200">${item.title}</h4>
-        <p class="text-gray-600 dark:text-gray-400 mb-4">${info.message}</p>
+        <h4 class="font-medium text-lg mb-2 text-text">${item.title}</h4>
+        <p class="text-text/60 mb-4">${info.message}</p>
         
         <div class="mb-4">
-          <span class="${info.bgColor} ${info.textColor} px-3 py-1 rounded-full text-sm font-medium">
+          <span class="${info.bgColor} ${info.textColor} px-3 py-1 rounded-lg text-sm font-medium">
             ${item.perkType} • ${status}
           </span>
         </div>
         
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+        <p class="text-sm text-text/50 mb-4">
           You can track the status of this and other redeemed items on your "My Fam Points" page.
         </p>
         
         <button 
           onclick="this.closest('.fixed').remove()" 
-          class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          class="w-full px-4 py-2 bg-primary text-background rounded-lg hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md"
         >
           Got it!
         </button>
@@ -278,25 +278,25 @@ const VaultSection = ({ currentUser }) => {
     if (item.fileType === 'text-reward') {
       // Special modal for text-based rewards
       modal.innerHTML = `
-        <div class="bg-background p-6 rounded-lg max-w-md mx-4 text-center">
+        <div class="bg-dropdown-hover p-6 rounded-lg max-w-md mx-4 text-center">
           <div class="flex items-center justify-center mb-4">
             <span class="text-3xl mr-2">⭐</span>
-            <h3 class="text-xl font-bold text-text">Reward Unlocked!</h3>
+            <h3 class="text-xl font-light text-primary">Reward Unlocked!</h3>
           </div>
-          <p class="mb-4 text-text/70">You've successfully unlocked:</p>
+          <p class="mb-4 text-text/60">You've successfully unlocked:</p>
           <div class="bg-primary/20 p-4 rounded-lg mb-4">
-            <h4 class="font-bold text-primary mb-2">${item.title}</h4>
-            <p class="text-text/80 text-sm">${item.description}</p>
+            <h4 class="font-medium text-primary mb-2">${item.title}</h4>
+            <p class="text-text/70 text-sm">${item.description}</p>
           </div>
           ${item.requiresFanInput ? 
             '<div class="bg-secondary/20 p-3 rounded-lg mb-4"><p class="text-xs text-secondary font-medium">📝 This reward requires your input! Please contact the creator to provide the necessary information.</p></div>' : 
             ''
           }
-          <p class="text-xs text-text/60 mb-4">
+          <p class="text-xs text-text/50 mb-4">
             This is a text-based reward. Follow the instructions above or contact the creator for more details.
           </p>
           <button onclick="this.parentElement.parentElement.remove()" 
-                  class="block w-full bg-primary text-text px-4 py-2 rounded hover:bg-primary/80 transition">
+                  class="block w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md">
             Got it!
           </button>
         </div>
@@ -304,19 +304,19 @@ const VaultSection = ({ currentUser }) => {
     } else {
       // Regular file download modal
       modal.innerHTML = `
-        <div class="bg-background p-6 rounded-lg max-w-md mx-4 text-center">
-          <h3 class="text-xl font-bold mb-4 text-text">Content Unlocked!</h3>
-          <p class="mb-4 text-text/70">You've successfully unlocked "${item.title}"</p>
+        <div class="bg-dropdown-hover p-6 rounded-lg max-w-md mx-4 text-center">
+          <h3 class="text-xl font-light text-primary mb-4">Content Unlocked!</h3>
+          <p class="mb-4 text-text/60">You've successfully unlocked "${item.title}"</p>
           <div class="space-y-3">
             <a href="${downloadUrl}" target="_blank" rel="noopener noreferrer" 
-               class="block bg-primary text-text px-4 py-2 rounded hover:bg-primary/80 transition">
+               class="block bg-primary text-background px-4 py-2 rounded-lg hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md">
               ${item.fileType === 'image' ? 'View Image' : 
                 item.fileType === 'video' ? 'Watch Video' : 
                 item.fileType === 'pdf' ? 'View PDF' : 
                 item.fileType === 'audio' ? 'Listen Audio' : 'Download File'}
             </a>
             <button onclick="this.parentElement.parentElement.parentElement.remove()" 
-                    class="block w-full bg-text/10 text-text px-4 py-2 rounded hover:bg-text/20 transition">
+                    class="block w-full bg-background text-text px-4 py-2 rounded-lg hover:bg-background/80 transition-all duration-200 shadow-sm">
               Close
             </button>
           </div>
@@ -329,13 +329,13 @@ const VaultSection = ({ currentUser }) => {
 
   const getFileTypeIcon = (fileType) => {
     switch (fileType) {
-      case 'image': return '🖼️';
-      case 'video': return '🎥';
-      case 'pdf': return '📄';
-      case 'audio': return '🎵';
-      case 'document': return '📝';
-      case 'text-reward': return '⭐';
-      default: return '📁';
+      // case 'image': return '🖼️';
+      // case 'video': return '🎥';
+      // case 'pdf': return '📄';
+      // case 'audio': return '🎵';
+      // case 'document': return '📝';
+      // case 'text-reward': return '⭐';
+      // default: return '📁';
     }
   };
 
@@ -368,51 +368,48 @@ const VaultSection = ({ currentUser }) => {
   }
 
   return (
-    <div className="w-full max-w-5xl mt-8 p-6">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-secondary mb-4 uppercase tracking-wider">
-          🗃️ {currentUser?.username}'s VAULT
-        </h2>
-        <p className="text-text/70 mb-4">
+    <div className="w-full max-w-5xl mt-4 p-4">
+      <div className="text-center mb-6">
+        <p className="text-text/60 mb-4">
           Exclusive digital content available for Fam Points
         </p>
         {session && (
           <div className="bg-primary/20 text-primary px-4 py-2 rounded-lg inline-block">
-            💎 Your Fam Points: {userPoints}
+            🪙 Your Fam Points: {userPoints}
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {vaultItems.map((item) => {
           const isRedeemed = isItemRedeemed(item._id);
           const canAfford = userPoints >= item.pointCost;
           const isRedeeming = redeeming[item._id];
 
           return (
-            <div key={item._id} className="bg-text/5 border border-text/10 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+            <div key={item._id} className="bg-dropdown-hover rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
               {/* Item Header */}
               <div className="p-4 border-b border-text/10">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">{getFileTypeIcon(item.fileType)}</span>
                     {item.requiresFanInput && (
-                      <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
+                      <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-lg">
                         Input Required
                       </span>
                     )}
                   </div>
-                  <span className="bg-primary/20 text-primary px-2 py-1 rounded text-sm font-medium">
+                  <span className="bg-primary/20 text-primary px-2 py-1 rounded-lg text-sm font-medium">
                     {item.pointCost} points
                   </span>
                 </div>
-                <h3 className="font-bold text-lg mb-1 text-text">{item.title}</h3>
-                <p className="text-text/70 text-sm line-clamp-2">{item.description}</p>
+                <h3 className="font-medium text-lg mb-1 text-text">{item.title}</h3>
+                <p className="text-text/60 text-sm line-clamp-2">{item.description}</p>
               </div>
 
               {/* Item Content */}
               <div className="p-4">
-                <div className="flex items-center justify-between text-xs text-text/60 mb-4">
+                <div className="flex items-center justify-between text-xs text-text/50 mb-3">
                   <span>{item.fileType.toUpperCase()}</span>
                   <span>{item.unlockCount} unlocks</span>
                 </div>
@@ -421,9 +418,9 @@ const VaultSection = ({ currentUser }) => {
                 {!session ? (
                   <button
                     onClick={() => toast.info('Please login to redeem vault items')}
-                    className="w-full bg-text/20 text-text/60 py-2 px-4 rounded hover:bg-text/30 transition cursor-pointer"
+                    className="w-full bg-text/10 text-text/40 py-2 px-4 rounded-lg cursor-not-allowed transition-colors shadow-sm"
                   >
-                    Login to Redeem
+                    🔒 Login to Redeem
                   </button>
                 ) : isRedeemed ? (
                   (() => {
@@ -435,9 +432,9 @@ const VaultSection = ({ currentUser }) => {
                       return (
                         <button
                           onClick={() => showDownloadModal(item, item.fileUrl)}
-                          className="w-full bg-green-500/20 text-green-400 py-2 px-4 rounded hover:bg-green-500/30 transition"
+                          className="w-full bg-secondary text-background py-2 px-4 rounded-lg hover:bg-secondary/90 transition-colors shadow-sm"
                         >
-                          ✓ Download
+                          📱 View Content
                         </button>
                       );
                     } else {
@@ -448,7 +445,7 @@ const VaultSection = ({ currentUser }) => {
                       return (
                         <button
                           onClick={() => showStatusModal(item, status)}
-                          className={`w-full py-2 px-4 rounded transition ${
+                          className={`w-full py-2 px-4 rounded-lg transition-colors shadow-sm ${
                             isPending
                               ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
                               : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
@@ -461,28 +458,28 @@ const VaultSection = ({ currentUser }) => {
                   })()
                 ) : !canAfford ? (
                   <button
-                    className="w-full bg-red-500/20 text-red-400 py-2 px-4 rounded cursor-not-allowed"
+                    className="w-full bg-background border border-text/20 text-text/40 py-2 px-4 rounded-lg cursor-not-allowed shadow-sm"
                     disabled
                   >
-                    Insufficient Points
+                    🪙 Need {item.pointCost - userPoints} more points
                   </button>
                 ) : (
                   <button
                     onClick={() => handleRedeem(item)}
                     disabled={isRedeeming}
-                    className={`w-full py-2 px-4 rounded font-medium transition ${
+                    className={`w-full py-2 px-4 rounded-lg font-medium transition-colors shadow-sm ${
                       isRedeeming
-                        ? 'bg-primary/50 text-text/50 cursor-not-allowed'
-                        : 'bg-primary text-text hover:bg-primary/80'
+                        ? 'bg-primary/50 text-background cursor-not-allowed'
+                        : 'bg-primary text-black hover:bg-primary/90'
                     }`}
                   >
                     {isRedeeming ? (
                       <span className="flex items-center justify-center">
-                        <div className="animate-spin h-4 w-4 rounded-full border-2 border-text/50 border-t-transparent mr-2"></div>
+                        <div className="animate-spin h-4 w-4 rounded-full border-2 border-background border-t-transparent mr-2"></div>
                         Redeeming...
                       </span>
                     ) : (
-                      `Redeem for ${item.pointCost} points`
+                      `🪙 Redeem for ${item.pointCost} points`
                     )}
                   </button>
                 )}
@@ -493,8 +490,8 @@ const VaultSection = ({ currentUser }) => {
       </div>
 
       {session && vaultItems.length > 0 && (
-        <div className="mt-8 text-center p-4 bg-text/5 border border-text/10 rounded-lg">
-          <p className="text-text/70 text-sm">
+        <div className="mt-6 text-center p-4 bg-dropdown-hover rounded-lg">
+          <p className="text-text/60 text-sm">
             💡 <strong>Tip:</strong> Support {currentUser?.username || 'this creator'} to earn more Fam Points and unlock exclusive content!
           </p>
         </div>

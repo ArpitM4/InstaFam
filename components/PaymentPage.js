@@ -378,11 +378,11 @@ const PaymentPage = ({ username }) => {
         />
         
         {/* NEW TAB NAVIGATION UI - Replaces the old InteractionSection placement */}
-        <div className="w-full max-w-5xl mt-12 border-b border-text/20">
-          <div className="flex justify-center items-center gap-8">
+        <div className="w-full max-w-5xl mt-8 border-b border-text/10">
+          <div className="flex justify-center items-center gap-6">
             <button
               onClick={() => setActiveTab('contribute')}
-              className={`px-4 py-3 text-lg font-semibold uppercase tracking-wider transition-colors duration-200 ${
+              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
                 activeTab === 'contribute'
                   ? 'text-primary border-b-2 border-primary'
                   : 'text-text/60 hover:text-text border-b-2 border-transparent'
@@ -392,7 +392,7 @@ const PaymentPage = ({ username }) => {
             </button>
             <button
               onClick={() => setActiveTab('vault')}
-              className={`px-4 py-3 text-lg font-semibold uppercase tracking-wider transition-colors duration-200 ${
+              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
                 activeTab === 'vault'
                   ? 'text-primary border-b-2 border-primary'
                   : 'text-text/60 hover:text-text border-b-2 border-transparent'
@@ -405,7 +405,7 @@ const PaymentPage = ({ username }) => {
 
         {/* Conditionally Rendered Content */}
         <div className="w-full flex justify-center">
-          {activeTab === 'contribute' && (
+          {activeTab === 'contribute' && (<>
             <PaymentInteractionSection
               session={session}
               isEventActive={isEventActive}
@@ -417,12 +417,25 @@ const PaymentPage = ({ username }) => {
               onApprove={onApprove}
               router={router}
             />
+            </>
+            
           )}
 
           {activeTab === 'vault' && (
             <VaultSection currentUser={currentUser} />
           )}
         </div>
+
+                  {activeTab === 'contribute' && (
+ <div className="mt-6 text-center p-4 bg-dropdown-hover rounded-lg">
+      
+       
+          <p className="text-success text-sm font-medium">
+            💡 Multiple donations stack up! Keep contributing to climb higher on the leaderboard.
+          </p>
+                </div>   )}
+
+
       </div>
     </>
   );
