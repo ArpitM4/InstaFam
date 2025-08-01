@@ -7,6 +7,10 @@ import { OAuth2Client } from 'google-auth-library';
 import connectDB from '@/db/ConnectDb';
 import User from '@/models/User';
 
+console.log("✅ [NextAuth] route.js file loaded.");
+console.log(`✅ [NextAuth] GOOGLE_ID is: ${process.env.GOOGLE_ID}`);
+console.log(`✅ [NextAuth] NEXTAUTH_SECRET is set: ${!!process.env.NEXTAUTH_SECRET}`);
+
 const nextAuthConfig = {
   providers: [
     GitHubProvider({
@@ -41,39 +45,59 @@ const nextAuthConfig = {
         credential: { type: 'text' }
       },
       async authorize(credentials) {
+        console.log("1. [Authorize Function] --- Started ---");
+
+        if (!credentials || !credentials.credential) {
+          console.error("❌ ERROR: No credential received.");
+          return null;
+        }
+
         try {
           const client = new OAuth2Client(process.env.GOOGLE_ID);
+          console.log("2. [Authorize Function] Verifying token with Google...");
+          
           const ticket = await client.verifyIdToken({
             idToken: credentials.credential,
             audience: process.env.GOOGLE_ID,
           });
+          
           const payload = ticket.getPayload();
+          console.log("3. [Authorize Function] Token verified successfully. Payload:", payload);
 
           if (!payload.email) {
+            console.error("❌ ERROR: Email not found in Google payload.");
             throw new Error("Email not available from Google One Tap.");
           }
 
+          console.log("4. [Authorize Function] Connecting to database...");
           await connectDB();
+          console.log("5. [Authorize Function] Database connected. Finding user...");
+          
           let user = await User.findOne({ email: payload.email });
-
+          
           if (!user) {
+            console.log("6a. [Authorize Function] User not found. Creating new user...");
             user = await User.create({
               email: payload.email,
               username: payload.name || payload.email.split('@')[0], // Use name or email prefix as username
               profilepic: payload.picture,
             });
+            console.log("6b. [Authorize Function] New user created:", user);
+          } else {
+            console.log("6. [Authorize Function] Existing user found:", user);
           }
-
-          // Return the user object to be used by NextAuth
+          
+          console.log("7. [Authorize Function] --- Success! Returning user. ---");
           return { 
             id: user._id.toString(), 
             name: user.username, 
             email: user.email, 
             image: user.profilepic 
           };
+
         } catch (error) {
-          console.error('Google One Tap verification failed:', error);
-          return null;
+          console.error("❌ CRITICAL ERROR in authorize function:", error);
+          return null; // Return null on any error to prevent login
         }
       }
     })
