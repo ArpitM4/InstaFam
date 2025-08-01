@@ -58,11 +58,6 @@ const Navbar = () => {
     getUserInfo();
   }, [session]);
 
-  // Debug logging to see what's happening
-  useEffect(() => {
-    console.log('Session status:', status, 'Session:', session, 'isLoading:', isLoading);
-  }, [status, session, isLoading]);
-
   return (
     <nav className="absolute bg-black shadow-md py-2 z-30 w-full border-b-2 border-dropdown-border">
   <div className="mx-5 flex items-center justify-between">

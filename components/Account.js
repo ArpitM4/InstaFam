@@ -69,7 +69,7 @@ import { Bounce } from 'react-toastify';
 import { useTheme } from "@/context/ThemeContext";
 
 const Account = () => {
-  const { data: session, update } = useSession();
+  const { data: session, update, status } = useSession();
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
 
@@ -92,13 +92,13 @@ const Account = () => {
   const [nameModalLoading, setNameModalLoading] = useState(false);
 
   useEffect(() => {
-    if (!session) {
+    if (status === "unauthenticated") {
       router.push('/login');
-    } else {
+    } else if (status === "authenticated" && session) {
       getData();
     }
     // eslint-disable-next-line
-  }, [session]);
+  }, [session, status]);
 
   // Only show modal on first load if username is blank
   const getData = async () => {
@@ -219,16 +219,21 @@ const Account = () => {
     });
   };
 
-  // ✅ Loading screen if still fetching data
-  if (loading) {
+  // Simple minimal loading screen
+  if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-text">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 rounded-full border-4 border-primary border-t-transparent mb-4"></div>
-          <p className="text-lg font-semibold">Loading InstaFam...</p>
+          <div className="animate-spin h-8 w-8 rounded-full border-2 border-primary border-t-transparent mb-4 mx-auto"></div>
+          <p className="text-text">Loading</p>
         </div>
       </div>
     );
+  }
+
+  // If unauthenticated, redirect (this happens immediately with new status check)
+  if (status === "unauthenticated") {
+    return null;
   }
 
   return (

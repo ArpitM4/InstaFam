@@ -4,6 +4,7 @@ const {Schema,model} = mongoose;
 const PaymentSchema = new Schema({
     from_user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Fan paying
     to_user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Creator receiving
+    eventId: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: true }, // Event during which payment was made
     oid: { type: String, required: true },
     message: { type: String },
     amount: { type: Number, required: true },

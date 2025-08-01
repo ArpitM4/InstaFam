@@ -83,7 +83,6 @@ export const updateProfile = async (data, oldusername) => {
   if (!ndata.username || ndata.username.trim() === "") {
     delete ndata.username;
   }
-  console.log("Received data:", ndata);
   await User.updateOne({ email: ndata.email }, ndata);
   // Return the updated user so the modal logic can use it immediately
   const user = await User.findOne({ email: ndata.email });
@@ -96,17 +95,14 @@ export const updateProfile = async (data, oldusername) => {
 
 // actions/useractions.js
 export const updatePaymentInfo = async ({ phone, upi }, username) => {
-  console.log("updatePaymentInfo called with:", phone, upi, username); // ← Add this
   await connectDb();
-console.log("✅ Connected to DB");
 
   const paymentInfo = {
     ...(phone && { phone }),
     ...(upi && { upi }),
   };
 
-const res = await User.updateOne({ username }, { $set: { paymentInfo } });
-console.log("Mongo Update Result:", res);
+  const res = await User.updateOne({ username }, { $set: { paymentInfo } });
 
 };
 
@@ -129,4 +125,70 @@ export const generateInstagramOTP = async (username) => {
   );
 
   return otp;
+};
+
+// Event-related functions
+export const fetchEvents = async (userId, type = 'history') => {
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/events?action=${type}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch events');
+    }
+
+    const data = await response.json();
+    return type === 'current' ? data.event : data.events;
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    return type === 'current' ? null : [];
+  }
+};
+
+export const createEvent = async (eventData) => {
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/events`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(eventData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create event');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error creating event:', error);
+    throw error;
+  }
+};
+
+export const endEvent = async (eventId) => {
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/events`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ eventId, action: 'end' }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to end event');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error ending event:', error);
+    throw error;
+  }
 };

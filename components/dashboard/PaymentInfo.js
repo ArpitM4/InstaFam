@@ -2,17 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { fetchuser, updatePaymentInfo, fetchpayments } from "@/actions/useractions";
+import { fetchuser, updatePaymentInfo, fetchEvents } from "@/actions/useractions";
 import { toast } from 'react-toastify';
 
 const PaymentInfo = () => {
   const { data: session } = useSession();
   const [form, setForm] = useState(null);
-  const [userId, setUserId] = useState(null);
-  const [payments, setPayments] = useState([]);
-  const [leaderboardPayments, setLeaderboardPayments] = useState([]);
+  const [events, setEvents] = useState([]);
   const [totalEarning, setTotalEarning] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [expandedEvents, setExpandedEvents] = useState(new Set());
 
   useEffect(() => {
     if (session) {
@@ -22,21 +21,16 @@ const PaymentInfo = () => {
 
   const loadData = async () => {
     try {
-      const user = await fetchuser(session.user.name);
+      const user = await fetchuser(session.user.email);
       setForm(user);
-      setUserId(user?._id);
       
       if (user?._id) {
-        const payments = await fetchpayments(user._id);
-        setPayments(payments);
+        // Fetch event history
+        const eventHistory = await fetchEvents(user._id, 'history');
+        setEvents(eventHistory || []);
         
-        // For now, treat all payments as leaderboard payments since paymentType field might not exist
-        // In the future, you can add paymentType field to distinguish between donation and leaderboard payments
-        const leaderboardPayments = payments.filter(p => p.to_user === user._id);
-        setLeaderboardPayments(leaderboardPayments);
-        
-        // Calculate total from all payments for now
-        const total = leaderboardPayments.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+        // Calculate total earnings from all events
+        const total = (eventHistory || []).reduce((acc, event) => acc + (event.totalEarnings || 0), 0);
         setTotalEarning(total);
       }
     } catch (error) {
@@ -65,7 +59,7 @@ const PaymentInfo = () => {
     const upi = form.paymentInfo?.upi || "";
 
     try {
-      await updatePaymentInfo(session.user.name, phone, upi);
+      await updatePaymentInfo({ phone, upi }, session.user.name);
       toast.success("Payout information updated successfully!");
     } catch (error) {
       toast.error("Failed to update payout information");
@@ -73,16 +67,36 @@ const PaymentInfo = () => {
     }
   };
 
-  // Group payments by event (using existing structure)
-  const groupedPayments = leaderboardPayments.reduce((acc, payment) => {
-    // Since eventName might not exist, create groups based on date or use a default
-    const eventName = payment.eventName || payment.message || 'General Payments';
-    if (!acc[eventName]) {
-      acc[eventName] = [];
+  const toggleEventExpansion = (eventId) => {
+    const newExpanded = new Set(expandedEvents);
+    if (newExpanded.has(eventId)) {
+      newExpanded.delete(eventId);
+    } else {
+      newExpanded.add(eventId);
     }
-    acc[eventName].push(payment);
-    return acc;
-  }, {});
+    setExpandedEvents(newExpanded);
+  };
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const formatDateRange = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    if (start.toDateString() === end.toDateString()) {
+      return start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    
+    return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+  };
 
   if (loading) {
     return (
@@ -95,67 +109,111 @@ const PaymentInfo = () => {
   return (
     <div className="space-y-12">
       <div className="pb-8">
-        <h1 className="text-2xl font-semibold text-text mb-3">Leaderboard Payout</h1>
-        <p className="text-text/60 text-sm">Manage your earnings and payout details</p>
+        <h1 className="text-2xl font-semibold text-text mb-3">Event-Based Payout Management</h1>
+        <p className="text-text/60 text-sm">Track your earnings from completed events and manage payouts</p>
       </div>
 
-      {/* Earnings Section */}
+      {/* Earnings Overview */}
       <section className="space-y-6">
         <h3 className="text-lg font-medium text-text/90">Total Earnings</h3>
         <div className="bg-dropdown-hover rounded-xl p-8">
           <div className="text-center">
-            <p className="text-4xl font-light text-text mb-2">${totalEarning}</p>
-            <p className="text-text/60 text-sm">Total amount earned from leaderboard events</p>
+            <p className="text-4xl font-light text-text mb-2">₹{totalEarning.toLocaleString()}</p>
+            <p className="text-text/60 text-sm">Total earnings from all completed events</p>
+            <div className="mt-4 text-sm text-text/60">
+              <span className="inline-block mx-2">•</span>
+              {events.length} completed events
+              <span className="inline-block mx-2">•</span>
+              {events.reduce((acc, event) => acc + (event.paymentCount || 0), 0)} total payments
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Leaderboard Payment History Section */}
+      {/* Event History Accordion */}
       <section className="space-y-6">
-        <h3 className="text-lg font-medium text-text/90">Leaderboard Event Payments</h3>
+        <h3 className="text-lg font-medium text-text/90">Event History</h3>
         <div className="bg-dropdown-hover rounded-xl p-6">
-          <div className="max-h-96 overflow-y-auto custom-scrollbar space-y-6">
-            {Object.keys(groupedPayments).length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-text/60 text-sm">No leaderboard payments yet</p>
+          {events.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-text/50 mb-4">
+                <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
               </div>
-            ) : (
-              Object.entries(groupedPayments).map(([eventName, eventPayments]) => {
-                const eventTotal = eventPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+              <h3 className="text-lg font-medium text-text/80 mb-2">No completed events yet</h3>
+              <p className="text-text/50 mb-4">Events you create and complete will appear here with their payment history</p>
+              <p className="text-sm text-text/40">💡 Create events from your main dashboard to start tracking earnings</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {events.map((event) => {
+                const isExpanded = expandedEvents.has(event._id);
                 return (
-                  <div key={eventName} className="border-l-4 border-primary pl-4">
-                    <div className="flex justify-between items-center mb-3">
-                      <h4 className="font-medium text-text/90">{eventName}</h4>
-                      <span className="text-lg font-semibold text-success">${eventTotal}</span>
-                    </div>
-                    <div className="space-y-2">
-                      {eventPayments.map((p, index) => (
-                        <div
-                          key={`${eventName}-${index}`}
-                          className="flex justify-between items-center p-3 bg-background/30 rounded-lg hover:bg-background/50 transition-colors"
-                        >
-                          <div className="flex-1">
-                            <p className="text-sm text-text/90">
-                              {p.name || 'Payment'} {p.position ? `- #${p.position} Position` : ''}
-                            </p>
-                            <p className="text-xs text-text/60 mt-1">
-                              {new Date(p.createdAt).toLocaleDateString()}
-                            </p>
-                            {p.message && (
-                              <p className="text-xs text-text/60 mt-1 italic">
-                                "{p.message}"
-                              </p>
-                            )}
-                          </div>
-                          <span className="text-success font-medium ml-4">${p.amount}</span>
+                  <div key={event._id} className="border border-background/30 rounded-lg overflow-hidden">
+                    {/* Accordion Header */}
+                    <button
+                      onClick={() => toggleEventExpansion(event._id)}
+                      className="w-full p-4 bg-background/20 hover:bg-background/30 transition-colors text-left"
+                    >
+                      <div className="flex justify-between items-center">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-text mb-1">{event.title}</h4>
+                          <p className="text-sm text-text/60">{formatDateRange(event.startTime, event.endTime)}</p>
                         </div>
-                      ))}
-                    </div>
+                        <div className="text-right mr-4">
+                          <p className="text-lg font-semibold text-success">₹{event.totalEarnings?.toLocaleString() || 0}</p>
+                          <p className="text-xs text-text/60">{event.paymentCount || 0} payments</p>
+                        </div>
+                        <div className="text-text/40">
+                          {isExpanded ? '−' : '+'}
+                        </div>
+                      </div>
+                    </button>
+                    
+                    {/* Accordion Content */}
+                    {isExpanded && (
+                      <div className="p-4 bg-background/10">
+                        <div className="mb-4 p-3 bg-background/20 rounded-lg">
+                          <p className="text-sm text-text/70 font-medium mb-1">Event Description:</p>
+                          <p className="text-sm text-text/60">{event.perkDescription}</p>
+                        </div>
+                        
+                        {event.payments && event.payments.length > 0 ? (
+                          <div className="space-y-2">
+                            <h5 className="text-sm font-medium text-text/70 mb-3">Payment Details:</h5>
+                            {event.payments.map((payment, index) => (
+                              <div
+                                key={index}
+                                className="flex justify-between items-center p-3 bg-background/30 rounded-lg"
+                              >
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium text-text">
+                                    {payment.fanName || payment.fanUsername || 'Anonymous'}
+                                  </p>
+                                  <p className="text-xs text-text/60">
+                                    {formatDate(payment.createdAt)}
+                                  </p>
+                                  {payment.message && (
+                                    <p className="text-xs text-text/50 italic mt-1">
+                                      "{payment.message}"
+                                    </p>
+                                  )}
+                                </div>
+                                <span className="text-success font-semibold">₹{payment.amount}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-text/60 text-center py-4">No payments received for this event</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
-              })
-            )}
-          </div>
+              })}
+            </div>
+          )}
         </div>
       </section>
 
@@ -171,7 +229,7 @@ const PaymentInfo = () => {
                 name="phone"
                 value={form?.paymentInfo?.phone || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg bg-background/50 text-background border-0 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                className="w-full px-3 py-3 rounded-lg bg-background text-text placeholder-background focus:outline-none transition-all duration-200 border-0"
                 placeholder="Enter your phone number"
               />
             </div>
@@ -182,7 +240,7 @@ const PaymentInfo = () => {
                 name="upi"
                 value={form?.paymentInfo?.upi || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg bg-background/50 text-background border-0 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                className="w-full px-3 py-3 rounded-lg bg-background text-text placeholder-background focus:outline-none transition-all duration-200 border-0"
                 placeholder="you@bank"
               />
             </div>

@@ -62,8 +62,6 @@ export async function POST(request) {
 
     const { recipientId, type, title, message, data } = await request.json();
 
-    console.log('Creating notification with data:', { recipientId, senderId: session.user.id, type, title, message }); // Debug log
-
     const notification = new Notification({
       recipientId,
       senderId: session.user.id,
@@ -74,8 +72,6 @@ export async function POST(request) {
     });
 
     await notification.save();
-
-    console.log('Notification created successfully:', notification._id); // Debug log
 
     return NextResponse.json({ success: true, notification });
 
