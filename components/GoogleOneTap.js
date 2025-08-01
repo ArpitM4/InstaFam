@@ -31,6 +31,22 @@ export default function GoogleOneTap() {
     // AND we haven't initialized the script yet.
     if (status === 'unauthenticated' && !initialized.current) {
       
+      // Add CSS to ensure navbar stays on top and shift Google One Tap down
+      const style = document.createElement('style');
+      style.textContent = `
+        nav, .navbar, header {
+          z-index: 1000000 !important;
+          position: relative !important;
+        }
+        #credential_picker_container {
+          top: 60px !important;
+        }
+        .fedcm-idp-signin-status {
+          top: 60px !important;
+        }
+      `;
+      document.head.appendChild(style);
+      
       // Check if the Google Identity Services library is available on the window object
       if (window.google?.accounts?.id) {
         // Mark as initialized so this doesn't run again on re-renders

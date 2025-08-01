@@ -40,7 +40,8 @@ const nextAuthConfig = {
       }
     }),
     CredentialsProvider({
-      name: 'googleonetap',
+      id: 'googleonetap', // This is the critical line to add
+      name: 'Google One Tap',
       credentials: {
         credential: { type: 'text' }
       },
@@ -102,6 +103,10 @@ const nextAuthConfig = {
       }
     })
   ],
+  pages: {
+    signIn: '/login', // This is the critical line
+    error: '/login',
+  },
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === 'google' || account?.provider === 'github') {
@@ -130,10 +135,6 @@ const nextAuthConfig = {
       }
       return session;
     },
-  },
-  pages: {
-    signIn: '/login',
-    error: '/login',
   },
   session: {
     strategy: "jwt",
