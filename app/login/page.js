@@ -117,7 +117,7 @@ const Login = () => {
             onClick={() => signIn("google", { callbackUrl: '/account' })}
             className="w-full flex items-center justify-center gap-3 bg-dropdown-hover hover:bg-text/10 text-text py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm"
           >
-            <FaGoogle className="text-lg text-red-500" />
+            <FaGoogle className="text-lg text-blue-500" />
             Continue with Google
           </button>
           
