@@ -34,7 +34,7 @@ const PaymentInteractionSection = ({
             .map(([name, total], i) => (
               <li key={i} className="flex justify-between items-center bg-background/30 p-2 rounded-lg">
                 <div className="flex items-center space-x-2">
-                  <FaUserCircle className="text-primary text-xl" />
+                  <FaUserCircle className="text-yellow-500 text-xl"/>
                   <span className="font-medium">{name}</span>
                 </div>
                 <span className="text-text font-medium">${total}</span>
