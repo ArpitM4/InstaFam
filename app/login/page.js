@@ -95,6 +95,15 @@ const Login = () => {
             </div>
           </div>
 
+          <div className="text-right">
+            <button
+              onClick={() => router.push('/forgot-password')}
+              className="text-sm text-primary hover:text-primary/80 transition-colors"
+            >
+              Forgot Password?
+            </button>
+          </div>
+
           <button
             onClick={handleEmailLogin}
             className="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"

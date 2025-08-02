@@ -6,6 +6,8 @@ const UserSchema = new Schema({
   emailVerified: { type: Date, default: null }, // NextAuth will populate this when user verifies email
   emailVerificationOTP: { type: String, default: null }, // For OTP verification
   otpExpiry: { type: Date, default: null }, // OTP expiration time
+  passwordResetOTP: { type: String, default: null }, // For password reset OTP
+  passwordResetExpiry: { type: Date, default: null }, // Password reset OTP expiration time
   username: { type: String, required: false, default: null },
   password: { type: String },
   name: { type: String },
