@@ -11,25 +11,32 @@ import { FaUserCircle } from "react-icons/fa";
 import { FaPen } from "react-icons/fa";
 import "../app/globals.css"; // Assuming your global styles are here
 
-import { fetchuser, fetchpayments, updateProfile } from "@/actions/useractions";
+import { fetchuser, fetchpayments, updateProfile, createEvent, endEvent, fetchEvents } from "@/actions/useractions";
 import PaymentProfileSection from "./PaymentProfileSection";
 import PaymentInteractionSection from "./PaymentInteractionSection";
 import VaultSection from "./VaultSection";
 
 // Save payment after capture (send captureDetails to backend)
-const savePayment = async (paymentDetails, captureDetails) => {
+const savePayment = async (paymentDetails, captureDetails, currentEvent = null) => {
   try {
+    const paymentData = {
+      orderID: paymentDetails.orderID,
+      amount: paymentDetails.amount,
+      to_user: paymentDetails.to_user,
+      message: paymentDetails.message,
+      captureOnly: true,
+      captureDetails
+    };
+
+    // Include eventId if there's an active event
+    if (currentEvent && currentEvent._id) {
+      paymentData.eventId = currentEvent._id;
+    }
+
     const res = await fetch('/api/paypal', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        orderID: paymentDetails.orderID,
-        amount: paymentDetails.amount,
-        to_user: paymentDetails.to_user,
-        message: paymentDetails.message,
-        captureOnly: true,
-        captureDetails
-      })
+      body: JSON.stringify(paymentData)
     });
     const data = await res.json();
     console.log('PayPal API response:', data); // Debug log
@@ -79,6 +86,7 @@ const PaymentPage = ({ username }) => {
   // --- State Management ---
   const [currentUser, setcurrentUser] = useState({});
   const [userId, setUserId] = useState(null);
+  const [currentEvent, setCurrentEvent] = useState(null);
   const [payments, setPayments] = useState([]);
   const [paymentform, setPaymentform] = useState({ name: "", message: "", amount: "" });
   const [isEditing, setIsEditing] = useState(false);
@@ -90,14 +98,56 @@ const PaymentPage = ({ username }) => {
   const isOwner = session?.user?.name === username;
 
   // --- Data Fetching and Effects ---
+  const fetchActiveEvent = async (userId) => {
+    try {
+      const response = await fetch(`/api/events?userId=${userId}&status=active`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.events && data.events.length > 0) {
+          setCurrentEvent(data.events[0]); // Get the first active event
+        } else {
+          setCurrentEvent(null);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching active event:", error);
+      setCurrentEvent(null);
+    }
+  };
+
   const getData = useCallback(async () => {
     try {
       const user = await fetchuser(username);
       if (user) {
         setcurrentUser(user);
         setUserId(user._id);
-        const userPayments = await fetchpayments(user._id, user.eventStart);
+        
+        // Always try to show payments from current or last event
+        let userPayments = [];
+        
+        if (user.eventStart) {
+          // If there's an active event, use the user's eventStart
+          userPayments = await fetchpayments(user._id, user.eventStart);
+        } else {
+          // If no active event, try to get payments from the last completed event
+          try {
+            const eventData = await fetchEvents(user._id, 'history');
+            if (eventData && eventData.events && eventData.events.length > 0) {
+              // Get the most recent event (first in the array since they're sorted newest first)
+              const lastEvent = eventData.events[0];
+              if (lastEvent.startTime) {
+                userPayments = await fetchpayments(user._id, lastEvent.startTime);
+              }
+            }
+          } catch (error) {
+            console.error('Error fetching last event data:', error);
+            userPayments = [];
+          }
+        }
+        
         setPayments(userPayments);
+        // Fetch active event for this user
+        await fetchActiveEvent(user._id);
       } else {
         console.error("User not found");
       }
@@ -166,45 +216,103 @@ const PaymentPage = ({ username }) => {
   };
 
   const handleStartEvent = async () => {
-    const durationMs = Number(eventDuration) * 24 * 60 * 60 * 1000;
-    const start = new Date();
-    const end = new Date(start.getTime() + durationMs);
-    const res = await updateProfile(
-      { ...currentUser, eventStart: start, eventEnd: end },
-      username
-    );
-    if (res?.error) {
-      toast.error(res.error);
-    } else {
-      toast.success("Event started!");
-      setcurrentUser({ ...currentUser, eventStart: start, eventEnd: end });
+    try {
+      const durationMs = Number(eventDuration) * 24 * 60 * 60 * 1000;
+      const start = new Date();
+      const end = new Date(start.getTime() + durationMs);
       
-      // Notify followers about the new event
-      try {
-        await fetch('/api/notifications/followers/event', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            creatorId: currentUser._id,
-            creatorName: username
-          }),
-        });
-      } catch (error) {
-        console.error('Error notifying followers about event:', error);
-        // Don't show error to user as the event started successfully
+      // First, create the event in the database
+      const eventData = {
+        title: 'Event', // Default title since you don't use titles
+        perkDescription: currentUser.perk || 'No perk description',
+        startTime: start,
+        endTime: end
+      };
+      
+      console.log('Creating event with data:', eventData);
+      const createdEvent = await createEvent(eventData);
+      console.log('Event created successfully:', createdEvent._id);
+      
+      // Then update the user profile with event times
+      const res = await updateProfile(
+        { ...currentUser, eventStart: start, eventEnd: end },
+        username
+      );
+      
+      if (res?.error) {
+        toast.error(res.error);
+      } else {
+        toast.success("Event started!");
+        setcurrentUser({ ...currentUser, eventStart: start, eventEnd: end });
+        
+        // Clear previous event's payments when starting a new event
+        setPayments([]);
+        
+        // Notify followers about the new event
+        try {
+          await fetch('/api/notifications/followers/event', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              creatorId: currentUser._id,
+              creatorName: username
+            }),
+          });
+        } catch (error) {
+          console.error('Error notifying followers about event:', error);
+          // Don't show error to user as the event started successfully
+        }
       }
+    } catch (error) {
+      console.error('Error starting event:', error);
+      toast.error(error.message || 'Failed to start event');
     }
   };
 
   const handleEndEvent = async () => {
-    const res = await updateProfile({ ...currentUser, eventStart: null, eventEnd: null }, username);
-    if (res?.error) {
-      toast.error(res.error);
-    } else {
-      toast.success("Event ended!");
-      setcurrentUser({ ...currentUser, eventStart: null, eventEnd: null });
+    try {
+      console.log('=== STARTING END EVENT PROCESS ===');
+      console.log('Current user ID:', currentUser._id);
+      
+      // First, find and end the active event in the database
+      try {
+        // Get the current active event for this user using the server action
+        console.log('Fetching current active event...');
+        const activeEvent = await fetchEvents(currentUser._id, 'current');
+        console.log('Found active event:', activeEvent);
+        
+        if (activeEvent && activeEvent._id) {
+          console.log('Ending event with ID:', activeEvent._id);
+          const endedEvent = await endEvent(activeEvent._id);
+          console.log('Event ended successfully:', endedEvent);
+          toast.success("Event ended successfully!");
+        } else {
+          console.log('No active event found in database');
+          toast.warn("No active event found to end.");
+        }
+      } catch (error) {
+        console.error('Error ending event in database:', error);
+        toast.error(`Failed to end event: ${error.message}`);
+        // Don't continue if database update fails
+        return;
+      }
+      
+      // Then clear the user profile event fields
+      console.log('Clearing user profile event fields...');
+      const res = await updateProfile({ ...currentUser, eventStart: null, eventEnd: null }, username);
+      if (res?.error) {
+        toast.error(res.error);
+      } else {
+        console.log('User profile updated successfully');
+        setcurrentUser({ ...currentUser, eventStart: null, eventEnd: null });
+        // Keep showing the leaderboard from the ended event
+        // Don't clear payments - they'll remain from the last event
+      }
+    } catch (error) {
+      console.error('Error ending event:', error);
+      toast.error(error.message || 'Failed to end event');
     }
   };
   
@@ -315,7 +423,7 @@ const PaymentPage = ({ username }) => {
       };
 
       // Send capture details to backend for saving
-      const res = await savePayment(paymentDetails, details);
+      const res = await savePayment(paymentDetails, details, currentEvent);
       setIsPaying(false);
 
       if (res.success) {
@@ -326,8 +434,10 @@ const PaymentPage = ({ username }) => {
           toast.success('Payment successful!');
         }
 
-        // Refetch payments and update leaderboard
-        const updatedPayments = await fetchpayments(userId);
+        // Refetch payments and update leaderboard - use the same filtering as initial load
+        const updatedPayments = currentUser.eventStart ? 
+          await fetchpayments(userId, currentUser.eventStart) : 
+          [];
         setPayments(updatedPayments);
         router.push(`/${username}?paymentdone=true`);
       } else {

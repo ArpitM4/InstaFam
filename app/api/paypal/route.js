@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
 import Payment from "@/models/Payment";
 import User from "@/models/User";
 import PointTransaction from "@/models/PointTransaction";
@@ -22,7 +22,7 @@ const getAccessToken = async () => {
 
 export async function POST(req) {
   await connectDB();
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(nextAuthConfig);
   if (!session || !session.user || !session.user.email) {
     return NextResponse.json({ error: "You must be logged in to pay." }, { status: 401 });
   }
@@ -34,7 +34,7 @@ export async function POST(req) {
   const body = await req.json();
   console.log('PayPal API received body:', body); // Debug log
   
-  const { amount, message, orderID, captureOnly, to_user } = body;
+  const { amount, message, orderID, captureOnly, to_user, eventId } = body;
 
   const accessToken = await getAccessToken();
   if (!accessToken) {
@@ -51,14 +51,24 @@ export async function POST(req) {
   if (captureOnly && orderID && body.captureDetails) {
     const captureData = body.captureDetails;
     if (captureData.status === "COMPLETED") {
-      const payment = await Payment.create({
-        oid: orderID,
-        amount: amount,
-        to_user: toUserId,
-        from_user: fanUser._id,
-        message: message,
-        done: true,
-      });
+      try {
+        const paymentData = {
+          oid: orderID,
+          amount: amount,
+          to_user: toUserId,
+          from_user: fanUser._id,
+          message: message,
+          done: true,
+        };
+        
+        // Only include eventId if it's provided
+        if (eventId) {
+          paymentData.eventId = eventId;
+        }
+        
+        console.log('Creating payment with data:', paymentData); // Debug log
+        
+        const payment = await Payment.create(paymentData);
 
       // Award Fam Points to the fan using the existing points system
       // Calculate points earned (₹10 = 1 point, so amount * 0.1)
@@ -83,6 +93,13 @@ export async function POST(req) {
         paymentId: payment._id,
         pointsAwarded: pointsToAdd
       });
+      } catch (error) {
+        console.error('Error creating payment:', error);
+        return NextResponse.json({ 
+          error: "Failed to save payment", 
+          details: error.message 
+        }, { status: 500 });
+      }
     } else {
       return NextResponse.json({ error: "PayPal capture not completed", details: captureData }, { status: 400 });
     }

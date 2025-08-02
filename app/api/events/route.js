@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/db/ConnectDb";
+import connectDB from "@/db/ConnectDb";
 import Event from "@/models/Event";
 import Payment from "@/models/Payment";
 import User from "@/models/User";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { nextAuthConfig } from "../auth/[...nextauth]/route";
 
 export async function GET(request) {
     try {
         await connectDB();
-        const session = await getServerSession(authOptions);
+        const session = await getServerSession(nextAuthConfig);
         
         if (!session?.user?.email) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -94,7 +94,7 @@ export async function GET(request) {
 export async function POST(request) {
     try {
         await connectDB();
-        const session = await getServerSession(authOptions);
+        const session = await getServerSession(nextAuthConfig);
         
         if (!session?.user?.email) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -148,7 +148,7 @@ export async function POST(request) {
 export async function PUT(request) {
     try {
         await connectDB();
-        const session = await getServerSession(authOptions);
+        const session = await getServerSession(nextAuthConfig);
         
         if (!session?.user?.email) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

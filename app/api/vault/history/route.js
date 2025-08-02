@@ -3,13 +3,13 @@ import { getServerSession } from "next-auth";
 import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
 import VaultItem from "@/models/VaultItem";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
 
 await connectDb();
 
 export async function GET(request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(nextAuthConfig);
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

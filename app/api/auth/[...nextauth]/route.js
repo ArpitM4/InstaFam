@@ -1,14 +1,34 @@
 import NextAuth from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
+import EmailProvider from 'next-auth/providers/email';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import bcrypt from 'bcryptjs';
 import { OAuth2Client } from 'google-auth-library';
 import connectDB from '@/db/ConnectDb';
 import User from '@/models/User';
+import { MongoClient } from 'mongodb';
+
+// MongoDB client for NextAuth adapter
+const client = new MongoClient(process.env.MONGODB_URI);
+const clientPromise = client.connect();
 
 const nextAuthConfig = {
+  adapter: MongoDBAdapter(clientPromise), // Required for EmailProvider
   providers: [
+    EmailProvider({
+      server: {
+        host: process.env.EMAIL_SERVER_HOST,
+        port: parseInt(process.env.EMAIL_SERVER_PORT),
+        auth: {
+          user: process.env.EMAIL_SERVER_USER,
+          pass: process.env.EMAIL_SERVER_PASSWORD
+        },
+        secure: true, // Use SSL
+      },
+      from: process.env.EMAIL_FROM
+    }),
     GitHubProvider({
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
@@ -87,8 +107,9 @@ const nextAuthConfig = {
     })
   ],
   pages: {
-    signIn: '/login', // This is the critical line
+    signIn: '/login',
     error: '/login',
+    verifyRequest: '/auth/verify-request', // Custom page for "check your email"
   },
   callbacks: {
     async signIn({ user, account }) {

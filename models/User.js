@@ -3,6 +3,7 @@ const { Schema, model } = mongoose;
 
 const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
+  emailVerified: { type: Date, default: null }, // NextAuth will populate this when user verifies email
   username: { type: String, required: false, default: undefined },
   password: { type: String },
   name: { type: String },

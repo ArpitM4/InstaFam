@@ -3,7 +3,7 @@ const { Schema, model } = mongoose;
 
 const EventSchema = new Schema({
   creatorId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  title: { type: String, required: true }, // e.g., "Summer Special Fundraiser"
+  title: { type: String, default: 'Event' }, // Optional with default value
   perkDescription: { type: String, required: true },
   startTime: { type: Date, required: true },
   endTime: { type: Date, required: true },

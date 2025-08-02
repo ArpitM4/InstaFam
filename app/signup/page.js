@@ -1,52 +1,55 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSignup = async () => {
-    if (!email || !username || !password) {
-      setError("Please fill in all fields");
+  const handleEmailSignup = async () => {
+    if (!email) {
+      setError("Please enter your email address");
       return;
     }
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
       return;
     }
 
     setError("");
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, username, password }),
-    });
+    setIsLoading(true);
 
-    const data = await res.json();
+    try {
+      // Use NextAuth's signIn with email provider
+      const result = await signIn('email', { 
+        email, 
+        redirect: false,
+        callbackUrl: '/dashboard' // Where to redirect after verification
+      });
 
-    if (!res.ok) {
-      if (data.error && data.error.includes("Username already taken")) {
-        setError("Username already taken by a verified user");
-      } else if (data.error && data.error.includes("E11000")) {
-        setError("Email already exists. Please use a different email.");
+      if (result?.error) {
+        setError("Failed to send verification email. Please try again.");
       } else {
-        setError(data.error || "Signup failed. Please try again.");
+        // Redirect to the verification page with email parameter
+        router.push(`/auth/verify-request?email=${encodeURIComponent(email)}`);
       }
-    } else {
-      router.push("/login"); // redirect to login after successful signup
+    } catch (error) {
+      console.error('Email signup error:', error);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSignup();
+    if (e.key === 'Enter' && !isLoading) {
+      handleEmailSignup();
     }
   };
 
@@ -56,7 +59,7 @@ const Signup = () => {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-3xl font-light text-primary mb-3">Create account</h1>
-          <p className="text-text/60">Join the InstaFam community</p>
+          <p className="text-text/60">Enter your email to get started - we'll send you a magic link</p>
         </div>
 
         {/* Signup Form */}
@@ -74,52 +77,40 @@ const Signup = () => {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-text/70 mb-2">Email</label>
+              <label className="block text-sm font-medium text-text/70 mb-2">Email Address</label>
               <input
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Enter your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="w-full px-3 py-3 rounded-lg bg-background/50 text-text placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0"
+                disabled={isLoading}
+                className="w-full px-3 py-3 rounded-lg bg-background/50 text-text placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0 disabled:opacity-50 disabled:cursor-not-allowed"
                 required
+                autoComplete="email"
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-text/70 mb-2">Username</label>
-              <input
-                type="text"
-                placeholder="Choose a username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="w-full px-3 py-3 rounded-lg bg-background/50 text-text placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0"
-                required
-              />
-              <p className="text-xs text-text/50 mt-1">Choose a unique username for your profile</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-text/70 mb-2">Password</label>
-              <input
-                type="password"
-                placeholder="Create a password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="w-full px-3 py-3 rounded-lg bg-background/50 text-text placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0"
-                required
-              />
-              <p className="text-xs text-text/50 mt-1">Password must be at least 6 characters long</p>
+              <p className="text-xs text-text/50 mt-1">We'll send you a secure magic link to create your account</p>
             </div>
           </div>
 
           <button
-            onClick={handleSignup}
-            className="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+            onClick={handleEmailSignup}
+            disabled={isLoading}
+            className="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Account
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="animate-spin -ml-1 mr-3 h-5 w-5 text-white">
+                  <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </div>
+                Sending magic link...
+              </div>
+            ) : (
+              'Send Magic Link'
+            )}
           </button>
         </div>
 
@@ -135,9 +126,22 @@ const Signup = () => {
             </button>
           </p>
         </div>
+
+        {/* Terms notice */}
+        <div className="text-center">
+          <p className="text-xs text-text/40">
+            By signing up, you agree to our{" "}
+            <a href="/terms" className="text-primary hover:text-primary/80 transition-colors">
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a href="/privacypolicy" className="text-primary hover:text-primary/80 transition-colors">
+              Privacy Policy
+            </a>
+          </p>
+        </div>
       </div>
     </div>
-
   );
 };
 

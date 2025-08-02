@@ -130,19 +130,121 @@ export const generateInstagramOTP = async (username) => {
 // Event-related functions
 export const fetchEvents = async (userId, type = 'history') => {
   try {
-    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/events?action=${type}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const { getServerSession } = await import('next-auth/next');
+    const { nextAuthConfig } = await import('@/app/api/auth/[...nextauth]/route');
+    const connectDB = (await import('@/db/ConnectDb')).default;
+    const Event = (await import('@/models/Event')).default;
+    const Payment = (await import('@/models/Payment')).default;
+    const User = (await import('@/models/User')).default;
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch events');
+    await connectDB();
+    const session = await getServerSession(nextAuthConfig);
+    
+    if (!session?.user?.email) {
+      throw new Error('Unauthorized');
     }
 
-    const data = await response.json();
-    return type === 'current' ? data.event : data.events;
+    // Get the creator's user ID
+    const creator = await User.findOne({ email: session.user.email });
+    if (!creator) {
+      throw new Error('User not found');
+    }
+
+    if (type === 'current') {
+      // Find the current active event for this user
+      const event = await Event.findOne({ 
+        creatorId: creator._id, 
+        status: 'active' 
+      });
+      
+      if (event) {
+        // Convert to plain object to avoid serialization issues
+        const plainEvent = event.toObject();
+        return {
+          _id: plainEvent._id.toString(),
+          title: plainEvent.title,
+          perkDescription: plainEvent.perkDescription,
+          startTime: plainEvent.startTime.toISOString(),
+          endTime: plainEvent.endTime.toISOString(),
+          status: plainEvent.status,
+          creatorId: plainEvent.creatorId.toString(),
+          createdAt: plainEvent.createdAt.toISOString(),
+          updatedAt: plainEvent.updatedAt.toISOString(),
+          endedAt: plainEvent.endedAt?.toISOString()
+        };
+      }
+      return null;
+    } else {
+      // Get all events this creator has ever started
+      console.log('DEBUG: Looking for events for creator:', creator._id, creator.email);
+      const events = await Event.find({ 
+        creatorId: creator._id 
+      }).sort({ createdAt: -1 });
+
+      console.log('DEBUG: Found events:', events.length);
+      if (events.length > 0) {
+        console.log('DEBUG: First event:', events[0]);
+      }
+
+      // For each event, find all payments received during that event's time period
+      const eventsWithPayments = await Promise.all(
+        events.map(async (event) => {
+          console.log('DEBUG: Processing event:', event._id, 'from', event.startTime, 'to', event.endTime);
+          
+          // Find payments made to this creator during the event's time period
+          const payments = await Payment.find({
+            to_user: creator._id,
+            createdAt: {
+              $gte: event.startTime,
+              $lte: event.endTime
+            }
+          }).populate('from_user', 'name username email');
+
+          console.log('DEBUG: Found payments for event:', payments.length);
+
+          // Calculate total earnings for this event
+          const totalEarnings = payments.reduce((sum, payment) => sum + payment.amount, 0);
+
+          // Convert to plain object and add computed fields
+          const plainEvent = event.toObject();
+          return {
+            ...plainEvent,
+            _id: plainEvent._id.toString(),
+            creatorId: plainEvent.creatorId.toString(),
+            startTime: plainEvent.startTime.toISOString(),
+            endTime: plainEvent.endTime.toISOString(),
+            createdAt: plainEvent.createdAt.toISOString(),
+            updatedAt: plainEvent.updatedAt.toISOString(),
+            payments: payments.map(payment => ({
+              _id: payment._id.toString(),
+              amount: payment.amount,
+              message: payment.message,
+              createdAt: payment.createdAt.toISOString(),
+              from_user: payment.from_user ? {
+                name: payment.from_user.name,
+                username: payment.from_user.username,
+                email: payment.from_user.email
+              } : null
+            })),
+            totalEarnings,
+            paymentCount: payments.length
+          };
+        })
+      );
+
+      console.log('DEBUG: Final eventsWithPayments:', eventsWithPayments.length);
+      
+      // Also calculate total earnings from ALL payments to this user (not just event-based)
+      const allPayments = await Payment.find({ to_user: creator._id });
+      const totalAllEarnings = allPayments.reduce((sum, payment) => sum + payment.amount, 0);
+      console.log('DEBUG: Total earnings from all payments:', totalAllEarnings);
+      
+      return {
+        events: eventsWithPayments,
+        totalEarnings: totalAllEarnings,
+        totalPayments: allPayments.length
+      };
+    }
   } catch (error) {
     console.error('Error fetching events:', error);
     return type === 'current' ? null : [];
@@ -151,20 +253,58 @@ export const fetchEvents = async (userId, type = 'history') => {
 
 export const createEvent = async (eventData) => {
   try {
-    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/events`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(eventData),
-    });
+    const { getServerSession } = await import('next-auth/next');
+    const { nextAuthConfig } = await import('@/app/api/auth/[...nextauth]/route');
+    const connectDB = (await import('@/db/ConnectDb')).default;
+    const Event = (await import('@/models/Event')).default;
+    const User = (await import('@/models/User')).default;
 
-    if (!response.ok) {
-      throw new Error('Failed to create event');
+    await connectDB();
+    const session = await getServerSession(nextAuthConfig);
+    
+    if (!session?.user?.email) {
+      throw new Error('Unauthorized');
     }
 
-    const data = await response.json();
-    return data;
+    // Get the creator's user ID
+    const creator = await User.findOne({ email: session.user.email });
+    if (!creator) {
+      throw new Error('User not found');
+    }
+
+    // Check if user already has an active event
+    const existingEvent = await Event.findOne({ 
+      creatorId: creator._id, 
+      status: 'active' 
+    });
+    
+    if (existingEvent) {
+      throw new Error('You already have an active event. Please end your current event before creating a new one.');
+    }
+
+    // Create new event
+    const newEvent = new Event({
+      ...eventData,
+      creatorId: creator._id,
+      status: 'active',
+      createdAt: new Date()
+    });
+
+    await newEvent.save();
+    
+    // Convert to plain object to avoid serialization issues
+    const plainEvent = newEvent.toObject();
+    return {
+      _id: plainEvent._id.toString(),
+      title: plainEvent.title,
+      perkDescription: plainEvent.perkDescription,
+      startTime: plainEvent.startTime.toISOString(),
+      endTime: plainEvent.endTime.toISOString(),
+      status: plainEvent.status,
+      creatorId: plainEvent.creatorId.toString(),
+      createdAt: plainEvent.createdAt.toISOString(),
+      updatedAt: plainEvent.updatedAt.toISOString()
+    };
   } catch (error) {
     console.error('Error creating event:', error);
     throw error;
@@ -173,20 +313,55 @@ export const createEvent = async (eventData) => {
 
 export const endEvent = async (eventId) => {
   try {
-    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/events`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ eventId, action: 'end' }),
-    });
+    const { getServerSession } = await import('next-auth/next');
+    const { nextAuthConfig } = await import('@/app/api/auth/[...nextauth]/route');
+    const connectDB = (await import('@/db/ConnectDb')).default;
+    const Event = (await import('@/models/Event')).default;
+    const User = (await import('@/models/User')).default;
 
-    if (!response.ok) {
-      throw new Error('Failed to end event');
+    await connectDB();
+    const session = await getServerSession(nextAuthConfig);
+    
+    if (!session?.user?.email) {
+      throw new Error('Unauthorized');
     }
 
-    const data = await response.json();
-    return data;
+    // Get the creator's user ID
+    const creator = await User.findOne({ email: session.user.email });
+    if (!creator) {
+      throw new Error('User not found');
+    }
+
+    // Find and update the event
+    const event = await Event.findOne({ 
+      _id: eventId, 
+      creatorId: creator._id 
+    });
+    
+    if (!event) {
+      throw new Error('Event not found or you do not have permission to end this event.');
+    }
+
+    event.status = 'completed';
+    const actualEndTime = new Date();
+    event.endedAt = actualEndTime;
+    event.endTime = actualEndTime; // Update endTime to actual end time
+    await event.save();
+
+    // Convert to plain object to avoid serialization issues
+    const plainEvent = event.toObject();
+    return {
+      _id: plainEvent._id.toString(),
+      title: plainEvent.title,
+      perkDescription: plainEvent.perkDescription,
+      startTime: plainEvent.startTime.toISOString(),
+      endTime: plainEvent.endTime.toISOString(),
+      status: plainEvent.status,
+      creatorId: plainEvent.creatorId.toString(),
+      createdAt: plainEvent.createdAt.toISOString(),
+      updatedAt: plainEvent.updatedAt.toISOString(),
+      endedAt: plainEvent.endedAt?.toISOString()
+    };
   } catch (error) {
     console.error('Error ending event:', error);
     throw error;
