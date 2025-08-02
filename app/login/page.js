@@ -39,6 +39,25 @@ const Login = () => {
     }
   };
 
+  const handleOAuthLogin = async (provider) => {
+    setError(""); // Clear any existing errors
+    
+    try {
+      const result = await signIn(provider, { 
+        callbackUrl: '/account',
+        redirect: false 
+      });
+      
+      if (result?.error) {
+        setError(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login failed. If you have an existing account, please verify your email first.`);
+      } else if (result?.ok) {
+        router.push('/account');
+      }
+    } catch (error) {
+      setError(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login failed. Please try again.`);
+    }
+  };
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleEmailLogin();
@@ -125,7 +144,7 @@ const Login = () => {
         {/* OAuth Buttons */}
         <div className="space-y-3">
           <button
-            onClick={() => signIn("google", { callbackUrl: '/account' })}
+            onClick={() => handleOAuthLogin("google")}
             className="w-full flex items-center justify-center gap-3 bg-dropdown-hover hover:bg-text/10 text-text py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm"
           >
             <FaGoogle className="text-lg text-blue-500" />
@@ -133,7 +152,7 @@ const Login = () => {
           </button>
           
           <button
-            onClick={() => signIn("github", { callbackUrl: '/account' })}
+            onClick={() => handleOAuthLogin("github")}
             className="w-full flex items-center justify-center gap-3 bg-dropdown-hover hover:bg-text/10 text-text py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm"
           >
             <FaGithub className="text-lg" />

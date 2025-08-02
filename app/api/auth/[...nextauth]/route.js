@@ -95,7 +95,9 @@ export const authOptions = {
           if (existingUser) {
             // Check if this is an unverified email/password account
             if (existingUser.password && !existingUser.emailVerified) {
-              return '/login?error=Please verify your original account email first.';
+              // Block the OAuth login for unverified accounts
+              console.log('Blocked OAuth login for unverified account:', user.email);
+              return false; // This will prevent login and show error on the client
             }
           } else {
             // Create new user for OAuth login
