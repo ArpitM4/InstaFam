@@ -1,6 +1,8 @@
 "use client"
 import React from 'react'
 import "../app/globals.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faInstagram } from '@fortawesome/free-brands-svg-icons'
 
 
 
@@ -36,18 +38,19 @@ const Footer = () => {
       <div className="space-y-4">
         <h3 className="text-xl font-semibold">Follow Us</h3>
         <div className="flex space-x-6">
-          <a href="#" className="text-2xl hover:underline">
+          {/* <a href="#" className="text-2xl hover:underline">
             <i className="fab fa-facebook-f"></i>
           </a>
           <a href="#" className="text-2xl hover:underline">
             <i className="fab fa-twitter"></i>
+          </a> */}
+         <a target='_blank' href="https://www.instagram.com/_instafam_official/" className="text-2xl hover:underline flex items-center space-x-2">
+            <FontAwesomeIcon icon={faInstagram} className="opacity-80" />
+            <span>Instagram</span>
           </a>
-          <a target='blank' href="https://www.instagram.com/_instafam_official/" className="text-2xl hover:underline">
-            <i className="fab fa-instagram opacity-80">Instagram</i>
-          </a>
-          <a href="#" className="text-2xl hover:underline">
+          {/* <a href="#" className="text-2xl hover:underline">
             <i className="fab fa-linkedin-in"></i>
-          </a>
+          </a> */}
         </div>
       </div>
     </div>
