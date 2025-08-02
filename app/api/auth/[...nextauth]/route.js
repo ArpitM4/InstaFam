@@ -15,6 +15,7 @@ import clientPromise from "@/db/mongodb";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { OAuth2Client } from 'google-auth-library';
 import bcrypt from 'bcryptjs';
 import connectDB from '@/db/ConnectDb';
 import User from '@/models/User';
@@ -76,6 +77,65 @@ export const authOptions = {
         }
       }
     }),
+    
+    // Google One Tap Provider with detailed logging
+    CredentialsProvider({
+      id: 'googleonetap',
+      name: 'Google One Tap',
+      credentials: {
+        credential: { label: "Credential", type: "text" }
+      },
+      async authorize(credentials) {
+        console.log("--- [One Tap Authorize] 1: Process Started ---");
+
+        if (!credentials?.credential) {
+          console.error("--- [One Tap Authorize] ❌ ERROR: No credential token received from frontend.");
+          return null;
+        }
+
+        try {
+          console.log("--- [One Tap Authorize] 2: Verifying token with Google...");
+          const client = new OAuth2Client(process.env.GOOGLE_ID);
+          const ticket = await client.verifyIdToken({
+            idToken: credentials.credential,
+            audience: process.env.GOOGLE_ID,
+          });
+          const payload = ticket.getPayload();
+          console.log("--- [One Tap Authorize] 3: Token verified. Payload received:", payload);
+
+          if (!payload?.email) {
+            console.error("--- [One Tap Authorize] ❌ ERROR: Email not found in Google payload.");
+            return null;
+          }
+
+          console.log("--- [One Tap Authorize] 4: Connecting to database...");
+          await connectDB();
+          console.log("--- [One Tap Authorize] 5: Database connected. Looking for user...");
+
+          let user = await User.findOne({ email: payload.email });
+
+          if (user) {
+            console.log("--- [One Tap Authorize] 6: Existing user found:", user._id);
+          } else {
+            console.log("--- [One Tap Authorize] 6a: User not found. Creating new user...");
+            user = await User.create({
+              email: payload.email,
+              name: payload.name,
+              profilepic: payload.picture,
+              emailVerified: new Date(), // New users from Google are verified by default
+            });
+            console.log("--- [One Tap Authorize] 6b: New user created:", user._id);
+          }
+
+          console.log("--- [One Tap Authorize] 7: Success! Returning user object.");
+          return { id: user._id, name: user.name, email: user.email, image: user.profilepic };
+
+        } catch (error) {
+          console.error("--- [One Tap Authorize] ❌ CRITICAL ERROR:", error);
+          return null; // Return null on any error
+        }
+      }
+    }),
   ],
 
   // 4. CALLBACKS: Enhanced JWT strategy with database user validation
@@ -95,9 +155,7 @@ export const authOptions = {
           if (existingUser) {
             // Check if this is an unverified email/password account
             if (existingUser.password && !existingUser.emailVerified) {
-              // Block the OAuth login for unverified accounts
-              console.log('Blocked OAuth login for unverified account:', user.email);
-              throw new Error("AccountNotVerified");
+              return '/login?error=Please verify your original account email first.';
             }
           } else {
             // Create new user for OAuth login

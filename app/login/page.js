@@ -1,30 +1,15 @@
 "use client";
 import { FaGoogle, FaGithub } from 'react-icons/fa';
 import { useSession, signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const Login = () => {
   const { data: session } = useSession();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    // Check for NextAuth error in URL
-    const authError = searchParams.get('error');
-    if (authError) {
-      if (authError === 'AccountNotVerified') {
-        setError("Please verify your email before using OAuth login. Check your inbox for the verification link.");
-      } else {
-        setError("Authentication failed. Please try again.");
-      }
-      // Clean up the URL
-      router.replace('/login', undefined, { shallow: true });
-    }
-  }, [searchParams, router]);
 
   useEffect(() => {
     if (session) {
@@ -52,12 +37,6 @@ const Login = () => {
     } else {
       setError("Login failed. Please try again.");
     }
-  };
-
-  const handleOAuthLogin = async (provider) => {
-    setError(""); // Clear any existing errors
-    // For OAuth, let NextAuth handle the redirect naturally
-    await signIn(provider, { callbackUrl: '/account' });
   };
 
   const handleKeyPress = (e) => {
@@ -146,7 +125,7 @@ const Login = () => {
         {/* OAuth Buttons */}
         <div className="space-y-3">
           <button
-            onClick={() => handleOAuthLogin("google")}
+            onClick={() => signIn("google", { callbackUrl: '/account' })}
             className="w-full flex items-center justify-center gap-3 bg-dropdown-hover hover:bg-text/10 text-text py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm"
           >
             <FaGoogle className="text-lg text-blue-500" />
@@ -154,7 +133,7 @@ const Login = () => {
           </button>
           
           <button
-            onClick={() => handleOAuthLogin("github")}
+            onClick={() => signIn("github", { callbackUrl: '/account' })}
             className="w-full flex items-center justify-center gap-3 bg-dropdown-hover hover:bg-text/10 text-text py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm"
           >
             <FaGithub className="text-lg" />
