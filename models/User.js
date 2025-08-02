@@ -4,7 +4,9 @@ const { Schema, model } = mongoose;
 const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
   emailVerified: { type: Date, default: null }, // NextAuth will populate this when user verifies email
-  username: { type: String, required: false, default: undefined },
+  emailVerificationOTP: { type: String, default: null }, // For OTP verification
+  otpExpiry: { type: Date, default: null }, // OTP expiration time
+  username: { type: String, required: false, default: null },
   password: { type: String },
   name: { type: String },
   profilepic: { type: String, default: "https://picsum.photos/200" },
@@ -43,7 +45,12 @@ const UserSchema = new Schema({
   isReal: { type: Boolean, default: true },
 });
 
-// Ensure the username index only applies to non-empty usernames
-UserSchema.index({ username: 1 }, { unique: true, sparse: true, partialFilterExpression: { username: { $exists: true, $ne: "" } } });
+// Remove the old index definition - we'll handle this differently
+// UserSchema.index({ username: 1 }, { unique: true, sparse: true, partialFilterExpression: { username: { $exists: true, $ne: null, $ne: "" } } });
 
-export default mongoose.models.User || model("User", UserSchema);
+// Clear any existing model to force recreation
+if (mongoose.models.User) {
+  delete mongoose.models.User;
+}
+
+export default model("User", UserSchema);

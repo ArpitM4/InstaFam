@@ -87,7 +87,12 @@ const Navbar = () => {
         </>
       ) : (
         <>
-
+          {/* FamPoints Button */}
+          <Link href="/my-fam-points" className="px-3 py-2 flex items-center text-white bg-gray-800 border border-gray-600 rounded-md hover:bg-gray-700 transition-all duration-200 mr-2">
+            <span className="mr-1">🪙</span>
+            <span className="font-medium">{userPoints}</span>
+            <span className="ml-1 text-sm">FAM</span>
+          </Link>
           
           <div className="relative inline-block pb text-left group">
             <button className="px-4 py-2 flex items-center text-white rounded-md transition">

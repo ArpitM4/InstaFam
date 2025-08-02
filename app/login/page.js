@@ -33,7 +33,7 @@ const Login = () => {
     if (res.error) {
       setError("Invalid email or password. Please try again.");
     } else {
-      router.push("/dashboard");
+      router.push("/account");
     }
   };
 
@@ -74,7 +74,7 @@ const Login = () => {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="w-full px-3 py-3 rounded-lg bg-background/50 text-text placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0"
+                className="w-full px-3 py-3 rounded-lg bg-background/50 text-gray-600 placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0"
                 required
               />
             </div>
@@ -87,7 +87,7 @@ const Login = () => {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="w-full px-3 py-3 rounded-lg bg-background/50 text-text placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0"
+                className="w-full px-3 py-3 rounded-lg bg-background/50 text-gray-600 placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0"
                 required
               />
             </div>

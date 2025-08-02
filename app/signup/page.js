@@ -1,24 +1,31 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [step, setStep] = useState(1); // 1: signup form, 2: OTP verification
+  const [otpTimer, setOtpTimer] = useState(0);
   const router = useRouter();
 
-  const handleEmailSignup = async () => {
-    if (!email) {
-      setError("Please enter your email address");
+  const handleSignup = async () => {
+    if (!email || !password || !confirmPassword) {
+      setError("All fields are required");
       return;
     }
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address");
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
       return;
     }
 
@@ -26,30 +33,125 @@ const Signup = () => {
     setIsLoading(true);
 
     try {
-      // Use NextAuth's signIn with email provider
-      const result = await signIn('email', { 
-        email, 
-        redirect: false,
-        callbackUrl: '/dashboard' // Where to redirect after verification
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (result?.error) {
-        setError("Failed to send verification email. Please try again.");
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (data.error === "User already exists") {
+          setError("An account with this email already exists. Please login instead.");
+        } else {
+          setError(data.error || "Signup failed. Please try again.");
+        }
       } else {
-        // Redirect to the verification page with email parameter
-        router.push(`/auth/verify-request?email=${encodeURIComponent(email)}`);
+        setStep(2); // Move to OTP verification step
+        startOtpTimer();
       }
     } catch (error) {
-      console.error('Email signup error:', error);
+      console.error('Signup error:', error);
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleVerifyOtp = async () => {
+    if (!otp || otp.length !== 6) {
+      setError("Please enter a valid 6-digit OTP");
+      return;
+    }
+
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, otp }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "OTP verification failed");
+      } else {
+        // Success! Redirect to login
+        alert("Email verified successfully! You can now login.");
+        router.push("/login");
+      }
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to resend OTP");
+      } else {
+        setOtp("");
+        startOtpTimer();
+        alert("New OTP sent to your email!");
+      }
+    } catch (error) {
+      console.error('Resend OTP error:', error);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const startOtpTimer = () => {
+    setOtpTimer(300); // 5 minutes
+    const interval = setInterval(() => {
+      setOtpTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !isLoading) {
-      handleEmailSignup();
+      if (step === 1) {
+        handleSignup();
+      } else {
+        handleVerifyOtp();
+      }
     }
   };
 
@@ -58,8 +160,15 @@ const Signup = () => {
       <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-light text-primary mb-3">Create account</h1>
-          <p className="text-text/60">Enter your email to get started - we'll send you a magic link</p>
+          <h1 className="text-3xl font-light text-primary mb-3">
+            {step === 1 ? 'Create account' : 'Verify your email'}
+          </h1>
+          <p className="text-text/60">
+            {step === 1 
+              ? 'Enter your email and password to get started' 
+              : `Enter the 6-digit code sent to ${email}`
+            }
+          </p>
         </div>
 
         {/* Signup Form */}
@@ -75,71 +184,146 @@ const Signup = () => {
             </div>
           )}
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-text/70 mb-2">Email Address</label>
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onKeyPress={handleKeyPress}
-                disabled={isLoading}
-                className="w-full px-3 py-3 rounded-lg bg-background/50 text-text placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                required
-                autoComplete="email"
-              />
-              <p className="text-xs text-text/50 mt-1">We'll send you a secure magic link to create your account</p>
-            </div>
-          </div>
-
-          <button
-            onClick={handleEmailSignup}
-            disabled={isLoading}
-            className="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin -ml-1 mr-3 h-5 w-5 text-white">
-                  <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                </div>
-                Sending magic link...
+          {step === 1 ? (
+            // Step 1: Signup Form
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-text/70 mb-2">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  disabled={isLoading}
+                  className="w-full px-3 py-3 rounded-lg bg-background/50 text-gray-600 placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0 disabled:opacity-50"
+                  required
+                  autoComplete="email"
+                />
               </div>
-            ) : (
-              'Send Magic Link'
-            )}
-          </button>
+
+              <div>
+                <label className="block text-sm font-medium text-text/70 mb-2">Password</label>
+                <input
+                  type="password"
+                  placeholder="Create a password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  disabled={isLoading}
+                  className="w-full px-3 py-3 rounded-lg bg-background/50 text-gray-600 placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0 disabled:opacity-50"
+                  required
+                  autoComplete="new-password"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text/70 mb-2">Confirm Password</label>
+                <input
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  disabled={isLoading}
+                  className="w-full px-3 py-3 rounded-lg bg-background/50 text-gray-600 placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0 disabled:opacity-50"
+                  required
+                  autoComplete="new-password"
+                />
+                <p className="text-xs text-text/50 mt-1">Password must be at least 6 characters</p>
+              </div>
+
+              <button
+                onClick={handleSignup}
+                disabled={isLoading}
+                className="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Creating Account...' : 'Create Account'}
+              </button>
+            </div>
+          ) : (
+            // Step 2: OTP Verification
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-text/70 mb-2">Verification Code</label>
+                <input
+                  type="text"
+                  placeholder="Enter 6-digit code"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onKeyPress={handleKeyPress}
+                  disabled={isLoading}
+                  className="w-full px-3 py-3 rounded-lg bg-background/50 text-gray-600 placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0 disabled:opacity-50 text-center text-2xl tracking-widest font-mono"
+                  maxLength={6}
+                  autoComplete="one-time-code"
+                />
+                <p className="text-xs text-text/50 mt-1">Check your email inbox and spam folder</p>
+              </div>
+
+              <button
+                onClick={handleVerifyOtp}
+                disabled={isLoading || otp.length !== 6}
+                className="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Verifying...' : 'Verify Email'}
+              </button>
+
+              <div className="text-center space-y-2">
+                {otpTimer > 0 ? (
+                  <p className="text-text/50 text-sm">
+                    Resend code in {formatTime(otpTimer)}
+                  </p>
+                ) : (
+                  <button
+                    onClick={handleResendOtp}
+                    disabled={isLoading}
+                    className="text-primary hover:text-primary/80 text-sm font-medium disabled:opacity-50"
+                  >
+                    Resend verification code
+                  </button>
+                )}
+                
+                <button
+                  onClick={() => setStep(1)}
+                  className="block w-full text-text/50 hover:text-text text-sm"
+                >
+                  ← Back to signup
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sign in link */}
-        <div className="text-center">
-          <p className="text-text/50">
-            Already have an account?{' '}
-            <button
-              onClick={() => router.push('/login')}
-              className="text-primary hover:text-primary/80 font-medium transition-colors"
-            >
-              Sign in
-            </button>
-          </p>
-        </div>
+        {step === 1 && (
+          <div className="text-center">
+            <p className="text-text/50">
+              Already have an account?{' '}
+              <button
+                onClick={() => router.push('/login')}
+                className="text-primary hover:text-primary/80 font-medium transition-colors"
+              >
+                Sign in
+              </button>
+            </p>
+          </div>
+        )}
 
         {/* Terms notice */}
-        <div className="text-center">
-          <p className="text-xs text-text/40">
-            By signing up, you agree to our{" "}
-            <a href="/terms" className="text-primary hover:text-primary/80 transition-colors">
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a href="/privacypolicy" className="text-primary hover:text-primary/80 transition-colors">
-              Privacy Policy
-            </a>
-          </p>
-        </div>
+        {step === 1 && (
+          <div className="text-center">
+            <p className="text-xs text-text/40">
+              By signing up, you agree to our{" "}
+              <a href="/terms" className="text-primary hover:text-primary/80 transition-colors">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="/privacypolicy" className="text-primary hover:text-primary/80 transition-colors">
+                Privacy Policy
+              </a>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,156 +1,116 @@
-import NextAuth from 'next-auth';
-import GitHubProvider from 'next-auth/providers/github';
-import GoogleProvider from 'next-auth/providers/google';
-import EmailProvider from 'next-auth/providers/email';
-import CredentialsProvider from 'next-auth/providers/credentials';
+import NextAuth from "next-auth";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import clientPromise from "@/db/mongodb";
+import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
+import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from 'bcryptjs';
-import { OAuth2Client } from 'google-auth-library';
 import connectDB from '@/db/ConnectDb';
 import User from '@/models/User';
-import { MongoClient } from 'mongodb';
 
-// MongoDB client for NextAuth adapter
-const client = new MongoClient(process.env.MONGODB_URI);
-const clientPromise = client.connect();
+export const authOptions = {
+  // 1. THE ADAPTER: This is the engine for all database operations.
+  adapter: MongoDBAdapter(clientPromise),
 
-const nextAuthConfig = {
-  adapter: MongoDBAdapter(clientPromise), // Required for EmailProvider
+  // 2. SESSION STRATEGY: Use 'database' for robust, secure sessions.
+  session: {
+    strategy: "database",
+  },
+
+  // 3. PROVIDERS: Configure all your login methods here.
   providers: [
-    EmailProvider({
-      server: {
-        host: process.env.EMAIL_SERVER_HOST,
-        port: parseInt(process.env.EMAIL_SERVER_PORT),
-        auth: {
-          user: process.env.EMAIL_SERVER_USER,
-          pass: process.env.EMAIL_SERVER_PASSWORD
-        },
-        secure: true, // Use SSL
-      },
-      from: process.env.EMAIL_FROM
+    GoogleProvider({
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
     }),
     GitHubProvider({
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
     }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_ID,
-      clientSecret: process.env.GOOGLE_SECRET,
-    }),
     CredentialsProvider({
-      name: 'Credentials',
+      name: 'credentials',
       credentials: {
-        email: { label: "Email", type: "text" },
+        email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        await connectDB();
-
-        const user = await User.findOne({ email: credentials.email });
-        if (!user || !user.password) return null;
-
-        const isValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isValid) return null;
-
-        return { id: user._id, email: user.email, name: user.username };
-      }
-    }),
-    CredentialsProvider({
-      id: 'googleonetap', // This is the critical line to add
-      name: 'Google One Tap',
-      credentials: {
-        credential: { type: 'text' }
-      },
-      async authorize(credentials) {
-        if (!credentials || !credentials.credential) {
+        if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
-        try {
-          const client = new OAuth2Client(process.env.GOOGLE_ID);
-          
-          const ticket = await client.verifyIdToken({
-            idToken: credentials.credential,
-            audience: process.env.GOOGLE_ID,
-          });
-          
-          const payload = ticket.getPayload();
-
-          if (!payload.email) {
-            throw new Error("Email not available from Google One Tap.");
-          }
-
-          await connectDB();
-          
-          let user = await User.findOne({ email: payload.email });
-          
-          if (!user) {
-            user = await User.create({
-              email: payload.email,
-              username: payload.name || payload.email.split('@')[0], // Use name or email prefix as username
-              profilepic: payload.picture,
-            });
-          }
-          
-          return { 
-            id: user._id.toString(), 
-            name: user.username, 
-            email: user.email, 
-            image: user.profilepic 
-          };
-
-        } catch (error) {
-          console.error("❌ CRITICAL ERROR in authorize function:", error);
-          return null; // Return null on any error to prevent login
-        }
-      }
-    })
-  ],
-  pages: {
-    signIn: '/login',
-    error: '/login',
-    verifyRequest: '/auth/verify-request', // Custom page for "check your email"
-  },
-  callbacks: {
-    async signIn({ user, account }) {
-      if (account?.provider === 'google' || account?.provider === 'github') {
         await connectDB();
-        const existing = await User.findOne({ email: user.email });
-        if (!existing) {
-          await User.create({
-            email: user.email,
-            username: "", // Start with blank username, user must set it after login
-          });
+        const user = await User.findOne({ email: credentials.email });
+        
+        if (!user || !user.password) {
+          return null;
+        }
+
+        // Check if email is verified
+        if (!user.emailVerified) {
+          throw new Error("Please verify your email before logging in. Check your inbox for the verification code.");
+        }
+
+        const isValid = await bcrypt.compare(credentials.password, user.password);
+        if (!isValid) {
+          return null;
+        }
+
+        return {
+          id: user._id.toString(),
+          email: user.email,
+          name: user.username,
+        };
+      }
+    }),
+  ],
+
+  // 4. CALLBACKS: Use callbacks only to add extra data or run security checks.
+  // Do NOT manually create users here. The adapter handles that.
+  callbacks: {
+    async signIn({ user, account, profile }) {
+      // Security check: Block OAuth linking for unverified email/password accounts
+      if (account.provider === 'google' || account.provider === 'github') {
+        await connectDB();
+        const existingUser = await User.findOne({ email: user.email });
+        if (existingUser && existingUser.password && !existingUser.emailVerified) {
+          // Block linking if the original account is unverified
+          return '/login?error=Please verify your original account email first.';
         }
       }
       return true;
     },
-    async session({ session }) {
-      // Simplified session callback
+
+    async session({ session, user }) {
+      // Add the user's unique database ID to the session object.
+      session.user.id = user.id;
+      
+      // Fetch username from our custom User model and update session
       try {
         await connectDB();
         const dbUser = await User.findOne({ email: session.user.email });
-        if (dbUser) {
-          session.user.name = dbUser.username || session.user.name;
-          session.user.id = dbUser._id?.toString();
+        if (dbUser && dbUser.username) {
+          session.user.name = dbUser.username;
         }
       } catch (error) {
-        console.error('Session callback error:', error);
+        console.error('Error fetching username in session callback:', error);
       }
+      
       return session;
     },
   },
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+
+  pages: {
+    signIn: '/login',
+    error: '/login',
   },
-  secret: process.env.NEXTAUTH_SECRET,
-  // Ensure NextAuth uses the correct URL based on environment
-  url: process.env.NEXTAUTH_URL,
+
+  // This flag is essential for the adapter to link accounts.
+  allowDangerousEmailAccountLinking: true,
 };
 
-export { nextAuthConfig };
+const handler = NextAuth(authOptions);
 
-const authOptions = NextAuth(nextAuthConfig);
+// Export the config for other files that need it
+export const nextAuthConfig = authOptions;
 
-export { authOptions as GET, authOptions as POST };
+export { handler as GET, handler as POST };
