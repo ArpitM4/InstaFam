@@ -13,7 +13,7 @@ const UserSchema = new Schema({
   coverpic: { type: String, default: "https://picsum.photos/1600/400" },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-  followers: { type: Number, default: 10 }, // Legacy count field - kept for backward compatibility
+  followers: { type: Number, default: 0 }, // Legacy count field - kept for backward compatibility
   // New follow relationship arrays
   followersArray: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

@@ -30,10 +30,12 @@ const Login = () => {
       password,
     });
 
-    if (res.error) {
-      setError("Invalid email or password. Please try again.");
-    } else {
+    if (res?.error) {
+      setError(res.error.includes("verify") ? res.error : "Invalid email or password. Please try again.");
+    } else if (res?.ok) {
       router.push("/account");
+    } else {
+      setError("Login failed. Please try again.");
     }
   };
 
