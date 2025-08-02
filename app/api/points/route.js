@@ -4,12 +4,13 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import connectDB from '@/db/ConnectDb';
 import User from '@/models/User';
 import PointTransaction from '@/models/PointTransaction';
+import Payment from '@/models/Payment';
 
 export async function GET(req) {
   try {
     console.log('Points API: Starting request...');
     console.log('Points API: Environment:', process.env.NODE_ENV);
-    console.log('Points API: Models available:', { User: !!User, PointTransaction: !!PointTransaction });
+    console.log('Points API: Models available:', { User: !!User, PointTransaction: !!PointTransaction, Payment: !!Payment });
     
     // Step 1: Database connection
     console.log('Points API: Connecting to database...');
