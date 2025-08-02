@@ -61,7 +61,7 @@ const GeneralSettings = ({ user, onUserUpdate }) => {
   return (
     <div className="space-y-12">
       <div className="pb-8">
-        <h1 className="text-2xl font-semibold text-text mb-3">General Settings</h1>
+        <h1 className="text-2xl font-semibold text-primary mb-3">General Settings</h1>
         <p className="text-text/60 text-sm">Manage your account verification and basic settings</p>
       </div>
 

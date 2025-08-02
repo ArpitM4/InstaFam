@@ -78,7 +78,7 @@ const VaultPayouts = () => {
   return (
     <div className="space-y-12">
       <div className="pb-8">
-        <h1 className="text-2xl font-semibold text-text mb-3">Vault Payouts</h1>
+        <h1 className="text-2xl font-semibold text-primary mb-3">Vault Payouts</h1>
         <p className="text-text/60 text-sm">Track your earnings from fan vault redemptions</p>
       </div>
 

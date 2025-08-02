@@ -107,20 +107,20 @@ const MyFamPointsPage = () => {
         </div>
 
         {/* Points Summary Card */}
-        <div className="bg-text/5 border-text/10 rounded-lg p-6 mb-8 text-center">
+        <div className="bg-dropdown-hover rounded-lg p-6 mb-8 text-center">
           <h2 className="text-2xl font-semibold text-text mb-2">
             🪙 {pointsData.totalPoints} Fam Points
           </h2>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex bg-text/10 rounded-lg p-1 mb-8">
+        <div className="flex  rounded-lg p-1 mb-8">
           <button
             onClick={() => setActiveTab('points')}
             className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === 'points'
-                ? 'bg-primary text-text shadow-sm'
-                : 'text-text/70 hover:text-text hover:bg-text/5'
+                ? 'bg-primary text-white shadow-sm'
+                : 'text-text/70 hover:text-text hover:bg-background/50'
             }`}
           >
             Points History
@@ -129,8 +129,8 @@ const MyFamPointsPage = () => {
             onClick={() => setActiveTab('redemptions')}
             className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === 'redemptions'
-                ? 'bg-primary text-text shadow-sm'
-                : 'text-text/70 hover:text-text hover:bg-text/5'
+                ? 'bg-primary text-white shadow-sm'
+                : 'text-text/70 hover:text-text hover:bg-background/50'
             }`}
           >
             My Redemptions
@@ -140,7 +140,7 @@ const MyFamPointsPage = () => {
         {/* Tab Content */}
         {activeTab === 'points' ? (
           /* Transaction History */
-          <div className="bg-text/5 border-text/10 rounded-lg p-6">
+          <div className=" rounded-lg p-6">
             <h3 className="text-2xl font-semibold mb-6 text-text">Points History</h3>
             
             {pointsData.transactions.length === 0 ? (
@@ -148,7 +148,7 @@ const MyFamPointsPage = () => {
                 <p className="text-text/60 mb-4">No points earned yet</p>
                 <button
                   onClick={() => router.push('/explore')}
-                  className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                  className="bg-primary hover:bg-primary/90 text-background px-6 py-2 rounded-lg font-medium transition-colors shadow-sm"
                 >
                   Explore Creators
                 </button>
@@ -158,7 +158,7 @@ const MyFamPointsPage = () => {
                 {pointsData.transactions.map((transaction, index) => (
                   <div
                     key={transaction._id || index}
-                    className="bg-background/50 border border-text/10 rounded-lg p-4"
+                    className="bg-dropdown-hover rounded-lg p-4 py-8"
                   >
                     <div className="flex justify-between items-center">
                       <div>
@@ -187,15 +187,15 @@ const MyFamPointsPage = () => {
           </div>
         ) : (
           /* Redemption History */
-          <div className="bg-text/5 border-text/10 rounded-lg p-6">
+          <div className="bg- rounded-lg p-6">
             <h3 className="text-2xl font-semibold mb-6 text-text">My Redemptions</h3>
             
             {redemptions.length === 0 ? (
-              <div className="text-center py-8">
+              <div className="text-center rounded-lg p-4 py-8">
                 <p className="text-text/60 mb-4">No redemptions yet</p>
                 <button
                   onClick={() => router.push('/explore')}
-                  className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                  className="bg-primary hover:bg-primary/90 text-background px-6 py-2 rounded-lg font-medium transition-colors shadow-sm"
                 >
                   Explore Creators
                 </button>
@@ -210,7 +210,7 @@ const MyFamPointsPage = () => {
                   return (
                     <div
                       key={redemption._id}
-                      className="bg-background/50 border border-text/10 rounded-lg p-6"
+                      className="bg-dropdown-hover rounded-lg p-4"
                     >
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex-1">
@@ -226,10 +226,10 @@ const MyFamPointsPage = () => {
                         
                         {/* Status Badge */}
                         {isQandA && (
-                          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          <div className={`px-3 py-1 rounded-lg text-xs font-medium ${
                             redemption.status === 'Fulfilled'
-                              ? 'bg-text/10 text-green-500'
-                              : 'bg-text/10 text-red-500'
+                              ? 'bg-green-500/20 text-green-400'
+                              : 'bg-yellow-500/20 text-yellow-400'
                           }`}>
                             {redemption.status === 'Fulfilled' ? 'Answered' : 'Pending'}
                           </div>
@@ -244,7 +244,7 @@ const MyFamPointsPage = () => {
                               <div className="flex items-center justify-between">
                                 <div className="flex-1">
                                   <p className="text-sm text-text/80">
-                                    <span className="font-medium">Your Question:</span> 
+                                    <span className="font-medium text-yellow-500">Your Question:</span> 
                                     <span className="italic"> "{redemption.fanInput.substring(0, 100)}{redemption.fanInput.length > 100 ? '...' : ''}"</span>
                                   </p>
                                   {hasCreatorResponse && (
@@ -255,7 +255,7 @@ const MyFamPointsPage = () => {
                                 </div>
                                 <button
                                   onClick={() => toggleRedemptionExpansion(redemption._id)}
-                                  className="ml-4 bg-text/10 hover:bg-text/20 text-text px-3 py-1 rounded text-sm font-medium transition-colors"
+                                  className="ml-4 bg-primary text-text hover:bg-primary/90 px-3 py-1 rounded-lg text-sm font-medium transition-colors shadow-sm"
                                 >
                                   {hasCreatorResponse ? 'View Answer' : 'View Details'}
                                 </button>
@@ -265,7 +265,7 @@ const MyFamPointsPage = () => {
                             <div className="space-y-6">
                               {/* Full Q&A View */}
                               <div className="space-y-3">
-                                <h5 className="text-sm font-medium text-text/70 uppercase tracking-wide">
+                                <h5 className="text-sm font-medium text-yellow-500 uppercase tracking-wide">
                                   Your Question
                                 </h5>
                                 <div className="bg-background/30 rounded-lg p-4">
@@ -292,7 +292,7 @@ const MyFamPointsPage = () => {
                               <div className="flex justify-center">
                                 <button
                                   onClick={() => toggleRedemptionExpansion(redemption._id)}
-                                  className="bg-text/10 hover:bg-text/20 text-text/70 px-4 py-2 rounded text-sm transition-colors"
+                                  className="bg-background/50 hover:bg-background/70 text-red-300 px-4 py-2 rounded-lg text-sm transition-colors"
                                 >
                                   Collapse
                                 </button>
@@ -311,7 +311,7 @@ const MyFamPointsPage = () => {
                                 link.download = redemption.vaultItemId.title;
                                 link.click();
                               }}
-                              className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+                              className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm shadow-sm"
                             >
                               Download
                             </button>
@@ -330,7 +330,7 @@ const MyFamPointsPage = () => {
         <div className="text-center mt-8">
           <button
             onClick={() => router.back()}
-            className="bg-text/10 hover:bg-text/20 text-text px-6 py-2 rounded-lg font-medium transition-colors"
+            className="bg-background/50 hover:bg-background/70 text-text px-6 py-2 rounded-lg font-medium transition-colors"
           >
             ← Back
           </button>

@@ -141,7 +141,7 @@ const PaymentInfo = () => {
   return (
     <div className="space-y-12">
       <div className="pb-8">
-        <h1 className="text-2xl font-semibold text-text mb-3">Event-Based Payout Management</h1>
+        <h1 className="text-2xl font-semibold text-primary mb-3">Event-Based Payout  </h1>
         <p className="text-text/60 text-sm">Track your earnings from completed events and manage payouts</p>
       </div>
 
@@ -165,9 +165,9 @@ const PaymentInfo = () => {
       {/* Event History Accordion */}
       <section className="space-y-6">
         <h3 className="text-lg font-medium text-text/90">Event History</h3>
-        <div className="bg-dropdown-hover rounded-xl p-6">
+        <div className=" rounded-xl p-6">
           {events.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center  py-12">
               <div className="text-text/50 mb-4">
                 <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -178,11 +178,11 @@ const PaymentInfo = () => {
               <p className="text-sm text-text/40">💡 Create events from your main dashboard to start tracking earnings</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4 ">
               {events.map((event) => {
                 const isExpanded = expandedEvents.has(event._id);
                 return (
-                  <div key={event._id} className="border border-background/30 rounded-lg overflow-hidden">
+                  <div key={event._id} className=" bg-dropdown-hover rounded-lg overflow-hidden">
                     {/* Accordion Header */}
                     <button
                       onClick={() => toggleEventExpansion(event._id)}
@@ -190,7 +190,7 @@ const PaymentInfo = () => {
                     >
                       <div className="flex justify-between items-center">
                         <div className="flex-1">
-                          <h4 className="font-semibold text-text mb-1">
+                          <h4 className="font-semibold text-primary mb-1">
                             Event #{events.length - events.indexOf(event)}
                           </h4>
                           <p className="text-sm text-text/60">{formatDateRange(event.startTime, event.endTime)}</p>
@@ -229,13 +229,13 @@ const PaymentInfo = () => {
                         
                         {event.payments && event.payments.length > 0 ? (
                           <div className="space-y-2">
-                            <h5 className="text-sm font-medium text-text/70 mb-3">
+                            <h5 className="text-sm font-medium text-yellow-500 mb-3">
                               Payments received during this event:
                             </h5>
                             {event.payments.map((payment, index) => (
                               <div
                                 key={payment._id}
-                                className="flex justify-between items-center p-3 bg-background/30 rounded-lg"
+                                className="flex justify-between items-center p-3 bg-background rounded-lg"
                               >
                                 <div className="flex-1">
                                   <p className="text-sm font-medium text-text">

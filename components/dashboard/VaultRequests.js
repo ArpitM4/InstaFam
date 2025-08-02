@@ -131,7 +131,7 @@ const VaultRequests = () => {
   return (
     <div className="space-y-8">
       <div className="border-b border-text/20 pb-6">
-        <h1 className="text-3xl font-bold text-primary mb-2">Vault Requests</h1>
+        <h1 className="text-2xl font-bold text-primary mb-2">Vault Requests</h1>
         <p className="text-text/70">Manage fan redemptions that require your action</p>
       </div>
 
@@ -178,7 +178,7 @@ const VaultRequests = () => {
       {/* Pending Redemptions */}
       {activeRequestsTab === 'pending' && (
         <section className="bg-text/5  border-text/10 rounded-lg p-6">
-          <h3 className="text-2xl font-semibold mb-4">
+          <h3 className="text-xl font-semibold mb-4">
             Pending Fulfillments 
             {pendingRedemptions.length > 0 && (
               <span className="ml-2 bg-red-500 text-white text-sm px-3 py-1 rounded-full">
@@ -200,7 +200,7 @@ const VaultRequests = () => {
           ) : (
             <div className="space-y-4">
               {pendingRedemptions.map((redemption) => (
-                <div key={redemption._id} className="bg-background/50 border border-text/10 rounded-lg p-6">
+                <div key={redemption._id} className="bg-dropdown-hover rounded-lg p-4 px-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <h4 className="text-lg font-semibold text-primary mb-2">
@@ -247,7 +247,7 @@ const VaultRequests = () => {
                           value={creatorResponses[redemption._id] || ''}
                           onChange={(e) => handleResponseChange(redemption._id, e.target.value)}
                           placeholder="Write your exclusive answer to this fan's question..."
-                          className="w-full bg-background/30 border border-text/10 rounded-lg p-4 text-text resize-none focus:border-primary/30 focus:outline-none min-h-[100px] transition-colors"
+                          className="w-full bg-white border border-text/10 rounded-lg p-4 text-black resize-none focus:border-primary/30 focus:outline-none min-h-[60px] max-h-[70px] transition-colors"
                           maxLength={2000}
                         />
                         <div className="flex items-center justify-between">
@@ -314,8 +314,8 @@ const VaultRequests = () => {
           ) : (
             <div className="space-y-4">
               {fulfilledRedemptions.map((redemption) => (
-                <div key={redemption._id} className="bg-background/50 border border-text/10 rounded-lg p-6">
-                  <div className="flex items-start justify-between mb-4">
+                <div key={redemption._id} className="bg-dropdown-hover rounded-lg p-6">
+                  <div className="flex items-start  justify-between mb-4">
                     <div className="flex-1">
                       <h4 className="text-lg font-semibold text-primary mb-2">
                         {redemption.vaultItemId.title}
@@ -353,7 +353,7 @@ const VaultRequests = () => {
                       {/* Creator's Answer (if available) */}
                       {redemption.creatorResponse && (
                         <div className="space-y-3">
-                          <h5 className="text-sm font-medium text-text/70 uppercase tracking-wide">
+                          <h5 className="text-sm font-medium text-yellow-500 uppercase tracking-wide">
                             Your Answer
                           </h5>
                           <div className="bg-background/30 rounded-lg p-4">

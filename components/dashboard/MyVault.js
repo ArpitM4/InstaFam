@@ -153,7 +153,7 @@ const MyVault = () => {
   return (
     <div className="space-y-8">
       <div className="pb-6">
-        <h1 className="text-2xl font-semibold text-text mb-2">My Vault</h1>
+        <h1 className="text-2xl font-semibold text-primary mb-2">My Vault</h1>
         <p className="text-text/60">Manage exclusive content for your fans to unlock with Fam Points</p>
       </div>
 
@@ -460,9 +460,9 @@ const MyVault = () => {
                 <p className="text-text/40 text-sm">Items you expire will appear here</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto vault-scroll">
+              <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto vault-scroll">
                 {vaultHistoryItems.map((item) => (
-                  <div key={item._id} className="bg-background/60 rounded-xl p-4 space-y-3 opacity-75">
+                  <div key={item._id} className="bg-background/60 rounded-xl bg-background p-4 space-y-3 opacity-75">
                     <div className="flex items-start justify-between">
                       <h4 className="font-medium text-base truncate flex-1 mr-2">{item.title}</h4>
                       <span className="text-red-400 text-xs px-2 py-1 rounded-lg bg-red-400/10" title="Expired">
