@@ -1,21 +1,24 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import connectDb from '@/db/ConnectDb';
+import connectDB from '@/db/ConnectDb';
 import User from '@/models/User';
 import PointTransaction from '@/models/PointTransaction';
 
 export async function GET(req) {
   try {
     console.log('Points API: Starting request...');
+    console.log('Points API: Environment:', process.env.NODE_ENV);
+    console.log('Points API: Models available:', { User: !!User, PointTransaction: !!PointTransaction });
     
     // Step 1: Database connection
     console.log('Points API: Connecting to database...');
-    await connectDb();
+    await connectDB();
     console.log('Points API: Database connected successfully');
     
     // Step 2: Session validation
     console.log('Points API: Getting session...');
+    console.log('Points API: authOptions available:', !!authOptions);
     const session = await getServerSession(authOptions);
     console.log('Points API: Session retrieved:', !!session);
     
@@ -78,11 +81,16 @@ export async function GET(req) {
       message: error.message,
       stack: error.stack,
       name: error.name,
-      code: error.code
+      code: error.code,
+      environment: process.env.NODE_ENV
     });
+    
+    // Always return detailed error message for debugging
     return NextResponse.json({ 
       error: 'Internal server error',
-      details: process.env.NODE_ENV === 'development' ? error.message : 'Server error'
+      details: error.message,
+      stack: error.stack,
+      name: error.name
     }, { status: 500 });
   }
 }
