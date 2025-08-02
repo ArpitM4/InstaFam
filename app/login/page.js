@@ -1,15 +1,30 @@
 "use client";
 import { FaGoogle, FaGithub } from 'react-icons/fa';
 import { useSession, signIn } from "next-auth/react";
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const Login = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    // Check for NextAuth error in URL
+    const authError = searchParams.get('error');
+    if (authError) {
+      if (authError === 'AccountNotVerified') {
+        setError("Please verify your email before using OAuth login. Check your inbox for the verification link.");
+      } else {
+        setError("Authentication failed. Please try again.");
+      }
+      // Clean up the URL
+      router.replace('/login', undefined, { shallow: true });
+    }
+  }, [searchParams, router]);
 
   useEffect(() => {
     if (session) {
@@ -41,21 +56,8 @@ const Login = () => {
 
   const handleOAuthLogin = async (provider) => {
     setError(""); // Clear any existing errors
-    
-    try {
-      const result = await signIn(provider, { 
-        callbackUrl: '/account',
-        redirect: false 
-      });
-      
-      if (result?.error) {
-        setError(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login failed. If you have an existing account, please verify your email first.`);
-      } else if (result?.ok) {
-        router.push('/account');
-      }
-    } catch (error) {
-      setError(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login failed. Please try again.`);
-    }
+    // For OAuth, let NextAuth handle the redirect naturally
+    await signIn(provider, { callbackUrl: '/account' });
   };
 
   const handleKeyPress = (e) => {

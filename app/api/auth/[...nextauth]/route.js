@@ -97,7 +97,7 @@ export const authOptions = {
             if (existingUser.password && !existingUser.emailVerified) {
               // Block the OAuth login for unverified accounts
               console.log('Blocked OAuth login for unverified account:', user.email);
-              return false; // This will prevent login and show error on the client
+              throw new Error("AccountNotVerified");
             }
           } else {
             // Create new user for OAuth login
