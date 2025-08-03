@@ -45,6 +45,21 @@ const UserSchema = new Schema({
   points: { type: Number, default: 0 },
   vaultEarningsBalance: { type: Number, default: 0 },
   isReal: { type: Boolean, default: true },
+  
+  // Creator Onboarding System
+  creatorOnboarding: {
+    discountCode: { type: String, default: null }, // Stores claimed discount codes
+    onboardingCompleted: { type: Boolean, default: false },
+    checklist: {
+      isVerified: { type: Boolean, default: false },
+      paymentDetailsAdded: { type: Boolean, default: false },
+      profilePageCreated: { type: Boolean, default: false },
+      firstEventStarted: { type: Boolean, default: false },
+      firstVaultItemAdded: { type: Boolean, default: false }
+    },
+    onboardingStartedAt: { type: Date, default: null },
+    onboardingCompletedAt: { type: Date, default: null }
+  }
 });
 
 // Remove the old index definition - we'll handle this differently

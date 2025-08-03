@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import SessionWrapper from "@/components/SessionWrapper";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
 import GoogleOneTap from "@/components/GoogleOneTap";
+import FloatingCreatorChecklist from "@/components/FloatingCreatorChecklist";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/context/ThemeContext";
 
@@ -199,6 +200,7 @@ export default function RootLayout({ children }) {
             <PerformanceMonitor />
             <Navbar />
             <GoogleOneTap />
+            <FloatingCreatorChecklist />
             <main role="main">
               {children}
             </main>

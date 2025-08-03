@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react'
+import { triggerProfileUpdate } from '@/utils/onboardingTriggers';
 // Simple modal component for username
 function UsernameModal({ open, onSubmit, loading, error }) {
   const [username, setUsername] = useState("");
@@ -211,6 +212,10 @@ const Account = () => {
     }
     let a = await updateProfile(form, session.user.name);
     await update();
+    
+    // Trigger onboarding progress update
+    await triggerProfileUpdate();
+    
     toast('Profile Updated', {
       position: "top-right",
       autoClose: 5000,
