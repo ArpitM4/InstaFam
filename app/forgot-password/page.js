@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
 
 const ForgotPassword = () => {
   const router = useRouter();
@@ -13,6 +14,8 @@ const ForgotPassword = () => {
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSendOTP = async () => {
     if (!email) {
@@ -232,26 +235,44 @@ const ForgotPassword = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-text/70 mb-2">New Password</label>
-                <input
-                  type="password"
-                  placeholder="Enter new password"
-                  value={newPassword}
-                  onChange={e => setNewPassword(e.target.value)}
-                  className="w-full px-3 py-3 rounded-lg bg-background/50 text-gray-600 placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    placeholder="Enter new password"
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                    className="w-full px-3 py-3 pr-12 rounded-lg bg-background/50 text-gray-600 placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                  >
+                    {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-text/70 mb-2">Confirm Password</label>
-                <input
-                  type="password"
-                  placeholder="Confirm new password"
-                  value={confirmPassword}
-                  onChange={e => setConfirmPassword(e.target.value)}
-                  onKeyPress={e => handleKeyPress(e, handleResetPassword)}
-                  className="w-full px-3 py-3 rounded-lg bg-background/50 text-gray-600 placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm new password"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                    onKeyPress={e => handleKeyPress(e, handleResetPassword)}
+                    className="w-full px-3 py-3 pr-12 rounded-lg bg-background/50 text-gray-600 placeholder-text/40 focus:outline-none focus:bg-background transition-all duration-200 border-0"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
               <button
                 onClick={handleResetPassword}

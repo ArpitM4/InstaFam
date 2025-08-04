@@ -118,7 +118,7 @@ const DiscountCodeModal = ({ isOpen, onClose, onSuccess }) => {
                     value={code}
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     placeholder="e.g., FIRST50"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-center text-lg font-mono tracking-wider"
+                    className="w-full text-black px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-center text-lg font-mono tracking-wider"
                     disabled={loading}
                   />
                 </div>
