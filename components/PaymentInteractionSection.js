@@ -23,6 +23,7 @@ const PaymentInteractionSection = ({
   createOrder,
   onApprove,
   router,
+  currentUser, // Add currentUser to get perkRank
 }) => {
   const [paypalClientId, setPaypalClientId] = useState(null);
   const [isClient, setIsClient] = useState(false);
@@ -54,15 +55,23 @@ const PaymentInteractionSection = ({
                 return acc;
               }, {})
             ).sort(([, a], [, b]) => b - a)
-            .map(([name, total], i) => (
-              <li key={i} className="flex justify-between items-center bg-background/30 p-2 rounded-lg">
-                <div className="flex items-center space-x-2">
-                  <FaUserCircle className="text-yellow-500 text-xl"/>
-                  <span className="font-medium">{name}</span>
-                </div>
-                <span className="text-text font-medium">${total}</span>
-              </li>
-            ))}
+            .map(([name, total], i) => {
+              const isPerkEligible = i < (currentUser?.perkRank || 5);
+              return (
+                <li key={i} className={`flex justify-between items-center p-2 rounded-lg transition-all duration-200 ${
+                  isPerkEligible 
+                    ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20' 
+                    : 'bg-background/30'
+                }`}>
+                  <div className="flex items-center space-x-2">
+                    <FaUserCircle className={`text-xl ${isPerkEligible ? 'text-yellow-400' : 'text-yellow-500'}`}/>
+                    <span className={`font-medium ${isPerkEligible ? 'text-yellow-100' : ''}`}>{name}</span>
+                    {isPerkEligible && <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">🎁 Perk Eligible</span>}
+                  </div>
+                  <span className={`font-medium ${isPerkEligible ? 'text-yellow-100' : 'text-text'}`}>${total}</span>
+                </li>
+              );
+            })}
           </ol>
         )}
       </div>

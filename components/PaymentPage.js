@@ -231,7 +231,11 @@ const PaymentPage = ({ username }) => {
     };
 
   const handleSavePerk = async () => {
-    const res = await updateProfile({ email: currentUser.email, perk: currentUser.perk }, username);
+    const res = await updateProfile({ 
+      email: currentUser.email, 
+      perk: currentUser.perk,
+      perkRank: currentUser.perkRank || 5
+    }, username);
     if (!res?.error) toast.success("Perk saved!");
   };
 
@@ -326,7 +330,7 @@ const PaymentPage = ({ username }) => {
         toast.error(res.error);
       } else {
         console.log('User profile updated successfully');
-        setcurrentUser({ ...currentUser, eventStart: null, eventEnd: null });
+        setcurrentUser(prevUser => ({ ...prevUser, eventStart: null, eventEnd: null }));
         // Keep showing the leaderboard from the ended event
         // Don't clear payments - they'll remain from the last event
       }
@@ -575,6 +579,7 @@ const PaymentPage = ({ username }) => {
                     createOrder={createOrder}
                     onApprove={onApprove}
                     router={router}
+                    currentUser={currentUser}
                   />
                 </ErrorBoundary>
               ) : (

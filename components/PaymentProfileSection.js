@@ -140,20 +140,51 @@ const PaymentProfileSection = ({
 
         {/* Perk Section - Combined Display and Edit */}
         {isOwner && (
-          <div className="mt-4">
+          <div className="mt-4 space-y-3">
             <div className="relative">
               <input
                 type="text"
-                className="w-full bg-background text-text text-sm text-center rounded-lg p-3 pr-8 focus:outline-none transition-all duration-200 border-0 placeholder-text/40"
+                className={`w-full bg-background text-text text-sm text-center rounded-lg p-3 pr-8 focus:outline-none transition-all duration-200 border-0 placeholder-text/40 ${isEventActive ? 'opacity-50 cursor-not-allowed' : ''}`}
                 value={currentUser.perk || ""}
-                onClick={() => setIsEditing(true)}
-                onFocus={() => setIsEditing(true)}
-                onChange={(e) => setcurrentUser({ ...currentUser, perk: e.target.value })}
-                onBlur={handleSavePerk}
-                placeholder="Set your perk for top donors..."
+                onClick={() => !isEventActive && setIsEditing(true)}
+                onFocus={() => !isEventActive && setIsEditing(true)}
+                onChange={(e) => !isEventActive && setcurrentUser({ ...currentUser, perk: e.target.value })}
+                onBlur={!isEventActive ? handleSavePerk : undefined}
+                placeholder={isEventActive ? "Cannot edit perk during active event" : "Set your perk for top donors..."}
+                disabled={isEventActive}
+                readOnly={isEventActive}
               />
-              <FaPen className="absolute top-1/2 right-3 transform -translate-y-1/2 text-text/40 text-xs pointer-events-none" />
+              <FaPen className={`absolute top-1/2 right-3 transform -translate-y-1/2 text-xs pointer-events-none ${isEventActive ? 'text-text/20' : 'text-text/40'}`} />
             </div>
+            
+            {/* Perk Rank Input */}
+            <div className="flex items-center gap-3">
+              <label className={`text-text/70 text-sm font-medium whitespace-nowrap ${isEventActive ? 'opacity-50' : ''}`}>Perk for Top</label>
+              <input
+                type="number"
+                min="1"
+                max="100"
+                className={`flex-1 bg-background text-text text-sm text-center rounded-lg p-2 focus:outline-none transition-all duration-200 border-0 placeholder-text/40 ${isEventActive ? 'opacity-50 cursor-not-allowed' : ''}`}
+                value={currentUser.perkRank || 5}
+                onChange={(e) => {
+                  if (!isEventActive) {
+                    const value = Math.min(Math.max(1, Number(e.target.value)), 100);
+                    setcurrentUser({ ...currentUser, perkRank: value });
+                  }
+                }}
+                onBlur={!isEventActive ? handleSavePerk : undefined}
+                placeholder="5"
+                disabled={isEventActive}
+                readOnly={isEventActive}
+              />
+              <span className={`text-text/70 text-sm ${isEventActive ? 'opacity-50' : ''}`}>donors</span>
+            </div>
+            <p className={`text-text/50 text-xs text-center ${isEventActive ? 'opacity-50' : ''}`}>
+              {isEventActive 
+                ? "Perk settings are locked during active events" 
+                : "Top donors will be highlighted in the leaderboard and eligible for your perk"
+              }
+            </p>
           </div>
         )}
 
@@ -161,7 +192,7 @@ const PaymentProfileSection = ({
         {!isOwner && isEventActive && currentUser.perk && (
           <div className="mt-4 bg-black p-3 rounded-lg">
             <div className="text-text/90 text-sm text-center">
-              🎁 <span className="font-medium text-primary/40">Top 5 Perk : </span> {currentUser.perk}
+              🎁 <span className="font-medium text-primary/40">Top {currentUser.perkRank || 5} Perk : </span> {currentUser.perk}
             </div>
           </div>
         )}
@@ -172,18 +203,39 @@ const PaymentProfileSection = ({
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
               <input 
                 type="number" 
-                placeholder="Duration in days" 
+                placeholder={isEventActive ? "Event is running" : "Duration in days"} 
                 value={eventDuration} 
-                onChange={(e) => setEventDuration(e.target.value)}
-                className="w-full sm:min-w-[160px] sm:flex-1 px-3 py-2 bg-background text-text rounded-lg focus:outline-none transition-all duration-200 border-0 placeholder-text/40"
+                onChange={(e) => !isEventActive && setEventDuration(e.target.value)}
+                className={`w-full sm:min-w-[160px] sm:flex-1 px-3 py-2 bg-background text-text rounded-lg focus:outline-none transition-all duration-200 border-0 placeholder-text/40 ${isEventActive ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={isEventActive}
+                readOnly={isEventActive}
               />
-              <button onClick={handleStartEvent} className="w-full sm:w-auto bg-success hover:bg-success/90 text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md">
-                Start Event
+              <button 
+                onClick={handleStartEvent} 
+                disabled={isEventActive || !eventDuration}
+                className={`w-full sm:w-auto px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm ${
+                  isEventActive || !eventDuration 
+                    ? 'bg-gray-500 text-gray-300 cursor-not-allowed opacity-50' 
+                    : 'bg-success hover:bg-success/90 text-white hover:shadow-md'
+                }`}
+              >
+                {isEventActive ? 'Event Active' : 'Start Event'}
               </button>
-              <button onClick={handleEndEvent} className="w-full sm:w-auto bg-error hover:bg-error/90 text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md">
+              <button 
+                onClick={handleEndEvent} 
+                disabled={!isEventActive}
+                className={`w-full sm:w-auto px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm ${
+                  !isEventActive 
+                    ? 'bg-gray-500 text-gray-300 cursor-not-allowed opacity-50' 
+                    : 'bg-error hover:bg-error/90 text-white hover:shadow-md'
+                }`}
+              >
                 End Event
               </button>
             </div>
+            {isEventActive && (
+              <p className="text-center text-xs text-text/50">Event settings are locked while event is running</p>
+            )}
           </div>
         )}
 

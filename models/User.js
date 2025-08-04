@@ -40,6 +40,7 @@ const UserSchema = new Schema({
     durationHours: Number,
   },
   perk: { type: String, default: "" },
+  perkRank: { type: Number, default: 5 }, // Number of top donors for perk eligibility
   eventStart: { type: Date, default: null },
   eventEnd: { type: Date, default: null },
   points: { type: Number, default: 0 },
