@@ -1,6 +1,17 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FaUserCircle, FaSpinner } from "react-icons/fa";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import dynamic from "next/dynamic";
+
+// Dynamically import PayPal components to prevent SSR issues
+const PayPalScriptProvider = dynamic(
+  () => import("@paypal/react-paypal-js").then((mod) => mod.PayPalScriptProvider),
+  { ssr: false }
+);
+
+const PayPalButtons = dynamic(
+  () => import("@paypal/react-paypal-js").then((mod) => mod.PayPalButtons),
+  { ssr: false }
+);
 
 const PaymentInteractionSection = ({
   session,
@@ -13,6 +24,18 @@ const PaymentInteractionSection = ({
   onApprove,
   router,
 }) => {
+  const [paypalClientId, setPaypalClientId] = useState(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    // Only run on client side to avoid hydration mismatch
+    const timer = setTimeout(() => {
+      setIsClient(true);
+      setPaypalClientId(process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID);
+    }, 100); // Small delay to ensure proper hydration
+    
+    return () => clearTimeout(timer);
+  }, []);
   return (<>
     <div className="w-full max-w-5xl mt-8 flex flex-col md:flex-row gap-6 px-2">
       {/* Leaderboard Disclaimer */}
@@ -96,18 +119,34 @@ const PaymentInteractionSection = ({
           </div>
           {/* PayPal Button Logic */}
           {session ? (
-            (process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ? (
-              <PayPalScriptProvider options={{ "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID, currency: "USD", components: "buttons" }}>
-                <PayPalButtons
-                  style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay" }}
-                  createOrder={createOrder}
-                  onApprove={onApprove}
-                  disabled={!paymentform.amount || Number(paymentform.amount) <= 0 || isPaying || !isEventActive}
-                />
-              </PayPalScriptProvider>
-            ) : (
+            isClient && paypalClientId ? (
+              <div className="paypal-container">
+                <PayPalScriptProvider 
+                  options={{ 
+                    "client-id": paypalClientId, 
+                    currency: "USD", 
+                    components: "buttons",
+                    "disable-funding": "credit,card"
+                  }}
+                  deferLoading={false}
+                >
+                  <PayPalButtons
+                    style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay" }}
+                    createOrder={createOrder}
+                    onApprove={onApprove}
+                    onError={(err) => {
+                      console.error('PayPal Button Error:', err);
+                      // Don't show error to user as it might be temporary
+                    }}
+                    disabled={!paymentform.amount || Number(paymentform.amount) <= 0 || isPaying || !isEventActive}
+                  />
+                </PayPalScriptProvider>
+              </div>
+            ) : isClient ? (
               <div className="text-center p-3 bg-red-500/10 text-red-400 rounded-lg">PayPal is not configured.</div>
-            ))
+            ) : (
+              <div className="text-center p-3 bg-gray-500/10 text-gray-400 rounded-lg">Loading payment options...</div>
+            )
           ) : (
             <button className="w-full bg-primary hover:bg-primary/90 transition-all duration-200 text-white font-medium py-2 rounded-lg shadow-sm hover:shadow-md" onClick={() => router.push('/login')}>
               Login to Donate

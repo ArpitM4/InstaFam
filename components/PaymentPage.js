@@ -17,6 +17,7 @@ import { emitPaymentSuccess } from "@/utils/eventBus";
 import PaymentProfileSection from "./PaymentProfileSection";
 import PaymentInteractionSection from "./PaymentInteractionSection";
 import VaultSection from "./VaultSection";
+import ErrorBoundary from "./ErrorBoundary";
 
 // Save payment after capture (send captureDetails to backend)
 const savePayment = async (paymentDetails, captureDetails, currentEvent = null) => {
@@ -40,8 +41,14 @@ const savePayment = async (paymentDetails, captureDetails, currentEvent = null) 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(paymentData)
     });
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    
     const data = await res.json();
     console.log('PayPal API response:', data); // Debug log
+    
     if (data.capture && data.capture.status === "COMPLETED") {
       toast.success("Payment successful!", {
         position: "top-right",
@@ -84,7 +91,16 @@ const PaymentPage = ({ username }) => {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { updatePoints } = useUser(); // For updating points in navbar
+  
+  // Safe access to UserContext with fallback
+  let updatePoints;
+  try {
+    const userContext = useUser();
+    updatePoints = userContext?.updatePoints;
+  } catch (error) {
+    console.warn('UserContext not available:', error);
+    updatePoints = null;
+  }
 
   // --- State Management ---
   const [currentUser, setcurrentUser] = useState({});
@@ -97,6 +113,7 @@ const PaymentPage = ({ username }) => {
   const [timeLeft, setTimeLeft] = useState(null);
   const [isPaying, setIsPaying] = useState(false);
   const [activeTab, setActiveTab] = useState('contribute');
+  const [hasError, setHasError] = useState(false);
 
   const isOwner = session?.user?.name === username;
 
@@ -375,16 +392,16 @@ const PaymentPage = ({ username }) => {
   // --- PayPal Functions ---
   // Create order on backend, return orderID to PayPal
   const createOrder = async (data, actions) => {
-    if (!paymentform.amount || Number(paymentform.amount) <= 0) {
-      toast.error("Please enter a valid amount to donate.");
-      throw new Error("Invalid amount");
-    }
-    if (!userId) {
-      toast.error("User not loaded.");
-      throw new Error("User not loaded");
-    }
-    
     try {
+      if (!paymentform.amount || Number(paymentform.amount) <= 0) {
+        toast.error("Please enter a valid amount to donate.");
+        throw new Error("Invalid amount");
+      }
+      if (!userId) {
+        toast.error("User not loaded.");
+        throw new Error("User not loaded");
+      }
+      
       // Call backend to create order
       const res = await fetch('/api/paypal', {
         method: 'POST',
@@ -395,6 +412,10 @@ const PaymentPage = ({ username }) => {
           message: paymentform.message
         })
       });
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       
       const dataRes = await res.json();
       console.log('PayPal order creation response:', dataRes); // Debug log
@@ -408,6 +429,7 @@ const PaymentPage = ({ username }) => {
       }
     } catch (error) {
       console.error('Error creating PayPal order:', error);
+      setHasError(true);
       toast.error("Failed to create payment order.");
       throw error;
     }
@@ -415,46 +437,59 @@ const PaymentPage = ({ username }) => {
 
   const onApprove = async (data, actions) => {
     setIsPaying(true);
-    return actions.order.capture().then(async (details) => {
-      const paymentDetails = {
-        payerName: paymentform.name,
-        message: paymentform.message,
-        amount: details.purchase_units[0].amount.value,
-        orderID: data.orderID,
-        timestamp: new Date().toISOString(),
-        to_user: userId,
-      };
+    try {
+      return actions.order.capture().then(async (details) => {
+        try {
+          const paymentDetails = {
+            payerName: paymentform.name,
+            message: paymentform.message,
+            amount: details.purchase_units[0].amount.value,
+            orderID: data.orderID,
+            timestamp: new Date().toISOString(),
+            to_user: userId,
+          };
 
-      // Send capture details to backend for saving
-      const res = await savePayment(paymentDetails, details, currentEvent);
+          // Send capture details to backend for saving
+          const res = await savePayment(paymentDetails, details, currentEvent);
+
+          if (res.success) {
+            // Points are already awarded in the PayPal route
+            if (res.pointsAwarded) {
+              toast.success(`Payment successful! You earned ${res.pointsAwarded} Fam Points! 🎉`);
+            } else {
+              toast.success('Payment successful!');
+            }
+
+            // Emit global payment success event for navbar updates
+            emitPaymentSuccess({ pointsAwarded: res.pointsAwarded });
+
+            // Update points in the navbar immediately (legacy support)
+            if (updatePoints) {
+              updatePoints();
+            }
+
+            // Refetch payments and update leaderboard - use the same filtering as initial load
+            const updatedPayments = currentUser.eventStart ? 
+              await fetchpayments(userId, currentUser.eventStart) : 
+              [];
+            setPayments(updatedPayments);
+            router.push(`/${username}?paymentdone=true`);
+          } else {
+            toast.error("Payment failed. Please contact support.");
+          }
+        } catch (error) {
+          console.error('Error processing payment completion:', error);
+          setHasError(true);
+          toast.error("Payment processing failed. Please contact support.");
+        }
+      });
+    } catch (error) {
+      console.error('Error in onApprove:', error);
+      setHasError(true);
+      toast.error("Payment processing failed. Please try again.");
+    } finally {
       setIsPaying(false);
-
-      if (res.success) {
-        // Points are already awarded in the PayPal route
-        if (res.pointsAwarded) {
-          toast.success(`Payment successful! You earned ${res.pointsAwarded} Fam Points! 🎉`);
-        } else {
-          toast.success('Payment successful!');
-        }
-
-        // Emit global payment success event for navbar updates
-        emitPaymentSuccess({ pointsAwarded: res.pointsAwarded });
-
-        // Update points in the navbar immediately (legacy support)
-        if (updatePoints) {
-          updatePoints();
-        }
-
-        // Refetch payments and update leaderboard - use the same filtering as initial load
-        const updatedPayments = currentUser.eventStart ? 
-          await fetchpayments(userId, currentUser.eventStart) : 
-          [];
-        setPayments(updatedPayments);
-        router.push(`/${username}?paymentdone=true`);
-      } else {
-        toast.error("Payment failed. Please contact support.");
-      }
-    });
+    }
   };
     
   const isEventActive = currentUser?.eventEnd && new Date(currentUser.eventEnd) > new Date();
@@ -526,20 +561,40 @@ const PaymentPage = ({ username }) => {
 
         {/* Conditionally Rendered Content */}
         <div className="w-full flex justify-center">
-          {activeTab === 'contribute' && (<>
-            <PaymentInteractionSection
-              session={session}
-              isEventActive={isEventActive}
-              payments={payments}
-              isPaying={isPaying}
-              paymentform={paymentform}
-              handleChange={handleChange}
-              createOrder={createOrder}
-              onApprove={onApprove}
-              router={router}
-            />
-            </>
-            
+          {activeTab === 'contribute' && (
+            <div className="w-full">
+              {!hasError ? (
+                <ErrorBoundary>
+                  <PaymentInteractionSection
+                    session={session}
+                    isEventActive={isEventActive}
+                    payments={payments}
+                    isPaying={isPaying}
+                    paymentform={paymentform}
+                    handleChange={handleChange}
+                    createOrder={createOrder}
+                    onApprove={onApprove}
+                    router={router}
+                  />
+                </ErrorBoundary>
+              ) : (
+                <div className="w-full max-w-5xl mt-8 flex justify-center">
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-6 text-center">
+                    <h3 className="text-lg font-medium text-red-400 mb-2">Payment System Unavailable</h3>
+                    <p className="text-red-300 mb-4">We're experiencing technical difficulties with our payment system. Please try again later.</p>
+                    <button 
+                      onClick={() => {
+                        setHasError(false);
+                        window.location.reload();
+                      }}
+                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           {activeTab === 'vault' && (

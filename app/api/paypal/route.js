@@ -21,31 +21,32 @@ const getAccessToken = async () => {
 };
 
 export async function POST(req) {
-  await connectDB();
-  const session = await getServerSession(nextAuthConfig);
-  if (!session || !session.user || !session.user.email) {
-    return NextResponse.json({ error: "You must be logged in to pay." }, { status: 401 });
-  }
-  const fanUser = await User.findOne({ email: session.user.email });
-  if (!fanUser) {
-    return NextResponse.json({ error: "Fan user not found." }, { status: 401 });
-  }
-  
-  const body = await req.json();
-  console.log('PayPal API received body:', body); // Debug log
-  
-  const { amount, message, orderID, captureOnly, to_user, eventId } = body;
+  try {
+    await connectDB();
+    const session = await getServerSession(nextAuthConfig);
+    if (!session || !session.user || !session.user.email) {
+      return NextResponse.json({ error: "You must be logged in to pay." }, { status: 401 });
+    }
+    const fanUser = await User.findOne({ email: session.user.email });
+    if (!fanUser) {
+      return NextResponse.json({ error: "Fan user not found." }, { status: 401 });
+    }
+    
+    const body = await req.json();
+    console.log('PayPal API received body:', body); // Debug log
+    
+    const { amount, message, orderID, captureOnly, to_user, eventId } = body;
 
-  const accessToken = await getAccessToken();
-  if (!accessToken) {
-    return NextResponse.json({ error: "Failed to get access token" }, { status: 500 });
-  }
+    const accessToken = await getAccessToken();
+    if (!accessToken) {
+      return NextResponse.json({ error: "Failed to get access token" }, { status: 500 });
+    }
 
-  // Find userId (ObjectId) for to_user
-  let toUserId = to_user;
-  if (!toUserId) {
-    return NextResponse.json({ error: "Creator userId (to_user) required." }, { status: 400 });
-  }
+    // Find userId (ObjectId) for to_user
+    let toUserId = to_user;
+    if (!toUserId) {
+      return NextResponse.json({ error: "Creator userId (to_user) required." }, { status: 400 });
+    }
 
   // If captureOnly is true, just save the payment (capture already done client-side)
   if (captureOnly && orderID && body.captureDetails) {
@@ -140,4 +141,11 @@ export async function POST(req) {
   }
   
   return NextResponse.json(order);
+  } catch (error) {
+    console.error('PayPal API Error:', error);
+    return NextResponse.json({ 
+      error: "Internal server error", 
+      details: process.env.NODE_ENV === 'development' ? error.message : 'Payment processing failed'
+    }, { status: 500 });
+  }
 }
