@@ -562,7 +562,7 @@ const PaymentPage = ({ username }) => {
         {/* Conditionally Rendered Content */}
         <div className="w-full flex justify-center">
           {activeTab === 'contribute' && (
-            <div className="w-full">
+            <>
               {!hasError ? (
                 <ErrorBoundary>
                   <PaymentInteractionSection
@@ -594,7 +594,7 @@ const PaymentPage = ({ username }) => {
                   </div>
                 </div>
               )}
-            </div>
+            </>
           )}
 
           {activeTab === 'vault' && (
