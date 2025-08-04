@@ -16,9 +16,15 @@ export const fetchuser = async (identifier) => {
   } else {
     query.username = identifier;
   }
+  console.log('🔍 fetchuser Debug - Query:', query);
   let u = await User.findOne(query);
+  console.log('🔍 fetchuser Debug - User found:', !!u);
+  if (u) {
+    console.log('🔍 fetchuser Debug - User accountType:', u.accountType);
+  }
   if (!u) return null;
   let user = u.toObject({ flattenObjectIds: true });
+  console.log('🔍 fetchuser Debug - Final user object accountType:', user.accountType);
   return user;
 };
 

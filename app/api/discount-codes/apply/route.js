@@ -37,16 +37,33 @@ export async function POST(req) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    console.log('User found:', { email: user.email, accountType: user.accountType });
+
     // Find the discount code
+    console.log('Looking for discount code:', code.toUpperCase());
     const discountCode = await DiscountCode.findOne({ 
       code: code.toUpperCase(),
       isActive: true 
     });
 
+    console.log('Discount code found:', discountCode ? {
+      code: discountCode.code,
+      isActive: discountCode.isActive,
+      description: discountCode.description
+    } : 'Not found');
+
     if (!discountCode) {
+      // Let's also check if code exists but is inactive
+      const inactiveCode = await DiscountCode.findOne({ code: code.toUpperCase() });
+      console.log('Inactive code check:', inactiveCode ? 'Found but inactive' : 'Not found at all');
+      
       return NextResponse.json({ 
         error: 'Invalid discount code',
-        message: 'The discount code you entered is not valid or has expired.'
+        message: 'The discount code you entered is not valid or has expired.',
+        debug: {
+          searchedCode: code.toUpperCase(),
+          foundInactive: !!inactiveCode
+        }
       }, { status: 400 });
     }
 

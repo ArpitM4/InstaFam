@@ -41,8 +41,17 @@ const Navbar = () => {
   useEffect(() => {
     const getUserInfo = async () => {
       if (session?.user?.name) {
+        console.log('🔍 Navbar Debug - Fetching user info for:', session.user.name);
         const user = await fetchuser(session.user.name);
+        console.log('🔍 Navbar Debug - User data received:', user);
+        console.log('🔍 Navbar Debug - Account type:', user?.accountType);
         setAccountType(user?.accountType);
+        
+        // Log the state after setting
+        setTimeout(() => {
+          console.log('🔍 Navbar Debug - AccountType state after setting:', user?.accountType);
+        }, 100);
+        
         // Fetch user points
         try {
           const pointsRes = await fetch('/api/points');
@@ -103,6 +112,7 @@ const Navbar = () => {
             <div className="absolute pb-1 right-0 w-48 bg-black text-white border border-dropdown-border rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-10">
               <Link href="/account" className="block px-5 py-3 hover:bg-dropdown-hover transition">Profile</Link>
               <Link href="/my-fam-points" className="block px-5 py-3 hover:bg-dropdown-hover transition">My Fam Points</Link>
+              {console.log('🔍 Navbar Debug - Rendering dropdown. AccountType:', accountType, 'Is Creator?:', accountType === "Creator")}
               {accountType === "Creator" && (
                 <Link href="/dashboard" className="block px-5 py-3 hover:bg-dropdown-hover transition">Creator Dashboard</Link>
               )}
