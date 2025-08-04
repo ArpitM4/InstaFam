@@ -5,10 +5,13 @@ import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
 import { fetchCreatorVaultItems, redeemVaultItem, fetchRedeemedItems, fetchFanRedemptions } from '@/actions/vaultActions';
+import { useUser } from '@/context/UserContext';
+import { emitPaymentSuccess } from '@/utils/eventBus';
 import { fetchuser } from '@/actions/useractions';
 
 const VaultSection = ({ currentUser }) => {
   const { data: session } = useSession();
+  const { updatePoints } = useUser(); // For updating navbar points
   const [vaultItems, setVaultItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [redeeming, setRedeeming] = useState({});
@@ -185,6 +188,14 @@ const VaultSection = ({ currentUser }) => {
         toast.success('Item redeemed successfully!');
         setUserPoints(prev => prev - item.pointCost);
         setRedeemedItems(prev => [...prev, item._id]);
+        
+        // Update navbar points immediately
+        if (updatePoints) {
+          updatePoints();
+        }
+        
+        // Emit global event for points update
+        emitPaymentSuccess({ pointsSpent: item.pointCost });
         
         // Show appropriate modal based on file type
         if (item.fileType === 'text-reward') {

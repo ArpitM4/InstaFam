@@ -64,6 +64,8 @@ import { useSession, signIn, signOut } from "next-auth/react"
 import "../app/globals.css";
 import { useRouter } from 'next/navigation'
 import { fetchuser, updateProfile } from '@/actions/useractions'
+import { useUser } from '@/context/UserContext'
+import { emitProfileUpdate, emitAccountTypeChange } from '@/utils/eventBus'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bounce } from 'react-toastify';
@@ -73,6 +75,7 @@ const Account = () => {
   const { data: session, update, status } = useSession();
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
+  const { refreshUserData, updateUserData } = useUser(); // For updating user data in navbar
 
   const [form, setForm] = useState({
     name: "",
@@ -147,6 +150,18 @@ const Account = () => {
       setShowNameModal(true); // Open name modal after username
       toast.success("Username set successfully!", { position: "top-right", autoClose: 3000 });
       if (typeof update === 'function') await update();
+      
+      // Emit global profile update event
+      emitProfileUpdate({ username });
+      
+      // Update user data in navbar/context (legacy support)
+      if (refreshUserData) {
+        refreshUserData(true);
+      }
+      if (updateUserData) {
+        updateUserData({ username });
+      }
+      
       getData();
     }
   };
@@ -170,6 +185,18 @@ const Account = () => {
       setShowNameModal(false);
       toast.success("Name set successfully!", { position: "top-right", autoClose: 3000 });
       if (typeof update === 'function') await update();
+      
+      // Emit global profile update event
+      emitProfileUpdate({ name });
+      
+      // Update user data in navbar/context (legacy support)
+      if (refreshUserData) {
+        refreshUserData(true);
+      }
+      if (updateUserData) {
+        updateUserData({ name });
+      }
+      
       getData();
     }
   };
@@ -215,6 +242,22 @@ const Account = () => {
     
     // Trigger onboarding progress update
     await triggerProfileUpdate();
+    
+    // Emit global profile update event
+    emitProfileUpdate(form);
+    
+    // Update user data in navbar/context (legacy support)
+    if (refreshUserData) {
+      refreshUserData(true); // Force refresh
+    }
+    if (updateUserData) {
+      updateUserData(form); // Update with new form data
+    }
+    
+    // If account type changed, emit specific event
+    if (form.accountType && form.accountType !== userData?.accountType) {
+      emitAccountTypeChange(form.accountType);
+    }
     
     toast('Profile Updated', {
       position: "top-right",

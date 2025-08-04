@@ -12,6 +12,8 @@ import { FaPen } from "react-icons/fa";
 import "../app/globals.css"; // Assuming your global styles are here
 
 import { fetchuser, fetchpayments, updateProfile, createEvent, endEvent, fetchEvents } from "@/actions/useractions";
+import { useUser } from "@/context/UserContext";
+import { emitPaymentSuccess } from "@/utils/eventBus";
 import PaymentProfileSection from "./PaymentProfileSection";
 import PaymentInteractionSection from "./PaymentInteractionSection";
 import VaultSection from "./VaultSection";
@@ -82,6 +84,7 @@ const PaymentPage = ({ username }) => {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { updatePoints } = useUser(); // For updating points in navbar
 
   // --- State Management ---
   const [currentUser, setcurrentUser] = useState({});
@@ -432,6 +435,14 @@ const PaymentPage = ({ username }) => {
           toast.success(`Payment successful! You earned ${res.pointsAwarded} Fam Points! 🎉`);
         } else {
           toast.success('Payment successful!');
+        }
+
+        // Emit global payment success event for navbar updates
+        emitPaymentSuccess({ pointsAwarded: res.pointsAwarded });
+
+        // Update points in the navbar immediately (legacy support)
+        if (updatePoints) {
+          updatePoints();
         }
 
         // Refetch payments and update leaderboard - use the same filtering as initial load

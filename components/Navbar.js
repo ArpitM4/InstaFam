@@ -6,8 +6,8 @@ import { FaUser } from "react-icons/fa";
 import { FaMoon, FaSun } from "react-icons/fa";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { fetchuser } from "@/actions/useractions"; // make sure this is working
 import { useTheme } from "@/context/ThemeContext";
+import { useUser } from "@/context/UserContext";
 import NotificationBell from "./NotificationBell";
 
 const Navbar = () => {
@@ -15,57 +15,20 @@ const Navbar = () => {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [accountType, setAccountType] = useState(null);
-  const [userPoints, setUserPoints] = useState(0);
-  const [initialLoad, setInitialLoad] = useState(true);
   const { theme, toggleTheme, ThemeToggle } = useTheme();
+  
+  // Use the UserContext for user data and reactive updates
+  const { 
+    userData, 
+    userPoints, 
+    accountType, 
+    isLoading: userLoading, 
+    isAuthenticated,
+    refreshUserData 
+  } = useUser();
 
-  // Show loading state while session is being fetched, but with a fallback timeout
-  const isLoading = status === "loading" && initialLoad;
-
-  // Set a timeout to stop showing loading after 3 seconds max
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setInitialLoad(false);
-    }, 3000);
-    
-    // Clear loading when status changes to authenticated or unauthenticated
-    if (status === "authenticated" || status === "unauthenticated") {
-      setInitialLoad(false);
-    }
-    
-    return () => clearTimeout(timer);
-  }, [status]);
-
-  // Fetch accountType and points from DB
-  useEffect(() => {
-    const getUserInfo = async () => {
-      if (session?.user?.name) {
-        console.log('🔍 Navbar Debug - Fetching user info for:', session.user.name);
-        const user = await fetchuser(session.user.name);
-        console.log('🔍 Navbar Debug - User data received:', user);
-        console.log('🔍 Navbar Debug - Account type:', user?.accountType);
-        setAccountType(user?.accountType);
-        
-        // Log the state after setting
-        setTimeout(() => {
-          console.log('🔍 Navbar Debug - AccountType state after setting:', user?.accountType);
-        }, 100);
-        
-        // Fetch user points
-        try {
-          const pointsRes = await fetch('/api/points');
-          if (pointsRes.ok) {
-            const pointsData = await pointsRes.json();
-            setUserPoints(pointsData.totalPoints || 0);
-          }
-        } catch (error) {
-          console.error('Failed to fetch points:', error);
-        }
-      }
-    };
-    getUserInfo();
-  }, [session]);
+  // Show loading state while session or user data is being fetched
+  const isLoading = status === "loading" || (isAuthenticated && userLoading);
 
   return (
     <nav className="absolute bg-black shadow-md py-2 z-30 w-full border-b-2 border-dropdown-border">
@@ -112,7 +75,6 @@ const Navbar = () => {
             <div className="absolute pb-1 right-0 w-48 bg-black text-white border border-dropdown-border rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-10">
               <Link href="/account" className="block px-5 py-3 hover:bg-dropdown-hover transition">Profile</Link>
               <Link href="/my-fam-points" className="block px-5 py-3 hover:bg-dropdown-hover transition">My Fam Points</Link>
-              {console.log('🔍 Navbar Debug - Rendering dropdown. AccountType:', accountType, 'Is Creator?:', accountType === "Creator")}
               {accountType === "Creator" && (
                 <Link href="/dashboard" className="block px-5 py-3 hover:bg-dropdown-hover transition">Creator Dashboard</Link>
               )}

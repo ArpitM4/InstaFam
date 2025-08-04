@@ -9,6 +9,7 @@ import GoogleOneTap from "@/components/GoogleOneTap";
 import FloatingCreatorChecklist from "@/components/FloatingCreatorChecklist";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { UserProvider } from "@/context/UserContext";
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
@@ -197,14 +198,16 @@ export default function RootLayout({ children }) {
       <body className="antialiased">
         <SessionWrapper>  
           <ThemeProvider>
-            <PerformanceMonitor />
-            <Navbar />
-            <GoogleOneTap />
-            <FloatingCreatorChecklist />
-            <main role="main">
-              {children}
-            </main>
-            <Footer />
+            <UserProvider>
+              <PerformanceMonitor />
+              <Navbar />
+              <GoogleOneTap />
+              <FloatingCreatorChecklist />
+              <main role="main">
+                {children}
+              </main>
+              <Footer />
+            </UserProvider>
           </ThemeProvider>
           <Analytics />
         </SessionWrapper> 
