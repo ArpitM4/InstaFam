@@ -21,12 +21,37 @@ export async function GET(request) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
+        // ALWAYS auto-complete expired active events first
+        const expiredEventsUpdate = await Event.updateMany(
+            { 
+                creatorId: creator._id, 
+                status: 'active',
+                endTime: { $lt: new Date() } // endTime is in the past
+            },
+            { 
+                status: 'completed'
+            }
+        );
+
+        // If any events were expired, also clear user's event fields
+        if (expiredEventsUpdate.modifiedCount > 0) {
+            await User.updateOne(
+                { _id: creator._id },
+                { 
+                    $unset: { 
+                        eventStart: 1, 
+                        eventEnd: 1 
+                    } 
+                }
+            );
+        }
+
         // Get URL search params
         const { searchParams } = new URL(request.url);
         const action = searchParams.get('action');
 
         if (action === 'current') {
-            // Get current active event
+            // Get current active event (should be none if expired)
             const currentEvent = await Event.findOne({ 
                 creatorId: creator._id, 
                 status: 'active' 

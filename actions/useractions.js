@@ -354,6 +354,12 @@ export const endEvent = async (eventId) => {
     event.endTime = actualEndTime; // Update endTime to actual end time
     await event.save();
 
+    // Also clear eventStart and eventEnd in the User document
+    await User.updateOne(
+      { _id: creator._id },
+      { $set: { eventStart: null, eventEnd: null } }
+    );
+
     // Convert to plain object to avoid serialization issues
     const plainEvent = event.toObject();
     return {
