@@ -1,5 +1,5 @@
 import React from "react";
-import { FaPen, FaSpinner } from "react-icons/fa";
+import { FaPen, FaSpinner, FaExclamationTriangle } from "react-icons/fa";
 import FollowButton from "./FollowButton";
 
 const PaymentProfileSection = ({
@@ -23,6 +23,7 @@ const PaymentProfileSection = ({
   handleSavePerk,
   setcurrentUser,
   isEventActive,
+  setShowBetaPopup,
 }) => {
   return (
     <>
@@ -242,7 +243,14 @@ const PaymentProfileSection = ({
         {/* Event Timer */}
         {currentUser.eventEnd && timeLeft && (
           <div className="mt-3 text-center bg-background/50 text-text/80 text-sm py-2 px-3 rounded-lg shadow-sm">
-            <span className="font-medium text-primary">Event is live!</span> Ends in: <span className="font-medium">{timeLeft}</span>
+            <button
+              onClick={() => setShowBetaPopup && setShowBetaPopup(true)}
+              className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+            >
+              <FaExclamationTriangle className="text-red-500 text-xs" />
+              <span className="font-medium text-red-500">Event is not Live!</span>
+            </button>
+            <span className="ml-2">Ends in: <span className="font-medium">{timeLeft}</span></span>
           </div>
         )}
       </div>

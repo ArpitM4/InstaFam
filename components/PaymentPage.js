@@ -114,6 +114,7 @@ const PaymentPage = ({ username }) => {
   const [isPaying, setIsPaying] = useState(false);
   const [activeTab, setActiveTab] = useState('contribute');
   const [hasError, setHasError] = useState(false);
+  const [showBetaPopup, setShowBetaPopup] = useState(false);
 
   const isOwner = session?.user?.name === username;
 
@@ -276,6 +277,11 @@ const PaymentPage = ({ username }) => {
   };
 
   const handleStartEvent = async () => {
+    // Show beta popup first
+    setShowBetaPopup(true);
+  };
+
+  const proceedWithEventStart = async () => {
     try {
       const durationMs = Number(eventDuration) * 24 * 60 * 60 * 1000;
       const start = new Date();
@@ -328,6 +334,9 @@ const PaymentPage = ({ username }) => {
     } catch (error) {
       console.error('Error starting event:', error);
       toast.error(error.message || 'Failed to start event');
+    } finally {
+      // Close the popup regardless of success or failure
+      setShowBetaPopup(false);
     }
   };
 
@@ -534,8 +543,80 @@ const PaymentPage = ({ username }) => {
     
   const isEventActive = currentUser?.eventStart && currentUser?.eventEnd && new Date(currentUser.eventEnd) > new Date();
 
+  // Beta Popup Component
+  const BetaPopup = () => (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+      <div className="bg-background rounded-2xl border border-text/10 shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-orange-500/10 to-yellow-500/10 p-6 text-center border-b border-text/5">
+          <div className="text-3xl mb-2">🚧</div>
+          <h2 className="text-xl font-bold text-text mb-1">We're Currently in Beta</h2>
+          <p className="text-primary text-sm font-medium">Thank you for checking out InstaFam! 🎉</p>
+        </div>
+        
+        {/* Content */}
+        <div className="p-6 space-y-4">
+          <p className="text-text/80 text-sm leading-relaxed">
+            Right now, we're in the development & testing phase. Our payment gateway is still in test mode, which means transactions will not be processed for real earnings yet.
+          </p>
+          
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <span className="text-orange-400 text-sm mt-0.5">👉</span>
+              <p className="text-text/70 text-sm leading-relaxed">
+                Please do not start creating or sharing your InstaFam page with fans at this stage, as it is not live or active for public use.
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-3">
+              <span className="text-orange-400 text-sm mt-0.5">👉</span>
+              <p className="text-text/70 text-sm leading-relaxed">
+                We're actively onboarding creators and gathering feedback to make the platform stronger before launch.
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-3">
+              <span className="text-orange-400 text-sm mt-0.5">👉</span>
+              <p className="text-text/70 text-sm leading-relaxed">
+                Once we go live, you'll be the first to know and can start hosting events, earning instantly, and sharing your page with your community.
+              </p>
+            </div>
+          </div>
+          
+          <div className="bg-primary/5 rounded-lg p-4 mt-4">
+            <p className="text-text/80 text-sm leading-relaxed">
+              We truly appreciate your patience and support as an early creator — your feedback will help shape InstaFam into the go-to platform for fan-powered growth. 💜
+            </p>
+          </div>
+          
+          <div className="text-center pt-2">
+            <p className="text-text/60 text-xs font-medium">— Team InstaFam</p>
+          </div>
+        </div>
+        
+        {/* Actions */}
+        <div className="bg-background/50 p-4 flex gap-3">
+          <button
+            onClick={() => setShowBetaPopup(false)}
+            className="flex-1 px-4 py-2.5 rounded-lg border border-text/20 text-text/70 hover:bg-text/5 transition-colors text-sm font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={proceedWithEventStart}
+            className="flex-1 px-4 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-white transition-colors text-sm font-medium"
+          >
+            Continue Testing
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <>
+      {/* Beta Popup */}
+      {showBetaPopup && <BetaPopup />}
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -571,6 +652,7 @@ const PaymentPage = ({ username }) => {
           handleSavePerk={handleSavePerk}
           setcurrentUser={setcurrentUser}
           isEventActive={isEventActive}
+          setShowBetaPopup={setShowBetaPopup}
         />
         
         {/* NEW TAB NAVIGATION UI - Replaces the old InteractionSection placement */}

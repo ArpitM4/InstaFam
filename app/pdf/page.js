@@ -95,9 +95,9 @@ const PdfPage = () => {
 
           {/* Exit Fullscreen Button (visible in fullscreen mode) */}
           {isFullscreen && (
-            <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+            <div className={`absolute top-4 right-4 z-[9999] flex items-center gap-2 ${isMobile ? 'top-2 right-2' : 'top-4 right-4'}`}>
               {/* Device indicator in fullscreen */}
-              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-text/10 backdrop-blur-sm">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-black/80 backdrop-blur-sm text-white">
                 {isMobile ? (
                   <>
                     <FaMobile className="text-xs" />
@@ -112,7 +112,7 @@ const PdfPage = () => {
               </div>
               <button
                 onClick={toggleFullscreen}
-                className="px-4 py-2 rounded-lg bg-error/20 hover:bg-error/30 text-error transition-colors duration-200"
+                className={`rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors duration-200 ${isMobile ? 'px-3 py-1.5 text-sm' : 'px-4 py-2'}`}
               >
                 Exit Fullscreen
               </button>
