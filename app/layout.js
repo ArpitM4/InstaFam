@@ -125,6 +125,19 @@ export default function RootLayout({ children }) {
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <script src="https://apis.google.com/js/api.js" async defer></script>
         
+        {/* Google Analytics */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-7JF29P11H7"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-7JF29P11H7');
+            `,
+          }}
+        />
+        
         {/* JSON-LD Organization Schema */}
         <script
           type="application/ld+json"
