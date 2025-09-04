@@ -1,10 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
 import VaultItem from "@/models/VaultItem";
 import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
 import { notifyFollowersNewVaultItem } from "@/utils/notificationHelpers";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 await connectDb();
 

@@ -1,10 +1,13 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import connectDB from '@/db/ConnectDb';
 import User from '@/models/User';
 import DiscountCode from '@/models/DiscountCode';
 import { rateLimitDiscountAttempts, logDiscountCodeUsage } from '@/utils/onboardingSecurity';
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function POST(req) {
   try {

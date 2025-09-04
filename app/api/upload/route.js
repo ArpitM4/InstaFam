@@ -1,9 +1,12 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import cloudinary from 'cloudinary';
 import User from '@/models/User';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/db/ConnectDb';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -84,3 +87,4 @@ export async function POST(req) {
     return NextResponse.json({ error: 'Upload error', details: err.message }, { status: 500 });
   }
 }
+

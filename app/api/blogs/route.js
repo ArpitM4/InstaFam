@@ -6,6 +6,9 @@ import Blog from "@/models/Blog";
 import User from "@/models/User";
 import { revalidatePath } from 'next/cache';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 // Hardcoded admin emails - Update this array with your admin emails
 const ADMIN_EMAILS = ['arpitmahatpure@gmail.com', 'arpitmaurya1506@gmail.com', 'chiragbhandarlap@gmail.com']; // Add your admin emails here
 

@@ -1,7 +1,10 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import connectDB from '@/db/ConnectDb';
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 // Create a simple analytics event model
 const analyticsEvents = []; // In production, this would be a database
@@ -29,7 +32,7 @@ export async function POST(req) {
       analyticsEvents.shift();
     }
 
-    console.log('📊 Analytics Event Tracked:', analyticsEvent);
+    console.log('ðŸ“Š Analytics Event Tracked:', analyticsEvent);
 
     return NextResponse.json({ success: true, eventId: analyticsEvent.id });
 

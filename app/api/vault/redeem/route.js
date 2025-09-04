@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
@@ -6,6 +6,9 @@ import VaultItem from "@/models/VaultItem";
 import Redemption from "@/models/Redemption";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { notifyVaultRedeemed } from "@/utils/notificationHelpers";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 await connectDb();
 
@@ -61,7 +64,7 @@ export async function POST(request) {
       $inc: { points: -vaultItem.pointCost }
     });
 
-    // Add earnings to creator (1 point = ₹1)
+    // Add earnings to creator (1 point = â‚¹1)
     await User.findByIdAndUpdate(vaultItem.creatorId, {
       $inc: { vaultEarningsBalance: vaultItem.pointCost }
     });

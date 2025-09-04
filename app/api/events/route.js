@@ -6,6 +6,9 @@ import User from "@/models/User";
 import { getServerSession } from "next-auth";
 import { nextAuthConfig } from "../auth/[...nextauth]/route";
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
     try {
         await connectDB();

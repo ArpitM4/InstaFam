@@ -1,5 +1,8 @@
-import connectDb from "@/db/ConnectDb";
+﻿import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(req) {
   await connectDb();
@@ -13,3 +16,4 @@ export async function GET(req) {
 
   return Response.json(creators);
 }
+

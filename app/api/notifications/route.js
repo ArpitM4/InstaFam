@@ -1,8 +1,11 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { nextAuthConfig } from '../auth/[...nextauth]/route';
 import Notification from '@/models/Notification';
 import connectDB from '@/db/ConnectDb';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 // GET - Fetch user's notifications
 export async function GET(request) {
@@ -80,3 +83,4 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Failed to create notification' }, { status: 500 });
   }
 }
+

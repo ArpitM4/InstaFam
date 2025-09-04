@@ -1,8 +1,11 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { nextAuthConfig } from '../../auth/[...nextauth]/route';
 import Notification from '@/models/Notification';
 import connectDB from '@/db/ConnectDb';
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 // PUT - Mark all notifications as read
 export async function PUT(request) {

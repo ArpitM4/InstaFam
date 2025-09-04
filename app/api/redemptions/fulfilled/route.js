@@ -1,9 +1,12 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
 import Redemption from "@/models/Redemption";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 await connectDb();
 

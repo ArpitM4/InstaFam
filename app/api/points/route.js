@@ -6,6 +6,9 @@ import User from '@/models/User';
 import PointTransaction from '@/models/PointTransaction';
 import Payment from '@/models/Payment';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function GET(req) {
   try {
     console.log('Points API: Starting request...');

@@ -6,6 +6,9 @@ import User from "@/models/User";
 import PointTransaction from "@/models/PointTransaction";
 import connectDB from "@/db/ConnectDb";
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 const getAccessToken = async () => {
   const auth = Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`).toString("base64");
   const response = await fetch(`${process.env.PAYPAL_API_BASE}/v1/oauth2/token`, {

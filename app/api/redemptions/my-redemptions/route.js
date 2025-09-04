@@ -6,6 +6,9 @@ import Redemption from "@/models/Redemption";
 import VaultItem from "@/models/VaultItem";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 await connectDb();
 
 export async function GET(request) {

@@ -5,6 +5,9 @@ import User from '@/models/User';
 import connectDB from '@/db/ConnectDb';
 import { notifyNewFollower } from '@/utils/notificationHelpers';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 // POST - Follow/Unfollow a user
 export async function POST(request, { params }) {
   try {

@@ -1,10 +1,13 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/db/ConnectDb';
 import User from '@/models/User';
 import Payment from '@/models/Payment';
 import PointTransaction from '@/models/PointTransaction';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function POST(req) {
   await dbConnect();
@@ -39,7 +42,7 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Points already awarded for this payment' }, { status: 400 });
     }
 
-    // Calculate points earned (₹10 = 1 point, so amount * 0.1)
+    // Calculate points earned (â‚¹10 = 1 point, so amount * 0.1)
     const pointsEarned = Math.floor(payment.amount * 0.1);
 
     // Update user's total points
@@ -67,3 +70,4 @@ export async function POST(req) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

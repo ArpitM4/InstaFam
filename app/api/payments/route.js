@@ -1,6 +1,9 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import Payment from "@/models/Payment";
 import connectDB from "@/db/ConnectDb";
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(req) {
   await connectDB();
@@ -45,3 +48,4 @@ export async function GET(req) {
 
   return NextResponse.json(safePayments);
 }
+

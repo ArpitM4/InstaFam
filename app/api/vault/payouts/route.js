@@ -5,6 +5,9 @@ import User from "@/models/User";
 import Redemption from "@/models/Redemption";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 await connectDb();
 
 export async function GET(request) {

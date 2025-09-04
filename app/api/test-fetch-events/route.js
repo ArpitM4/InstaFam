@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { fetchEvents } from '@/actions/useractions';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     console.log('Testing fetchEvents function...');

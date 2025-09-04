@@ -1,7 +1,10 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import Notification from '@/models/Notification';
 import connectDB from '@/db/ConnectDb';
 import mongoose from 'mongoose';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 // Simple test endpoint without authentication
 export async function POST(request) {
@@ -73,3 +76,4 @@ export async function GET() {
     }, { status: 500 });
   }
 }
+

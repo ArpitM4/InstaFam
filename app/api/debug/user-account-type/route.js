@@ -1,8 +1,11 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import connectDB from '@/db/ConnectDb';
 import User from '@/models/User';
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function GET(req) {
   try {
@@ -13,17 +16,17 @@ export async function GET(req) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    console.log('🔍 Debug API - Session user:', session.user);
+    console.log('ðŸ” Debug API - Session user:', session.user);
 
     // Find user by email
     const user = await User.findOne({ email: session.user.email });
-    console.log('🔍 Debug API - User found:', !!user);
+    console.log('ðŸ” Debug API - User found:', !!user);
     
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    console.log('🔍 Debug API - User accountType:', user.accountType);
+    console.log('ðŸ” Debug API - User accountType:', user.accountType);
 
     return NextResponse.json({
       success: true,

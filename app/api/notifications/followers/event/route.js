@@ -1,9 +1,12 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { nextAuthConfig } from '../../../auth/[...nextauth]/route';
 import User from '@/models/User';
 import connectDB from '@/db/ConnectDb';
 import { notifyFollowersNewEvent } from '@/utils/notificationHelpers';
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 // POST - Notify followers about a new event
 export async function POST(request) {
