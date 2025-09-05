@@ -19,7 +19,9 @@ InstaFam is a comprehensive creator monetization platform built with Next.js 14,
 - **Event Management**: Time-based donation events with custom durations
 - **Flexible Perk System**: Creators can set custom top N donors (1-100) for perk eligibility
 
-### **🎁 Vault & Rewards System**
+
+### **🎁 Bonus & Rewards System**
+- **Bonus System**: Creators receive monthly bonuses based on vault activity and engagement
 - **Creator Vaults**: Digital and physical perk offerings
 - **Smart Redemption**: Points-based redemption with Q&A system
 - **Perk Leaderboard**: Visual indicators for perk-eligible donors with golden styling
@@ -186,13 +188,15 @@ db/
 - Privacy controls (follower counts hidden from public)
 - Automatic notifications for followers
 
+
 ### **Dashboard System**
 - Route-based dashboard (/dashboard, /dashboard/payment, etc.)
 - Modular components (broken down from 1500+ lines)
 - Creator analytics and settings
 - Payment information management
 
-### **Vault System**
+### **Bonus System**
+- Monthly bonus requests and payouts for creators
 - Vault item creation and management
 - Redemption system with Q&A functionality
 - Creator response system
@@ -214,18 +218,23 @@ db/
 - **Payment**: Razorpay integration
 - **Session Management**: NextAuth with custom callbacks
 
+
 ## 📊 **Current Database Relations**
 
 - **Users** have followers/following arrays
 - **Notifications** reference Users (recipient/sender)
 - **VaultItems** belong to Users (creators)
 - **Redemptions** link Users (fans) to VaultItems
+- **Bonuses** track monthly creator bonuses
 - **Payments** track transactions between Users
 
 This structure supports a full social media platform with creator monetization, fan engagement, and real-time notifications.
 - A MongoDB instance (local or cloud-based like MongoDB Atlas)
 - A PayPal account to handle payments.
 - Google & GitHub OAuth credentials for social logins.
+# 🕒 **Automated Vault Request Refunds**
+
+Expired vault requests (older than 30 days and still pending) are automatically refunded to users via a scheduled cron job. No manual action is required—refunds are processed daily to ensure user protection and system reliability.
 
 ### 1. Clone the Repository
 
