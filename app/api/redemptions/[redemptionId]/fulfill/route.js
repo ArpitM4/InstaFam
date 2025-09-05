@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
 import Redemption from "@/models/Redemption";
+import Bonus from "@/models/Bonus";
+import VaultItem from "@/models/VaultItem";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 await connectDb();
@@ -37,16 +39,39 @@ export async function PUT(request, { params }) {
       _id: redemptionId,
       creatorId: creator._id,
       status: 'Pending'
-    });
+    }).populate('vaultItemId', 'title').populate('fanId', 'username name');
 
     if (!redemption) {
       return NextResponse.json({ error: "Redemption not found, already fulfilled, or unauthorized" }, { status: 404 });
     }
 
+    const fulfilledAt = new Date();
+
     // Update redemption status to fulfilled
     await Redemption.findByIdAndUpdate(redemptionId, {
       status: 'Fulfilled',
-      fulfilledAt: new Date()
+      fulfilledAt: fulfilledAt
+    });
+
+    // Now add this fulfilled redemption to the bonus record
+    const currentMonth = fulfilledAt.getMonth() + 1;
+    const currentYear = fulfilledAt.getFullYear();
+    
+    // Get or create monthly bonus record
+    const bonus = await Bonus.getOrCreateMonthlyBonus(
+      creator._id,
+      creator.username,
+      currentMonth,
+      currentYear
+    );
+
+    // Add this redemption to the bonus record
+    await bonus.addRedemption({
+      redemptionId: redemption._id,
+      fanUsername: redemption.fanId?.username || redemption.fanId?.name || 'Unknown',
+      vaultItemTitle: redemption.vaultItemId?.title || 'Unknown Item',
+      famPointsSpent: redemption.pointsSpent,
+      redeemedAt: fulfilledAt
     });
 
     return NextResponse.json({ 

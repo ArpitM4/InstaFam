@@ -237,6 +237,11 @@ const Account = () => {
       toast.error("Username is mandatory.", { position: "top-right", autoClose: 3000 });
       return;
     }
+
+    // Get current user data to compare account type changes
+    const currentUser = await fetchuser(session.user.email);
+    const isChangingToCreator = currentUser?.accountType === "User" && form.accountType === "Creator";
+    
     let a = await updateProfile(form, session.user.name);
     await update();
     
@@ -255,7 +260,7 @@ const Account = () => {
     }
     
     // If account type changed, emit specific event
-    if (form.accountType && form.accountType !== userData?.accountType) {
+    if (form.accountType && form.accountType !== currentUser?.accountType) {
       emitAccountTypeChange(form.accountType);
     }
     
@@ -265,6 +270,13 @@ const Account = () => {
       theme: "light",
       transition: Bounce,
     });
+
+    // Redirect to dashboard if user changed from User to Creator
+    if (isChangingToCreator) {
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 1500); // Delay to show the success toast
+    }
   };
 
   // Simple minimal loading screen

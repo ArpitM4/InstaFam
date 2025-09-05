@@ -29,7 +29,7 @@ const redemptionSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['Pending', 'Fulfilled'],
+    enum: ['Pending', 'Fulfilled', 'Unfulfilled'],
     default: 'Pending'
   },
   fanInput: {
@@ -41,6 +41,9 @@ const redemptionSchema = new Schema({
     maxlength: 2000 // Allow longer responses from creators
   },
   fulfilledAt: {
+    type: Date
+  },
+  expiredAt: {
     type: Date
   }
 }, {

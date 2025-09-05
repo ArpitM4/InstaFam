@@ -4,6 +4,7 @@ import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
 import VaultItem from "@/models/VaultItem";
 import Redemption from "@/models/Redemption";
+import Bonus from "@/models/Bonus";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { notifyVaultRedeemed } from "@/utils/notificationHelpers";
 
@@ -64,10 +65,8 @@ export async function POST(request) {
       $inc: { points: -vaultItem.pointCost }
     });
 
-    // Add earnings to creator (1 point = â‚¹1)
-    await User.findByIdAndUpdate(vaultItem.creatorId, {
-      $inc: { vaultEarningsBalance: vaultItem.pointCost }
-    });
+    // Note: We no longer add earnings directly to creator
+    // Instead, we track FamPoints through the bonus system
 
     // Increment unlock count
     await VaultItem.findByIdAndUpdate(vaultItem._id, {
@@ -88,6 +87,33 @@ export async function POST(request) {
     });
 
     await redemption.save();
+
+    // Update monthly bonus record for the creator ONLY if it's fulfilled
+    if (isDigitalFile) { // Only for auto-fulfilled digital files
+      const now = new Date();
+      const currentMonth = now.getMonth() + 1;
+      const currentYear = now.getFullYear();
+      
+      // Get creator details
+      const creator = await User.findById(vaultItem.creatorId);
+      
+      // Get or create monthly bonus record
+      const bonus = await Bonus.getOrCreateMonthlyBonus(
+        vaultItem.creatorId,
+        creator.username,
+        currentMonth,
+        currentYear
+      );
+
+      // Add this redemption to the bonus record
+      await bonus.addRedemption({
+        redemptionId: redemption._id,
+        fanUsername: fan.username || fan.name,
+        vaultItemTitle: vaultItem.title,
+        famPointsSpent: vaultItem.pointCost,
+        redeemedAt: redemption.fulfilledAt // Use fulfilledAt date
+      });
+    }
 
     // Send notification to creator for non-digital items that require action
     if (!isDigitalFile) {

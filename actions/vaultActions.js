@@ -168,3 +168,14 @@ export const fetchFulfilledRedemptions = async () => {
     return { success: false, error: 'Failed to fetch fulfilled redemptions' };
   }
 };
+
+export const fetchExpiredRedemptions = async () => {
+  try {
+    const response = await fetch('/api/redemptions/expired');
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error fetching expired redemptions:', error);
+    return { success: false, error: 'Failed to fetch expired redemptions' };
+  }
+};

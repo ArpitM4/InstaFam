@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { fetchPendingRedemptions, fulfillRedemption, submitCreatorAnswer, fetchFulfilledRedemptions } from "@/actions/vaultActions";
+import { fetchPendingRedemptions, fulfillRedemption, submitCreatorAnswer, fetchFulfilledRedemptions, fetchExpiredRedemptions } from "@/actions/vaultActions";
 import { toast } from 'react-toastify';
 
 const VaultRequests = () => {
   const [pendingRedemptions, setPendingRedemptions] = useState([]);
   const [fulfilledRedemptions, setFulfilledRedemptions] = useState([]);
+  const [expiredRedemptions, setExpiredRedemptions] = useState([]);
   const [redemptionsLoading, setRedemptionsLoading] = useState(false);
   const [activeRequestsTab, setActiveRequestsTab] = useState('pending');
   const [creatorResponses, setCreatorResponses] = useState({});
@@ -44,11 +45,27 @@ const VaultRequests = () => {
     }
   };
 
+  const loadExpiredRedemptions = async () => {
+    try {
+      setRedemptionsLoading(true);
+      const result = await fetchExpiredRedemptions();
+      if (result.success) {
+        setExpiredRedemptions(result.redemptions);
+      }
+    } catch (error) {
+      console.error('Error loading expired redemptions:', error);
+    } finally {
+      setRedemptionsLoading(false);
+    }
+  };
+
   const loadRedemptions = async () => {
     if (activeRequestsTab === 'pending') {
       await loadPendingRedemptions();
-    } else {
+    } else if (activeRequestsTab === 'fulfilled') {
       await loadFulfilledRedemptions();
+    } else if (activeRequestsTab === 'expired') {
+      await loadExpiredRedemptions();
     }
   };
 
@@ -173,6 +190,24 @@ const VaultRequests = () => {
             </span>
           )}
         </button>
+        <button
+          onClick={() => {
+            setActiveRequestsTab('expired');
+            loadRedemptions();
+          }}
+          className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            activeRequestsTab === 'expired'
+              ? 'bg-primary text-text shadow-sm'
+              : 'text-text/70 hover:text-text hover:bg-text/5'
+          }`}
+        >
+          Expired Requests
+          {expiredRedemptions.length > 0 && (
+            <span className="ml-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+              {expiredRedemptions.length}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* Pending Redemptions */}
@@ -199,7 +234,9 @@ const VaultRequests = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {pendingRedemptions.map((redemption) => (
+              {[...pendingRedemptions]
+                .sort((a, b) => new Date(a.redeemedAt) - new Date(b.redeemedAt))
+                .map((redemption) => (
                 <div key={redemption._id} className="bg-dropdown-hover rounded-lg p-4 px-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -363,6 +400,87 @@ const VaultRequests = () => {
                       )}
                     </div>
                   )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Expired Redemptions */}
+      {activeRequestsTab === 'expired' && (
+        <section className="bg-text/5 border-text/10 rounded-lg p-6">
+          <h3 className="text-xl font-semibold mb-4">
+            Expired Requests 
+            {expiredRedemptions.length > 0 && (
+              <span className="ml-2 bg-orange-500 text-white text-sm px-3 py-1 rounded-full">
+                {expiredRedemptions.length}
+              </span>
+            )}
+          </h3>
+          
+          {redemptionsLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin h-8 w-8 rounded-full border-2 border-primary border-t-transparent mx-auto mb-2"></div>
+              <p className="text-text/60">Loading expired requests...</p>
+            </div>
+          ) : expiredRedemptions.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-4xl mb-2">⏰</div>
+              <p className="text-text/60">No expired requests. Keep up the good work fulfilling requests on time!</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {expiredRedemptions.map((redemption) => (
+                <div key={redemption._id} className="bg-dropdown-hover rounded-lg p-4 px-6 border-l-4 border-orange-500">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h4 className="text-lg font-semibold text-primary mb-2">
+                        {redemption.vaultItemId.title}
+                      </h4>
+                      <div className="flex items-center gap-4 text-sm text-text/60">
+                        <span className="flex items-center gap-1">
+                          👤 <strong>{redemption.fanId.username}</strong>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          📅 Requested: {new Date(redemption.redeemedAt).toLocaleDateString()}
+                        </span>
+                        <span className="flex items-center gap-1 text-orange-600">
+                          ⏰ Expired: {new Date(redemption.expiredAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Expired Status Badge */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-xs font-medium">
+                      Expired & Refunded
+                    </span>
+                    <span className="text-xs text-text/60">
+                      {redemption.pointsSpent} FamPoints refunded to fan
+                    </span>
+                  </div>
+
+                  {/* Fan Input if it was a Q&A item */}
+                  {redemption.vaultItemId.requiresFanInput && redemption.fanInput && (
+                    <div className="space-y-3">
+                      <h5 className="text-sm font-medium text-text/70 uppercase tracking-wide">
+                        Fan's Question
+                      </h5>
+                      <div className="bg-background/30 rounded-lg p-4">
+                        <p className="text-text/90 leading-relaxed">
+                          {redemption.fanInput}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                    <p className="text-sm text-orange-800">
+                      <strong>⚠️ Request expired:</strong> This request was not fulfilled within 30 days and the fan has been automatically refunded their FamPoints.
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>

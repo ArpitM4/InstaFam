@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
 import Redemption from "@/models/Redemption";
+import Bonus from "@/models/Bonus";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export const runtime = 'nodejs';
@@ -29,35 +30,112 @@ export async function GET(request) {
       return NextResponse.json({ error: "Access denied. Creator account required." }, { status: 403 });
     }
 
-    // Get current vault earnings balance from user model
-    let vaultEarningsBalance = creator.vaultEarningsBalance || 0;
-
-    // Calculate current month earnings from redemptions (fallback for existing data)
+    // Calculate current month FamPoints
     const now = new Date();
     const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     
-    // Fetch all redemptions for this creator with populated data
-    const redemptions = await Redemption.find({ creatorId: creator._id })
+    // Fetch all FULFILLED redemptions for this creator with populated data
+    const redemptions = await Redemption.find({ 
+      creatorId: creator._id,
+      status: 'Fulfilled', // Only count fulfilled redemptions
+      fulfilledAt: { $exists: true, $ne: null } // Must have fulfilledAt date
+    })
       .populate('fanId', 'username name')
       .populate('vaultItemId', 'title pointCost')
-      .sort({ redeemedAt: -1 })
+      .sort({ fulfilledAt: -1 }) // Sort by fulfilled date, not redeemed date
       .lean();
 
-    // Calculate current month earnings from redemptions
-    const currentMonthRedemptions = redemptions.filter(redemption => 
-      new Date(redemption.redeemedAt) >= currentMonthStart
-    );
-    
-    const currentMonthEarnings = currentMonthRedemptions.reduce((sum, redemption) => 
-      sum + (redemption.pointsSpent || 0), 0
-    );
+    console.log(`Found ${redemptions.length} fulfilled redemptions for creator ${creator.username}`);
 
-    // If vaultEarningsBalance is 0 but we have current month earnings, use the calculated amount
-    if (vaultEarningsBalance === 0 && currentMonthEarnings > 0) {
-      vaultEarningsBalance = currentMonthEarnings;
+    // Calculate current month FamPoints from fulfilled redemptions only
+    const currentMonthRedemptions = redemptions.filter(redemption => {
+      const fulfilledDate = new Date(redemption.fulfilledAt);
+      return fulfilledDate >= currentMonthStart;
+    });
+    
+    console.log(`Current month fulfilled redemptions: ${currentMonthRedemptions.length}`);
+    
+    const currentMonthFamPoints = currentMonthRedemptions.reduce((sum, redemption) => {
+      const points = parseInt(redemption.pointsSpent) || 0;
+      console.log(`Adding ${points} points from redemption ${redemption._id}`);
+      return sum + points;
+    }, 0);
+
+    console.log(`Current month FamPoints total: ${currentMonthFamPoints}`);
+
+    // Calculate total FamPoints redeemed from fulfilled redemptions only
+    const totalFamPointsRedeemed = redemptions.reduce((sum, redemption) => {
+      const points = parseInt(redemption.pointsSpent) || 0;
+      return sum + points;
+    }, 0);
+
+    console.log(`Total FamPoints redeemed: ${totalFamPointsRedeemed}`);
+
+    // Create bonus records for all months that have fulfilled redemptions
+    const monthlyRedemptionGroups = {};
+    
+    // Group redemptions by month/year
+    redemptions.forEach(redemption => {
+      const fulfilledDate = new Date(redemption.fulfilledAt);
+      const monthKey = `${fulfilledDate.getFullYear()}-${fulfilledDate.getMonth() + 1}`;
+      
+      if (!monthlyRedemptionGroups[monthKey]) {
+        monthlyRedemptionGroups[monthKey] = {
+          year: fulfilledDate.getFullYear(),
+          month: fulfilledDate.getMonth() + 1,
+          redemptions: []
+        };
+      }
+      
+      monthlyRedemptionGroups[monthKey].redemptions.push(redemption);
+    });
+
+    console.log(`Found ${Object.keys(monthlyRedemptionGroups).length} months with redemptions`);
+
+    // Create/update bonus records for each month
+    for (const [monthKey, groupData] of Object.entries(monthlyRedemptionGroups)) {
+      const bonus = await Bonus.getOrCreateMonthlyBonus(
+        creator._id,
+        creator.username,
+        groupData.month,
+        groupData.year
+      );
+
+      // Reset and rebuild the bonus record to ensure accuracy
+      await bonus.resetRedemptions();
+
+      for (const redemption of groupData.redemptions) {
+        await bonus.addRedemption({
+          redemptionId: redemption._id,
+          fanUsername: redemption.fanId?.username || redemption.fanId?.name || 'Unknown',
+          vaultItemTitle: redemption.vaultItemId?.title || 'Unknown Item',
+          famPointsSpent: parseInt(redemption.pointsSpent) || 0,
+          redeemedAt: redemption.fulfilledAt
+        });
+      }
+
+      console.log(`Updated bonus for ${groupData.month}/${groupData.year} with ${groupData.redemptions.length} redemptions`);
     }
 
-    // Calculate next payout date (first day of next month)
+    // Also ensure current month exists even if no redemptions
+    if (!monthlyRedemptionGroups[`${now.getFullYear()}-${now.getMonth() + 1}`]) {
+      await Bonus.getOrCreateMonthlyBonus(
+        creator._id, 
+        creator.username, 
+        now.getMonth() + 1, 
+        now.getFullYear()
+      );
+    }
+
+    // Get updated monthly bonus records after creation/updates
+    const monthlyBonuses = await Bonus.find({ creatorId: creator._id })
+      .sort({ year: -1, month: -1 })
+      .lean();
+
+    console.log(`Found ${monthlyBonuses.length} bonus records for creator ${creator.username}:`, 
+      monthlyBonuses.map(b => `${b.month}/${b.year}: ${b.totalFamPointsRedeemed} FP, Status: ${b.status}`));
+
+    // Calculate next bonus period date (first day of next month)
     const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
     const nextPayoutDate = nextMonth.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -68,22 +146,30 @@ export async function GET(request) {
     // Transform redemption data for the frontend
     const redemptionHistory = redemptions.map(redemption => ({
       id: redemption._id,
-      date: redemption.redeemedAt,
+      date: redemption.fulfilledAt, // Use fulfilledAt instead of redeemedAt
       fanUsername: redemption.fanId?.username || redemption.fanId?.name || 'Unknown',
       vaultItemTitle: redemption.vaultItemId?.title || 'Unknown Item',
-      earnings: redemption.pointsSpent, // 1 point = ₹1
+      famPointsSpent: parseInt(redemption.pointsSpent) || 0, // Ensure it's a number
       status: redemption.status
     }));
+
+    console.log('Final API response data:', {
+      currentMonthFamPoints,
+      totalFamPointsRedeemed,
+      totalRedemptions: redemptions.length,
+      currentMonthRedemptions: currentMonthRedemptions.length
+    });
 
     return NextResponse.json({
       success: true,
       data: {
-        vaultEarningsBalance,
-        currentMonthEarnings,
+        currentMonthFamPoints: currentMonthFamPoints || 0,
+        totalFamPointsRedeemed: totalFamPointsRedeemed || 0,
         nextPayoutDate,
         redemptionHistory,
-        totalRedemptions: redemptions.length,
-        currentMonthRedemptions: currentMonthRedemptions.length
+        totalRedemptions: redemptions.length || 0,
+        currentMonthRedemptions: currentMonthRedemptions.length || 0,
+        monthlyBonuses: monthlyBonuses || []
       }
     });
 

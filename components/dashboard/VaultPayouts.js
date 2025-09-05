@@ -9,12 +9,13 @@ const VaultPayouts = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [payoutData, setPayoutData] = useState({
-    vaultEarningsBalance: 0,
-    currentMonthEarnings: 0,
+    currentMonthFamPoints: 0,
+    totalFamPointsRedeemed: 0,
     nextPayoutDate: '',
     redemptionHistory: [],
     totalRedemptions: 0,
-    currentMonthRedemptions: 0
+    currentMonthRedemptions: 0,
+    monthlyBonuses: []
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -33,6 +34,7 @@ const VaultPayouts = () => {
       const response = await fetch('/api/vault/payouts');
       if (response.ok) {
         const result = await response.json();
+        console.log('API Response:', result.data); // Debug logging
         setPayoutData(result.data);
       } else if (response.status === 403) {
         toast.error("Access denied. Creator account required.");
@@ -48,6 +50,29 @@ const VaultPayouts = () => {
     }
   };
 
+  const requestBonus = async (month, year) => {
+    try {
+      const response = await fetch('/api/vault/request-bonus', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ month, year }),
+      });
+
+      if (response.ok) {
+        toast.success("Bonus request submitted successfully!");
+        fetchPayoutData(); // Refresh data
+      } else {
+        const error = await response.json();
+        toast.error(error.message || "Failed to request bonus");
+      }
+    } catch (error) {
+      console.error('Error requesting bonus:', error);
+      toast.error("Error submitting bonus request");
+    }
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -58,13 +83,28 @@ const VaultPayouts = () => {
     });
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount);
+  const formatFamPoints = (points) => {
+    const numPoints = parseInt(points) || 0;
+    return new Intl.NumberFormat('en-IN').format(numPoints);
+  };
+
+  const getMonthName = (month) => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[month - 1];
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'UnRequested':
+        return 'bg-gray-500/10 text-gray-500';
+      case 'Requested':
+        return 'bg-yellow-500/10 text-yellow-500';
+      case 'Granted':
+        return 'bg-green-500/10 text-green-500';
+      default:
+        return 'bg-gray-500/10 text-gray-500';
+    }
   };
 
   if (status === "loading" || isLoading) {
@@ -78,42 +118,98 @@ const VaultPayouts = () => {
   return (
     <div className="space-y-12">
       <div className="pb-8">
-        <h1 className="text-2xl font-semibold text-primary mb-3">Vault Payouts</h1>
-        <p className="text-text/60 text-sm">Track your earnings from fan vault redemptions</p>
+        <h1 className="text-2xl font-semibold text-primary mb-3">Vault Bonuses</h1>
+        <p className="text-text/60 text-sm">Track your FamPoints from vault redemptions and request monthly bonuses</p>
       </div>
 
-      {/* Current Earnings Section */}
+      {/* Current Month FamPoints Section */}
       <section className="space-y-6">
-        <h3 className="text-lg font-medium text-text/90">Current Month Vault Earnings</h3>
+        <h3 className="text-lg font-medium text-text/90">Current Month Vault Activity</h3>
         <div className="bg-dropdown-hover rounded-xl p-8">
           <div className="text-center">
             <p className="text-4xl font-light text-text mb-2">
-              {formatCurrency(payoutData.vaultEarningsBalance)}
+              {formatFamPoints(payoutData.currentMonthFamPoints || 0)} <span className="text-lg text-primary">FP</span>
             </p>
             <p className="text-text/60 text-sm">
-              Earnings from {payoutData.currentMonthRedemptions} redemptions this month
+              FamPoints from {payoutData.currentMonthRedemptions || 0} redemptions this month
             </p>
-            {payoutData.currentMonthRedemptions !== payoutData.totalRedemptions && (
+            {(payoutData.currentMonthRedemptions || 0) !== (payoutData.totalRedemptions || 0) && (
               <p className="text-text/50 text-xs mt-2">
-                Total: {payoutData.totalRedemptions} redemptions (₹{payoutData.redemptionHistory.reduce((sum, r) => sum + r.earnings, 0)} lifetime earnings)
+                Total: {payoutData.totalRedemptions || 0} redemptions ({formatFamPoints(payoutData.totalFamPointsRedeemed || 0)} FP lifetime)
               </p>
             )}
           </div>
         </div>
       </section>
 
-      {/* Next Payout Section */}
+      {/* Bonus Schedule Section */}
       <section className="space-y-6">
-        <h3 className="text-lg font-medium text-text/90">Payout Schedule</h3>
+        <h3 className="text-lg font-medium text-text/90">Bonus Schedule</h3>
         <div className="bg-dropdown-hover rounded-xl p-6 space-y-4">
           <div className="flex items-center space-x-3">
-            <span className="text-sm text-text/70">Next Payout:</span>
+            <span className="text-sm text-text/70">Next Bonus Period:</span>
             <span className="text-sm font-medium text-primary">{payoutData.nextPayoutDate}</span>
           </div>
           <p className="text-text/60 text-sm">
-            Vault earnings are paid out monthly on the 1st of each month to your registered payment method.
+            Monthly bonuses are calculated based on your FamPoints activity. Request bonuses at the end of each month.
           </p>
         </div>
+
+        {/* Monthly Bonuses Table */}
+        {payoutData.monthlyBonuses && payoutData.monthlyBonuses.length > 0 && (
+          <div className="bg-dropdown-hover rounded-xl p-6">
+            <h4 className="text-md font-medium text-text/90 mb-4">Monthly Bonus History</h4>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-text/10">
+                    <th className="text-left py-3 text-sm font-medium text-text/70">Month</th>
+                    <th className="text-left py-3 text-sm font-medium text-text/70">FamPoints</th>
+                    <th className="text-left py-3 text-sm font-medium text-text/70">Redemptions</th>
+                    <th className="text-left py-3 text-sm font-medium text-text/70">Status</th>
+                    <th className="text-left py-3 text-sm font-medium text-text/70">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payoutData.monthlyBonuses.map((bonus, index) => (
+                    <tr key={index} className="border-b border-text/5">
+                      <td className="py-3 text-sm text-text">
+                        {getMonthName(bonus.month)} {bonus.year}
+                      </td>
+                      <td className="py-3 text-sm text-text">
+                        {formatFamPoints(bonus.totalFamPointsRedeemed)} FP
+                      </td>
+                      <td className="py-3 text-sm text-text">
+                        {bonus.totalRedemptions}
+                      </td>
+                      <td className="py-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(bonus.status)}`}>
+                          {bonus.status}
+                        </span>
+                      </td>
+                      <td className="py-3">
+                        {bonus.status === 'UnRequested' && bonus.totalFamPointsRedeemed > 0 && (
+                          <button
+                            onClick={() => requestBonus(bonus.month, bonus.year)}
+                            className="px-3 py-1 bg-primary text-white text-xs rounded-lg hover:bg-primary/90 transition-colors"
+                          >
+                            Request Bonus
+                          </button>
+                        )}
+                        {bonus.status === 'Requested' && (
+                          <span className="text-xs text-text/50">Pending Review</span>
+                        )}
+                        {bonus.status === 'Granted' && (
+                          <span className="text-xs text-green-500 font-medium">₹{bonus.bonusAmount || 0}</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Redemption History Section */}
@@ -167,8 +263,8 @@ const VaultPayouts = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-green-500 text-sm">
-                      {formatCurrency(redemption.earnings)}
+                    <p className="font-semibold text-primary text-sm">
+                      {formatFamPoints(redemption.famPointsSpent || 0)} FP
                     </p>
                   </div>
                 </div>
@@ -185,19 +281,19 @@ const VaultPayouts = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-dropdown-hover rounded-xl p-6 text-center">
               <p className="text-2xl font-light text-text mb-2">
-                {payoutData.totalRedemptions}
+                {payoutData.totalRedemptions || 0}
               </p>
               <p className="text-text/60 text-sm">Total Redemptions</p>
             </div>
             <div className="bg-dropdown-hover rounded-xl p-6 text-center">
               <p className="text-2xl font-light text-text mb-2">
-                {formatCurrency(payoutData.redemptionHistory.reduce((sum, r) => sum + r.earnings, 0))}
+                {formatFamPoints(payoutData.totalFamPointsRedeemed || 0)} <span className="text-sm text-primary">FP</span>
               </p>
-              <p className="text-text/60 text-sm">Total Earnings</p>
+              <p className="text-text/60 text-sm">Total FamPoints</p>
             </div>
             <div className="bg-dropdown-hover rounded-xl p-6 text-center">
               <p className="text-2xl font-light text-text mb-2">
-                ₹{Math.round(payoutData.redemptionHistory.reduce((sum, r) => sum + r.earnings, 0) / payoutData.totalRedemptions) || 0}
+                {formatFamPoints(Math.round((payoutData.totalFamPointsRedeemed || 0) / (payoutData.totalRedemptions || 1)))} <span className="text-sm text-primary">FP</span>
               </p>
               <p className="text-text/60 text-sm">Avg per Redemption</p>
             </div>

@@ -105,7 +105,7 @@ const DashboardLayout = ({ children }) => {
                       : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
                   }`}
                 >
-                  Vault Payouts
+                  Vault Bonuses
                 </Link>
               </>
             )}

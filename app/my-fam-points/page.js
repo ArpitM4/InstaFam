@@ -229,9 +229,12 @@ const MyFamPointsPage = () => {
                           <div className={`px-3 py-1 rounded-lg text-xs font-medium ${
                             redemption.status === 'Fulfilled'
                               ? 'bg-green-500/20 text-green-400'
+                              : redemption.status === 'Unfulfilled'
+                              ? 'bg-red-500/20 text-red-400'
                               : 'bg-yellow-500/20 text-yellow-400'
                           }`}>
-                            {redemption.status === 'Fulfilled' ? 'Answered' : 'Pending'}
+                            {redemption.status === 'Fulfilled' ? 'Answered' : 
+                             redemption.status === 'Unfulfilled' ? 'Unfulfilled' : 'Pending'}
                           </div>
                         )}
                       </div>
