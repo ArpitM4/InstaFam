@@ -11,7 +11,8 @@ import {
   BarChart3, 
   Menu,
   X,
-  Home
+  Home,
+  TrendingUp
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -40,6 +41,11 @@ const sidebarItems = [
     href: '/admin/dashboard/analytics', 
     icon: BarChart3 
   },
+  { 
+    name: 'Google Analytics', 
+    href: '/admin/dashboard/google-analytics', 
+    icon: TrendingUp 
+  },
 ];
 
 function AdminDashboardLayoutInner({ children }) {
@@ -60,18 +66,7 @@ function AdminDashboardLayoutInner({ children }) {
       <aside className="hidden lg:flex flex-col justify-between w-72 bg-[var(--background)] border-r border-gray-200 dark:border-gray-700 shadow-xl">
         {/* Sidebar header */}
         <div className="flex items-center justify-between h-20 px-6 border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-              <span className="text-[var(--primary)] font-bold text-lg">A</span>
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-white">Admin Panel</h1>
-              <p className="text-xs text-white/80">InstaFam Dashboard</p>
-            </div>
-          </div>
-          <div className="bg-white/20 rounded-lg p-1">
-            <ThemeToggle />
-          </div>
+      
         </div>
         {/* Navigation */}
         <nav className="mt-8 px-4 flex-1">
