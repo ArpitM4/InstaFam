@@ -27,16 +27,16 @@ const vaultItemSchema = new Schema({
   },
   fileUrl: {
     type: String,
-    required: false // Make optional for text-based rewards
+    required: false // Make optional for Q&A rewards
   },
   fileType: {
     type: String,
     required: true,
-    enum: ['image', 'video', 'pdf', 'audio', 'document', 'text-reward']
+    enum: ['image', 'video', 'pdf', 'audio', 'document', 'text-reward', 'promise']
   },
   perkType: {
     type: String,
-    enum: ['DigitalFile', 'Recognition', 'Influence', 'AccessLink'],
+    enum: ['DigitalFile', 'Recognition', 'Influence', 'AccessLink', 'Promise'],
     required: true,
     default: 'DigitalFile'
   },

@@ -203,7 +203,7 @@ const MyFamPointsPage = () => {
             ) : (
               <div className="space-y-4">
                 {redemptions.map((redemption, index) => {
-                  const isQandA = redemption.fanInput && redemption.vaultItemId.fileType === 'text-reward';
+                  const isQandA = redemption.fanInput && (redemption.vaultItemId.fileType === 'text-reward' || redemption.vaultItemId.fileType === 'promise');
                   const isExpanded = expandedRedemptions.has(redemption._id);
                   const hasCreatorResponse = redemption.creatorResponse && redemption.status === 'Fulfilled';
 
@@ -306,7 +306,7 @@ const MyFamPointsPage = () => {
                       ) : (
                         <>
                           {/* Non-Q&A Content */}
-                          {redemption.vaultItemId.fileType !== 'text-reward' && (
+                          {redemption.vaultItemId.fileType !== 'text-reward' && redemption.vaultItemId.fileType !== 'promise' && (
                             <button
                               onClick={() => {
                                 const link = document.createElement('a');

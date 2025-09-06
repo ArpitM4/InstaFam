@@ -29,12 +29,24 @@ export async function POST(request) {
     // Determine perkType based on fileType if not provided
     let finalPerkType = perkType;
     if (!finalPerkType) {
-      finalPerkType = fileType === 'text-reward' ? 'Recognition' : 'DigitalFile';
+      if (fileType === 'text-reward') {
+        finalPerkType = 'Recognition';
+      } else if (fileType === 'promise') {
+        finalPerkType = 'Promise';
+      } else {
+        finalPerkType = 'DigitalFile';
+      }
     }
 
-    // For non-text rewards, fileUrl is required
-    if (fileType !== 'text-reward' && !fileUrl) {
-      return NextResponse.json({ error: "File URL is required for non-text rewards" }, { status: 400 });
+    // For non-digital file rewards, fileUrl is optional
+    if (fileType !== 'text-reward' && fileType !== 'promise' && !fileUrl) {
+      return NextResponse.json({ error: "File URL is required for digital file rewards" }, { status: 400 });
+    }
+
+    // For Q&A and Promise rewards, always require fan input
+    let finalRequiresFanInput = requiresFanInput;
+    if (fileType === 'text-reward' || fileType === 'promise') {
+      finalRequiresFanInput = true;
     }
 
     // Find the creator by email (session uses email)
@@ -57,7 +69,7 @@ export async function POST(request) {
       fileUrl,
       fileType: fileType,
       perkType: finalPerkType,
-      requiresFanInput: Boolean(requiresFanInput)
+      requiresFanInput: Boolean(finalRequiresFanInput)
     });
 
     await vaultItem.save();

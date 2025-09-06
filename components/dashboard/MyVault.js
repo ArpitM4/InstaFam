@@ -35,13 +35,16 @@ const MyVault = () => {
     if (method === 'none') {
       perkType = 'Recognition';
       fileType = 'text-reward';
+    } else if (method === 'promise') {
+      perkType = 'Promise';
+      fileType = 'promise';
     }
     
     setNewVaultItem(prev => ({
       ...prev,
       perkType,
       fileType,
-      requiresFanInput: method === 'none'
+      requiresFanInput: (method === 'none' || method === 'promise') ? true : prev.requiresFanInput
     }));
   };
 
@@ -198,7 +201,9 @@ const MyVault = () => {
               onChange={handleVaultItemChange}
               className="w-full p-3 rounded-xl bg-background text-text focus:ring-2 focus:ring-primary outline-none transition-all resize-none"
               placeholder={uploadMethod === 'none' 
-                ? "Describe the reward/perk fans will receive (e.g., 'Your name will be featured in my next video credits')" 
+                ? "Describe your Q&A reward (e.g., 'I'll answer your question in my next video' or 'Personal video response to your question')" 
+                : uploadMethod === 'promise'
+                ? "Describe your promise (e.g., 'Shoutout in my next video', 'Meet & greet at next event', 'Custom social media post about you')"
                 : "Describe what fans will get when they unlock this item..."
               }
               rows="3"
@@ -207,9 +212,9 @@ const MyVault = () => {
             />
           </div>
 
-          {/* Content Source Selection */}
+          {/* Item Type Selection */}
           <div className="mb-4">
-            <label className="block mb-3 text-text/70 font-medium text-sm">Content Source</label>
+            <label className="block mb-3 text-text/70 font-medium text-sm">Item Type</label>
             <div className="flex items-center gap-6 mb-4">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -242,7 +247,18 @@ const MyVault = () => {
                   onChange={() => handleUploadMethodChange('none')}
                   className="w-4 h-4 text-primary bg-background focus:ring-primary focus:ring-2"
                 />
-                <span className="text-text/70">Text-Based Reward</span>
+                <span className="text-text/70">Q&A</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="uploadMethod"
+                  value="promise"
+                  checked={uploadMethod === 'promise'}
+                  onChange={() => handleUploadMethodChange('promise')}
+                  className="w-4 h-4 text-primary bg-background focus:ring-primary focus:ring-2"
+                />
+                <span className="text-text/70">Promise</span>
               </label>
             </div>
 
@@ -276,33 +292,39 @@ const MyVault = () => {
                   placeholder="https://res.cloudinary.com/..."
                 />
               </div>
+            ) : uploadMethod === 'none' ? (
+              <div className="p-4 bg-primary/10 rounded-xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-medium text-primary">Q&A</span>
+                </div>
+                <p className="text-text/60 text-sm">
+                  Perfect for Q&A sessions, personalized messages, or any reward that requires fan interaction.
+                  [The fans will be given an Input to ask the Question Directly through InstaFam]
+                </p>
+              </div>
+            ) : uploadMethod === 'promise' ? (
+              <div className="p-4 bg-green-500/10 rounded-xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-medium text-green-500">Promise</span>
+                </div>
+                <p className="text-text/60 text-sm">
+                  Make commitments to your fans like shoutouts in videos, social media posts, meetups, or other personal promises.
+                </p>
+              </div>
             ) : (
               <div className="p-4 bg-primary/10 rounded-xl">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="font-medium text-primary">Text-Based Reward</span>
+                  <span className="font-medium text-primary">Q&A</span>
                 </div>
-                <p className="text-text/60 text-sm mb-4">
-                  Perfect for recognition, influence, or access rewards that don't require file attachments.
+                <p className="text-text/60 text-sm">
+                  Perfect for Q&A sessions, personalized messages, or any reward that requires fan interaction.
+                  [The fans will be given an Input to ask the Question Directly through InstaFam]
                 </p>
-                
-                <div>
-                  <label className="block mb-2 text-text/70 font-medium text-sm">Reward Type</label>
-                  <select
-                    name="perkType"
-                    value={newVaultItem.perkType}
-                    onChange={handleVaultItemChange}
-                    className="w-full p-3 rounded-xl bg-background text-text focus:ring-2 focus:ring-primary outline-none transition-all"
-                  >
-                    <option value="Recognition">Recognition</option>
-                    <option value="Influence">Influence</option>
-                    <option value="AccessLink">Access Link</option>
-                  </select>
-                </div>
               </div>
             )}
           </div>
 
-          {uploadMethod !== 'none' && (
+          {uploadMethod !== 'none' && uploadMethod !== 'promise' && (
             <div>
               <label className="block mb-2 text-text/70 font-medium text-sm">File Type</label>
               <select
@@ -317,26 +339,6 @@ const MyVault = () => {
                 <option value="audio">Audio</option>
                 <option value="document">Document</option>
               </select>
-            </div>
-          )}
-
-          {uploadMethod === 'none' && (
-            <div className="p-4 bg-dropdown-hover rounded-xl">
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="requiresFanInput"
-                  checked={newVaultItem.requiresFanInput}
-                  onChange={handleVaultItemChange}
-                  className="mt-1 w-4 h-4 text-primary bg-background rounded focus:ring-primary focus:ring-2"
-                />
-                <div>
-                  <span className="text-text/70 font-medium">This perk requires input from the fan</span>
-                  <p className="text-text/50 text-sm mt-1">
-                    Check this if fans need to provide information (like their name for credits, question for Q&A, etc.)
-                  </p>
-                </div>
-              </label>
             </div>
           )}
 

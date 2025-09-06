@@ -74,7 +74,7 @@ export async function POST(request) {
     });
 
     // Create redemption record
-    const isDigitalFile = vaultItem.fileType !== 'text-reward';
+    const isDigitalFile = vaultItem.fileType !== 'text-reward' && vaultItem.fileType !== 'promise';
     
     const redemption = new Redemption({
       fanId: fan._id,

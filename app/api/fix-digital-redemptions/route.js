@@ -12,7 +12,7 @@ export async function POST() {
     let updatedCount = 0;
     
     for (const redemption of pendingRedemptions) {
-      if (redemption.vaultItemId && redemption.vaultItemId.fileType !== 'text-reward') {
+      if (redemption.vaultItemId && redemption.vaultItemId.fileType !== 'text-reward' && redemption.vaultItemId.fileType !== 'promise') {
         // This is a Digital File that should be automatically fulfilled
         await Redemption.findByIdAndUpdate(redemption._id, {
           status: 'Fulfilled',

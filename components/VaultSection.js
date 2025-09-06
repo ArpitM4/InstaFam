@@ -99,17 +99,11 @@ const VaultSection = ({ currentUser }) => {
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
     
-    const getInputPlaceholder = (perkType) => {
-      switch (perkType) {
-        case 'Recognition':
-          return 'Enter your name or message for the shout-out...';
-        case 'Influence':
-          return 'Submit your question or vote...';
-        case 'AccessLink':
-          return 'Provide any required details...';
-        default:
-          return 'Enter your input...';
+    const getInputPlaceholder = (item) => {
+      if (item.fileType === 'promise') {
+        return 'Provide any additional details or preferences for this promise...';
       }
+      return 'Enter your question or message for the creator...';
     };
 
     modal.innerHTML = `
@@ -128,7 +122,7 @@ const VaultSection = ({ currentUser }) => {
             id="fanInput" 
             class="w-full p-3 bg-background text-text rounded-lg focus:outline-none transition-all duration-200 border-0 placeholder-text/40" 
             rows="3" 
-            placeholder="${getInputPlaceholder(item.perkType)}"
+            placeholder="${getInputPlaceholder(item)}"
             maxlength="1000"
           ></textarea>
           <div class="text-xs text-text/60 mt-1">
@@ -198,7 +192,7 @@ const VaultSection = ({ currentUser }) => {
         emitPaymentSuccess({ pointsSpent: item.pointCost });
         
         // Show appropriate modal based on file type
-        if (item.fileType === 'text-reward') {
+        if (item.fileType === 'text-reward' || item.fileType === 'promise') {
           showStatusModal(item, 'Pending');
         } else {
           showDownloadModal(item, result.downloadUrl || item.fileUrl);
@@ -286,8 +280,8 @@ const VaultSection = ({ currentUser }) => {
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
     
-    if (item.fileType === 'text-reward') {
-      // Special modal for text-based rewards
+    if (item.fileType === 'text-reward' || item.fileType === 'promise') {
+      // Special modal for Q&A and Promise rewards
       modal.innerHTML = `
         <div class="bg-dropdown-hover p-6 rounded-lg max-w-md mx-4 text-center">
           <div class="flex items-center justify-center mb-4">
@@ -304,7 +298,7 @@ const VaultSection = ({ currentUser }) => {
             ''
           }
           <p class="text-xs text-text/50 mb-4">
-            This is a text-based reward. Follow the instructions above or contact the creator for more details.
+            This is a ${item.fileType === 'promise' ? 'Promise' : 'Q&A'} reward. Follow the instructions above or contact the creator for more details.
           </p>
           <button onclick="this.parentElement.parentElement.remove()" 
                   class="block w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md">
@@ -346,6 +340,7 @@ const VaultSection = ({ currentUser }) => {
       // case 'audio': return '🎵';
       // case 'document': return '📝';
       // case 'text-reward': return '⭐';
+      // case 'promise': return '🤝';
       // default: return '📁';
     }
   };
@@ -436,9 +431,10 @@ const VaultSection = ({ currentUser }) => {
                 ) : isRedeemed ? (
                   (() => {
                     const redemptionInfo = redemptionStatuses[item._id];
-                    const isTextBasedReward = item.fileType === 'text-reward';
-                    
-                    if (!isTextBasedReward) {
+                    const isQnAReward = item.fileType === 'text-reward';
+                    const isPromiseReward = item.fileType === 'promise';
+
+                    if (!isQnAReward && !isPromiseReward) {
                       // Digital files (upload/URL) show download button
                       return (
                         <button
@@ -449,7 +445,7 @@ const VaultSection = ({ currentUser }) => {
                         </button>
                       );
                     } else {
-                      // Text-based rewards (Recognition/Influence/AccessLink) show status
+                      // Q&A and Promise rewards show status
                       const status = redemptionInfo?.status || 'Pending';
                       const isPending = status === 'Pending';
                       
