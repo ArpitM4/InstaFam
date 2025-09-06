@@ -53,19 +53,95 @@ InstaFam is a comprehensive creator monetization platform built with Next.js 14,
 - **Accessibility**: ARIA labels and keyboard navigation support
 - **Theme Support**: Light/dark mode ready architecture
 
-## 📁 **Root Directory Structure**
+## 📁 **Latest Folder Structure**
 
 ```
 InstaFam/
 ├── app/                          # Next.js 14 App Router
+│   ├── admin/                    # Admin dashboard & analytics
+│   │   └── dashboard/
+│   │       ├── analytics/
+│   │       ├── bonus/
+│   │       ├── google-analytics/
+│   │       ├── search/
+│   │       ├── verification/
+│   │       └── page.js
+│   ├── dashboard/                # Creator dashboard
+│   │   ├── payment/
+│   │   ├── requests/
+│   │   ├── vault/
+│   │   ├── vault-payouts/
+│   │   └── page.js
+│   ├── api/                      # API routes (auth, vault, payments, etc.)
+│   ├── blogs/
+│   ├── explore/
+│   ├── login/
+│   ├── signup/
+│   ├── [username]/               # Dynamic creator profiles
+│   └── ...                       # Other pages (about, contact, etc.)
 ├── components/                   # React Components
-├── models/                       # MongoDB Models
+│   ├── admin/
+│   ├── dashboard/
+│   ├── Account.js
+│   ├── Dashboard.js
+│   ├── DashboardLayout.js
+│   ├── FollowButton.js
+│   ├── Footer.js
+│   ├── Navbar.js
+│   ├── NotificationBell.js
+│   ├── PaymentInteractionSection.js
+│   ├── PaymentPage.js
+│   ├── PaymentProfileSection.js
+│   ├── SessionWrapper.js
+│   ├── VaultSection.js
+│   └── ...
 ├── actions/                      # Server Actions
+│   ├── notificationActions.js
+│   ├── useractions.js
+│   ├── vaultActions.js
+├── models/                       # MongoDB Models
+│   ├── Blog.js
+│   ├── Bonus.js
+│   ├── Event.js
+│   ├── Notification.js
+│   ├── Payment.js
+│   ├── PointTransaction.js
+│   ├── Redemption.js
+│   ├── User.js
+│   ├── VaultItem.js
+│   └── ...
+├── db/                           # Database Configuration
+│   ├── ConnectDb.js
+│   └── mongodb.js
+├── public/                       # Static Assets
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── next.svg
+│   ├── site.webmanifest
+│   ├── Text.png
+│   ├── vercel.svg
+│   ├── vid.mp4
+│   ├── window.svg
+│   └── ...
+├── scripts/                      # Migration & utility scripts
+│   ├── migrate_payments_to_userid.cjs
+│   ├── migrate_payments_to_userid.js
+│   ├── migrate_payments_to_userid.mjs
+│   └── ...
 ├── utils/                        # Utility Functions
-├── db/                          # Database Configuration
-├── public/                      # Static Assets
-├── styles/                      # CSS/Styling
-└── scripts/                     # Database Migration Scripts
+│   ├── loadrazorpay.js
+│   ├── loadStripe.js
+│   ├── notificationHelpers.js
+│   └── ...
+├── context/                      # React Contexts
+│   ├── FastAuthContext.js
+│   ├── ThemeContext.js
+├── hooks/                        # Custom React Hooks
+│   ├── useAuthSession.js
+│   ├── usePreloadUserData.js
+├── .env.local                    # Environment variables
+├── README.md                     # Project documentation
+└── ...
 ```
 
 ## 🚀 **App Directory (Next.js 14 App Router)**
@@ -169,44 +245,26 @@ db/
 └── ConnectDb.js               # MongoDB connection setup
 ```
 
-## 📋 **Key Features Implemented**
 
-### **Authentication System**
-- NextAuth with Google OAuth
-- Session management across app
-- Protected routes and API endpoints
+## 📋 **Latest Features**
 
-### **Notification System**
-- Real-time notification bell with unread counts
-- Creator-fan interaction notifications
-- Event and vault item notifications for followers
-- System/admin message capability
+- **Multi-provider OAuth** (Google, GitHub) via NextAuth.js
+- **Role-based dashboards** for creators and admins
+- **Admin dashboard** with analytics, bonus management, verification, and search
+- **Google Analytics integration** for site-wide stats
+- **Monthly bonus system** for creators based on vault activity
+- **Vault system** for digital/physical perks, redemptions, and Q&A
+- **Real-time notification system** (polling, grouping, event alerts)
+- **Payment integrations** (PayPal, Razorpay)
+- **Points-based economy** (FamPoints)
+- **Creator profiles** with dynamic routing
+- **Explore, search, and follow system**
+- **Responsive UI** with Tailwind CSS, light/dark mode
+- **Accessibility and error boundaries**
+- **Automated refunds for expired vault requests**
+- **Comprehensive API routes for all features**
 
-### **Follow System**
-- Follow/unfollow functionality
-- Bi-directional following (followers/following arrays)
-- Privacy controls (follower counts hidden from public)
-- Automatic notifications for followers
-
-
-### **Dashboard System**
-- Route-based dashboard (/dashboard, /dashboard/payment, etc.)
-- Modular components (broken down from 1500+ lines)
-- Creator analytics and settings
-- Payment information management
-
-### **Bonus System**
-- Monthly bonus requests and payouts for creators
-- Vault item creation and management
-- Redemption system with Q&A functionality
-- Creator response system
-- Points-based economy
-
-### **Creator Profile System**
-- Dynamic creator pages (/{username})
-- Payment integration
-- Event management
-- Vault display and redemption
+For more details, see the feature sections above and the codebase for implementation specifics.
 
 ## � **Technical Stack**
 
