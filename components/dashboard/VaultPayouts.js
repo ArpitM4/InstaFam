@@ -34,6 +34,7 @@ const VaultPayouts = () => {
       const response = await fetch('/api/vault/payouts');
       if (response.ok) {
         const result = await response.json();
+        console.log('API Response:', result.data); // Debug logging
         setPayoutData(result.data);
       } else if (response.status === 403) {
         toast.error("Access denied. Creator account required.");
@@ -42,6 +43,7 @@ const VaultPayouts = () => {
         toast.error("Failed to fetch payout data");
       }
     } catch (error) {
+      console.error('Error fetching payout data:', error);
       toast.error("Error loading payout data");
     } finally {
       setIsLoading(false);
