@@ -25,7 +25,12 @@ export async function POST(req) {
   const file = formData.get('file');
   const type = formData.get('type'); // 'profilepic', 'coverpic', or undefined for vault
 
+  console.log('API /api/upload called');
+  console.log('Received file:', file ? file.name : null, 'type:', file ? file.type : null, 'size:', file ? file.size : null);
+  console.log('Received type:', type);
+
   if (!file) {
+    console.log('No file received');
     return NextResponse.json({ error: 'Missing file' }, { status: 400 });
   }
 
@@ -58,9 +63,12 @@ export async function POST(req) {
       uploadOptions.unique_filename = true;
     }
 
+    console.log('Uploading to Cloudinary with options:', uploadOptions);
     const result = await cloudinary.v2.uploader.upload(dataUri, uploadOptions);
-    
+    console.log('Cloudinary upload result:', result);
+
     if (!result || !result.secure_url) {
+      console.log('Cloudinary upload failed, result:', result);
       return NextResponse.json({ error: 'Cloudinary upload failed' }, { status: 500 });
     }
 
@@ -71,13 +79,14 @@ export async function POST(req) {
         { [type]: result.secure_url },
         { new: true }
       );
-      return NextResponse.json({ success: true, url: result.secure_url, user });
+      console.log('Profile/cover pic updated for user:', user?.email);
+      return NextResponse.json({ success: true, secure_url: result.secure_url, user });
     }
 
-    // For vault uploads, just return the URL
+    // For vault uploads, always return secure_url for frontend compatibility
     return NextResponse.json({ 
       success: true, 
-      url: result.secure_url,
+      secure_url: result.secure_url,
       resourceType: resourceType,
       originalName: file.name,
       size: file.size

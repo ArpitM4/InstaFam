@@ -44,7 +44,7 @@ const MyVault = () => {
       ...prev,
       perkType,
       fileType,
-      requiresFanInput: (method === 'none' || method === 'promise') ? true : prev.requiresFanInput
+      requiresFanInput: method === 'none' ? true : false
     }));
   };
 
@@ -97,17 +97,44 @@ const MyVault = () => {
 
     try {
       setVaultLoading(true);
+      console.log('handleAddVaultItem called');
+      console.log('uploadMethod:', uploadMethod);
+      console.log('selectedFile:', selectedFile);
 
+      // Upload file to Cloudinary if needed
       if (uploadMethod === 'upload' && selectedFile) {
-        // Handle file upload logic here if needed
-        // For now, we'll use the existing file URL approach
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        // Optionally, you can add a type field if needed
+        // formData.append('type', 'vault');
+        console.log('Uploading file to /api/upload...');
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+        console.log('Upload response status:', res.status);
+        const data = await res.json();
+        console.log('Upload response data:', data);
+        if (data.secure_url) {
+          finalFileUrl = data.secure_url;
+        } else {
+          toast.error(data.error || 'File upload failed');
+          setVaultLoading(false);
+          return;
+        }
       }
 
+      console.log('Submitting vault item:', {
+        ...newVaultItem,
+        fileUrl: finalFileUrl,
+        fileType: finalFileType
+      });
       const result = await addVaultItem({
         ...newVaultItem,
         fileUrl: finalFileUrl,
         fileType: finalFileType
       });
+      console.log('Vault item add result:', result);
 
       if (result.success) {
         toast.success('Vault item added successfully!');
@@ -128,7 +155,7 @@ const MyVault = () => {
       }
     } catch (error) {
       toast.error('Error adding vault item');
-      console.error(error);
+      console.error('Vault item add error:', error);
     } finally {
       setVaultLoading(false);
     }
@@ -429,7 +456,7 @@ const MyVault = () => {
                         <span className="text-text/50 text-xs">
                           {item.fileType.toUpperCase()}
                         </span>
-                        {item.requiresFanInput && (
+                        {item.requiresFanInput && item.fileType !== 'promise' && (
                           <span className="bg-blue-500/20 text-text px-2 py-1 rounded-lg text-xs" title="Requires fan input">
                             Input Required
                           </span>
@@ -482,7 +509,7 @@ const MyVault = () => {
                         <span className="text-text/50 text-xs">
                           {item.fileType.toUpperCase()}
                         </span>
-                        {item.requiresFanInput && (
+                        {item.requiresFanInput && item.fileType !== 'promise' && (
                           <span className="bg-text/20 text-text/50 px-2 py-1 rounded-lg text-xs" title="Required fan input">
                             Input Required
                           </span>

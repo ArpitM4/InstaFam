@@ -75,6 +75,8 @@ export async function POST(request) {
 
     // Create redemption record
     const isDigitalFile = vaultItem.fileType !== 'text-reward' && vaultItem.fileType !== 'promise';
+    const isPromise = vaultItem.fileType === 'promise';
+    const isAutoFulfilled = isDigitalFile || isPromise; // Both digital files and promises are auto-fulfilled
     
     const redemption = new Redemption({
       fanId: fan._id,
@@ -82,14 +84,14 @@ export async function POST(request) {
       vaultItemId: vaultItem._id,
       pointsSpent: vaultItem.pointCost,
       fanInput: fanInput ? fanInput.trim() : null,
-      status: isDigitalFile ? 'Fulfilled' : 'Pending', // Auto-fulfill digital files
-      fulfilledAt: isDigitalFile ? new Date() : null // Set fulfillment date for digital files
+      status: isAutoFulfilled ? 'Fulfilled' : 'Pending', // Auto-fulfill digital files and promises
+      fulfilledAt: isAutoFulfilled ? new Date() : null // Set fulfillment date for auto-fulfilled items
     });
 
     await redemption.save();
 
     // Update monthly bonus record for the creator ONLY if it's fulfilled
-    if (isDigitalFile) { // Only for auto-fulfilled digital files
+    if (isAutoFulfilled) { // For both digital files and promises
       const now = new Date();
       const currentMonth = now.getMonth() + 1;
       const currentYear = now.getFullYear();

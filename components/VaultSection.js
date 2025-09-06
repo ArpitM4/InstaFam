@@ -86,10 +86,11 @@ const VaultSection = ({ currentUser }) => {
     }
 
     // Check if fan input is required
-    if (item.requiresFanInput) {
-      showInputModal(item);
-      return;
-    }
+    // Removed fan input logic for Promise rewards
+    // if (item.requiresFanInput) {
+    //   showInputModal(item);
+    //   return;
+    // }
 
     // Proceed with direct redemption
     await processRedemption(item, null);
@@ -100,9 +101,10 @@ const VaultSection = ({ currentUser }) => {
     modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
     
     const getInputPlaceholder = (item) => {
-      if (item.fileType === 'promise') {
-        return 'Provide any additional details or preferences for this promise...';
-      }
+    // Removed placeholder for promise input
+    // if (item.fileType === 'promise') {
+    //   return 'Provide any additional details or preferences for this promise...';
+    // }
       return 'Enter your question or message for the creator...';
     };
 
@@ -192,9 +194,10 @@ const VaultSection = ({ currentUser }) => {
         emitPaymentSuccess({ pointsSpent: item.pointCost });
         
         // Show appropriate modal based on file type
-        if (item.fileType === 'text-reward' || item.fileType === 'promise') {
+        if (item.fileType === 'text-reward') {
           showStatusModal(item, 'Pending');
         } else {
+          // For media and promise rewards, fulfill immediately
           showDownloadModal(item, result.downloadUrl || item.fileUrl);
         }
       } else {
@@ -280,25 +283,23 @@ const VaultSection = ({ currentUser }) => {
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
     
-    if (item.fileType === 'text-reward' || item.fileType === 'promise') {
-      // Special modal for Q&A and Promise rewards
+    if (item.fileType === 'text-reward') {
+      // Special modal for Q&A rewards only - removed for Promise rewards
+    } else if (item.fileType === 'promise') {
+      // Promise reward modal
       modal.innerHTML = `
         <div class="bg-dropdown-hover p-6 rounded-lg max-w-md mx-4 text-center">
           <div class="flex items-center justify-center mb-4">
-            <span class="text-3xl mr-2">⭐</span>
-            <h3 class="text-xl font-light text-primary">Reward Unlocked!</h3>
+            <span class="text-3xl mr-2">🤝</span>
+            <h3 class="text-xl font-light text-primary">Promise Unlocked!</h3>
           </div>
           <p class="mb-4 text-text/60">You've successfully unlocked:</p>
-          <div class="bg-primary/20 p-4 rounded-lg mb-4">
-            <h4 class="font-medium text-primary mb-2">${item.title}</h4>
+          <div class="bg-green-500/20 p-4 rounded-lg mb-4">
+            <h4 class="font-medium text-green-500 mb-2">${item.title}</h4>
             <p class="text-text/70 text-sm">${item.description}</p>
           </div>
-          ${item.requiresFanInput ? 
-            '<div class="bg-secondary/20 p-3 rounded-lg mb-4"><p class="text-xs text-secondary font-medium">📝 This reward requires your input! Please contact the creator to provide the necessary information.</p></div>' : 
-            ''
-          }
           <p class="text-xs text-text/50 mb-4">
-            This is a ${item.fileType === 'promise' ? 'Promise' : 'Q&A'} reward. Follow the instructions above or contact the creator for more details.
+            This promise will be fulfilled by the creator. Check back or contact them for updates!
           </p>
           <button onclick="this.parentElement.parentElement.remove()" 
                   class="block w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md">
@@ -399,7 +400,7 @@ const VaultSection = ({ currentUser }) => {
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">{getFileTypeIcon(item.fileType)}</span>
-                    {item.requiresFanInput && (
+                    {item.requiresFanInput && item.fileType !== 'promise' && (
                       <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-lg">
                         Input Required
                       </span>
@@ -432,20 +433,19 @@ const VaultSection = ({ currentUser }) => {
                   (() => {
                     const redemptionInfo = redemptionStatuses[item._id];
                     const isQnAReward = item.fileType === 'text-reward';
-                    const isPromiseReward = item.fileType === 'promise';
 
-                    if (!isQnAReward && !isPromiseReward) {
-                      // Digital files (upload/URL) show download button
+                    if (!isQnAReward) {
+                      // Digital files and Promise rewards show download/view button
                       return (
                         <button
                           onClick={() => showDownloadModal(item, item.fileUrl)}
                           className="w-full bg-secondary text-background py-2 px-4 rounded-lg hover:bg-secondary/90 transition-colors shadow-sm"
                         >
-                          📱 View Content
+                          {item.fileType === 'promise' ? '🤝 View Promise' : '📱 View Content'}
                         </button>
                       );
                     } else {
-                      // Q&A and Promise rewards show status
+                      // Only Q&A rewards show status
                       const status = redemptionInfo?.status || 'Pending';
                       const isPending = status === 'Pending';
                       

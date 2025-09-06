@@ -43,10 +43,12 @@ export async function POST(request) {
       return NextResponse.json({ error: "File URL is required for digital file rewards" }, { status: 400 });
     }
 
-    // For Q&A and Promise rewards, always require fan input
+    // Only Q&A rewards require fan input, not Promise rewards
     let finalRequiresFanInput = requiresFanInput;
-    if (fileType === 'text-reward' || fileType === 'promise') {
+    if (fileType === 'text-reward') {
       finalRequiresFanInput = true;
+    } else if (fileType === 'promise') {
+      finalRequiresFanInput = false;
     }
 
     // Find the creator by email (session uses email)
