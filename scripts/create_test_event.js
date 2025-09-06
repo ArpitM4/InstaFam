@@ -15,7 +15,7 @@ async function createTestEvent() {
     
     // Find the user first
     const user = await db.collection('users').findOne({
-  email: process.env.ADMIN_EMAILS?.split(',')[1] || ''
+  email: process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')[1] || ''
     });
     
     if (!user) {

@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // Admin emails - Update this with your admin emails
-const ADMIN_EMAILS = process.env.ADMIN_EMAILS?.split(',') || [];
+const ADMIN_EMAILS = process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',') || [];
 
 export async function GET(req) {
   try {
@@ -19,7 +19,7 @@ export async function GET(req) {
     }
 
     // Check if user is admin
-    if (!ADMIN_EMAILS.includes(session.user.email)) {
+  if (!ADMIN_EMAILS.includes(session.user.email)) {
       return NextResponse.json({ message: 'Access denied. Admin only.' }, { status: 403 });
     }
 

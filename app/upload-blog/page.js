@@ -24,7 +24,7 @@ import "easymde/dist/easymde.min.css";
 import ReactMarkdown from 'react-markdown';
 
 // Hardcoded admin emails - Update this array with your admin emails
-const ADMIN_EMAILS = process.env.ADMIN_EMAILS?.split(',') || [];
+const ADMIN_EMAILS = process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',') || [];
 
 const UploadBlogPage = () => {
   const { data: session, status } = useSession();

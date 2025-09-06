@@ -8,7 +8,7 @@ export async function POST() {
     await connectDB();
     
     // Get the test user
-  const testUser = await User.findOne({ email: process.env.ADMIN_EMAILS?.split(',')[1] || '' });
+  const testUser = await User.findOne({ email: process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')[1] || '' });
     
     if (!testUser) {
       return NextResponse.json({

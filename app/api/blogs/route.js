@@ -10,7 +10,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // Hardcoded admin emails - Update this array with your admin emails
-const ADMIN_EMAILS = process.env.ADMIN_EMAILS?.split(',') || [];
+const ADMIN_EMAILS = process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',') || []; // Updated to use NEXT_PUBLIC_ADMIN_EMAILS
 
 // Helper function to generate URL-friendly slug
 function generateSlug(title) {
@@ -57,7 +57,7 @@ export async function POST(request) {
     }
 
     // Admin check
-    if (!ADMIN_EMAILS.includes(session.user.email)) {
+  if (!ADMIN_EMAILS.includes(session.user.email)) {
       return NextResponse.json(
         { success: false, error: 'Access denied. Admin privileges required.' },
         { status: 403 }

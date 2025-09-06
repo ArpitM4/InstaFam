@@ -5,7 +5,7 @@ import connectDB from "@/db/ConnectDb";
 import Blog from "@/models/Blog";
 
 // Hardcoded admin emails - should match other API routes
-const ADMIN_EMAILS = process.env.ADMIN_EMAILS?.split(',') || [];
+const ADMIN_EMAILS = process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',') || []; // Updated to use NEXT_PUBLIC_ADMIN_EMAILS
 
 export async function GET(request, { params }) {
   try {
@@ -19,7 +19,7 @@ export async function GET(request, { params }) {
     }
 
     // Admin check
-    if (!ADMIN_EMAILS.includes(session.user.email)) {
+  if (!ADMIN_EMAILS.includes(session.user.email)) {
       return NextResponse.json(
         { success: false, error: 'Access denied. Admin privileges required.' },
         { status: 403 }

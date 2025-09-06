@@ -5,8 +5,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
-// Hardcoded admin emails - should match the API
-const ADMIN_EMAILS = process.env.ADMIN_EMAILS?.split(',') || [];
+// Use NEXT_PUBLIC_ADMIN_EMAILS for client-side access
+const ADMIN_EMAILS = (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_ADMIN_EMAILS)
+  ? process.env.NEXT_PUBLIC_ADMIN_EMAILS.split(',')
+  : [];
 
 const AdminBlogActions = ({ blog, onDelete }) => {
   const { data: session } = useSession();
