@@ -45,7 +45,6 @@ export async function GET(request) {
       .sort({ fulfilledAt: -1 }) // Sort by fulfilled date, not redeemed date
       .lean();
 
-    console.log(`Found ${redemptions.length} fulfilled redemptions for creator ${creator.username}`);
 
     // Calculate current month FamPoints from fulfilled redemptions only
     const currentMonthRedemptions = redemptions.filter(redemption => {
@@ -53,15 +52,12 @@ export async function GET(request) {
       return fulfilledDate >= currentMonthStart;
     });
     
-    console.log(`Current month fulfilled redemptions: ${currentMonthRedemptions.length}`);
     
     const currentMonthFamPoints = currentMonthRedemptions.reduce((sum, redemption) => {
       const points = parseInt(redemption.pointsSpent) || 0;
-      console.log(`Adding ${points} points from redemption ${redemption._id}`);
       return sum + points;
     }, 0);
 
-    console.log(`Current month FamPoints total: ${currentMonthFamPoints}`);
 
     // Calculate total FamPoints redeemed from fulfilled redemptions only
     const totalFamPointsRedeemed = redemptions.reduce((sum, redemption) => {
@@ -69,7 +65,6 @@ export async function GET(request) {
       return sum + points;
     }, 0);
 
-    console.log(`Total FamPoints redeemed: ${totalFamPointsRedeemed}`);
 
     // Create bonus records for all months that have fulfilled redemptions
     const monthlyRedemptionGroups = {};
@@ -90,7 +85,6 @@ export async function GET(request) {
       monthlyRedemptionGroups[monthKey].redemptions.push(redemption);
     });
 
-    console.log(`Found ${Object.keys(monthlyRedemptionGroups).length} months with redemptions`);
 
     // Create/update bonus records for each month
     for (const [monthKey, groupData] of Object.entries(monthlyRedemptionGroups)) {
@@ -114,7 +108,6 @@ export async function GET(request) {
         });
       }
 
-      console.log(`Updated bonus for ${groupData.month}/${groupData.year} with ${groupData.redemptions.length} redemptions`);
     }
 
     // Also ensure current month exists even if no redemptions
@@ -132,8 +125,6 @@ export async function GET(request) {
       .sort({ year: -1, month: -1 })
       .lean();
 
-    console.log(`Found ${monthlyBonuses.length} bonus records for creator ${creator.username}:`, 
-      monthlyBonuses.map(b => `${b.month}/${b.year}: ${b.totalFamPointsRedeemed} FP, Status: ${b.status}`));
 
     // Calculate next bonus period date (first day of next month)
     const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
@@ -153,12 +144,6 @@ export async function GET(request) {
       status: redemption.status
     }));
 
-    console.log('Final API response data:', {
-      currentMonthFamPoints,
-      totalFamPointsRedeemed,
-      totalRedemptions: redemptions.length,
-      currentMonthRedemptions: currentMonthRedemptions.length
-    });
 
     return NextResponse.json({
       success: true,
@@ -174,7 +159,6 @@ export async function GET(request) {
     });
 
   } catch (error) {
-    console.error("Error fetching vault payouts:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "instafam-448410",
+  "private_key_id": "879e20de66efd93ea69ed2659d46885e7d71711a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCtAXbChPZolUNX\nsxZZfl1UELKa8lDOPNNagl8u9dtRyuWxaZ+lnupl1v1r3uaYsYLfRcMJmBx1J5GE\nEDhQ6j/5J4egmjdp4JeIfsxaw0sd8qymCGe5tdpzBeIcS4bAn0NB6kNOPMvspYuC\nJ2ErJotT2lLBVSbRLzkJlBc20nRAjkaE3QIN7VkpU8BBQF/SQxChqfLISngcbTvW\nfNLuQ4WNKGp6rFu+9wRcNJ7U3fSroETF/rJgTCT/rtyy4XcSr2+9ciChcW5rjuno\nc5eFaFlWsL5CIrMzhEfbv7jOo3tzQhpd9B1hy/qNEHyxef0GBaxXeLP9qxdcUTjh\nfKw0SCcHAgMBAAECggEAEEed/En0wfyhvKPui3dXoux7UhdRQUb6AH9aI5ohDD5S\nhPJSgoxEtFaZvEfaXS3/CbGP29xDeUbC67F3Cy4v3Os6WQOKCV2IBOEhq7zK2cOX\nOXx6/j+9katRDqaQxJl4A8DemoMgEWG2kgXQn/XdkINv3B9+KpsN+/fCg3ckV1qk\nXy9T/0oJ/b9wT8BVabCiJJAr+td5eunTcAD507z8XFN0ofVHWnut9uJt7AresjBQ\nWiQy9ITLsGBUYwJRwcvZPjackt6IsdYO8yq2nUwk85wR1tZ50jYMZ0aS5wwBidhY\nQVNW34p7UgCnUWtGuMnb6ETpZKTeH9gkBGdN9BlwQQKBgQDea8qPZMEYSf3hQ9G2\nmOU94e64jpsCe3cnGkZcz9Hpw6Dw7+WI31m7a3i6m/d82Vz68aL4SU3X+x2zEp63\nmqhATObIgspRKJQJUhYuPf1jgOBvZn4H5SOWIjalLCliLvbqP6eeNsyfYCBeF15f\nNsmES6dd/gsUc+Fcx+RMNREppwKBgQDHH9nRp41rbihp65jfBY76wfW8XNOaOcBk\ncaQuxd3TBpmTTaz9o9Y4RVvs64gqUT7TAWAKQoHsqb1XJlq1qtqvAE3Ktl88IXL6\ncIVFaay0LLIm+DCeKPtBtsFRK40LiGCFRYs2R3WgpTJ7lY74bQlmmSvNkcaAfdMz\ntSqFdwADoQKBgQCZAdYK5uje6Ke5+4mc73lkJLSwSYnhH0ZMpAqbdmuVQHrKxH1G\ntz9navtWhEywmmcYSnouC199oMZBliGRdNchxMVOUosTYbLU5p9TmFljxhifCgbR\nL5RXh5nH7qVZYa2CX9/TOydwzBP4JmNJZMskM1cjlcvRehYiWXB37FmuKQKBgE8O\nCylcbx3+vxbGTYwFpe1SQiCFbhEl6oc2Quu67MWSMji0NwEAIdV3W/ak0AuU8+9L\n9Xg9TV3LSfumo47KhUXDRh875nV2BjL9pzuWp9VkhVpJYOv58z70sq1qL/YrL77Z\njFqBZmbgDznXd8qTZ48PMr/Lp1ZuHgLCY15Xj27hAoGAJWBuZfxduGXweEeNtPWD\nHR9inQUcV3/Rnutg3dNtedXPfxOEKm7er7NWcLlnOCD0k6lSZoyXx2i/Wpcnu5on\njMgtClEUr4/gSZ0VpJO7s2llApk+sWH0SLT8d37Fz5php3JL5H0jnGN0Prw9i2ed\ntURjZOh5LKjLJN72rwAqmAA=\n-----END PRIVATE KEY-----\n",
+  "client_email": "instafam@instafam-448410.iam.gserviceaccount.com",
+  "client_id": "108675579420497540353",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/instafam%40instafam-448410.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
