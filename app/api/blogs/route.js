@@ -10,7 +10,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // Hardcoded admin emails - Update this array with your admin emails
-const ADMIN_EMAILS = ['arpitmahatpure@gmail.com', 'arpitmaurya1506@gmail.com', 'chiragbhandarlap@gmail.com']; // Add your admin emails here
+const ADMIN_EMAILS = process.env.ADMIN_EMAILS?.split(',') || [];
 
 // Helper function to generate URL-friendly slug
 function generateSlug(title) {

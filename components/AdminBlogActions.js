@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
 // Hardcoded admin emails - should match the API
-const ADMIN_EMAILS = ['arpitmahatpure@gmail.com', 'arpitmaurya1506@gmail.com', 'chiragbhandarlap@gmail.com'];
+const ADMIN_EMAILS = process.env.ADMIN_EMAILS?.split(',') || [];
 
 const AdminBlogActions = ({ blog, onDelete }) => {
   const { data: session } = useSession();

@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // Admin emails - Update this with your admin emails
-const ADMIN_EMAILS = ['arpitmahatpure@gmail.com', 'arpitmaurya1506@gmail.com', 'chiragbhandarlap@gmail.com'];
+const ADMIN_EMAILS = process.env.ADMIN_EMAILS?.split(',') || [];
 
 export async function GET(req) {
   try {

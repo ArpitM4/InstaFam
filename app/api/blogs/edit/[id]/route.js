@@ -5,7 +5,7 @@ import connectDB from "@/db/ConnectDb";
 import Blog from "@/models/Blog";
 
 // Hardcoded admin emails - should match other API routes
-const ADMIN_EMAILS = ['arpitmahatpure@gmail.com', 'arpitmaurya1506@gmail.com', 'chiragbhandarlap@gmail.com'];
+const ADMIN_EMAILS = process.env.ADMIN_EMAILS?.split(',') || [];
 
 export async function GET(request, { params }) {
   try {
