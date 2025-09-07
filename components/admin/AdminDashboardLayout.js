@@ -12,7 +12,8 @@ import {
   Menu,
   X,
   Home,
-  TrendingUp
+  TrendingUp,
+  Coins
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -35,6 +36,11 @@ const sidebarItems = [
     name: 'Bonus Management', 
     href: '/admin/dashboard/bonus', 
     icon: Gift 
+  },
+  { 
+    name: 'FamPoints', 
+    href: '/admin/dashboard/fampoints', 
+    icon: Coins 
   },
   { 
     name: 'Analytics', 

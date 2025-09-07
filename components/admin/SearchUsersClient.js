@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Edit2, Save, X } from 'lucide-react';
 
 export default function SearchUsersClient() {
@@ -9,19 +9,50 @@ export default function SearchUsersClient() {
   const [loading, setLoading] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [editData, setEditData] = useState({});
+  const [userLimit, setUserLimit] = useState(50);
+
+  // Load latest users on component mount
+  const loadLatestUsers = async (limit = 50) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/admin/search-users?latest=${limit}`);
+      const data = await response.json();
+      setUsers(data.users || []);
+    } catch (error) {
+      console.error('Load users error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load latest users when component mounts
+  useEffect(() => {
+    loadLatestUsers(userLimit);
+  }, []);
 
   const searchUsers = async () => {
-    if (!searchTerm.trim()) return;
+    if (!searchTerm.trim()) {
+      // If no search term, load latest users
+      loadLatestUsers(userLimit);
+      return;
+    }
     
     setLoading(true);
     try {
-      const response = await fetch(`/api/admin/search-users?q=${encodeURIComponent(searchTerm)}`);
+      const response = await fetch(`/api/admin/search-users?q=${encodeURIComponent(searchTerm)}&limit=${userLimit}`);
       const data = await response.json();
       setUsers(data.users || []);
     } catch (error) {
       console.error('Search error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLimitChange = (newLimit) => {
+    setUserLimit(newLimit);
+    if (!searchTerm.trim()) {
+      loadLatestUsers(newLimit);
     }
   };
 
@@ -67,25 +98,53 @@ export default function SearchUsersClient() {
     <div className="space-y-6">
       {/* Search Bar */}
       <div className="bg-[var(--background)] border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-6">
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Search by username, email, or name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && searchUsers()}
-              className="w-full px-4 py-2 bg-[var(--background)] border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent text-[var(--text)]"
-            />
+        <div className="space-y-4">
+          {/* User Limit Filter */}
+          <div className="flex items-center gap-4">
+            <label className="text-sm font-medium text-[var(--text)]">
+              Show latest:
+            </label>
+            <div className="flex gap-2">
+              {[50, 100, 200, 500].map((limit) => (
+                <button
+                  key={limit}
+                  onClick={() => handleLimitChange(limit)}
+                  className={`px-3 py-1 text-sm rounded-md border transition-colors ${
+                    userLimit === limit
+                      ? 'bg-[var(--primary)] text-white border-[var(--primary)]'
+                      : 'bg-[var(--background)] text-[var(--text)] border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  {limit}
+                </button>
+              ))}
+            </div>
+            <span className="text-xs text-gray-500">
+              users (default: 50)
+            </span>
           </div>
-          <button
-            onClick={searchUsers}
-            disabled={loading}
-            className="px-6 py-2 bg-[var(--primary)] text-white rounded-md hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
-          >
-            <Search className="h-4 w-4" />
-            {loading ? 'Searching...' : 'Search'}
-          </button>
+
+          {/* Search Input */}
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="Search by username, email, or name... (leave empty to show latest users)"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && searchUsers()}
+                className="w-full px-4 py-2 bg-[var(--background)] border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent text-[var(--text)]"
+              />
+            </div>
+            <button
+              onClick={searchUsers}
+              disabled={loading}
+              className="px-6 py-2 bg-[var(--primary)] text-white rounded-md hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
+            >
+              <Search className="h-4 w-4" />
+              {loading ? 'Loading...' : searchTerm.trim() ? 'Search' : 'Refresh'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -94,7 +153,10 @@ export default function SearchUsersClient() {
         <div className="bg-[var(--background)] border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold text-[var(--text)]">
-              Search Results ({users.length} found)
+              {searchTerm.trim() 
+                ? `Search Results (${users.length} found)` 
+                : `Latest ${userLimit} Users (${users.length} shown)`
+              }
             </h2>
           </div>
           

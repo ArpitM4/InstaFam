@@ -19,25 +19,41 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q');
-
-    if (!query) {
-      return NextResponse.json({ users: [] });
-    }
+    const latest = searchParams.get('latest');
+    const limit = parseInt(searchParams.get('limit') || '50');
 
     await ConnectDb();
 
-    const searchRegex = new RegExp(query, 'i');
-    
-    const users = await User.find({
-      $or: [
-        { username: searchRegex },
-        { email: searchRegex },
-        { name: searchRegex }
-      ]
-    })
-    .select('-password -emailVerificationOTP -passwordResetOTP')
-    .limit(20)
-    .sort({ createdAt: -1 });
+    let users;
+
+    if (latest) {
+      // Get latest users by creation date
+      const userLimit = parseInt(latest) || 50;
+      users = await User.find({})
+        .select('-password -emailVerificationOTP -passwordResetOTP')
+        .limit(userLimit)
+        .sort({ createdAt: -1 });
+    } else if (query) {
+      // Search users by query
+      const searchRegex = new RegExp(query, 'i');
+      
+      users = await User.find({
+        $or: [
+          { username: searchRegex },
+          { email: searchRegex },
+          { name: searchRegex }
+        ]
+      })
+      .select('-password -emailVerificationOTP -passwordResetOTP')
+      .limit(limit)
+      .sort({ createdAt: -1 });
+    } else {
+      // Default: return latest 50 users
+      users = await User.find({})
+        .select('-password -emailVerificationOTP -passwordResetOTP')
+        .limit(50)
+        .sort({ createdAt: -1 });
+    }
 
     return NextResponse.json({ users });
   } catch (error) {

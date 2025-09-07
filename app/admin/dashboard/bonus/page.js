@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 import AdminDashboardLayout from '@/components/admin/AdminDashboardLayout';
-import BonusManagementClient from '@/components/admin/BonusManagementClient';
+import BonusTabsClient from '@/components/admin/BonusTabsClient';
 
 async function isAdminUser(email) {
   const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
@@ -21,9 +21,9 @@ export default async function BonusManagementPage() {
       <div className="p-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-[var(--text)]">Bonus Management</h1>
-          <p className="text-[var(--text)] opacity-70 mt-2">Review and approve creator bonus requests</p>
+          <p className="text-[var(--text)] opacity-70 mt-2">Manage creator bonuses and award FamPoints bonuses</p>
         </div>
-        <BonusManagementClient />
+        <BonusTabsClient />
       </div>
     </AdminDashboardLayout>
   );

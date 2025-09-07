@@ -7,6 +7,7 @@ import Redemption from "@/models/Redemption";
 import Bonus from "@/models/Bonus";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { notifyVaultRedeemed } from "@/utils/notificationHelpers";
+import { spendPoints, getAvailablePoints } from "@/utils/pointsHelpers";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -39,13 +40,14 @@ export async function POST(request) {
       return NextResponse.json({ error: "Vault item not found" }, { status: 404 });
     }
 
-    // Check if fan has enough points
-    const fanPoints = fan.points || 0;
-    if (fanPoints < vaultItem.pointCost) {
+    // Check if fan has enough available (unexpired) points
+    const availablePoints = await getAvailablePoints(fan._id);
+    if (availablePoints < vaultItem.pointCost) {
       return NextResponse.json({ 
         error: "Insufficient points",
         required: vaultItem.pointCost,
-        current: fanPoints
+        available: availablePoints,
+        total: fan.points || 0
       }, { status: 400 });
     }
 
@@ -60,10 +62,16 @@ export async function POST(request) {
     }
 
     // Start transaction-like operations
-    // Deduct points from fan
-    await User.findByIdAndUpdate(fan._id, {
-      $inc: { points: -vaultItem.pointCost }
-    });
+    // Use FIFO point spending system
+    try {
+      await spendPoints(fan._id, vaultItem.pointCost, `Vault redemption: ${vaultItem.title}`);
+    } catch (pointError) {
+      return NextResponse.json({ 
+        error: pointError.message,
+        required: vaultItem.pointCost,
+        available: availablePoints
+      }, { status: 400 });
+    }
 
     // Note: We no longer add earnings directly to creator
     // Instead, we track FamPoints through the bonus system
@@ -131,7 +139,7 @@ export async function POST(request) {
       success: true, 
       message: "Item redeemed successfully",
       fileUrl: vaultItem.fileUrl,
-      pointsRemaining: fanPoints - vaultItem.pointCost,
+      pointsRemaining: Math.max(0, (fan.points || 0) - vaultItem.pointCost),
       redemption: {
         id: redemption._id,
         redeemedAt: redemption.redeemedAt

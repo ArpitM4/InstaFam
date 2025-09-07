@@ -27,22 +27,30 @@ export async function POST() {
         redemption.expiredAt = new Date();
         await redemption.save();
 
-        // Refund FamPoints to the fan
+        // Refund FamPoints to the fan with proper expiry
         const fan = redemption.fanId;
         const refundAmount = Number(redemption.pointsSpent) || 0;
+        
+        // Update user's total points
         await User.findByIdAndUpdate(
           fan._id,
           { $inc: { points: refundAmount } },
           { new: true }
         );
 
-        // Create refund point transaction
+        // Create refund point transaction with expiry (60 days from refund date)
+        const refundExpiryDate = new Date();
+        refundExpiryDate.setDate(refundExpiryDate.getDate() + 60);
+        
         await PointTransaction.create({
           userId: fan._id,
           type: 'Refund',
-          amount: redemption.pointsSpent,
+          amount: refundAmount,
           description: `Refund for unfulfilled vault request: ${redemption.vaultItemId.title}`,
-          redemptionId: redemption._id
+          redemptionId: redemption._id,
+          expiresAt: refundExpiryDate,
+          expired: false,
+          used: false
         });
 
         processedResults.push({

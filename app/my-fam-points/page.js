@@ -11,12 +11,98 @@ const MyFamPointsPage = () => {
   const router = useRouter();
   const [pointsData, setPointsData] = useState({
     totalPoints: 0,
-    transactions: []
+    transactions: [],
+    expiryInfo: {
+      totalExpiring: 0,
+      expiringCount: 0,
+      nextExpiry: null
+    }
   });
+  const [expiringPoints, setExpiringPoints] = useState([]);
+  const [pointsBreakdown, setPointsBreakdown] = useState(null);
   const [redemptions, setRedemptions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('points');
   const [expandedRedemptions, setExpandedRedemptions] = useState(new Set()); // Track expanded Q&A redemptions
+
+  // Add helper functions for expiry display
+  const getDaysUntilExpiry = (expiresAt) => {
+    if (!expiresAt) return null;
+    const now = new Date();
+    const expiry = new Date(expiresAt);
+    const diffTime = expiry - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const getExpiryStatus = (daysUntilExpiry) => {
+    if (daysUntilExpiry === null) return null;
+    if (daysUntilExpiry <= 0) return 'expired';
+    if (daysUntilExpiry <= 7) return 'critical';
+    if (daysUntilExpiry <= 30) return 'warning';
+    return 'safe';
+  };
+
+  const ExpiryWarningBanner = () => {
+    const totalExpiring = pointsData.expiryInfo?.totalExpiring || 0;
+    const nextExpiry = pointsData.expiryInfo?.nextExpiry;
+    
+    if (totalExpiring === 0) return null;
+
+    const daysUntilNext = nextExpiry ? getDaysUntilExpiry(nextExpiry) : null;
+    
+    return (
+      <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-4 mb-6">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 mt-1">
+            <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h4 className="font-semibold text-yellow-200 mb-1">FamPoints Expiring Soon!</h4>
+            <p className="text-yellow-100 text-sm">
+              <strong>{totalExpiring} points</strong> will expire in the next 30 days
+              {daysUntilNext && (
+                <span className="block mt-1">
+                  Next expiry: {daysUntilNext} day{daysUntilNext !== 1 ? 's' : ''} 
+                  ({new Date(nextExpiry).toLocaleDateString()})
+                </span>
+              )}
+            </p>
+            <p className="text-yellow-200/80 text-xs mt-2">
+              💡 Use your points in the Vault section to prevent them from expiring!
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const ExpiryInfoBanner = () => (
+    <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
+      <div className="flex items-start gap-3">
+        <div className="flex-shrink-0 mt-1">
+          <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <div className="flex-1">
+          <h4 className="font-semibold text-blue-200 mb-1">FamPoints Expiry Policy</h4>
+          <p className="text-blue-100 text-sm">
+            Your FamPoints automatically expire after <strong>60 days</strong> if not used. 
+            This ensures an active and engaging community.
+          </p>
+          <ul className="text-blue-200/80 text-xs mt-2 space-y-1">
+            <li>• Points earned from donations expire 60 days after earning</li>
+            <li>• Use points in creator Vaults to prevent expiration</li>
+            <li>• You'll receive warnings 7 days before expiration</li>
+            <li>• Expired points cannot be recovered</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
 
   useEffect(() => {
     if (status === "loading") return;
@@ -26,6 +112,8 @@ const MyFamPointsPage = () => {
     }
     fetchPointsData();
     fetchRedemptionsData();
+    fetchExpiringPoints();
+    fetchPointsBreakdown();
   }, [session, status, router]);
 
   const fetchPointsData = async () => {
@@ -57,6 +145,30 @@ const MyFamPointsPage = () => {
     } catch (error) {
       console.error('Error fetching redemptions:', error);
       toast.error("Error loading redemption data");
+    }
+  };
+
+  const fetchExpiringPoints = async () => {
+    try {
+      const response = await fetch('/api/points/expiring?days=30');
+      if (response.ok) {
+        const data = await response.json();
+        setExpiringPoints(data.expiringPoints || []);
+      }
+    } catch (error) {
+      console.error('Error fetching expiring points:', error);
+    }
+  };
+
+  const fetchPointsBreakdown = async () => {
+    try {
+      const response = await fetch('/api/points/breakdown');
+      if (response.ok) {
+        const data = await response.json();
+        setPointsBreakdown(data);
+      }
+    } catch (error) {
+      console.error('Error fetching points breakdown:', error);
     }
   };
 
@@ -114,7 +226,7 @@ const MyFamPointsPage = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex  rounded-lg p-1 mb-8">
+        <div className="flex rounded-lg p-1 mb-8">
           <button
             onClick={() => setActiveTab('points')}
             className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -143,47 +255,197 @@ const MyFamPointsPage = () => {
           <div className=" rounded-lg p-6">
             <h3 className="text-2xl font-semibold mb-6 text-text">Points History</h3>
             
-            {pointsData.transactions.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-text/60 mb-4">No points earned yet</p>
-                <button
-                  onClick={() => router.push('/explore')}
-                  className="bg-primary hover:bg-primary/90 text-background px-6 py-2 rounded-lg font-medium transition-colors shadow-sm"
-                >
-                  Explore Creators
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {pointsData.transactions.map((transaction, index) => (
-                  <div
-                    key={transaction._id || index}
-                    className="bg-dropdown-hover rounded-lg p-4 py-8"
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-green-400">
-                            +{transaction.points_earned} Points
-                          </span>
-                        </div>
-                        <p className="text-sm text-text/70">
-                          ${transaction.donation_amount} donation
-                          {transaction.payment_id?.to_user?.username && (
-                            <span className="ml-2">to {transaction.payment_id.to_user.username}</span>
-                          )}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-text/60">
-                          {formatDate(transaction.createdAt)}
-                        </p>
-                      </div>
+            {/* Removed ExpiryInfoBanner and ExpiryWarningBanner as requested */}
+
+            {/* Points Breakdown Section */}
+            {pointsBreakdown && (
+              <div className="mb-8">
+                <h4 className="text-xl font-semibold mb-6 text-text">Points Breakdown</h4>
+                
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-dropdown-hover rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-text/70 mb-1">Active Points</h4>
+                    <p className="text-2xl font-bold text-green-400">{pointsBreakdown.totals?.active || 0}</p>
+                    <p className="text-xs text-text/60">Ready to use</p>
+                  </div>
+                  
+                  <div className="bg-dropdown-hover rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-text/70 mb-1">Expiring Soon</h4>
+                    <p className="text-2xl font-bold text-yellow-400">{pointsBreakdown.totals?.expiring || 0}</p>
+                    <p className="text-xs text-text/60">Next 30 days</p>
+                  </div>
+                  
+                  <div className="bg-dropdown-hover rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-text/70 mb-1">Recently Expired</h4>
+                    <p className="text-2xl font-bold text-gray-400">{pointsBreakdown.totals?.recentlyExpired || 0}</p>
+                    <p className="text-xs text-text/60">Last 30 days</p>
+                  </div>
+                  
+                  <div className="bg-dropdown-hover rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-text/70 mb-1">Total Spent</h4>
+                    <p className="text-2xl font-bold text-blue-400">{pointsBreakdown.totals?.spent || 0}</p>
+                    <p className="text-xs text-text/60">All time</p>
+                  </div>
+                </div>
+
+                {/* Expiring Points Section */}
+                {pointsBreakdown.expiringPoints?.length > 0 && (
+                  <div className="mb-6">
+                    <h5 className="text-lg font-semibold mb-4 text-yellow-400">⚠️ Points Expiring Soon</h5>
+                    <div className="space-y-2">
+                      {/* Show only the soonest expiring point */}
+                      {(() => {
+                        const soonest = [...pointsBreakdown.expiringPoints].sort((a, b) => new Date(a.expiresAt) - new Date(b.expiresAt))[0];
+                        if (!soonest) return null;
+                        return (
+                          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <span className="font-semibold text-yellow-200">{soonest.amount} points</span>
+                                <p className="text-sm text-yellow-100/80">
+                                  Expires in {soonest.daysUntilExpiry} day{soonest.daysUntilExpiry !== 1 ? 's' : ''}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm text-yellow-200/60">
+                                  {new Date(soonest.expiresAt).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
-                ))}
+                )}
+
+                {/* Removed Active Points Section as requested */}
+
+                {/* Recently Expired Points */}
+                {pointsBreakdown.recentlyExpired?.length > 0 && (
+                  <div className="mb-6">
+                    <h5 className="text-lg font-semibold mb-4 text-gray-400">❌ Recently Expired</h5>
+                    <div className="space-y-2">
+                      {pointsBreakdown.recentlyExpired.map((point, index) => (
+                        <div key={index} className="bg-gray-500/10 border border-gray-500/30 rounded-lg p-4">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <span className="font-semibold text-gray-300">{point.amount} points</span>
+                              <p className="text-sm text-gray-100/80">{point.description}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm text-gray-300/60">
+                                {new Date(point.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
+
+            {/* Transaction History Section */}
+            <div>
+              <h4 className="text-xl font-semibold mb-6 text-text">Transaction History</h4>
+              
+              {pointsData.transactions.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-text/60 mb-4">No points earned yet</p>
+                  <button
+                    onClick={() => router.push('/explore')}
+                    className="bg-primary hover:bg-primary/90 text-background px-6 py-2 rounded-lg font-medium transition-colors shadow-sm"
+                  >
+                    Explore Creators
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {pointsData.transactions.map((transaction, index) => {
+                    const daysUntilExpiry = getDaysUntilExpiry(transaction.expiresAt);
+                    const expiryStatus = getExpiryStatus(daysUntilExpiry);
+                    
+                    return (
+                      <div
+                        key={transaction._id || index}
+                        className={`bg-dropdown-hover rounded-lg p-4 py-8 ${
+                          expiryStatus === 'critical' ? 'ring-2 ring-red-500/50' :
+                          expiryStatus === 'warning' ? 'ring-2 ring-yellow-500/50' : ''
+                        }`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`font-semibold ${
+                                transaction.type === 'Earned' ? 'text-green-400' :
+                                transaction.type === 'Spent' ? 'text-red-400' :
+                                transaction.type === 'Expired' ? 'text-gray-400' :
+                                transaction.type === 'Refund' ? 'text-blue-400' :
+                                transaction.type === 'Bonus' ? 'text-purple-400' :
+                                'text-blue-400'
+                              }`}>
+                                {(transaction.type === 'Earned' || transaction.type === 'Refund' || transaction.type === 'Bonus') ? '+' : ''}
+                                {Math.abs(transaction.amount || transaction.points_earned)} Points
+                              </span>
+                              
+                              {/* Transaction Type Badge */}
+                              <span className={`px-2 py-1 text-xs rounded-full ${
+                                transaction.type === 'Earned' ? 'bg-green-500/20 text-green-300' :
+                                transaction.type === 'Spent' ? 'bg-red-500/20 text-red-300' :
+                                transaction.type === 'Expired' ? 'bg-gray-500/20 text-gray-300' :
+                                transaction.type === 'Refund' ? 'bg-blue-500/20 text-blue-300' :
+                                transaction.type === 'Bonus' ? 'bg-purple-500/20 text-purple-300' :
+                                'bg-blue-500/20 text-blue-300'
+                              }`}>
+                                {transaction.type}
+                              </span>
+
+                              {/* Expiry Warning Badge - Show for Earned, Refund, and Bonus */}
+                              {(transaction.type === 'Earned' || transaction.type === 'Refund' || transaction.type === 'Bonus') && !transaction.used && !transaction.expired && expiryStatus && (
+                                <span className={`px-2 py-1 text-xs rounded-full ${
+                                  expiryStatus === 'critical' ? 'bg-red-500/20 text-red-300 animate-pulse' :
+                                  expiryStatus === 'warning' ? 'bg-yellow-500/20 text-yellow-300' :
+                                  'bg-green-500/20 text-green-300'
+                                }`}>
+                                  {daysUntilExpiry <= 0 ? 'Expired' : `${daysUntilExpiry}d left`}
+                                </span>
+                              )}
+                            </div>
+                            
+                            <p className="text-sm text-text/70">
+                              {transaction.description || (
+                                <>
+                                  ${transaction.donation_amount} donation
+                                  {transaction.payment_id?.to_user?.username && (
+                                    <span className="ml-2">to {transaction.payment_id.to_user.username}</span>
+                                  )}
+                                </>
+                              )}
+                            </p>
+
+                            {/* Expiry Date for Earned, Refund, and Bonus Points */}
+                            {(transaction.type === 'Earned' || transaction.type === 'Refund' || transaction.type === 'Bonus') && transaction.expiresAt && !transaction.used && !transaction.expired && (
+                              <p className="text-xs text-text/50 mt-1">
+                                Expires: {new Date(transaction.expiresAt).toLocaleDateString()}
+                              </p>
+                            )}
+                          </div>
+                          
+                          <div className="text-right">
+                            <p className="text-sm text-text/60">
+                              {formatDate(transaction.createdAt)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           /* Redemption History */

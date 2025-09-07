@@ -43,9 +43,18 @@ export async function GET(req) {
     }
     console.log('Points API: User ID:', user._id, 'Points:', user.points);
 
-    // Step 4: Transaction lookup
+    // Step 4: Transaction lookup with proper filtering
     console.log('Points API: Fetching transactions...');
-    const transactions = await PointTransaction.find({ userId: user._id })
+    const now = new Date();
+    const transactions = await PointTransaction.find({ 
+      userId: user._id,
+      // Include all transactions except internal split transactions (used=true AND type != 'Spent')
+      $or: [
+        { used: { $ne: true } }, // Show non-used transactions
+        { type: 'Spent' }, // Always show spent transactions even if marked as used
+        { used: { $exists: false } } // Handle old records without used field
+      ]
+    })
       .populate({
         path: 'source_payment_id',
         populate: {
@@ -57,27 +66,58 @@ export async function GET(req) {
       .limit(50);
     console.log('Points API: Transactions found:', transactions.length);
 
+    // Get expiring points info
+    const expiringPoints = await PointTransaction.find({
+      userId: user._id,
+      type: 'Earned',
+      expired: false,
+      used: false,
+      expiresAt: {
+        $gt: now,
+        $lte: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000) // Next 30 days
+      }
+    }).sort({ expiresAt: 1 });
+
+    const totalExpiring = expiringPoints.reduce((sum, tx) => sum + tx.amount, 0);
+
     // Step 5: Format transactions
     console.log('Points API: Formatting transactions...');
-    const formattedTransactions = transactions.map(transaction => ({
-      _id: transaction._id,
-      points_earned: transaction.points_earned,
-      donation_amount: transaction.source_payment_id?.amount || 0,
-      createdAt: transaction.createdAt,
-      payment_id: {
-        message: transaction.source_payment_id?.message,
-        to_user: {
-          username: transaction.source_payment_id?.to_user?.username
+    const formattedTransactions = transactions.map(transaction => {
+      // Handle backward compatibility for amount field
+      const points = transaction.amount !== undefined ? transaction.amount : transaction.points_earned;
+      
+      return {
+        _id: transaction._id,
+        points_earned: transaction.points_earned,
+        amount: points, // Use the calculated points value
+        type: transaction.type,
+        donation_amount: transaction.source_payment_id?.amount || 0,
+        createdAt: transaction.createdAt,
+        expiresAt: transaction.expiresAt,
+        expired: transaction.expired,
+        used: transaction.used,
+        daysUntilExpiry: transaction.expiresAt ? Math.ceil((transaction.expiresAt - now) / (1000 * 60 * 60 * 24)) : null,
+        description: transaction.description,
+        payment_id: {
+          message: transaction.source_payment_id?.message,
+          to_user: {
+            username: transaction.source_payment_id?.to_user?.username
+          }
         }
-      }
-    }));
+      };
+    });
     console.log('Points API: Transactions formatted successfully');
 
     console.log('Points API: Returning response...');
     return NextResponse.json({ 
       success: true, 
       totalPoints: user.points || 0,
-      transactions: formattedTransactions
+      transactions: formattedTransactions,
+      expiryInfo: {
+        totalExpiring,
+        expiringCount: expiringPoints.length,
+        nextExpiry: expiringPoints.length > 0 ? expiringPoints[0].expiresAt : null
+      }
     });
 
   } catch (error) {

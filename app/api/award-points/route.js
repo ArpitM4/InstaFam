@@ -50,12 +50,15 @@ export async function POST(req) {
       $inc: { points: pointsEarned }
     });
 
-    // Create point transaction record
+    // Create point transaction record with expiry
     const pointTransaction = new PointTransaction({
       userId: user._id,
-      points_earned: pointsEarned,
+      type: 'Earned',
+      amount: pointsEarned,
+      points_earned: pointsEarned, // Keep for backward compatibility
       source_payment_id: paymentId,
       description: `Support for ${payment.to_user}`,
+      // expiresAt will be automatically set by the schema default (60 days from now)
     });
     await pointTransaction.save();
 

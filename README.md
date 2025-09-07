@@ -4,9 +4,15 @@
 
 InstaFam is a comprehensive creator monetization platform built with Next.js 14, enabling creators to connect with their audience, receive donations, and offer exclusive perks through a vault system. The platform features real-time notifications, event management, and a points-based reward system.
 
+
 ## 🌟 **Key Features**
 
-### **🔐 Authentication & Security**
+### **� FamPoints Expiry System**
+- **Automatic Expiry:** FamPoints expire 60 days after earning if not used, encouraging active participation.
+- **Expiry Warnings:** Users receive warnings 7 days before points expire.
+- **Expiry Dashboard:** Users can view detailed expiry breakdowns, including points expiring soon, recently expired, and total spent.
+
+### **�🔐 Authentication & Security**
 - **Multi-Provider OAuth**: Google and GitHub social login integration
 - **NextAuth.js**: Secure session management with JWT tokens
 - **Password Security**: Enhanced login forms with password visibility toggles
@@ -20,7 +26,7 @@ InstaFam is a comprehensive creator monetization platform built with Next.js 14,
 - **Flexible Perk System**: Creators can set custom top N donors (1-100) for perk eligibility
 
 
-### **🎁 Bonus & Rewards System**
+- **Admin Bonus Capability:** Admins can award monthly bonuses to creators based on vault activity and engagement, with full tracking and analytics.
 - **Bonus System**: Creators receive monthly bonuses based on vault activity and engagement
 - **Creator Vaults**: Digital and physical perk offerings
 - **Smart Redemption**: Points-based redemption with Q&A system
@@ -40,7 +46,7 @@ InstaFam is a comprehensive creator monetization platform built with Next.js 14,
 - **Explore Page**: Discover new creators with search functionality
 - **Privacy First**: Follower counts hidden from public view
 
-### **📊 Dashboard & Analytics**
+- **Admin FamPoints Dashboard:** Admins have access to a dedicated dashboard to monitor all FamPoints activity across the platform, including expiry stats, bonus distributions, and user engagement.
 - **Modular Dashboard**: Route-based navigation (/dashboard, /dashboard/payment, etc.)
 - **Earnings Tracking**: Comprehensive payment history and analytics
 - **Vault Management**: Easy creation and management of digital/physical perks
@@ -246,8 +252,12 @@ db/
 ```
 
 
+
 ## 📋 **Latest Features**
 
+- **FamPoints Expiry System:** Points expire after 60 days, with user warnings and a full expiry dashboard.
+- **Admin Bonus Capability:** Admins can award and track monthly bonuses for creators.
+- **Admin FamPoints Dashboard:** Monitor all FamPoints activity, expiry, and bonuses from a central admin dashboard.
 - **Multi-provider OAuth** (Google, GitHub) via NextAuth.js
 - **Role-based dashboards** for creators and admins
 - **Admin dashboard** with analytics, bonus management, verification, and search
@@ -367,3 +377,4 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+

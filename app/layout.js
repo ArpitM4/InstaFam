@@ -10,6 +10,8 @@ import FloatingCreatorChecklist from "@/components/FloatingCreatorChecklist";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { UserProvider } from "@/context/UserContext";
+// Initialize FamPoints expiry system
+import "@/utils/initializeExpiry";
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
