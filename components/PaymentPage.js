@@ -154,19 +154,14 @@ const PaymentPage = ({ username }) => {
     }
   }, [searchParams, username]);
 
-  // Update URL when tab changes - use router.push for path-based navigation
+  // Update URL when tab changes - use replaceState to avoid page reload
   const handleTabChange = (tab) => {
     // Set active tab FIRST for immediate UI feedback
     setActiveTab(tab);
     
-    // Then update URL (this happens async and won't block UI)
-    if (tab === 'links') {
-      // For links tab (default), go to base username URL
-      router.push(`/${username}`, { scroll: false });
-    } else {
-      // For other tabs, use path-based routing
-      router.push(`/${username}/${tab}`, { scroll: false });
-    }
+    // Update URL in browser without navigation (no page reload)
+    const newUrl = tab === 'links' ? `/${username}` : `/${username}/${tab}`;
+    window.history.replaceState(null, '', newUrl);
   };
   const [hasError, setHasError] = useState(false);
   const [showBetaPopup, setShowBetaPopup] = useState(false);

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
 
-const VaultPage = async ({ params }) => {
+const UsernamePage = async ({ params }) => {
   const user = await fetchuser(params.username);
   const session = await getServerSession(nextAuthConfig);
 
@@ -52,4 +52,4 @@ const VaultPage = async ({ params }) => {
   return <PaymentPage username={params.username} />;
 };
 
-export default VaultPage;
+export default UsernamePage;
