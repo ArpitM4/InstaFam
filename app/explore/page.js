@@ -50,9 +50,12 @@ const ExplorePage = () => {
                 <div className="flex flex-col items-center space-y-4">
                   <div className="relative">
                     <img
-                      src={user.profilepic || "https://picsum.photos/100"}
+                      src={
+                        user.profilepic ||
+                        `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(user.username)}`
+                      }
                       alt="profile"
-                      className="w-16 h-16 rounded-full object-cover"
+                      className="w-16 h-16 rounded-full object-cover bg-white"
                     />
                   </div>
                   <div className="text-center">

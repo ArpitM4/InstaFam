@@ -140,7 +140,8 @@ const PaymentProfileSection = ({
         )}
 
         {/* Perk Section - Combined Display and Edit */}
-        {isOwner && (
+        {/* COMMENTED OUT - Perk feature temporarily disabled */}
+        {/* {isOwner && (
           <div className="mt-4 space-y-3">
             <div className="relative">
               <input
@@ -158,7 +159,6 @@ const PaymentProfileSection = ({
               <FaPen className={`absolute top-1/2 right-3 transform -translate-y-1/2 text-xs pointer-events-none ${isEventActive ? 'text-text/20' : 'text-text/40'}`} />
             </div>
             
-            {/* Perk Rank Input */}
             <div className="flex items-center gap-3">
               <label className={`text-text/70 text-sm font-medium whitespace-nowrap ${isEventActive ? 'opacity-50' : ''}`}>Perk for Top</label>
               <input
@@ -187,16 +187,17 @@ const PaymentProfileSection = ({
               }
             </p>
           </div>
-        )}
+        )} */}
 
         {/* Perk Display for Non-Owners */}
-        {!isOwner && isEventActive && currentUser.perk && (
+        {/* COMMENTED OUT - Perk feature temporarily disabled */}
+        {/* {!isOwner && isEventActive && currentUser.perk && (
           <div className="mt-4 bg-black p-3 rounded-lg">
             <div className="text-text/90 text-sm text-center">
               🎁 <span className="font-medium text-primary/40">Top {currentUser.perkRank || 5} Perk : </span> {currentUser.perk}
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Owner-only controls */}
         {isOwner && (
@@ -248,7 +249,7 @@ const PaymentProfileSection = ({
               className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
             >
               <FaExclamationTriangle className="text-red-500 text-xs" />
-              <span className="font-medium text-red-500">Event is not Live!</span>
+              <span className="font-medium text-green-500">Event is not Live!</span>
             </button>
             <span className="ml-2">Ends in: <span className="font-medium">{timeLeft}</span></span>
           </div>

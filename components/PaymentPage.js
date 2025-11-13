@@ -17,6 +17,10 @@ import { emitPaymentSuccess } from "@/utils/eventBus";
 import PaymentProfileSection from "./PaymentProfileSection";
 import PaymentInteractionSection from "./PaymentInteractionSection";
 import VaultSection from "./VaultSection";
+import LinksSection from "./LinksSection";
+import MerchandiseSection from "./MerchandiseSection";
+import GiveawaySection from "./GiveawaySection";
+import CommunitySection from "./CommunitySection";
 import ErrorBoundary from "./ErrorBoundary";
 
 // Save payment after capture (send captureDetails to backend)
@@ -676,8 +680,49 @@ const PaymentPage = ({ username }) => {
                   : 'text-text/60 hover:text-text border-b-2 border-transparent'
               }`}
             >
-              {currentUser.username}'s Vault
+               Vault
             </button>
+            <button
+              onClick={() => setActiveTab('community')}
+              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
+                activeTab === 'community'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
+              }`}
+            >
+              Community
+            </button>
+            <button
+              onClick={() => setActiveTab('links')}
+              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
+                activeTab === 'links'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
+              }`}
+            >
+              Links
+            </button>
+            <button
+              onClick={() => setActiveTab('merchandise')}
+              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
+                activeTab === 'merchandise'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
+              }`}
+            >
+              Merchandise
+            </button>
+            {/* COMMENTED OUT - Giveaway section temporarily hidden */}
+            {/* <button
+              onClick={() => setActiveTab('giveaway')}
+              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
+                activeTab === 'giveaway'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
+              }`}
+            >
+              Giveaway
+            </button> */}
           </div>
         </div>
 
@@ -723,6 +768,23 @@ const PaymentPage = ({ username }) => {
           {activeTab === 'vault' && (
             <VaultSection currentUser={currentUser} />
           )}
+
+          {activeTab === 'community' && (
+            <CommunitySection />
+          )}
+
+          {activeTab === 'links' && (
+            <LinksSection />
+          )}
+
+          {activeTab === 'merchandise' && (
+            <MerchandiseSection />
+          )}
+
+          {/* COMMENTED OUT - Giveaway section temporarily hidden */}
+          {/* {activeTab === 'giveaway' && (
+            <GiveawaySection />
+          )} */}
         </div>
 
                   {activeTab === 'contribute' && (

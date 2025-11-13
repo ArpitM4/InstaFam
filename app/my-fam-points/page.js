@@ -221,7 +221,7 @@ const MyFamPointsPage = () => {
         {/* Points Summary Card */}
         <div className="bg-dropdown-hover rounded-lg p-6 mb-8 text-center">
           <h2 className="text-2xl font-semibold text-text mb-2">
-            🪙 {pointsData.totalPoints} Fam Points
+            🪙 {pointsBreakdown?.totals?.active || pointsData.totalPoints} Fam Points
           </h2>
         </div>
 
