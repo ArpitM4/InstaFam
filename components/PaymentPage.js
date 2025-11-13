@@ -137,29 +137,33 @@ const PaymentPage = ({ username }) => {
   const [eventDuration, setEventDuration] = useState("");
   const [timeLeft, setTimeLeft] = useState(null);
   const [isPaying, setIsPaying] = useState(false);
-  const [activeTab, setActiveTab] = useState('contribute');
+  const [activeTab, setActiveTab] = useState('links');
 
-  // Sync activeTab with ?section= in URL
+  // Sync activeTab with URL path
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const section = params.get('section');
-    if (section && [
-      'contribute',
-      'vault',
-      'community',
-      'links',
-      'merchandise'
-    ].includes(section)) {
+    const pathParts = window.location.pathname.split('/');
+    const section = pathParts[pathParts.length - 1];
+    
+    const validSections = ['contribute', 'vault', 'community', 'links', 'merchandise'];
+    
+    if (validSections.includes(section)) {
       setActiveTab(section);
+    } else if (pathParts.length === 2 || section === username) {
+      // Default to 'links' when on base username page
+      setActiveTab('links');
     }
-  }, [searchParams]);
+  }, [searchParams, username]);
 
-  // Update URL when tab changes
+  // Update URL when tab changes - use router.push for path-based navigation
   const handleTabChange = (tab) => {
+    if (tab === 'links') {
+      // For links tab (default), go to base username URL
+      router.push(`/${username}`);
+    } else {
+      // For other tabs, use path-based routing
+      router.push(`/${username}/${tab}`);
+    }
     setActiveTab(tab);
-    const url = new URL(window.location.href);
-    url.searchParams.set('section', tab);
-    window.history.replaceState({}, '', url);
   };
   const [hasError, setHasError] = useState(false);
   const [showBetaPopup, setShowBetaPopup] = useState(false);
