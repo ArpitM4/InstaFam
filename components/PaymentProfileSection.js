@@ -242,14 +242,14 @@ const PaymentProfileSection = ({
         )}
 
         {/* Event Timer */}
-        {currentUser.eventEnd && timeLeft && (
+        {isEventActive && timeLeft && (
           <div className="mt-3 text-center bg-background/50 text-text/80 text-sm py-2 px-3 rounded-lg shadow-sm">
             <button
               onClick={() => setShowBetaPopup && setShowBetaPopup(true)}
               className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
             >
               <FaExclamationTriangle className="text-red-500 text-xs" />
-              <span className="font-medium text-green-500">Event is not Live!</span>
+              <span className="font-medium text-green-500">Event is Live!</span>
             </button>
             <span className="ml-2">Ends in: <span className="font-medium">{timeLeft}</span></span>
           </div>

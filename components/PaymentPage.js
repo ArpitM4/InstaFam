@@ -167,13 +167,34 @@ const PaymentPage = ({ username }) => {
   // --- Data Fetching and Effects ---
   const fetchActiveEvent = async (userId) => {
     try {
-      // This API call will automatically update expired events to 'completed' status
-      const response = await fetch(`/api/events?action=current`);
+      // Use public endpoint to fetch event by username (works for all visitors)
+      const response = await fetch(`/api/events/public?username=${username}`);
       if (response.ok) {
         const data = await response.json();
         if (data.event) {
+          console.log('Active event found:', data.event);
           setCurrentEvent(data.event); // Get the current active event
+          
+          // Sync user fields with event data if they don't match
+          // This ensures UI consistency on reload
+          const eventStart = new Date(data.event.startTime);
+          const eventEnd = new Date(data.event.endTime);
+          
+          setcurrentUser(prev => {
+            if (prev && (!prev.eventStart || !prev.eventEnd ||
+                new Date(prev.eventStart).getTime() !== eventStart.getTime() ||
+                new Date(prev.eventEnd).getTime() !== eventEnd.getTime())) {
+              console.log('Syncing user event fields with active event');
+              return {
+                ...prev,
+                eventStart: eventStart,
+                eventEnd: eventEnd
+              };
+            }
+            return prev;
+          });
         } else {
+          console.log('No active event found');
           setCurrentEvent(null);
         }
       }
@@ -187,23 +208,15 @@ const PaymentPage = ({ username }) => {
     try {
       const user = await fetchuser(username);
       if (user) {
-        // Check if user has expired event fields and clear them
-        if (user.eventEnd && new Date(user.eventEnd) <= new Date()) {
-          console.log('Event has expired, clearing user event fields...');
-          try {
-            const res = await updateProfile({ ...user, eventStart: null, eventEnd: null }, username);
-            if (!res?.error) {
-              // Update the user object to reflect the cleared fields
-              user.eventStart = null;
-              user.eventEnd = null;
-            }
-          } catch (error) {
-            console.error('Error clearing expired event fields:', error);
-          }
-        }
-        
-        setcurrentUser(user);
         setUserId(user._id);
+        
+        // Fetch active event FIRST to determine if event is actually active
+        await fetchActiveEvent(user._id);
+        
+        // After fetching active event, check if we need to sync user fields
+        // The API automatically marks expired events as completed and clears user fields
+        // So we can trust the fetched user data
+        setcurrentUser(user);
         
         // Always try to show payments from current or last event
         let userPayments = [];
@@ -229,8 +242,6 @@ const PaymentPage = ({ username }) => {
         }
         
         setPayments(userPayments);
-        // Fetch active event for this user
-        await fetchActiveEvent(user._id);
       } else {
         console.error("User not found");
       }
@@ -252,17 +263,21 @@ const PaymentPage = ({ username }) => {
 
 
   
-  // Countdown timer effect
+  // Countdown timer effect - watch both currentUser.eventEnd and currentEvent
   useEffect(() => {
-    if (currentUser.eventEnd) {
+    // Use currentEvent.endTime as fallback if currentUser.eventEnd not set yet
+    const eventEndTime = currentUser?.eventEnd || currentEvent?.endTime;
+    
+    if (eventEndTime) {
       const interval = setInterval(() => {
         const now = new Date();
-        const end = new Date(currentUser.eventEnd);
+        const end = new Date(eventEndTime);
         const diff = end - now;
 
         if (diff <= 0) {
           clearInterval(interval);
           setTimeLeft(null);
+          setCurrentEvent(null); // Clear current event state
           
           // Event has expired - automatically end it
           console.log('Event expired, automatically ending...');
@@ -291,8 +306,10 @@ const PaymentPage = ({ username }) => {
         }
       }, 1000);
       return () => clearInterval(interval);
+    } else {
+      setTimeLeft(null);
     }
-  }, [currentUser.eventEnd, currentUser, username]);
+  }, [currentUser?.eventEnd, currentEvent, username]);
 
   // --- Event Handlers ---
   const handleChange = (e) => {
@@ -343,6 +360,9 @@ const PaymentPage = ({ username }) => {
       console.log('Creating event with data:', eventData);
       const createdEvent = await createEvent(eventData);
       console.log('Event created successfully:', createdEvent._id);
+      
+      // Set currentEvent state immediately
+      setCurrentEvent(createdEvent);
       
       // Then update the user profile with event times
       const res = await updateProfile(
@@ -402,6 +422,7 @@ const PaymentPage = ({ username }) => {
           console.log('Ending event with ID:', activeEvent._id);
           const endedEvent = await endEvent(activeEvent._id);
           console.log('Event ended successfully:', endedEvent);
+          setCurrentEvent(null); // Clear current event state
           toast.success("Event ended successfully!");
         } else {
           console.log('No active event found in database');
@@ -591,7 +612,8 @@ const PaymentPage = ({ username }) => {
     }
   };
     
-  const isEventActive = currentUser?.eventStart && currentUser?.eventEnd && new Date(currentUser.eventEnd) > new Date();
+  // Check if event is active - use currentEvent as primary source of truth
+  const isEventActive = currentEvent !== null || (currentUser?.eventStart && currentUser?.eventEnd && new Date(currentUser.eventEnd) > new Date());
 
   // Beta Popup Component
   const BetaPopup = () => (

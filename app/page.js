@@ -4,14 +4,19 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import SEO from "@/components/SEO";
+import { useSession } from "next-auth/react";
+import { useUser } from "@/context/UserContext";
 
 export default function Home() {
-  const headings = ["Support Your Favorite Creators", "Get Exclusive Perks"];
+  const headings = ["Creator Business at One Place", "Stop Scattering Your Fans."];
   const animationDuration = 10000; // Match with CSS
   const [textIndex, setTextIndex] = useState(0);
   const [key, setKey] = useState(0);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const videoRef = useRef(null);
+  const router = useRouter();
+  const { data: session } = useSession();
+  const { userData } = useUser();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -50,20 +55,31 @@ export default function Home() {
     }
   }, []);
 
-  const [searchQuery, setSearchQuery] = useState("");
-const router = useRouter();
+  const handleCreatePage = () => {
+    if (!session) {
+      // Not logged in - redirect to login
+      router.push('/login');
+    } else if (userData?.accountType === 'Creator' || userData?.accountType === 'VCreator') {
+      // Creator - go to their profile page
+      router.push(`/${session.user.name}`);
+    } else {
+      // User - go to account page
+      router.push('/account');
+    }
+  };
 
-const handleSearch = (e) => {
-  e.preventDefault();
-  if (searchQuery.trim()) {
-    router.push(`/search/${searchQuery}`);
-  }
-};
+  const getButtonText = () => {
+    if (!session) return "Create your Page →";
+    if (userData?.accountType === 'Creator' || userData?.accountType === 'VCreator') {
+      return "Your Page";
+    }
+    return "Create your Page →";
+  };
 
   return (
     <>
             <SEO
-        title="Sygil - Connect with Your Favorite Creators"
+        title="Build Your Creator Business on One Page"
         description="Join Sygil to connect with creators, earn points, unlock exclusive content, and support your favorite influencers."
         url="https://www.sygil.app"
         image="https://www.sygil.app/og-home.jpg"
@@ -94,28 +110,18 @@ const handleSearch = (e) => {
     </h1>
 
     <p className="text-base sm:text-lg md:text-xl text-white opacity-80 mb-8 animate-fadeIn delay-200">
-      Join a community that empowers Instagram creators. Support them directly, access exclusive content, and help them grow.
+      Bring all your engagement, contributions, links, and loyalty into a single creator page — simple, powerful, and built to grow your brand.
     </p>
 
-    {/* Search Bar */}
-    <form
-      onSubmit={handleSearch}
-      className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 animate-fadeIn delay-300"
-    >
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Search creators..."
-        className="w-full sm:w-96 px-4 py-3 rounded-md bg-secondary/90 text-black placeholder-black/60 focus:outline-none focus:ring-2 focus:ring-primary"
-      />
+    {/* Create Page Button */}
+    <div className="flex items-center justify-center animate-fadeIn delay-300">
       <button
-        type="submit"
-        className="px-6 py-3 font-semibold text-white bg-primary rounded-md hover:bg-primary/90 hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
+        onClick={handleCreatePage}
+        className="px-8 py-4 font-semibold text-white bg-primary rounded-md hover:bg-primary/90 hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200 text-lg"
       >
-        Search
+        {getButtonText()}
       </button>
-    </form>
+    </div>
 
     {/* Explore Link */}
     <div className="pt-20 animate-fadeIn delay-400">
