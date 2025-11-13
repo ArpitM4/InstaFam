@@ -67,19 +67,22 @@ const PaymentInteractionSection = ({
                     }, {})
                   ).sort(([, a], [, b]) => b - a)
                   .map(([name, total], i) => {
-                    const isPerkEligible = i < (currentUser?.perkRank || 5);
+                    const isTop3 = i < 3;
+                    const rankEmoji = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
                     return (
                       <li key={i} className={`flex justify-between items-center p-2 rounded-lg transition-all duration-200 ${
-                        isPerkEligible 
+                        isTop3
                           ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20' 
                           : 'bg-background/30'
                       }`}>
                         <div className="flex items-center space-x-2">
-                          <FaUserCircle className={`text-xl ${isPerkEligible ? 'text-yellow-400' : 'text-yellow-500'}`}/>
-                          <span className={`font-medium ${isPerkEligible ? 'text-yellow-100' : ''}`}>{name}</span>
-                          {isPerkEligible && <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">🎁 Perk Eligible</span>}
+                          <FaUserCircle className={`text-xl ${isTop3 ? 'text-yellow-400' : 'text-yellow-500'}`}/>
+                          <span className={`font-medium ${isTop3 ? 'text-yellow-100' : ''}`}>
+                            {rankEmoji && <span className="mr-1">{rankEmoji}</span>}
+                            {name}
+                          </span>
                         </div>
-                        <span className={`font-medium ${isPerkEligible ? 'text-yellow-100' : 'text-text'}`}>${total}</span>
+                        <span className={`font-medium ${isTop3 ? 'text-yellow-100' : 'text-text'} blur-sm select-none`}>${total.toFixed(2)}</span>
                       </li>
                     );
                   })}

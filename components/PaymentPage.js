@@ -570,13 +570,6 @@ const PaymentPage = ({ username }) => {
           const res = await savePayment(paymentDetails, details, currentEvent, paymentform.name);
 
           if (res.success) {
-            // Points are already awarded in the PayPal route (only for logged in users)
-            if (res.pointsAwarded) {
-              toast.success(`Payment successful! You earned ${res.pointsAwarded} Fam Points! 🎉`);
-            } else {
-              toast.success('Payment successful!');
-            }
-
             // Emit global payment success event for navbar updates
             emitPaymentSuccess({ pointsAwarded: res.pointsAwarded });
 
@@ -585,15 +578,16 @@ const PaymentPage = ({ username }) => {
               updatePoints();
             }
 
-            // Refetch payments and update leaderboard - ONLY for ranked donations
-            if (res.type === 'ranked') {
-              const updatedPayments = currentUser.eventStart ? 
-                await fetchpayments(userId, currentUser.eventStart) : 
-                [];
+            // Refetch payments and update leaderboard in real-time for ALL donations
+            if (res.type === 'ranked' && currentUser.eventStart) {
+              const updatedPayments = await fetchpayments(userId, currentUser.eventStart);
               setPayments(updatedPayments);
             }
             
-            router.push(`/${username}?paymentdone=true`);
+            // Small delay before redirect to ensure state updates
+            setTimeout(() => {
+              router.push(`/${username}?paymentdone=true`);
+            }, 100);
           } else {
             toast.error("Payment failed. Please contact support.");
           }
