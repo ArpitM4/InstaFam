@@ -73,36 +73,45 @@ const PaymentInteractionSection = ({
     <>
       <div className="w-full max-w-5xl mt-8 flex justify-center px-2">
         <div className="w-full flex flex-col md:flex-row gap-6">
-          {/* Leaderboard - ONLY show when event is active */}
+          {/* Leaderboard - ONLY show when event is active - Visible to ALL users */}
           {isEventActive && (
-            <div className={`flex-1 bg-dropdown-hover rounded-lg shadow-sm p-4 mx-2 md:mx-0 ${!session ? "blur-sm" : ""}`}> 
+            <div className="flex-1 bg-dropdown-hover rounded-lg shadow-sm p-4 mx-2 md:mx-0"> 
               <h2 className="text-2xl font-semibold text-primary mb-4">Leaderboard</h2>
-              {paymentsLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <FaSpinner className="animate-spin text-primary text-2xl" />
-                  <span className="ml-2 text-text/60">Loading leaderboard...</span>
-                </div>
-              ) : leaderboardData.length === 0 ? (
-                <p className="text-text/60">No payments yet</p>
+              {leaderboardData.length === 0 ? (
+                paymentsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <FaSpinner className="animate-spin text-primary text-2xl" />
+                    <span className="ml-2 text-text/60">Loading leaderboard...</span>
+                  </div>
+                ) : (
+                  <p className="text-text/60">No payments yet</p>
+                )
               ) : (
-                <ol className="list-decimal list-inside text-text/80 space-y-2">
-                  {leaderboardData.map((entry, i) => (
-                    <li key={`${entry.name}-${i}`} className={`flex justify-between items-center p-2 rounded-lg transition-all duration-200 ${
-                      entry.isTop3
-                        ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20' 
-                        : 'bg-background/30'
-                    }`}>
-                      <div className="flex items-center space-x-2">
-                        <FaUserCircle className={`text-xl ${entry.isTop3 ? 'text-yellow-400' : 'text-yellow-500'}`}/>
-                        <span className={`font-medium ${entry.isTop3 ? 'text-yellow-100' : ''}`}>
-                          {entry.rankEmoji && <span className="mr-1">{entry.rankEmoji}</span>}
-                          {entry.name}
-                        </span>
-                      </div>
-                      <span className={`font-medium ${entry.isTop3 ? 'text-yellow-100' : 'text-text'} blur-sm select-none`}>${entry.total.toFixed(2)}</span>
-                    </li>
-                  ))}
-                </ol>
+                <div className="relative">
+                  {paymentsLoading && (
+                    <div className="absolute inset-0 bg-dropdown-hover/50 backdrop-blur-sm flex items-center justify-center rounded-lg z-10">
+                      <FaSpinner className="animate-spin text-primary text-xl" />
+                    </div>
+                  )}
+                  <ol className="list-decimal list-inside text-text/80 space-y-2">
+                    {leaderboardData.map((entry, i) => (
+                      <li key={`${entry.name}-${i}`} className={`flex justify-between items-center p-2 rounded-lg transition-all duration-200 ${
+                        entry.isTop3
+                          ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20' 
+                          : 'bg-background/30'
+                      }`}>
+                        <div className="flex items-center space-x-2">
+                          <FaUserCircle className={`text-xl ${entry.isTop3 ? 'text-yellow-400' : 'text-yellow-500'}`}/>
+                          <span className={`font-medium ${entry.isTop3 ? 'text-yellow-100' : ''}`}>
+                            {entry.rankEmoji && <span className="mr-1">{entry.rankEmoji}</span>}
+                            {entry.name}
+                          </span>
+                        </div>
+                        <span className={`font-medium ${entry.isTop3 ? 'text-yellow-100' : 'text-text'} blur-sm select-none`}>${entry.total.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
               )}
             </div>
           )}

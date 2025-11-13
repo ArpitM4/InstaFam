@@ -285,7 +285,7 @@ const LinksSection = ({ currentUser }) => {
       <div>
         <h2 className="text-2xl font-bold text-text mb-6 flex items-center gap-2">
           <span className="text-3xl">⭐</span>
-          Favourites
+          Favourites/ Affiliates
         </h2>
         
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">

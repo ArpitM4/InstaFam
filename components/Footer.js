@@ -16,8 +16,7 @@ const Footer = () => {
       <div className="space-y-4">
         <h2 className="text-3xl font-bold text-gradient">Sygil</h2>
         <p className="text-lg opacity-80">
-          Support your favorite Instagram creators and empower them to succeed by joining our community. Get exclusive content and interact directly with creators.
-        </p>
+Designed for creators. Built for connection.        </p>
       </div>
 
       {/* Column 2: Links Section */}

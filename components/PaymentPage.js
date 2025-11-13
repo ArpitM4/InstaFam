@@ -183,68 +183,83 @@ const PaymentPage = ({ username }) => {
           console.log('Active event found:', data.event);
           setCurrentEvent(data.event); // Get the current active event
           
-          // Sync user fields with event data if they don't match
-          // This ensures UI consistency on reload
-          const eventStart = new Date(data.event.startTime);
-          const eventEnd = new Date(data.event.endTime);
-          
-          setcurrentUser(prev => {
-            if (prev && (!prev.eventStart || !prev.eventEnd ||
-                new Date(prev.eventStart).getTime() !== eventStart.getTime() ||
-                new Date(prev.eventEnd).getTime() !== eventEnd.getTime())) {
-              console.log('Syncing user event fields with active event');
-              return {
-                ...prev,
-                eventStart: eventStart,
-                eventEnd: eventEnd
-              };
-            }
-            return prev;
-          });
+          // Return the event so caller can use it immediately
+          return data.event;
         } else {
           console.log('No active event found');
           setCurrentEvent(null);
+          return null;
         }
       }
+      return null;
     } catch (error) {
       console.error("Error fetching active event:", error);
       setCurrentEvent(null);
+      return null;
     }
   };
 
   const getData = useCallback(async () => {
     setPaymentsLoading(true);
     try {
-      const user = await fetchuser(username);
+      // Fetch user and event in parallel
+      const userPromise = fetchuser(username);
+      const eventPromise = fetchActiveEvent();
+      
+      const [user, activeEvent] = await Promise.all([userPromise, eventPromise]);
+      
       if (user) {
         setUserId(user._id);
-        setcurrentUser(user);
         
-        // Parallel fetch: event and payments at the same time
-        const eventPromise = fetchActiveEvent(user._id);
-        
-        // Determine payment fetch based on event status
-        let paymentsPromise;
-        if (user.eventStart && user.eventEnd && new Date(user.eventEnd) > new Date()) {
-          // Active event - fetch payments from event start
-          paymentsPromise = fetchpayments(user._id, user.eventStart);
+        // Sync user state with event data if active event exists
+        if (activeEvent) {
+          const eventStart = new Date(activeEvent.startTime);
+          const eventEnd = new Date(activeEvent.endTime);
+          
+          setcurrentUser({
+            ...user,
+            eventStart: eventStart,
+            eventEnd: eventEnd
+          });
+          
+          // Fetch payments based on ACTIVE EVENT data
+          if (eventEnd > new Date()) {
+            console.log('Fetching payments for active event:', activeEvent._id);
+            const paymentsData = await fetchpayments(user._id, eventStart);
+            setPayments(paymentsData || []);
+          } else {
+            console.log('Event has ended');
+            setPayments([]);
+          }
         } else {
-          // No active event - try last completed event
-          paymentsPromise = fetchEvents(user._id, 'history')
-            .then(eventData => {
+          // No active event - set user and check for past events
+          setcurrentUser(user);
+          
+          if (user.eventStart && user.eventEnd && new Date(user.eventEnd) > new Date()) {
+            // User has valid event fields (shouldn't happen without active event, but handle it)
+            console.log('Fetching payments based on user event fields');
+            const paymentsData = await fetchpayments(user._id, new Date(user.eventStart));
+            setPayments(paymentsData || []);
+          } else {
+            // Try to fetch last completed event's payments
+            try {
+              const eventData = await fetchEvents(user._id, 'history');
               if (eventData?.events?.length > 0) {
                 const lastEvent = eventData.events[0];
-                return lastEvent.startTime ? fetchpayments(user._id, lastEvent.startTime) : [];
+                if (lastEvent.startTime) {
+                  const paymentsData = await fetchpayments(user._id, lastEvent.startTime);
+                  setPayments(paymentsData || []);
+                } else {
+                  setPayments([]);
+                }
+              } else {
+                setPayments([]);
               }
-              return [];
-            })
-            .catch(() => []);
+            } catch {
+              setPayments([]);
+            }
+          }
         }
-        
-        // Wait for both to complete in parallel
-        const [_, userPayments] = await Promise.all([eventPromise, paymentsPromise]);
-        
-        setPayments(userPayments || []);
       } else {
         console.error("User not found");
         setPayments([]);
