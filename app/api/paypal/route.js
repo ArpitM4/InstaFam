@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
 import Payment from "@/models/Payment";
+import UnrankedDonation from "@/models/UnrankedDonation"; // New model for non-event donations
 import User from "@/models/User";
 import PointTransaction from "@/models/PointTransaction";
 import connectDB from "@/db/ConnectDb";
@@ -26,20 +27,38 @@ const getAccessToken = async () => {
 export async function POST(req) {
   try {
     await connectDB();
-    const session = await getServerSession(nextAuthConfig);
-    if (!session || !session.user || !session.user.email) {
-      return NextResponse.json({ error: "You must be logged in to pay." }, { status: 401 });
-    }
-    const fanUser = await User.findOne({ email: session.user.email });
-    if (!fanUser) {
-      return NextResponse.json({ error: "Fan user not found." }, { status: 401 });
-    }
-    
     const body = await req.json();
     console.log('PayPal API received body:', body); // Debug log
     
-    const { amount, message, orderID, captureOnly, to_user, eventId } = body;
-
+    const { amount, message, orderID, captureOnly, to_user, eventId, isRanked, donorName } = body;
+    
+    // Session is OPTIONAL now - only required for ranked donations
+    const session = await getServerSession(nextAuthConfig);
+    
+    /**
+     * RANKED vs UNRANKED DONATION LOGIC:
+     * - RANKED: Event is active, user must be logged in, saved to Payment model, leaderboard eligible
+     * - UNRANKED: No event active, can be guest or logged in, saved to UnrankedDonation model, no leaderboard
+     */
+    
+    let fanUser = null;
+    
+    // For RANKED donations, authentication is required
+    if (isRanked) {
+      if (!session || !session.user || !session.user.email) {
+        return NextResponse.json({ error: "You must be logged in for ranked contributions." }, { status: 401 });
+      }
+      fanUser = await User.findOne({ email: session.user.email });
+      if (!fanUser) {
+        return NextResponse.json({ error: "Fan user not found." }, { status: 401 });
+      }
+    } else {
+      // For UNRANKED donations, try to get user if logged in (optional)
+      if (session && session.user && session.user.email) {
+        fanUser = await User.findOne({ email: session.user.email });
+      }
+    }
+    
     const accessToken = await getAccessToken();
     if (!accessToken) {
       return NextResponse.json({ error: "Failed to get access token" }, { status: 500 });
@@ -56,49 +75,107 @@ export async function POST(req) {
     const captureData = body.captureDetails;
     if (captureData.status === "COMPLETED") {
       try {
-        const paymentData = {
-          oid: orderID,
-          amount: amount,
-          to_user: toUserId,
-          from_user: fanUser._id,
-          message: message,
-          done: true,
-        };
+        /**
+         * SAVE DONATION BASED ON TYPE:
+         * - If RANKED (event active): Save to Payment model with eventId
+         * - If UNRANKED (no event): Save to UnrankedDonation model with donor name
+         */
         
-        // Only include eventId if it's provided
-        if (eventId) {
-          paymentData.eventId = eventId;
+        if (isRanked) {
+          // RANKED DONATION - Save to Payment model (requires logged in user)
+          const paymentData = {
+            oid: orderID,
+            amount: amount,
+            to_user: toUserId,
+            from_user: fanUser._id,
+            message: message,
+            done: true,
+          };
+          
+          // Include eventId for ranked donations
+          if (eventId) {
+            paymentData.eventId = eventId;
+          }
+          
+          console.log('Creating RANKED payment with data:', paymentData);
+          
+          const payment = await Payment.create(paymentData);
+
+          // Award Fam Points to the fan using the existing points system
+          // Calculate points earned (₹10 = 1 point, so amount * 0.1)
+          const pointsToAdd = Math.floor(amount * 0.1);
+          
+          // Update user's total points
+          await User.findByIdAndUpdate(fanUser._id, {
+            $inc: { points: pointsToAdd }
+          });
+
+          // Create point transaction record
+          await PointTransaction.create({
+            userId: fanUser._id,
+            points_earned: pointsToAdd,
+            source_payment_id: payment._id,
+            description: `Ranked support payment of $${amount}`
+          });
+
+          return NextResponse.json({ 
+            success: true, 
+            capture: captureData, 
+            paymentId: payment._id,
+            pointsAwarded: pointsToAdd,
+            type: 'ranked'
+          });
+          
+        } else {
+          // UNRANKED DONATION - Save to UnrankedDonation model (guest or logged in)
+          const unrankedData = {
+            oid: orderID,
+            amount: amount,
+            to_user: toUserId,
+            from_name: donorName || 'Anonymous', // Use provided name or default
+            message: message,
+            done: true,
+          };
+          
+          // Optionally link to user account if logged in
+          if (fanUser) {
+            unrankedData.from_user = fanUser._id;
+          }
+          
+          console.log('Creating UNRANKED donation with data:', unrankedData);
+          
+          const donation = await UnrankedDonation.create(unrankedData);
+
+          // Award Fam Points ONLY if user is logged in
+          let pointsAwarded = 0;
+          if (fanUser) {
+            const pointsToAdd = Math.floor(amount * 0.1);
+            
+            await User.findByIdAndUpdate(fanUser._id, {
+              $inc: { points: pointsToAdd }
+            });
+
+            await PointTransaction.create({
+              userId: fanUser._id,
+              points_earned: pointsToAdd,
+              source_payment_id: donation._id,
+              description: `Unranked support payment of $${amount}`
+            });
+            
+            pointsAwarded = pointsToAdd;
+          }
+
+          return NextResponse.json({ 
+            success: true, 
+            capture: captureData, 
+            paymentId: donation._id,
+            pointsAwarded: pointsAwarded,
+            type: 'unranked'
+          });
         }
         
-        console.log('Creating payment with data:', paymentData); // Debug log
-        
-        const payment = await Payment.create(paymentData);
-
-      // Award Fam Points to the fan using the existing points system
-      // Calculate points earned (₹10 = 1 point, so amount * 0.1)
-      const pointsToAdd = Math.floor(amount * 0.1);
-      
-      // Update user's total points
-      await User.findByIdAndUpdate(fanUser._id, {
-        $inc: { points: pointsToAdd }
-      });
-
-      // Create point transaction record
-      await PointTransaction.create({
-        userId: fanUser._id,
-        points_earned: pointsToAdd,
-        source_payment_id: payment._id,
-        description: `Support payment of $${amount}`
-      });
-
-      return NextResponse.json({ 
-        success: true, 
-        capture: captureData, 
-        paymentId: payment._id,
-        pointsAwarded: pointsToAdd
-      });
       } catch (error) {
-        console.error('Error creating payment:', error);
+        console.error('Error creating payment/donation:', error);
         return NextResponse.json({ 
           error: "Failed to save payment", 
           details: error.message 

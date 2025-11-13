@@ -24,19 +24,28 @@ import CommunitySection from "./CommunitySection";
 import ErrorBoundary from "./ErrorBoundary";
 
 // Save payment after capture (send captureDetails to backend)
-const savePayment = async (paymentDetails, captureDetails, currentEvent = null) => {
+const savePayment = async (paymentDetails, captureDetails, currentEvent = null, donorName = null) => {
   try {
+    /**
+     * Determine if this is a RANKED or UNRANKED donation:
+     * - RANKED: Event is active (currentEvent exists)
+     * - UNRANKED: No event active (currentEvent is null)
+     */
+    const isRanked = currentEvent !== null;
+    
     const paymentData = {
       orderID: paymentDetails.orderID,
       amount: paymentDetails.amount,
       to_user: paymentDetails.to_user,
       message: paymentDetails.message,
       captureOnly: true,
-      captureDetails
+      captureDetails,
+      isRanked: isRanked, // Flag to indicate ranked vs unranked
+      donorName: donorName // Name provided by donor (for unranked or editable ranked)
     };
 
-    // Include eventId if there's an active event
-    if (currentEvent && currentEvent._id) {
+    // Include eventId only for RANKED donations (when event is active)
+    if (isRanked && currentEvent._id) {
       paymentData.eventId = currentEvent._id;
     }
 
@@ -46,30 +55,40 @@ const savePayment = async (paymentDetails, captureDetails, currentEvent = null) 
       body: JSON.stringify(paymentData)
     });
     
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
-    
-    const data = await res.json();
-    console.log('PayPal API response:', data); // Debug log
-    
-    if (data.capture && data.capture.status === "COMPLETED") {
-      toast.success("Payment successful!", {
-        position: "top-right",
-        autoClose: 5000,
-        theme: "light",
-        transition: Bounce,
-      });
-      return { success: true, paymentId: data.paymentId };
+    if (res.ok) {
+      const data = await res.json();
+      console.log('PayPal API response:', data); // Debug log
+      
+      if (data.capture && data.capture.status === "COMPLETED") {
+        // Show appropriate success message based on donation type
+        if (data.type === 'ranked') {
+          toast.success("Ranked contribution successful! You're on the leaderboard! 🏆", {
+            position: "top-right",
+            autoClose: 5000,
+            theme: "light",
+            transition: Bounce,
+          });
+        } else {
+          toast.success("Contribution successful! Thank you for your support! ❤️", {
+            position: "top-right",
+            autoClose: 5000,
+            theme: "light",
+            transition: Bounce,
+          });
+        }
+        return { success: true, paymentId: data.paymentId, type: data.type };
+      } else {
+        const errorMsg = data.capture && data.capture.status ? `Payment status: ${data.capture.status}` : (data.error || "Payment failed.");
+        toast.error(`Payment error: ${errorMsg}`, {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "light",
+          transition: Bounce,
+        });
+        return { success: false, message: errorMsg };
+      }
     } else {
-      const errorMsg = data.capture && data.capture.status ? `Payment status: ${data.capture.status}` : (data.error || "Payment failed.");
-      toast.error(`Payment error: ${errorMsg}`, {
-        position: "top-right",
-        autoClose: 5000,
-        theme: "light",
-        transition: Bounce,
-      });
-      return { success: false, message: errorMsg };
+      throw new Error(`HTTP error! status: ${res.status}`);
     }
   } catch (err) {
     console.error('Error saving payment:', err);
@@ -117,6 +136,29 @@ const PaymentPage = ({ username }) => {
   const [timeLeft, setTimeLeft] = useState(null);
   const [isPaying, setIsPaying] = useState(false);
   const [activeTab, setActiveTab] = useState('contribute');
+
+  // Sync activeTab with ?section= in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const section = params.get('section');
+    if (section && [
+      'contribute',
+      'vault',
+      'community',
+      'links',
+      'merchandise'
+    ].includes(section)) {
+      setActiveTab(section);
+    }
+  }, [searchParams]);
+
+  // Update URL when tab changes
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    const url = new URL(window.location.href);
+    url.searchParams.set('section', tab);
+    window.history.replaceState({}, '', url);
+  };
   const [hasError, setHasError] = useState(false);
   const [showBetaPopup, setShowBetaPopup] = useState(false);
 
@@ -225,19 +267,18 @@ const PaymentPage = ({ username }) => {
           // Event has expired - automatically end it
           console.log('Event expired, automatically ending...');
           
-          // Clear the user's event fields immediately
-          setcurrentUser(prevUser => ({ 
-            ...prevUser, 
-            eventStart: null, 
-            eventEnd: null 
-          }));
-          
-          // Update the backend
+          // Update the backend first
           updateProfile({ 
-            ...currentUser, 
             eventStart: null, 
             eventEnd: null 
-          }, username).catch(error => {
+          }, username).then(() => {
+            // Clear the user's event fields after successful backend update
+            setcurrentUser(prevUser => ({ 
+              ...prevUser, 
+              eventStart: null, 
+              eventEnd: null 
+            }));
+          }).catch(error => {
             console.error('Error clearing expired event fields:', error);
           });
           
@@ -305,7 +346,7 @@ const PaymentPage = ({ username }) => {
       
       // Then update the user profile with event times
       const res = await updateProfile(
-        { ...currentUser, eventStart: start, eventEnd: end },
+        { eventStart: start, eventEnd: end },
         username
       );
       
@@ -313,7 +354,8 @@ const PaymentPage = ({ username }) => {
         toast.error(res.error);
       } else {
         toast.success("Event started!");
-        setcurrentUser({ ...currentUser, eventStart: start, eventEnd: end });
+        // Use functional update to avoid stale closure issues
+        setcurrentUser(prevUser => ({ ...prevUser, eventStart: start, eventEnd: end }));
         
         // Clear previous event's payments when starting a new event
         setPayments([]);
@@ -374,7 +416,7 @@ const PaymentPage = ({ username }) => {
       
       // Then clear the user profile event fields
       console.log('Clearing user profile event fields...');
-      const res = await updateProfile({ ...currentUser, eventStart: null, eventEnd: null }, username);
+      const res = await updateProfile({ eventStart: null, eventEnd: null }, username);
       if (res?.error) {
         toast.error(res.error);
       } else {
@@ -503,10 +545,11 @@ const PaymentPage = ({ username }) => {
           };
 
           // Send capture details to backend for saving
-          const res = await savePayment(paymentDetails, details, currentEvent);
+          // Pass the donor name from the form for both ranked and unranked
+          const res = await savePayment(paymentDetails, details, currentEvent, paymentform.name);
 
           if (res.success) {
-            // Points are already awarded in the PayPal route
+            // Points are already awarded in the PayPal route (only for logged in users)
             if (res.pointsAwarded) {
               toast.success(`Payment successful! You earned ${res.pointsAwarded} Fam Points! 🎉`);
             } else {
@@ -521,11 +564,14 @@ const PaymentPage = ({ username }) => {
               updatePoints();
             }
 
-            // Refetch payments and update leaderboard - use the same filtering as initial load
-            const updatedPayments = currentUser.eventStart ? 
-              await fetchpayments(userId, currentUser.eventStart) : 
-              [];
-            setPayments(updatedPayments);
+            // Refetch payments and update leaderboard - ONLY for ranked donations
+            if (res.type === 'ranked') {
+              const updatedPayments = currentUser.eventStart ? 
+                await fetchpayments(userId, currentUser.eventStart) : 
+                [];
+              setPayments(updatedPayments);
+            }
+            
             router.push(`/${username}?paymentdone=true`);
           } else {
             toast.error("Payment failed. Please contact support.");
@@ -663,7 +709,7 @@ const PaymentPage = ({ username }) => {
         <div className="w-full max-w-5xl mt-8 border-b border-text/10">
           <div className="flex justify-center items-center gap-6">
             <button
-              onClick={() => setActiveTab('contribute')}
+              onClick={() => handleTabChange('contribute')}
               className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
                 activeTab === 'contribute'
                   ? 'text-primary border-b-2 border-primary'
@@ -673,7 +719,7 @@ const PaymentPage = ({ username }) => {
               Contribute
             </button>
             <button
-              onClick={() => setActiveTab('vault')}
+              onClick={() => handleTabChange('vault')}
               className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
                 activeTab === 'vault'
                   ? 'text-primary border-b-2 border-primary'
@@ -682,18 +728,9 @@ const PaymentPage = ({ username }) => {
             >
                Vault
             </button>
+             {/* Links */}
             <button
-              onClick={() => setActiveTab('community')}
-              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                activeTab === 'community'
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
-              }`}
-            >
-              Community
-            </button>
-            <button
-              onClick={() => setActiveTab('links')}
+              onClick={() => handleTabChange('links')}
               className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
                 activeTab === 'links'
                   ? 'text-primary border-b-2 border-primary'
@@ -702,8 +739,20 @@ const PaymentPage = ({ username }) => {
             >
               Links
             </button>
+            {/* Community */}
             <button
-              onClick={() => setActiveTab('merchandise')}
+              onClick={() => handleTabChange('community')}
+              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
+                activeTab === 'community'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
+              }`}
+            >
+              Community
+            </button>
+           
+            <button
+              onClick={() => handleTabChange('merchandise')}
               className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
                 activeTab === 'merchandise'
                   ? 'text-primary border-b-2 border-primary'
@@ -743,6 +792,7 @@ const PaymentPage = ({ username }) => {
                     onApprove={onApprove}
                     router={router}
                     currentUser={currentUser}
+                    setPaymentform={setPaymentform}
                   />
                 </ErrorBoundary>
               ) : (
@@ -774,7 +824,7 @@ const PaymentPage = ({ username }) => {
           )}
 
           {activeTab === 'links' && (
-            <LinksSection />
+            <LinksSection currentUser={currentUser} />
           )}
 
           {activeTab === 'merchandise' && (

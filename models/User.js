@@ -60,7 +60,23 @@ const UserSchema = new Schema({
     },
     onboardingStartedAt: { type: Date, default: null },
     onboardingCompletedAt: { type: Date, default: null }
-  }
+  },
+
+  // Social Media Links - Array of social media profiles
+  socials: [{
+    platform: { type: String, required: true }, // e.g., "Instagram", "Twitter", "YouTube"
+    username: { type: String, required: true }, // e.g., "@username"
+    link: { type: String, required: true }, // Full URL to the profile
+    createdAt: { type: Date, default: Date.now }
+  }],
+
+  // Favourite Products/Affiliates - Array of affiliated products
+  favourites: [{
+    name: { type: String, required: true }, // Product/Affiliate name
+    link: { type: String, required: true }, // Affiliate/Product link
+    image: { type: String }, // Product image URL
+    createdAt: { type: Date, default: Date.now }
+  }]
 });
 
 // Remove the old index definition - we'll handle this differently

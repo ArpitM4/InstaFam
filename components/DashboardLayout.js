@@ -75,6 +75,16 @@ const DashboardLayout = ({ children }) => {
             >
               Leaderboard Payout
             </Link>
+            <Link
+              href="/dashboard/unranked-donations"
+              className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
+                isActive('/dashboard/unranked-donations')
+                  ? 'bg-primary/10 text-primary font-medium shadow-sm'
+                  : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
+              }`}
+            >
+              Unranked Donations
+            </Link>
             {user?.instagram?.isVerified && (
               <>
                 <Link
@@ -156,6 +166,16 @@ const DashboardLayout = ({ children }) => {
             }`}
           >
             Payout
+          </Link>
+          <Link
+            href="/dashboard/unranked-donations"
+            className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
+              isActive('/dashboard/unranked-donations')
+                ? 'bg-primary/10 text-primary shadow-sm'
+                : 'bg-dropdown-hover text-text/70 hover:text-text'
+            }`}
+          >
+            Unranked
           </Link>
           {user?.instagram?.isVerified && (
             <>
