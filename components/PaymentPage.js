@@ -59,10 +59,11 @@ const savePayment = async (paymentDetails, captureDetails, currentEvent = null, 
       const data = await res.json();
       console.log('PayPal API response:', data); // Debug log
       
-      if (data.capture && data.capture.status === "COMPLETED") {
+      // Check if payment was successful (either data.success or capture status COMPLETED)
+      if (data.success || (data.capture && data.capture.status === "COMPLETED")) {
         // Show appropriate success message based on donation type
         if (data.type === 'ranked') {
-          toast.success("Ranked contribution successful! You're on the leaderboard! 🏆", {
+          toast.success("Thank you for your support! ❤️ You're on the leaderboard! 🏆", {
             position: "top-right",
             autoClose: 5000,
             theme: "light",
@@ -76,7 +77,7 @@ const savePayment = async (paymentDetails, captureDetails, currentEvent = null, 
             transition: Bounce,
           });
         }
-        return { success: true, paymentId: data.paymentId, type: data.type };
+        return { success: true, paymentId: data.paymentId, type: data.type, pointsAwarded: data.pointsAwarded || 0 };
       } else {
         const errorMsg = data.capture && data.capture.status ? `Payment status: ${data.capture.status}` : (data.error || "Payment failed.");
         toast.error(`Payment error: ${errorMsg}`, {
@@ -130,6 +131,7 @@ const PaymentPage = ({ username }) => {
   const [userId, setUserId] = useState(null);
   const [currentEvent, setCurrentEvent] = useState(null);
   const [payments, setPayments] = useState([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(true);
   const [paymentform, setPaymentform] = useState({ name: "", message: "", amount: "" });
   const [isEditing, setIsEditing] = useState(false);
   const [eventDuration, setEventDuration] = useState("");
@@ -161,6 +163,8 @@ const PaymentPage = ({ username }) => {
   };
   const [hasError, setHasError] = useState(false);
   const [showBetaPopup, setShowBetaPopup] = useState(false);
+  const [showFamPointsPopup, setShowFamPointsPopup] = useState(false);
+  const [earnedFamPoints, setEarnedFamPoints] = useState(0);
 
   const isOwner = session?.user?.name === username;
 
@@ -205,49 +209,48 @@ const PaymentPage = ({ username }) => {
   };
 
   const getData = useCallback(async () => {
+    setPaymentsLoading(true);
     try {
       const user = await fetchuser(username);
       if (user) {
         setUserId(user._id);
-        
-        // Fetch active event FIRST to determine if event is actually active
-        await fetchActiveEvent(user._id);
-        
-        // After fetching active event, check if we need to sync user fields
-        // The API automatically marks expired events as completed and clears user fields
-        // So we can trust the fetched user data
         setcurrentUser(user);
         
-        // Always try to show payments from current or last event
-        let userPayments = [];
+        // Parallel fetch: event and payments at the same time
+        const eventPromise = fetchActiveEvent(user._id);
         
+        // Determine payment fetch based on event status
+        let paymentsPromise;
         if (user.eventStart && user.eventEnd && new Date(user.eventEnd) > new Date()) {
-          // If there's an active event, use the user's eventStart
-          userPayments = await fetchpayments(user._id, user.eventStart);
+          // Active event - fetch payments from event start
+          paymentsPromise = fetchpayments(user._id, user.eventStart);
         } else {
-          // If no active event, try to get payments from the last completed event
-          try {
-            const eventData = await fetchEvents(user._id, 'history');
-            if (eventData && eventData.events && eventData.events.length > 0) {
-              // Get the most recent event (first in the array since they're sorted newest first)
-              const lastEvent = eventData.events[0];
-              if (lastEvent.startTime) {
-                userPayments = await fetchpayments(user._id, lastEvent.startTime);
+          // No active event - try last completed event
+          paymentsPromise = fetchEvents(user._id, 'history')
+            .then(eventData => {
+              if (eventData?.events?.length > 0) {
+                const lastEvent = eventData.events[0];
+                return lastEvent.startTime ? fetchpayments(user._id, lastEvent.startTime) : [];
               }
-            }
-          } catch (error) {
-            console.error('Error fetching last event data:', error);
-            userPayments = [];
-          }
+              return [];
+            })
+            .catch(() => []);
         }
         
-        setPayments(userPayments);
+        // Wait for both to complete in parallel
+        const [_, userPayments] = await Promise.all([eventPromise, paymentsPromise]);
+        
+        setPayments(userPayments || []);
       } else {
         console.error("User not found");
+        setPayments([]);
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);
       toast.error("Could not load profile data.");
+      setPayments([]);
+    } finally {
+      setPaymentsLoading(false);
     }
   }, [username]);
 
@@ -260,6 +263,16 @@ const PaymentPage = ({ username }) => {
       setPaymentform((prev) => ({ ...prev, name: session.user.name }));
     }
   }, [session]);
+
+  // Auto-close FamPoints popup after 3 seconds
+  useEffect(() => {
+    if (showFamPointsPopup) {
+      const timer = setTimeout(() => {
+        setShowFamPointsPopup(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showFamPointsPopup]);
 
 
   
@@ -578,16 +591,33 @@ const PaymentPage = ({ username }) => {
               updatePoints();
             }
 
-            // Refetch payments and update leaderboard in real-time for ALL donations
+            // Refetch payments and update leaderboard in real-time for RANKED donations only
             if (res.type === 'ranked' && currentUser.eventStart) {
-              const updatedPayments = await fetchpayments(userId, currentUser.eventStart);
-              setPayments(updatedPayments);
+              setPaymentsLoading(true);
+              try {
+                const updatedPayments = await fetchpayments(userId, currentUser.eventStart);
+                setPayments(updatedPayments || []);
+              } catch (error) {
+                console.error('Error refreshing payments:', error);
+              } finally {
+                setPaymentsLoading(false);
+              }
             }
             
-            // Small delay before redirect to ensure state updates
-            setTimeout(() => {
-              router.push(`/${username}?paymentdone=true`);
-            }, 100);
+            // Show FamPoints popup ONLY if points >= 1 (payment >= $10)
+            if (res.pointsAwarded && res.pointsAwarded >= 1) {
+              setEarnedFamPoints(res.pointsAwarded);
+              setShowFamPointsPopup(true);
+            }
+            
+            // Reset payment form for next contribution
+            setPaymentform({
+              name: session?.user?.name || "",
+              message: "",
+              amount: ""
+            });
+            
+            // Don't redirect - stay on payment page to show updated leaderboard
           } else {
             toast.error("Payment failed. Please contact support.");
           }
@@ -608,6 +638,51 @@ const PaymentPage = ({ username }) => {
     
   // Check if event is active - use currentEvent as primary source of truth
   const isEventActive = currentEvent !== null || (currentUser?.eventStart && currentUser?.eventEnd && new Date(currentUser.eventEnd) > new Date());
+
+  // FamPoints Celebration Popup Component
+  const FamPointsPopup = () => (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[10000] flex items-center justify-center p-4" style={{ animation: 'fadeIn 0.3s ease-out forwards' }}>
+      <div className="bg-gradient-to-br from-background to-dropdown-hover rounded-2xl border-2 border-primary/30 shadow-2xl max-w-md w-full mx-4 overflow-hidden" style={{ animation: 'scaleIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards' }}>
+        {/* Header */}
+        <div className="relative bg-gradient-to-r from-primary/20 to-yellow-500/20 p-8 text-center border-b border-primary/10">
+          <div className="text-6xl mb-3">🎉</div>
+          <h2 className="text-2xl font-bold text-primary mb-1">Congratulations!</h2>
+        </div>
+        
+        {/* Content */}
+        <div className="relative p-8 text-center">
+          <p className="text-text/80 text-lg mb-6">
+            You have received
+          </p>
+          
+          {/* FamPoints Display */}
+          <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-6">
+            <div className="flex items-center justify-center gap-3">
+              <span className="text-5xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                {earnedFamPoints}
+              </span>
+              <div className="flex flex-col items-start">
+                <span className="text-3xl">🪙</span>
+                <span className="text-sm text-text/60 font-medium">FamPoints</span>
+              </div>
+            </div>
+          </div>
+          
+          <p className="text-text/70 text-sm leading-relaxed">
+            Keep earning FamPoints with every contribution to unlock exclusive perks and rewards!
+          </p>
+        </div>
+        
+        {/* Auto-close indicator */}
+        <div className="px-8 pb-6 text-center">
+          <div className="h-1 bg-text/5 rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-primary to-yellow-500" style={{ animation: 'progressBar 3s linear forwards' }}></div>
+          </div>
+          <p className="text-text/40 text-xs mt-2">Redirecting...</p>
+        </div>
+      </div>
+    </div>
+  );
 
   // Beta Popup Component
   const BetaPopup = () => (
@@ -681,6 +756,9 @@ const PaymentPage = ({ username }) => {
 
   return (
     <>
+      {/* FamPoints Celebration Popup */}
+      {showFamPointsPopup && <FamPointsPopup />}
+      
       {/* Beta Popup */}
       {showBetaPopup && <BetaPopup />}
       <ToastContainer
@@ -801,6 +879,7 @@ const PaymentPage = ({ username }) => {
                     session={session}
                     isEventActive={isEventActive}
                     payments={payments}
+                    paymentsLoading={paymentsLoading}
                     isPaying={isPaying}
                     paymentform={paymentform}
                     handleChange={handleChange}

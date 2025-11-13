@@ -373,7 +373,7 @@ const Account = () => {
               {/* Instagram Username */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-text/70">
-                  Instagram Username <span className="text-error">*</span>
+                  Username <span className="text-error">*</span>
                 </label>
                 <input
                   type="text"
