@@ -21,7 +21,7 @@ export default function Contact() {
           <br />
           <span className="text-accent font-bold">Phone:</span> <a href="tel:7982432872" className="text-secondary underline hover:text-primary">+91 7982432872</a>
           <br />
-          <span className="text-accent font-bold">Email:</span> <a href="mailto:support@instafam.social" className="text-secondary underline hover:text-primary">support@instafam.social</a>
+          <span className="text-accent font-bold">Email:</span> <a href="mailto:support@sygil.app" className="text-secondary underline hover:text-primary">support@sygil.app</a>
         </p>
 
         <div className="text-center mt-10">

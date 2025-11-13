@@ -135,7 +135,7 @@ const PdfPage = () => {
                 src={isMobile ? mobilePresentationUrl : pcPresentationUrl}
                 className="w-full h-full border-0"
                 allow="fullscreen"
-                title={`InstaFam Presentation - ${isMobile ? 'Mobile' : 'Desktop'} View`}
+                title={`Sygil Presentation - ${isMobile ? 'Mobile' : 'Desktop'} View`}
                 loading="lazy"
               />
             </div>

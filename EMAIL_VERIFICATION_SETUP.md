@@ -2,7 +2,7 @@
 
 ## 🎉 Email Verification Implementation Complete!
 
-Your InstaFam application now has a complete email verification system using NextAuth.js EmailProvider. Here's what has been implemented:
+Your Sygil application now has a complete email verification system using NextAuth.js EmailProvider. Here's what has been implemented:
 
 ### ✅ What's Been Done
 
@@ -23,7 +23,7 @@ EMAIL_SERVER_HOST=smtp.gmail.com
 EMAIL_SERVER_PORT=465
 EMAIL_SERVER_USER=your-email@gmail.com        # ← Change this
 EMAIL_SERVER_PASSWORD=your-gmail-app-password # ← Change this
-EMAIL_FROM=InstaFam <noreply@instafam.social>
+EMAIL_FROM=Sygil <noreply@sygil.app>
 ```
 
 ### 📧 Gmail Setup (Recommended for Development)

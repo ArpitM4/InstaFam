@@ -1,5 +1,5 @@
 /**
- * NextAuth Configuration for InstaFam
+ * NextAuth Configuration for Sygil
  * 
  * Architecture:
  * - JWT session strategy for stability and performance

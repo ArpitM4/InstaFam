@@ -1,5 +1,5 @@
 Slide 1: Title Slide
-- Title: Instafam – Revolutionizing Donations Through Instagram
+- Title: Sygil – Revolutionizing Donations Through Instagram
 - Subtitle: Empowering Creators & Engaging Communities
 - Your Name and Position: Arpit Maurya, Founder & CEO
 - Date
@@ -11,14 +11,14 @@ Slide 1: Title Slide
    - Creators struggle with engaging their audience and monetizing effectively.
    - Donors want to feel connected and recognized.
 - Solution:  
-   - Instafam provides a platform where creators can ask for donations via Instagram reels, with top donors receiving exclusive rewards.
+   - Sygil provides a platform where creators can ask for donations via Instagram reels, with top donors receiving exclusive rewards.
 
 ---
 
- Slide 3: How Instafam Works
+ Slide 3: How Sygil Works
 - Creators create donation-based Instagram reels with a leaderboard.
 - Donors contribute and track their position, with the top donors receiving exclusive perks.
-- Key Feature: Zero upfront cost for creators; Instafam takes a small commission from donations.
+- Key Feature: Zero upfront cost for creators; Sygil takes a small commission from donations.
 
 ---
 
@@ -31,7 +31,7 @@ Slide 1: Title Slide
 
  Slide 5: Monetization Model
 - Free for Creators: Initial cost-free to join and promote donation-based reels.
-- Commission: Instafam takes a small percentage of donations (to cover platform maintenance).
+- Commission: Sygil takes a small percentage of donations (to cover platform maintenance).
 - Future Monetization:  
    - Subscription fees for premium features (analytics, higher reward tiers).
    - Add-ons like advanced donor engagement tools.
@@ -60,7 +60,7 @@ Slide 1: Title Slide
 ---
 
  Slide 8: Conclusion & Contact
-- Summary: Instafam is a unique, low-risk way for creators to monetize their audience via donations with exclusive rewards.
+- Summary: Sygil is a unique, low-risk way for creators to monetize their audience via donations with exclusive rewards.
 - Contact:  
    - Name: Arpit Maurya  
    - Email: [your email]  

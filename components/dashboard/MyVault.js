@@ -326,7 +326,7 @@ const MyVault = () => {
                 </div>
                 <p className="text-text/60 text-sm">
                   Perfect for Q&A sessions, personalized messages, or any reward that requires fan interaction.
-                  [The fans will be given an Input to ask the Question Directly through InstaFam]
+                  [The fans will be given an Input to ask the Question Directly through Sygil]
                 </p>
               </div>
             ) : uploadMethod === 'promise' ? (
@@ -345,7 +345,7 @@ const MyVault = () => {
                 </div>
                 <p className="text-text/60 text-sm">
                   Perfect for Q&A sessions, personalized messages, or any reward that requires fan interaction.
-                  [The fans will be given an Input to ask the Question Directly through InstaFam]
+                  [The fans will be given an Input to ask the Question Directly through Sygil]
                 </p>
               </div>
             )}

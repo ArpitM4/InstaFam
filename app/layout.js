@@ -16,21 +16,21 @@ import "@/utils/initializeExpiry";
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata = {
-  metadataBase: new URL('https://www.instafam.social'),
+  metadataBase: new URL('https://www.sygil.app'),
   title: {
-    default: 'InstaFam - Connect with Your Favorite Creators',
-    template: '%s | InstaFam'
+    default: 'Sygil - Connect with Your Favorite Creators',
+    template: '%s | Sygil'
   },
-  description: 'Join InstaFam to connect with creators, earn points, unlock exclusive content, and support your favorite influencers through donations and premium perks. The ultimate creator-fan platform.',
+  description: 'Join Sygil to connect with creators, earn points, unlock exclusive content, and support your favorite influencers through donations and premium perks. The ultimate creator-fan platform.',
   keywords: [
     'creators', 'influencers', 'exclusive content', 'fan community', 
     'creator support', 'social platform', 'content creators', 'fan engagement',
     'creator economy', 'monetization', 'vault items', 'creator dashboard',
     'fan points', 'donations', 'premium content', 'influencer marketing'
   ],
-  authors: [{ name: 'InstaFam Team', url: 'https://www.instafam.social' }],
-  creator: 'InstaFam',
-  publisher: 'InstaFam',
+  authors: [{ name: 'Sygil Team', url: 'https://www.sygil.app' }],
+  creator: 'Sygil',
+  publisher: 'Sygil',
   formatDetection: {
     email: false,
     address: false,
@@ -41,26 +41,26 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://www.instafam.social',
-    siteName: 'InstaFam',
-    title: 'InstaFam - Connect with Your Favorite Creators',
+    url: 'https://www.sygil.app',
+    siteName: 'Sygil',
+    title: 'Sygil - Connect with Your Favorite Creators',
     description: 'Join thousands of fans connecting with their favorite creators. Earn points, unlock exclusive content, and support creators through donations and premium perks.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'InstaFam - Creator Community Platform',
+        alt: 'Sygil - Creator Community Platform',
         type: 'image/jpeg',
       }
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'InstaFam - Connect with Your Favorite Creators',
+    title: 'Sygil - Connect with Your Favorite Creators',
     description: 'Join thousands of fans connecting with their favorite creators. Earn points, unlock exclusive content, and support creators.',
-    creator: '@instafam_official',
-    site: '@instafam_official',
+    creator: '@sygil_official',
+    site: '@sygil_official',
     images: ['/og-image.jpg'],
   },
   robots: {
@@ -98,11 +98,11 @@ export const metadata = {
     },
   },
   alternates: {
-    canonical: 'https://www.instafam.social',
+    canonical: 'https://www.sygil.app',
   },
   other: {
-    'application-name': 'InstaFam',
-    'apple-mobile-web-app-title': 'InstaFam',
+    'application-name': 'Sygil',
+    'apple-mobile-web-app-title': 'Sygil',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'default',
     'format-detection': 'telephone=no',
@@ -147,23 +147,23 @@ export default function RootLayout({ children }) {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              "name": "InstaFam",
-              "url": "https://www.instafam.social",
+              "name": "Sygil",
+              "url": "https://www.sygil.app",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://www.instafam.social/logo.png",
+                "url": "https://www.sygil.app/logo.png",
                 "width": 512,
                 "height": 512
               },
               "description": "The ultimate platform connecting creators with their fans through exclusive content, points, and donations.",
               "sameAs": [
-                "https://instagram.com/_instafam_official",
-                "https://twitter.com/instafam_official"
+                "https://instagram.com/_sygil_official",
+                "https://twitter.com/sygil_official"
               ],
               "contactPoint": {
                 "@type": "ContactPoint",
                 "contactType": "customer service",
-                "url": "https://www.instafam.social/contact",
+                "url": "https://www.sygil.app/contact",
                 "availableLanguage": "English"
               },
               "foundingDate": "2024",
@@ -185,8 +185,8 @@ export default function RootLayout({ children }) {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              "name": "InstaFam",
-              "url": "https://www.instafam.social",
+              "name": "Sygil",
+              "url": "https://www.sygil.app",
               "description": "Connect with creators, earn points, unlock exclusive content",
               "applicationCategory": "SocialNetworkingApplication",
               "operatingSystem": "Web Browser",

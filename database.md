@@ -1,6 +1,6 @@
-# InstaFam Database Schemas
+# Sygil Database Schemas
 
-This document explains all MongoDB schemas used in InstaFam, their fields, and the purpose of each field.
+This document explains all MongoDB schemas used in Sygil, their fields, and the purpose of each field.
 
 ---
 
@@ -168,4 +168,4 @@ Represents points that have expired for a user.
 
 ---
 
-This schema design supports InstaFam's features: social following, donations, vault perks, points economy, expiry, admin bonuses, and real-time notifications.
+This schema design supports Sygil's features: social following, donations, vault perks, points economy, expiry, admin bonuses, and real-time notifications.

@@ -1,8 +1,8 @@
-# InstaFam - Creator Monetization Platform
+# Sygil - Creator Monetization Platform
 
-![InstaFam Logo](public/Text.png)
+![Sygil Logo](public/Text.png)
 
-InstaFam is a comprehensive creator monetization platform built with Next.js 14, enabling creators to connect with their audience, receive donations, and offer exclusive perks through a vault system. The platform features real-time notifications, event management, and a points-based reward system.
+Sygil is a comprehensive creator monetization platform built with Next.js 14, enabling creators to connect with their audience, receive donations, and offer exclusive perks through a vault system. The platform features real-time notifications, event management, and a points-based reward system.
 
 
 ## 🌟 **Key Features**
@@ -62,7 +62,7 @@ InstaFam is a comprehensive creator monetization platform built with Next.js 14,
 ## 📁 **Latest Folder Structure**
 
 ```
-InstaFam/
+Sygil/
 ├── app/                          # Next.js 14 App Router
 │   ├── admin/                    # Admin dashboard & analytics
 │   │   └── dashboard/
@@ -307,8 +307,8 @@ Expired vault requests (older than 30 days and still pending) are automatically 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/instafam.git
-cd instafam
+git clone https://github.com/your-username/sygil.git
+cd sygil
 ```
 
 ### 2. Install Dependencies
@@ -331,7 +331,7 @@ MONGODB_URI=your_mongodb_connection_string
 
 # NextAuth Configuration
 NEXTAUTH_SECRET=a_super_secret_string_for_jwt_hashing
-NEXT_PUBLIC_URL=http://localhost:3000
+NEXT_PUBLIC_URL=https://www.sygil.app
 
 # NextAuth Providers (OAuth Credentials)
 GOOGLE_ID=your_google_client_id

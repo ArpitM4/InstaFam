@@ -8,11 +8,10 @@ import { FaArrowLeft } from "react-icons/fa";
 export default function NotFound() {
   return (
     <>
-      <SEO 
-        title="Page Not Found - InstaFam"
-        description="The page you are looking for could not be found. Explore InstaFam to discover amazing creators and exclusive content."
-        url="https://www.instafam.social/404"
-        type="website"
+      <SEO
+        title="Page Not Found"
+        description="The page you're looking for doesn't exist."
+        url="https://www.sygil.app/404"
       />
       
       <div className="min-h-screen flex flex-col items-center justify-center bg-background text-text text-center px-6">

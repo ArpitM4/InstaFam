@@ -33,7 +33,7 @@ const UserSchema = new Schema({
     otpGeneratedAt: Date,
     isVerified: { type: Boolean, default: false },
   },
-  description: { type: String, default: "Welcome to my Instafam" },
+  description: { type: String, default: "Welcome to my Sygil" },
   leaderboard: {
     isActive: Boolean,
     startTime: Date,

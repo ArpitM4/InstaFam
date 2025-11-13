@@ -33,7 +33,7 @@ export default function FAQ() {
     {
       question: "How can I contact customer support?",
       answer:
-        "You can reach out to us via our Contact page or email us directly at support@instafam.social.",
+        "You can reach out to us via our Contact page or email us directly at support@sygil.app.",
     },
   ];
 

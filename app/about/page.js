@@ -5,11 +5,11 @@ export default function About() {
     <div className="min-h-screen bg-background text-text py-16 px-4">
       <div className="max-w-5xl mx-auto text-center">
         <h1 className="text-4xl md:text-6xl font-extrabold mb-8 text-primary">
-          About InstaFam
+          About Sygil
         </h1>
 
         <p className="text-lg md:text-xl text-text/80 max-w-3xl mx-auto leading-relaxed">
-          Welcome to <span className="text-accent font-bold">InstaFam</span> — where creators shine and fans empower. 
+          Welcome to <span className="text-accent font-bold">Sygil</span> — where creators shine and fans empower. 
           We help fans support their favorite Instagram creators through quick, secure donations. 
           Whether it’s for a new camera, a dance shoot, or just appreciation — we make every rupee count.
         </p>
@@ -23,7 +23,7 @@ export default function About() {
         </div>
 
         <div className="mt-16">
-          <h2 className="text-3xl font-semibold mb-6 text-secondary">🚀 Why InstaFam?</h2>
+          <h2 className="text-3xl font-semibold mb-6 text-secondary">🚀 Why Sygil?</h2>
           <ul className="text-text/80 text-left list-disc list-inside space-y-4 text-lg md:text-xl max-w-3xl mx-auto">
             <li>
               <span className="text-primary font-semibold">100% Transparent:</span> Every donation goes directly to the creator.
@@ -55,7 +55,7 @@ export default function About() {
         </div>
 
         <div className="mt-16">
-          <p className="text-sm text-text/40">© {new Date().getFullYear()} InstaFam. Built for creators, loved by fans.</p>
+          <p className="text-sm text-text/40">© {new Date().getFullYear()} Sygil. Built for creators, loved by fans.</p>
         </div>
       </div>
     </div>

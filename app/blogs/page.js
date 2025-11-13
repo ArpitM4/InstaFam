@@ -154,7 +154,7 @@ const BlogsPage = () => {
               <section className="grid gap-6" aria-labelledby="articles-heading">
                 <h2 id="articles-heading" className="sr-only">Latest Creator Education Articles</h2>
                 {blogs.map((blog, index) => {
-                  const blogUrl = `https://www.instafam.social/blogs/${blog.slug}`;
+                  const blogUrl = `https://www.sygil.app/blogs/${blog.slug}`;
                   const publishDate = new Date(blog.createdAt).toISOString();
                   
                   return (
@@ -185,7 +185,7 @@ const BlogsPage = () => {
                               "name": "InstaFam",
                               "logo": {
                                 "@type": "ImageObject",
-                                "url": "https://www.instafam.social/logo.png"
+                                "url": "https://www.sygil.app/logo.png"
                               }
                             },
                             "mainEntityOfPage": {

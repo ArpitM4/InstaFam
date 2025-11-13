@@ -14,7 +14,7 @@ const Footer = () => {
       
       {/* Column 1: Brand/Logo Section */}
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold text-gradient">InstaFam</h2>
+        <h2 className="text-3xl font-bold text-gradient">Sygil</h2>
         <p className="text-lg opacity-80">
           Support your favorite Instagram creators and empower them to succeed by joining our community. Get exclusive content and interact directly with creators.
         </p>
@@ -44,7 +44,7 @@ const Footer = () => {
           <a href="#" className="text-2xl hover:underline">
             <i className="fab fa-twitter"></i>
           </a> */}
-         <a target='_blank' href="https://www.instagram.com/_instafam_official/" className="text-2xl hover:underline flex items-center space-x-2">
+         <a target='_blank' href="https://www.instagram.com/_sygil_official/" className="text-2xl hover:underline flex items-center space-x-2">
             <FontAwesomeIcon icon={faInstagram} className="opacity-80" />
             <span>Instagram</span>
           </a>
@@ -58,7 +58,7 @@ const Footer = () => {
     {/* Copyright Section */}
     <div className="mt-10 border-t border-dropdown-border pt-6 text-center">
       <p className="text-sm text-text/60">
-        &copy; {new Date().getFullYear()} Insta_Support. All rights reserved.
+        &copy; {new Date().getFullYear()} Sygil. All rights reserved.
       </p>
     </div>
   </div>

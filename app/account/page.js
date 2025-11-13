@@ -9,5 +9,5 @@ const AccountPage = () => {
 export default AccountPage
 
 export const metadata = {
-    title: "Your Account - InstaFam",
+    title: "Your Account - Sygil",
 }

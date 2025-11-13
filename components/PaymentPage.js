@@ -601,7 +601,7 @@ const PaymentPage = ({ username }) => {
         <div className="bg-gradient-to-r from-orange-500/10 to-yellow-500/10 p-6 text-center border-b border-text/5">
           <div className="text-3xl mb-2">🚧</div>
           <h2 className="text-xl font-bold text-text mb-1">We're Currently in Beta</h2>
-          <p className="text-primary text-sm font-medium">Thank you for checking out InstaFam! 🎉</p>
+          <p className="text-primary text-sm font-medium">Thank you for checking out Sygil! 🎉</p>
         </div>
         
         {/* Content */}
@@ -614,7 +614,7 @@ const PaymentPage = ({ username }) => {
             <div className="flex items-start gap-3">
               <span className="text-orange-400 text-sm mt-0.5">👉</span>
               <p className="text-text/70 text-sm leading-relaxed">
-                Please do not start creating or sharing your InstaFam page with fans at this stage, as it is not live or active for public use.
+                Please do not start creating or sharing your Sygil page with fans at this stage, as it is not live or active for public use.
               </p>
             </div>
             
@@ -635,12 +635,12 @@ const PaymentPage = ({ username }) => {
           
           <div className="bg-primary/5 rounded-lg p-4 mt-4">
             <p className="text-text/80 text-sm leading-relaxed">
-              We truly appreciate your patience and support as an early creator — your feedback will help shape InstaFam into the go-to platform for fan-powered growth. 💜
+              We truly appreciate your patience and support as an early creator — your feedback will help shape Sygil into the go-to platform for fan-powered growth. 💜
             </p>
           </div>
           
           <div className="text-center pt-2">
-            <p className="text-text/60 text-xs font-medium">— Team InstaFam</p>
+            <p className="text-text/60 text-xs font-medium">— Team Sygil</p>
           </div>
         </div>
         

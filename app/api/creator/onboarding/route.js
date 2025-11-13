@@ -113,7 +113,7 @@ async function validateChecklistItems(user) {
 
   // Step 3: Profile Page Creation
   const hasCustomProfile = user.username && 
-                          user.description !== "Welcome to my Instafam" && 
+                          user.description !== "Welcome to my Sygil" && 
                           user.profilepic !== "https://picsum.photos/200";
   checklist.profilePageCreated = hasCustomProfile;
 

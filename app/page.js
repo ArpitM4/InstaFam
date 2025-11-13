@@ -62,13 +62,11 @@ const handleSearch = (e) => {
 
   return (
     <>
-      <SEO 
-        title="InstaFam - Connect with Your Favorite Creators"
-        description="Join thousands of fans connecting with their favorite creators. Earn points, unlock exclusive content, support creators through donations, and access premium perks on the ultimate creator-fan platform."
-        keywords="creator platform, fan engagement, exclusive content, creator support, social network, influencer platform, creator economy, fan community, content creators, monetization"
-        url="https://www.instafam.social"
-        image="https://www.instafam.social/og-home.jpg"
-        type="website"
+            <SEO
+        title="Sygil - Connect with Your Favorite Creators"
+        description="Join Sygil to connect with creators, earn points, unlock exclusive content, and support your favorite influencers."
+        url="https://www.sygil.app"
+        image="https://www.sygil.app/og-home.jpg"
       />
       
       {/* Fallback background image while video loads */}

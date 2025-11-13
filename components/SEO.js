@@ -3,16 +3,16 @@
 import Head from 'next/head';
 
 const SEO = ({
-  title = "InstaFam - Connect with Your Favorite Creators",
-  description = "Join InstaFam to connect with creators, earn points, unlock exclusive content, and support your favorite influencers through donations and premium perks.",
+  title = "Sygil - Connect with Your Favorite Creators",
+  description = "Join Sygil to connect with creators, earn points, unlock exclusive content, and support your favorite influencers through donations and premium perks.",
   keywords = "creators, influencers, exclusive content, fan community, creator support, social platform, content creators, fan engagement, creator economy",
-  image = "https://www.instafam.social/og-image.jpg",
-  url = "https://www.instafam.social",
+  image = "https://www.sygil.app/og-image.jpg",
+  url = "https://www.sygil.app",
   type = "website",
   twitterCard = "summary_large_image",
-  author = "InstaFam Team"
+  author = "Sygil Team"
 }) => {
-  const siteTitle = title.includes('InstaFam') ? title : `${title} | InstaFam`;
+  const siteTitle = title.includes('Sygil') ? title : `${title} | Sygil`;
   
   return (
     <Head>
@@ -27,7 +27,7 @@ const SEO = ({
       <meta name="language" content="English" />
       <meta name="theme-color" content="#FF1B6B" />
       <meta name="msapplication-TileColor" content="#FF1B6B" />
-      <meta name="application-name" content="InstaFam" />
+      <meta name="application-name" content="Sygil" />
       
       {/* Canonical URL */}
       <link rel="canonical" href={url} />
@@ -40,7 +40,7 @@ const SEO = ({
       <meta property="og:image" content={image} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:site_name" content="InstaFam" />
+      <meta property="og:site_name" content="Sygil" />
       <meta property="og:locale" content="en_US" />
       
       {/* Twitter */}
@@ -49,11 +49,11 @@ const SEO = ({
       <meta name="twitter:title" content={siteTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
-      <meta name="twitter:creator" content="@instafam_official" />
-      <meta name="twitter:site" content="@instafam_official" />
+      <meta name="twitter:creator" content="@sygil_official" />
+      <meta name="twitter:site" content="@sygil_official" />
       
       {/* Additional SEO Meta Tags */}
-      <meta name="apple-mobile-web-app-title" content="InstaFam" />
+      <meta name="apple-mobile-web-app-title" content="Sygil" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <meta name="format-detection" content="telephone=no" />
@@ -78,20 +78,20 @@ const SEO = ({
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "name": "InstaFam",
-            "url": "https://www.instafam.social",
+            "name": "Sygil",
+            "url": "https://www.sygil.app",
             "description": description,
             "publisher": {
               "@type": "Organization",
-              "name": "InstaFam",
+              "name": "Sygil",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://www.instafam.social/logo.png"
+                "url": "https://www.sygil.app/logo.png"
               }
             },
             "potentialAction": {
               "@type": "SearchAction",
-              "target": "https://www.instafam.social/explore?q={search_term_string}",
+              "target": "https://www.sygil.app/explore?q={search_term_string}",
               "query-input": "required name=search_term_string"
             }
           })

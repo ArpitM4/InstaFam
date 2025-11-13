@@ -3,7 +3,7 @@ import Blog from "@/models/Blog";
 import User from "@/models/User";
 
 export default async function sitemap() {
-  const baseUrl = 'https://www.instafam.social';
+  const baseUrl = 'https://www.sygil.app';
   
   try {
     // Connect to database

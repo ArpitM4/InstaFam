@@ -37,7 +37,7 @@ const Navbar = () => {
     <Link href="/" className="block w-[110px] md:w-[200px] lg:w-[200px] xl:w-[150px]">
       <img
         src="/Text.png"
-        alt="InstaFam Logo"
+        alt="Sygil Logo"
         className="w-full h-auto"
       />
     </Link>

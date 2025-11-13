@@ -53,7 +53,7 @@ export async function POST(req) {
 
     // Upload to Cloudinary using Promise API
     const uploadOptions = {
-      folder: type ? 'instafam' : 'instafam/vault',
+      folder: type ? 'sygil' : 'sygil/vault',
       resource_type: resourceType,
     };
 

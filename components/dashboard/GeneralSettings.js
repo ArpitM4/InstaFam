@@ -58,7 +58,7 @@ const GeneralSettings = ({ user, onUserUpdate }) => {
     try {
       const generated = await generateInstagramOTP(session.user.name);
       setOtp(generated);
-      toast("OTP generated! DM it to @instafam_official.");
+      toast("OTP generated! DM it to @sygil_official.");
     } catch (error) {
       toast.error("Failed to generate OTP");
     } finally {
@@ -149,12 +149,12 @@ const GeneralSettings = ({ user, onUserUpdate }) => {
                   </div>
 
                   <a
-                    href="https://www.instagram.com/_instafam_official/"
+                    href="https://www.instagram.com/_sygil_official/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-block text-sm text-primary hover:text-primary/80 transition-colors"
                   >
-                    Go to @_instafam_official on Instagram
+                    Go to @_sygil_official on Instagram
                   </a>
                   <p className="text-text/60 text-xs">Your account will be verified within 24 hours after your DM.</p>
                 </div>

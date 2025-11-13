@@ -84,12 +84,12 @@ export async function POST(request) {
       <body>
         <div class="container">
           <div class="header">
-            <h1>🎉 Welcome to InstaFam!</h1>
+            <h1>🎉 Welcome to Sygil!</h1>
             <p>Verify your email to complete your account setup</p>
           </div>
           <div class="content">
             <h2>Your Verification Code</h2>
-            <p>Hi there! Thanks for joining InstaFam. Please use the following 6-digit code to verify your email address:</p>
+            <p>Hi there! Thanks for joining Sygil. Please use the following 6-digit code to verify your email address:</p>
             
             <div class="otp-box">
               <div class="otp-code">${otp}</div>
@@ -105,13 +105,13 @@ export async function POST(request) {
             <p>Once verified, you'll be able to:</p>
             <ul>
               <li>✨ Create and participate in events</li>
-              <li>💰 Earn and redeem InstaFam points</li>
+              <li>💰 Earn and redeem Sygil points</li>
               <li>🎯 Connect with your favorite creators</li>
             </ul>
           </div>
           <div class="footer">
-            <p>Need help? Contact us at <a href="mailto:support@instafam.social">support@instafam.social</a></p>
-            <p>© 2025 InstaFam. All rights reserved.</p>
+            <p>Need help? Contact us at <a href="mailto:support@sygil.app">support@sygil.app</a></p>
+            <p>© 2025 Sygil. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -122,7 +122,7 @@ export async function POST(request) {
     await transporter.sendMail({
       from: process.env.EMAIL_FROM,
       to: email,
-      subject: 'Verify Your InstaFam Account - OTP Code',
+      subject: 'Verify Your Sygil Account - OTP Code',
       html: htmlTemplate,
     });
 
