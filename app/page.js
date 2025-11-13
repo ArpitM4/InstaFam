@@ -71,7 +71,7 @@ export default function Home() {
   const getButtonText = () => {
     if (!session) return "Create your Page →";
     if (userData?.accountType === 'Creator' || userData?.accountType === 'VCreator') {
-      return "Your Page";
+      return "My Page";
     }
     return "Create your Page →";
   };

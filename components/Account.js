@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { triggerProfileUpdate } from '@/utils/onboardingTriggers';
 // Simple modal component for username
 function UsernameModal({ open, onSubmit, loading, error }) {
@@ -94,29 +94,29 @@ const Account = () => {
   const [modalLoading, setModalLoading] = useState(false);
   const [nameModalError, setNameModalError] = useState("");
   const [nameModalLoading, setNameModalLoading] = useState(false);
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push('/login');
-    } else if (status === "authenticated" && session) {
-      getData();
-    }
-    // eslint-disable-next-line
-  }, [session, status]);
+  const hasLoadedData = useRef(false);
 
   // Only show modal on first load if username is blank
-  const getData = async () => {
+  const getData = useCallback(async () => {
     if (!session?.user?.email) return;
     const u = await fetchuser(session.user.email);
+    
+    // Extract only the fields we need to avoid circular references
     setForm({
-      ...u,
+      name: u?.name || "",
+      email: u?.email || "",
+      username: u?.username || "",
+      profilepic: u?.profilepic || "",
+      coverpic: u?.coverpic || "",
+      accountType: u?.accountType || "User",
       instagram: {
-        otp: u && u.instagram ? u.instagram.otp ?? null : null,
-        otpGeneratedAt: u && u.instagram ? u.instagram.otpGeneratedAt ?? null : null,
-        isVerified: u && u.instagram ? u.instagram.isVerified ?? false : false,
+        otp: u?.instagram?.otp ?? null,
+        otpGeneratedAt: u?.instagram?.otpGeneratedAt ?? null,
+        isVerified: u?.instagram?.isVerified ?? false,
       },
     });
     setLoading(false);
+    hasLoadedData.current = true;
     // Only show modal on first load
     if (!u || !u.username || u.username.trim() === "") {
       setShowUsernameModal(true);
@@ -128,7 +128,17 @@ const Account = () => {
       setShowUsernameModal(false);
       setShowNameModal(false);
     }
-  };
+  }, [session?.user?.email]);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push('/login');
+    } else if (status === "authenticated" && session && !hasLoadedData.current) {
+      getData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, getData]);
+
   // Modal username submit handler
   const handleUsernameModal = async (username) => {
     if (!username || username.trim() === "") {
@@ -161,8 +171,6 @@ const Account = () => {
       if (updateUserData) {
         updateUserData({ username });
       }
-      
-      getData();
     }
   };
 
@@ -196,14 +204,12 @@ const Account = () => {
       if (updateUserData) {
         updateUserData({ name });
       }
-      
-      getData();
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm(prevForm => ({ ...prevForm, [name]: value }));
     
     // Handle theme change immediately
     if (name === "theme") {
@@ -248,15 +254,27 @@ const Account = () => {
     // Trigger onboarding progress update
     await triggerProfileUpdate();
     
-    // Emit global profile update event
-    emitProfileUpdate(form);
+    // Emit global profile update event (only pass necessary fields)
+    emitProfileUpdate({
+      name: form.name,
+      username: form.username,
+      accountType: form.accountType,
+      profilepic: form.profilepic,
+      coverpic: form.coverpic
+    });
     
     // Update user data in navbar/context (legacy support)
     if (refreshUserData) {
       refreshUserData(true); // Force refresh
     }
     if (updateUserData) {
-      updateUserData(form); // Update with new form data
+      updateUserData({
+        name: form.name,
+        username: form.username,
+        accountType: form.accountType,
+        profilepic: form.profilepic,
+        coverpic: form.coverpic
+      });
     }
     
     // If account type changed, emit specific event

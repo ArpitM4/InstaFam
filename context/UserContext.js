@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { fetchuser } from '@/actions/useractions';
@@ -22,10 +22,11 @@ export const UserProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [userPoints, setUserPoints] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [lastFetch, setLastFetch] = useState(0);
+  const lastFetchRef = useRef(0);
+  const isFetchingRef = useRef(false);
 
   // Function to refresh user data
-  const refreshUserData = async (force = false) => {
+  const refreshUserData = useCallback(async (force = false) => {
     if (!session?.user?.name) {
       setUserData(null);
       setUserPoints(0);
@@ -35,10 +36,18 @@ export const UserProvider = ({ children }) => {
 
     // Prevent too frequent refreshes unless forced
     const now = Date.now();
-    if (!force && now - lastFetch < 2000) {
+    if (!force && now - lastFetchRef.current < 2000) {
+      console.log('🔄 UserContext: Skipping refresh (too soon)');
       return;
     }
 
+    // Prevent concurrent fetches
+    if (isFetchingRef.current) {
+      console.log('🔄 UserContext: Skipping refresh (already fetching)');
+      return;
+    }
+
+    isFetchingRef.current = true;
     setIsLoading(true);
     try {
       console.log('🔄 UserContext: Refreshing user data for:', session.user.name);
@@ -46,7 +55,7 @@ export const UserProvider = ({ children }) => {
       // Fetch user data
       const user = await fetchuser(session.user.name);
       setUserData(user);
-      setLastFetch(now);
+      lastFetchRef.current = now;
       
       // Fetch user points
       try {
@@ -70,11 +79,12 @@ export const UserProvider = ({ children }) => {
       setUserPoints(0);
     } finally {
       setIsLoading(false);
+      isFetchingRef.current = false;
     }
-  };
+  }, [session?.user?.name]);
 
   // Function to update points without full refresh
-  const updatePoints = async () => {
+  const updatePoints = useCallback(async () => {
     try {
       const pointsRes = await fetch('/api/points', {
         cache: 'no-store',
@@ -90,13 +100,13 @@ export const UserProvider = ({ children }) => {
     } catch (error) {
       console.error('Failed to update points:', error);
     }
-  };
+  }, []);
 
   // Function to update user data (e.g., after profile changes)
-  const updateUserData = (newData) => {
+  const updateUserData = useCallback((newData) => {
     setUserData(prev => ({ ...prev, ...newData }));
     console.log('🔄 UserContext: User data updated:', newData);
-  };
+  }, []);
 
   // Initial data fetch when session changes
   useEffect(() => {
@@ -109,21 +119,17 @@ export const UserProvider = ({ children }) => {
       setUserPoints(0);
       setIsLoading(false);
     }
-  }, [session, status]);
+  }, [session?.user?.name, status, refreshUserData]);
 
-  // Refresh data when session user changes
-  useEffect(() => {
-    if (session?.user?.name && userData?.username !== session.user.name) {
-      refreshUserData(true);
-    }
-  }, [session?.user?.name]);
+  // Refresh data when session user changes - REMOVED to prevent duplicate calls
+  // The above useEffect already handles this
 
   // Refresh user data when navigating to dashboard or account pages
   useEffect(() => {
     if (session?.user?.name && (pathname === '/dashboard' || pathname === '/account')) {
       refreshUserData(true);
     }
-  }, [pathname, session?.user?.name]);
+  }, [pathname, session?.user?.name, refreshUserData]);
 
   // Listen to global events for updates
   useEffect(() => {
@@ -132,7 +138,9 @@ export const UserProvider = ({ children }) => {
     };
 
     const handleProfileUpdate = () => {
-      refreshUserData(true);
+      // Don't call refreshUserData here to prevent loops
+      // The Account component already updates via updateUserData
+      console.log('🔄 UserContext: Profile update event received (skipping refresh)');
     };
 
     const handleAccountTypeChange = ({ accountType }) => {
@@ -156,7 +164,7 @@ export const UserProvider = ({ children }) => {
       eventBus.off(EVENTS.ACCOUNT_TYPE_CHANGE, handleAccountTypeChange);
       eventBus.off(EVENTS.POINTS_UPDATE, handlePointsUpdate);
     };
-  }, []);
+  }, [updatePoints]);
 
   const value = {
     userData,

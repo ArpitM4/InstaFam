@@ -17,13 +17,21 @@ export const fetchuser = async (identifier) => {
     query.username = identifier;
   }
   console.log('🔍 fetchuser Debug - Query:', query);
-  let u = await User.findOne(query);
+  let u = await User.findOne(query).lean();
   console.log('🔍 fetchuser Debug - User found:', !!u);
   if (u) {
     console.log('🔍 fetchuser Debug - User accountType:', u.accountType);
   }
   if (!u) return null;
-  let user = u.toObject({ flattenObjectIds: true });
+  
+  // Convert ObjectIds to strings to prevent serialization issues
+  const user = {
+    ...u,
+    _id: u._id?.toString(),
+    createdAt: u.createdAt?.toISOString(),
+    updatedAt: u.updatedAt?.toISOString(),
+  };
+  
   console.log('🔍 fetchuser Debug - Final user object accountType:', user.accountType);
   return user;
 };
@@ -90,9 +98,10 @@ export const updateProfile = async (data, oldusername) => {
     delete ndata.username;
   }
   await User.updateOne({ email: ndata.email }, ndata);
-  // Return the updated user so the modal logic can use it immediately
-  const user = await User.findOne({ email: ndata.email });
-  return { success: true, user };
+  
+  // Return only success status, don't return the full user object
+  // to avoid circular reference issues in Next.js serialization
+  return { success: true };
 };
 
 
