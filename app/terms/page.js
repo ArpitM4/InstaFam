@@ -2,76 +2,116 @@
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen bg-background text-text py-20 px-6">
+    <div className="min-h-screen bg-background text-text pt-20 pb-10 px-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-5xl font-bold mb-4 text-primary">Terms & Conditions</h1>
-        <p className="text-base text-text/60 mb-6">
-          Last updated on 06-02-2025 10:59:19
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-primary text-center">Terms of Service</h1>
+        <p className="text-sm text-text/60 mb-8 text-center">
+          Last Updated: November 13, 2025
         </p>
 
-        <p className="mb-4">
-          These Terms and Conditions ("Agreement") govern your use of InstaFam ("Website", "we", "us", "our"), owned and operated by ARPIT MAURYA, having its registered address at Bawana Rd, Delhi Technological University, Shahbad Daulatpur Village, Rohini, New Delhi, Delhi 110042.
+        <p className="mb-8 text-base text-center max-w-2xl mx-auto text-text/80">
+          Welcome to <strong>Sygil</strong> ("we", "us", "our"). By accessing or using our website (sygil.app) or related services (collectively, the "Platform"), you agree to be bound by these Terms of Service ("Terms").
+        </p>
+        <p className="mb-8 text-base text-center text-text/80">
+          If you do not agree, please do not use Sygil.
         </p>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2 text-accent">1. Acceptance of Terms</h2>
-        <p className="mb-4">
-          By accessing or using our services, you agree to be bound by this Agreement. If you do not agree, please do not use the website.
+        <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">1. Overview</h2>
+        <p className="mb-6 text-base text-text/80">
+          Sygil provides creators ("Creators") with tools to receive fan support through voluntary donations and to display public leaderboards that showcase engagement and recognition. We do <strong>not</strong> host contests, competitions, or any activity where monetary rewards, prizes, or gifts are given based on rankings.
         </p>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2 text-accent">2. Services</h2>
-        <p className="mb-4">
-          InstaFam enables fans to support Instagram creators via voluntary monetary contributions ("donations"). We do not sell physical or digital goods or offer subscriptions.
-        </p>
-
-        <h2 className="text-xl font-semibold mt-6 mb-2 text-accent">3. Eligibility</h2>
-        <p className="mb-4">
-          You must be at least 18 years old or have legal parental/guardian consent to use this website. We reserve the right to refuse service to anyone for any reason at any time.
-        </p>
-
-        <h2 className="text-xl font-semibold mt-6 mb-2 text-accent">4. Payment Terms</h2>
-        <p className="mb-4">
-          All donations are processed via secure third-party payment gateways such as PayU. We do not store or process your card details directly. You must ensure that the payment information you provide is accurate.
-        </p>
-
-        <h2 className="text-xl font-semibold mt-6 mb-2 text-accent">5. Refund Policy</h2>
-        <p className="mb-4">
-          All donations made through our platform are final and non-refundable. However, in case of payment failure or accidental duplication, you may request a refund by contacting support@instafam.social within 3 days of the transaction.
-        </p>
-
-        <h2 className="text-xl font-semibold mt-6 mb-2 text-accent">6. Prohibited Activities</h2>
-        <ul className="list-disc list-inside mb-4 text-text/90">
-          <li>Misuse of the platform for fraudulent or illegal activities</li>
-          <li>Attempt to disrupt, harm or interfere with the security or integrity of our services</li>
-          <li>Use of stolen or unauthorised payment methods</li>
+        <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">2. Eligibility</h2>
+        <p className="mb-3 text-base text-text/80">To use Sygil, you must:</p>
+        <ul className="list-disc list-inside mb-6 text-base text-text/90 space-y-2 pl-4">
+          <li>Be at least 18 years old (or have parental consent if under 18).</li>
+          <li>Comply with local laws governing online payments and donations.</li>
+          <li>Provide accurate information when creating or using an account.</li>
         </ul>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2 text-accent">7. Liability Disclaimer</h2>
-        <p className="mb-4">
-          We are not liable for the actions of any creator or donor. We do not guarantee the accuracy or reliability of content posted by users.
+        <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">3. Donations</h2>
+        <ul className="list-disc list-inside mb-6 text-base text-text/90 space-y-2 pl-4">
+          <li>All contributions on Sygil are <strong>voluntary</strong> and <strong>non-refundable</strong>.</li>
+          <li>Donations do <strong>not</strong> entitle the donor to any material, monetary, or exclusive benefit.</li>
+          <li>Creators may acknowledge donors publicly (e.g., leaderboards or shoutouts), but these acknowledgments are symbolic and non-monetary.</li>
+          <li>Sygil charges a <strong>5% service fee</strong> per donation for platform maintenance and payment processing.</li>
+        </ul>
+
+        <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">4. Affiliate Links</h2>
+        <ul className="list-disc list-inside mb-6 text-base text-text/90 space-y-2 pl-4">
+          <li>Some product links on creator pages may include <strong>affiliate tracking</strong>.</li>
+          <li>If a creator adds a product link without an affiliate code, Sygil may attach its own affiliate link transparently.</li>
+          <li>Sygil may earn a commission on qualifying purchases. This does <strong>not</strong> affect product prices for users.</li>
+        </ul>
+
+        <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">5. Creator Conduct</h2>
+        <p className="mb-3 text-base text-text/80">Creators agree <strong>not</strong> to:</p>
+        <ul className="list-disc list-inside mb-6 text-base text-text/90 space-y-2 pl-4">
+          <li>Offer cash prizes, giveaways, or other material rewards in exchange for donations.</li>
+          <li>Run or promote gambling, betting, or "pay-to-win" style contests.</li>
+          <li>Post unlawful, abusive, or infringing content.</li>
+          <li>Misrepresent fundraising goals or mislead donors.</li>
+        </ul>
+        <p className="mb-6 text-base text-text/80">
+          Violation of these terms may result in <strong>immediate account suspension</strong> ("One Strike" Policy).
         </p>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2 text-accent">8. Privacy</h2>
-        <p className="mb-4">
-          Your use of the platform is subject to our Privacy Policy, which describes how we collect, store, and protect your data.
+        <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">6. Platform Role</h2>
+        <p className="mb-3 text-base text-text/80">Sygil is a <strong>neutral intermediary</strong>. We:</p>
+        <ul className="list-disc list-inside mb-6 text-base text-text/90 space-y-2 pl-4">
+          <li>Provide infrastructure for fan-creator interaction.</li>
+          <li>Are <strong>not</strong> responsible for the conduct, promises, or actions of creators or donors.</li>
+          <li>Do <strong>not</strong> verify or endorse fundraising purposes.</li>
+        </ul>
+        <p className="mb-6 text-base text-text/80">
+          Under the "Safe Harbor" model, we will act promptly on valid reports of misuse or illegal activity.
         </p>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2 text-accent">9. Governing Law</h2>
-        <p className="mb-4">
-          This Agreement shall be governed by and construed in accordance with the laws of India. Any disputes shall be resolved in the courts of New Delhi, Delhi.
+        <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">7. Account Suspension & Removal</h2>
+        <p className="mb-3 text-base text-text/80">We reserve the right to suspend or terminate any account that:</p>
+        <ul className="list-disc list-inside mb-6 text-base text-text/90 space-y-2 pl-4">
+          <li>Violates these Terms or applicable law.</li>
+          <li>Engages in fraud, abuse, or misleading behavior.</li>
+          <li>Receives valid reports or regulatory takedown requests.</li>
+        </ul>
+
+        <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">8. Refunds</h2>
+        <p className="mb-6 text-base text-text/80">
+          Donations are <strong>non-refundable</strong>. In case of technical errors (duplicate payments, payment failures), users may contact our support team at <a className="underline text-secondary" href="mailto:support@sygil.app">support@sygil.app</a> for review.
         </p>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2 text-accent">10. Contact Information</h2>
-        <p className="mb-2">
-          Legal Entity: <strong>ARPIT MAURYA</strong><br />
-          Registered & Operational Address:<br />
-          Bawana Rd, Delhi Technological University,<br />
-          Shahbad Daulatpur Village, Rohini, New Delhi, Delhi 110042<br />
-          Email: <a className="text-secondary underline" href="mailto:support@instafam.social">support@instafam.social</a><br />
-          Phone: <a className="text-secondary underline" href="tel:+917982432872">+91 7982432872</a>
+        <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">9. Intellectual Property</h2>
+        <p className="mb-6 text-base text-text/80">
+          All content on Sygil (branding, design, text, and code) belongs to Sygil or its licensors. Creators retain rights to their own uploaded content (text, links, profile images).
         </p>
 
-        <p className="mt-8 text-sm text-text/60">
-          If you have any questions regarding these Terms & Conditions, please contact us using the information provided above.
+        <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">10. Limitation of Liability</h2>
+        <p className="mb-3 text-base text-text/80">Sygil is provided "as is." We are not liable for:</p>
+        <ul className="list-disc list-inside mb-6 text-base text-text/90 space-y-2 pl-4">
+          <li>Any indirect or consequential losses.</li>
+          <li>Damages from misuse or unavailability of the platform.</li>
+          <li>Creator misrepresentation or misuse of donations.</li>
+        </ul>
+
+        <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">11. Privacy</h2>
+        <p className="mb-6 text-base text-text/80">
+          Your privacy matters. Please read our <a className="underline text-secondary" href="/privacypolicy">Privacy Policy</a> to understand how we handle your data.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">12. Governing Law</h2>
+        <p className="mb-6 text-base text-text/80">
+          These Terms are governed by the laws of <strong>India</strong>, under the jurisdiction of <strong>Mumbai, Maharashtra</strong>.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">13. Contact</h2>
+        <p className="mb-3 text-base text-text/80">For questions, complaints, or legal notices, contact:</p>
+        <ul className="list-none mb-6 text-base text-text/90 space-y-1 pl-4">
+          <li>Email: <a className="underline text-secondary" href="mailto:legal@sygil.app">legal@sygil.app</a></li>
+          <li>Location: Mumbai, India</li>
+        </ul>
+
+        <p className="mt-8 text-sm text-text/60 text-center">
+          If you have any questions regarding these Terms of Service, please contact us using the information provided above.
         </p>
       </div>
     </div>
