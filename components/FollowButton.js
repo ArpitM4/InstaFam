@@ -15,19 +15,23 @@ const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFoll
   const shouldShowButton = session && session.user.id !== creatorId;
 
   useEffect(() => {
-    if (shouldShowButton) {
+    if (shouldShowButton && creatorId) {
       checkFollowStatus();
     } else {
       setCheckingStatus(false);
     }
-  }, [creatorId, session]);
+  }, [creatorId, session?.user?.id]);
 
   const checkFollowStatus = async () => {
     try {
+      console.log('Checking follow status for creator:', creatorId);
       const response = await fetch(`/api/users/${creatorId}/follow`);
       if (response.ok) {
         const data = await response.json();
+        console.log('Follow status response:', data);
         setIsFollowing(data.isFollowing);
+      } else {
+        console.error('Failed to check follow status:', response.status);
       }
     } catch (error) {
       console.error('Error checking follow status:', error);

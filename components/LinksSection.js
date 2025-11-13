@@ -11,6 +11,7 @@ const LinksSection = ({ currentUser }) => {
   const [favourites, setFavourites] = useState([]);
   const [showSocialModal, setShowSocialModal] = useState(false);
   const [showFavouriteModal, setShowFavouriteModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [loading, setLoading] = useState(true);
   
   // Form states for adding new items
@@ -44,6 +45,17 @@ const LinksSection = ({ currentUser }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Copy creator page link to clipboard
+  const handleCopyLink = () => {
+    const pageUrl = `${window.location.origin}/${currentUser.username}`;
+    navigator.clipboard.writeText(pageUrl).then(() => {
+      toast.success('Link copied to clipboard!');
+      setShowShareModal(false);
+    }).catch(() => {
+      toast.error('Failed to copy link');
+    });
   };
 
   // Add a new social link
@@ -191,6 +203,19 @@ const LinksSection = ({ currentUser }) => {
 
   return (
     <div className="w-full max-w-5xl mt-8 px-4">
+      {/* Share Button - Positioned at top right */}
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={() => setShowShareModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:scale-105"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          </svg>
+          Share Page
+        </button>
+      </div>
+
       {/* Socials Section */}
       <div className="mb-12">
         <h2 className="text-2xl font-bold text-text mb-6 flex items-center gap-2">
@@ -373,6 +398,42 @@ const LinksSection = ({ currentUser }) => {
               </button>
             </div>
           </form>
+        </Modal>
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <Modal onClose={() => setShowShareModal(false)}>
+          <div className="text-center">
+            <h3 className="text-2xl font-bold text-primary mb-2">Share {currentUser.username || currentUser.name}'s Page</h3>
+            <p className="text-text/60 mb-6">Copy the link below to share</p>
+            
+            <div className="bg-dropdown-hover border border-text/10 rounded-lg p-4 mb-4">
+              <p className="text-text font-mono text-sm break-all">
+                {typeof window !== 'undefined' && `${window.location.origin}/${currentUser.username}`}
+              </p>
+            </div>
+            
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowShareModal(false)}
+                className="flex-1 px-4 py-2 bg-text/10 text-text rounded-lg hover:bg-text/20 transition-colors"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Copy Link
+              </button>
+            </div>
+          </div>
         </Modal>
       )}
 
