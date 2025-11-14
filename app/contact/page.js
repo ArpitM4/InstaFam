@@ -27,8 +27,8 @@ export default function Contact() {
               </div>
               <div>
                 <p className="font-semibold text-text mb-1">Email</p>
-                <a href="mailto:support@sygil.app" className="text-secondary hover:text-primary transition">
-                  support@sygil.app
+                <a href="mailto:contact@sygil.app" className="text-secondary hover:text-primary transition">
+                  contact@sygil.app
                 </a>
               </div>
             </div>
