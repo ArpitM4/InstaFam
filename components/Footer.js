@@ -43,7 +43,7 @@ Designed for creators. Built for connection.        </p>
           <a href="#" className="text-2xl hover:underline">
             <i className="fab fa-twitter"></i>
           </a> */}
-         <a target='_blank' href="https://www.instagram.com/_sygil_official/" className="text-2xl hover:underline flex items-center space-x-2">
+         <a target='_blank' href="https://www.instagram.com/sygil_official/" className="text-2xl hover:underline flex items-center space-x-2">
             <FontAwesomeIcon icon={faInstagram} className="opacity-80" />
             <span>Instagram</span>
           </a>
