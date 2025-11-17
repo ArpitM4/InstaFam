@@ -1,6 +1,6 @@
 import PaymentPage from "@/components/PaymentPage";
 import { fetchuser } from "@/actions/useractions";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
 
@@ -12,10 +12,22 @@ const CoursesPage = async ({ params }) => {
     notFound();
   }
 
+  // Check if courses section is visible
+  const visibleSections = user.visibleSections || ['contribute', 'vault', 'links'];
+  const isOwnProfile = session?.user?.email === user?.email;
+  
+  if (!visibleSections.includes('courses')) {
+    // If owner is viewing their own disabled section, redirect to main page
+    if (isOwnProfile) {
+      redirect(`/${params.username}`);
+    }
+    // If visitor tries to access disabled section, show 404
+    notFound();
+  }
+
   // For courses, show coming soon for visitors; owners see profile-incomplete if missing setup
   const hasPaymentInfo = user?.paymentInfo?.phone || user?.paymentInfo?.upi;
   const isVerified = user?.instagram?.isVerified;
-  const isOwnProfile = session?.user?.email === user?.email;
 
   if (!isVerified || !hasPaymentInfo) {
     if (isOwnProfile) {

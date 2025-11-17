@@ -1,6 +1,6 @@
 import PaymentPage from "@/components/PaymentPage";
 import { fetchuser } from "@/actions/useractions";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
 
@@ -13,6 +13,16 @@ const UsernamePage = async ({ params }) => {
   const isOwnProfile = session?.user?.email === user?.email;
 
   if (!user) {
+    notFound();
+  }
+
+  // Check if merchandise section is visible
+  const visibleSections = user.visibleSections || ['contribute', 'vault', 'links'];
+  
+  if (!visibleSections.includes('merchandise')) {
+    if (isOwnProfile) {
+      redirect(`/${params.username}`);
+    }
     notFound();
   } else if (!isVerified || !hasPaymentInfo) {
     if (isOwnProfile) {

@@ -1,6 +1,6 @@
 import PaymentPage from "@/components/PaymentPage";
 import { fetchuser } from "@/actions/useractions";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
 
@@ -16,6 +16,16 @@ const SubscriptionPage = async ({ params }) => {
   const isOwnProfile = session?.user?.email === user?.email;
 
   if (!user) {
+    notFound();
+  }
+
+  // Check if subscription section is visible
+  const visibleSections = user.visibleSections || ['contribute', 'vault', 'links'];
+  
+  if (!visibleSections.includes('subscription')) {
+    if (isOwnProfile) {
+      redirect(`/${params.username}`);
+    }
     notFound();
   } else if (!isVerified || !hasPaymentInfo) {
     // If it's the user's own profile, show profile incomplete message

@@ -1,6 +1,6 @@
 import PaymentPage from "@/components/PaymentPage";
 import { fetchuser } from "@/actions/useractions";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
 
@@ -15,6 +15,16 @@ const GiveawayPage = async ({ params }) => {
   const hasPaymentInfo = user?.paymentInfo?.phone || user?.paymentInfo?.upi;
   const isVerified = user?.instagram?.isVerified;
   const isOwnProfile = session?.user?.email === user?.email;
+
+  // Check if giveaway section is visible
+  const visibleSections = user.visibleSections || ['contribute', 'vault', 'links'];
+  
+  if (!visibleSections.includes('giveaway')) {
+    if (isOwnProfile) {
+      redirect(`/${params.username}`);
+    }
+    notFound();
+  }
 
   if (!isVerified || !hasPaymentInfo) {
     if (isOwnProfile) {
