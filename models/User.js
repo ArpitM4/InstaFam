@@ -76,7 +76,14 @@ const UserSchema = new Schema({
     link: { type: String, required: true }, // Affiliate/Product link
     image: { type: String }, // Product image URL
     createdAt: { type: Date, default: Date.now }
-  }]
+  }],
+
+  // Visible Sections - Controls which sections appear on creator's payment page
+  visibleSections: {
+    type: [String],
+    default: ['contribute', 'vault', 'links'],
+    enum: ['contribute', 'vault', 'links', 'merchandise', 'community', 'subscription', 'courses', 'giveaway']
+  }
 });
 
 // Remove the old index definition - we'll handle this differently

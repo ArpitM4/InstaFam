@@ -1,0 +1,1 @@
+“Before changing or adding any feature, always check and update the backend, database, and all dependent modules. No frontend change is complete until API logic, DB structure, and related features are verified and updated.”

@@ -26,6 +26,7 @@ const PaymentInteractionSection = ({
   router,
   currentUser, // Add currentUser to get perkRank
   setPaymentform, // Add setPaymentform to allow editing name
+  isOwner,
 }) => {
   const [paypalClientId, setPaypalClientId] = useState(null);
   const [isClient, setIsClient] = useState(false);
@@ -107,7 +108,7 @@ const PaymentInteractionSection = ({
                             {entry.name}
                           </span>
                         </div>
-                        <span className={`font-medium ${entry.isTop3 ? 'text-yellow-100' : 'text-text'} blur-sm select-none`}>${entry.total.toFixed(2)}</span>
+                        <span className={`font-medium ${entry.isTop3 ? 'text-yellow-100' : 'text-text'}${!isOwner ? ' blur-sm select-none' : ''}`}>${entry.total.toFixed(2)}</span>
                       </li>
                     ))}
                   </ol>

@@ -144,7 +144,7 @@ const PaymentPage = ({ username }) => {
     const pathParts = window.location.pathname.split('/');
     const section = pathParts[pathParts.length - 1];
     
-    const validSections = ['contribute', 'vault', 'community', 'links', 'merchandise'];
+    const validSections = ['contribute', 'vault', 'community', 'links', 'merchandise', 'subscription', 'courses', 'giveaway'];
     
     if (validSections.includes(section)) {
       setActiveTab(section);
@@ -163,10 +163,62 @@ const PaymentPage = ({ username }) => {
     const newUrl = tab === 'links' ? `/${username}` : `/${username}/${tab}`;
     window.history.replaceState(null, '', newUrl);
   };
+
+  const handleOpenCustomize = () => {
+    setTempVisibleSections([...visibleSections]);
+    setShowCustomizeModal(true);
+  };
+
+  const handleToggleSection = (section) => {
+    setTempVisibleSections(prev => {
+      if (prev.includes(section)) {
+        // If disabling vault, also remove contribute
+        if (section === 'vault') {
+          return prev.filter(s => s !== section && s !== 'contribute');
+        }
+        return prev.filter(s => s !== section);
+      } else {
+        // If enabling contribute, also enable vault
+        if (section === 'contribute') {
+          const newSections = [...prev, section];
+          if (!newSections.includes('vault')) {
+            newSections.push('vault');
+          }
+          return newSections;
+        }
+        return [...prev, section];
+      }
+    });
+  };
+
+  const handleSaveCustomization = async () => {
+    try {
+      const response = await fetch('/api/customize-sections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visibleSections: tempVisibleSections })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setVisibleSections(data.visibleSections);
+        setShowCustomizeModal(false);
+        toast.success('Page customization saved!');
+      } else {
+        toast.error('Failed to save customization');
+      }
+    } catch (error) {
+      console.error('Error saving customization:', error);
+      toast.error('Failed to save customization');
+    }
+  };
   const [hasError, setHasError] = useState(false);
   const [showBetaPopup, setShowBetaPopup] = useState(false);
   const [showFamPointsPopup, setShowFamPointsPopup] = useState(false);
   const [earnedFamPoints, setEarnedFamPoints] = useState(0);
+  const [visibleSections, setVisibleSections] = useState(['contribute', 'vault', 'links']);
+  const [showCustomizeModal, setShowCustomizeModal] = useState(false);
+  const [tempVisibleSections, setTempVisibleSections] = useState([]);
 
   const isOwner = session?.user?.name === username;
 
@@ -197,14 +249,27 @@ const PaymentPage = ({ username }) => {
     }
   };
 
+  const fetchVisibleSections = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/customize-sections?username=${username}`);
+      if (response.ok) {
+        const data = await response.json();
+        setVisibleSections(data.visibleSections || ['contribute', 'vault', 'links']);
+      }
+    } catch (error) {
+      console.error('Error fetching visible sections:', error);
+    }
+  }, [username]);
+
   const getData = useCallback(async () => {
     setPaymentsLoading(true);
     try {
-      // Fetch user and event in parallel
+      // Fetch user, event, and visible sections in parallel
       const userPromise = fetchuser(username);
       const eventPromise = fetchActiveEvent();
+      const sectionsPromise = fetchVisibleSections();
       
-      const [user, activeEvent] = await Promise.all([userPromise, eventPromise]);
+      const [user, activeEvent] = await Promise.all([userPromise, eventPromise, sectionsPromise]);
       
       if (user) {
         setUserId(user._id);
@@ -791,7 +856,7 @@ const PaymentPage = ({ username }) => {
         theme="light"
         style={{ top: 72 }}
       />
-      <div id="thisone" className="min-h-screen bg-background text-text flex flex-col items-center py-12 px-2">
+      <div id="thisone" className="min-h-screen bg-background text-text flex flex-col items-center py-12 pb-28  px-2">
         <PaymentProfileSection
           username={username}
           currentUser={currentUser}
@@ -818,71 +883,126 @@ const PaymentPage = ({ username }) => {
         
         {/* NEW TAB NAVIGATION UI - Replaces the old InteractionSection placement */}
         <div className="w-full max-w-5xl mt-8 border-b border-text/10">
-          <div className="flex justify-center items-center gap-6">
-            <button
-              onClick={() => handleTabChange('contribute')}
-              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                activeTab === 'contribute'
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
-              }`}
-            >
-              Contribute
-            </button>
-            <button
-              onClick={() => handleTabChange('vault')}
-              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                activeTab === 'vault'
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
-              }`}
-            >
-               Vault
-            </button>
-             {/* Links */}
-            <button
-              onClick={() => handleTabChange('links')}
-              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                activeTab === 'links'
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
-              }`}
-            >
-              Links
-            </button>
-            {/* Community */}
-            <button
-              onClick={() => handleTabChange('community')}
-              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                activeTab === 'community'
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
-              }`}
-            >
-              Community
-            </button>
-           
-            <button
-              onClick={() => handleTabChange('merchandise')}
-              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                activeTab === 'merchandise'
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
-              }`}
-            >
-              Merchandise
-            </button>
-            {/* COMMENTED OUT - Giveaway section temporarily hidden */}
-            {/* <button
-              onClick={() => setActiveTab('giveaway')}
-              className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                activeTab === 'giveaway'
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
-              }`}
-            >
-              Giveaway
-            </button> */}
+          <div className="flex justify-center items-center gap-6 flex-wrap">
+            {/* Dynamically render navigation buttons based on visibleSections */}
+                       {visibleSections.includes('links') && (
+              <button
+                onClick={() => handleTabChange('links')}
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
+                  activeTab === 'links'
+                    ? 'text-primary border-b-2 border-primary'
+                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                }`}
+              >
+                Links
+              </button>
+            )}
+
+            {visibleSections.includes('contribute') && (
+              <button
+                onClick={() => handleTabChange('contribute')}
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
+                  activeTab === 'contribute'
+                    ? 'text-primary border-b-2 border-primary'
+                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                }`}
+              >
+                Contribute
+              </button>
+            )}
+            
+            {visibleSections.includes('vault') && (
+              <button
+                onClick={() => handleTabChange('vault')}
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
+                  activeTab === 'vault'
+                    ? 'text-primary border-b-2 border-primary'
+                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                }`}
+              >
+                Vault
+              </button>
+            )}
+            
+ 
+            
+            {visibleSections.includes('community') && (
+              <button
+                onClick={() => handleTabChange('community')}
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
+                  activeTab === 'community'
+                    ? 'text-primary border-b-2 border-primary'
+                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                }`}
+              >
+                Community
+              </button>
+            )}
+            
+            {visibleSections.includes('merchandise') && (
+              <button
+                onClick={() => handleTabChange('merchandise')}
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
+                  activeTab === 'merchandise'
+                    ? 'text-primary border-b-2 border-primary'
+                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                }`}
+              >
+                Merchandise
+              </button>
+            )}
+            
+            {visibleSections.includes('subscription') && (
+              <button
+                onClick={() => handleTabChange('subscription')}
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
+                  activeTab === 'subscription'
+                    ? 'text-primary border-b-2 border-primary'
+                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                }`}
+              >
+                Subscription
+              </button>
+            )}
+            
+            {visibleSections.includes('courses') && (
+              <button
+                onClick={() => handleTabChange('courses')}
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
+                  activeTab === 'courses'
+                    ? 'text-primary border-b-2 border-primary'
+                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                }`}
+              >
+                Courses
+              </button>
+            )}
+            
+            {visibleSections.includes('giveaway') && (
+              <button
+                onClick={() => handleTabChange('giveaway')}
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
+                  activeTab === 'giveaway'
+                    ? 'text-primary border-b-2 border-primary'
+                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                }`}
+              >
+                Giveaway
+              </button>
+            )}
+            
+            {/* Customizable button - only visible to page owner */}
+            {isOwner && (
+              <button
+                onClick={handleOpenCustomize}
+                className="px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 text-text/60 hover:text-primary border-b-2 border-transparent flex items-center gap-2"
+                title="Customize visible sections"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
 
@@ -905,6 +1025,7 @@ const PaymentPage = ({ username }) => {
                     router={router}
                     currentUser={currentUser}
                     setPaymentform={setPaymentform}
+                    isOwner={isOwner}
                   />
                 </ErrorBoundary>
               ) : (
@@ -943,10 +1064,41 @@ const PaymentPage = ({ username }) => {
             <MerchandiseSection />
           )}
 
-          {/* COMMENTED OUT - Giveaway section temporarily hidden */}
-          {/* {activeTab === 'giveaway' && (
-            <GiveawaySection />
-          )} */}
+          {activeTab === 'subscription' && (
+            <div className="w-full max-w-5xl mt-8 flex justify-center">
+              <div className="bg-dropdown-hover rounded-2xl p-12 text-center border border-text/10">
+                <div className="text-6xl mb-4"></div>
+                <h2 className="text-2xl font-bold text-text mb-2">Subscription</h2>
+                <p className="text-primary text-lg font-semibold">Coming Soon</p>
+                <p className="text-text/40 text-sm mt-2">Exclusive subscription tiers with special perks and content</p>
+                <p className="text-text/40 text-sm mt-2">Get Discounts using FamPoints.</p>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'courses' && (
+            <div className="w-full max-w-5xl mt-8 flex justify-center">
+              <div className="bg-dropdown-hover rounded-2xl p-12 text-center border border-text/10">
+                <div className="text-6xl mb-4"></div>
+                <h2 className="text-2xl font-bold text-text mb-2">Courses</h2>
+                <p className="text-primary text-lg font-semibold">Coming Soon</p>
+                <p className="text-text/40 text-sm mt-2">Educational courses and tutorials from your favorite creators</p>
+                <p className="text-text/40 text-sm mt-2">Get Discounts using FamPoints.</p>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'giveaway' && (
+            <div className="w-full max-w-5xl mt-8 flex justify-center">
+              <div className="bg-dropdown-hover rounded-2xl p-12 text-center border border-text/10">
+                <div className="text-6xl mb-4"></div>
+                <h2 className="text-2xl font-bold text-text mb-2">Giveaway Picker</h2>
+                <p className="text-primary text-lg font-semibold">Coming Soon</p>
+                <p className="text-text/40 text-sm mt-2">Host giveaways and pick winners fairly using our picker tool</p>
+                <p className="text-text/40 text-sm mt-2">Engage your community with exciting giveaways.</p>
+              </div>
+            </div>
+          )}
         </div>
 
                   {activeTab === 'contribute' && (
@@ -960,6 +1112,78 @@ const PaymentPage = ({ username }) => {
 
 
       </div>
+
+      {/* Customization Modal */}
+      {showCustomizeModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-dropdown-hover rounded-xl p-4 sm:p-6 md:p-8 max-w-md sm:max-w-lg md:max-w-2xl w-full border border-text/10 shadow-2xl my-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-text flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                </svg>
+                <span className="hidden sm:inline">Customize Your Page</span>
+                <span className="sm:hidden">Customize</span>
+              </h2>
+              <button
+                onClick={() => setShowCustomizeModal(false)}
+                className="text-text/60 hover:text-text transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <p className="text-text/60 text-xs sm:text-sm mb-4">Select sections to display on your page.</p>
+
+            <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-2">
+              {/* Section checkboxes */}
+              {[
+                { id: 'contribute', name: 'Contribute', desc: 'Donations & leaderboard' },
+                { id: 'vault', name: 'Vault', desc: 'Exclusive content' },
+                { id: 'links', name: 'Links', desc: 'Social & products' },
+                { id: 'merchandise', name: 'Merchandise', desc: 'Your merch' },
+                { id: 'community', name: 'Community', desc: 'Engagement' },
+                { id: 'subscription', name: 'Subscription', desc: 'Tiers & perks' },
+                { id: 'courses', name: 'Courses', desc: 'Tutorials' },
+                { id: 'giveaway', name: 'Giveaway', desc: 'Host giveaways' }
+              ].map(section => (
+                <label
+                  key={section.id}
+                  className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-background/50 rounded-lg hover:bg-background/70 transition-colors cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={tempVisibleSections.includes(section.id)}
+                    onChange={() => handleToggleSection(section.id)}
+                    className="mt-0.5 sm:mt-1 w-4 h-4 sm:w-5 sm:h-5 rounded border-text/20 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-text text-sm sm:text-base">{section.name}</div>
+                    <div className="text-xs sm:text-sm text-text/60 truncate">{section.desc}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            <div className="flex gap-2 sm:gap-3 mt-4 sm:mt-6">
+              <button
+                onClick={() => setShowCustomizeModal(false)}
+                className="flex-1 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-background text-text rounded-lg hover:bg-background/80 transition-colors font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveCustomization}
+                className="flex-1 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-primary text-text rounded-lg hover:bg-primary/90 transition-colors font-medium"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

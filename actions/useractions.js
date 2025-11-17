@@ -30,6 +30,25 @@ export const fetchuser = async (identifier) => {
     _id: u._id?.toString(),
     createdAt: u.createdAt?.toISOString(),
     updatedAt: u.updatedAt?.toISOString(),
+    // Serialize socials subdocuments
+    socials: u.socials?.map(social => ({
+      platform: social.platform,
+      username: social.username,
+      link: social.link,
+      _id: social._id?.toString(),
+      createdAt: social.createdAt?.toISOString()
+    })) || [],
+    // Serialize favourites subdocuments
+    favourites: u.favourites?.map(fav => ({
+      name: fav.name,
+      link: fav.link,
+      image: fav.image,
+      _id: fav._id?.toString(),
+      createdAt: fav.createdAt?.toISOString()
+    })) || [],
+    // Serialize followersArray and following if they exist
+    followersArray: u.followersArray?.map(id => id.toString()) || [],
+    following: u.following?.map(id => id.toString()) || []
   };
   
   console.log('🔍 fetchuser Debug - Final user object accountType:', user.accountType);

@@ -93,7 +93,7 @@ const PaymentProfileSection = ({
       <div className="h-20" />
 
       {/* Profile Info Box */}
-      <div className="relative mt-20 w-full max-w-md mx-auto p-4 bg-dropdown-hover rounded-lg shadow-sm">
+      <div className="relative mt-6 w-full max-w-md mx-auto p-4 bg-dropdown-hover rounded-lg shadow-sm">
         <h1 className="text-xl font-light text-primary text-center mb-3">@{username}</h1>
         
         {/* Follower Count for Creator's Own Page */}

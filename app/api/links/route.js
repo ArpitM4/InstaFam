@@ -17,15 +17,28 @@ export async function GET(req) {
     }
 
     // Find user and return their socials and favourites (no auth check for GET)
-    const user = await User.findOne({ username }).select("socials favourites");
+    const user = await User.findOne({ username }).select("socials favourites").lean();
     
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Serialize ObjectIds to strings for client components
+    const serializedSocials = (user.socials || []).map(social => ({
+      ...social,
+      _id: social._id.toString(),
+      createdAt: social.createdAt?.toISOString()
+    }));
+
+    const serializedFavourites = (user.favourites || []).map(fav => ({
+      ...fav,
+      _id: fav._id.toString(),
+      createdAt: fav.createdAt?.toISOString()
+    }));
+
     return NextResponse.json({
-      socials: user.socials || [],
-      favourites: user.favourites || []
+      socials: serializedSocials,
+      favourites: serializedFavourites
     });
   } catch (error) {
     console.error("Error fetching links:", error);
@@ -75,10 +88,27 @@ export async function POST(req) {
 
     await user.save();
 
+    // Serialize the returned data
+    const serializedSocials = user.socials.map(social => ({
+      platform: social.platform,
+      username: social.username,
+      link: social.link,
+      _id: social._id.toString(),
+      createdAt: social.createdAt?.toISOString()
+    }));
+
+    const serializedFavourites = user.favourites.map(fav => ({
+      name: fav.name,
+      link: fav.link,
+      image: fav.image,
+      _id: fav._id.toString(),
+      createdAt: fav.createdAt?.toISOString()
+    }));
+
     return NextResponse.json({ 
       success: true, 
-      socials: user.socials,
-      favourites: user.favourites
+      socials: serializedSocials,
+      favourites: serializedFavourites
     });
   } catch (error) {
     console.error("Error adding link:", error);
@@ -120,10 +150,27 @@ export async function DELETE(req) {
 
     await user.save();
 
+    // Serialize the returned data
+    const serializedSocials = user.socials.map(social => ({
+      platform: social.platform,
+      username: social.username,
+      link: social.link,
+      _id: social._id.toString(),
+      createdAt: social.createdAt?.toISOString()
+    }));
+
+    const serializedFavourites = user.favourites.map(fav => ({
+      name: fav.name,
+      link: fav.link,
+      image: fav.image,
+      _id: fav._id.toString(),
+      createdAt: fav.createdAt?.toISOString()
+    }));
+
     return NextResponse.json({ 
       success: true,
-      socials: user.socials,
-      favourites: user.favourites
+      socials: serializedSocials,
+      favourites: serializedFavourites
     });
   } catch (error) {
     console.error("Error deleting link:", error);
