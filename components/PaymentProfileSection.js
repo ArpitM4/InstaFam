@@ -26,16 +26,31 @@ const PaymentProfileSection = ({
   isEventActive,
   setShowBetaPopup,
 }) => {
+  // Generate fallback profile image URL only when needed
+  const profileImageUrl = currentUser?.profilepic || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(username || 'User')}&backgroundColor=6366f1`;
+  const hasCoverImage = !!currentUser?.coverpic;
+
   return (
     <>
-      {/* Banner with full width and profile image overlapping bottom edge */}
-      <div className="relative w-full mx-auto">
-        {/* Background image with upload for owner and change banner button */}
+      {/* Banner - YouTube Style */}
+      <div className="relative w-full">
+        {/* Banner Image or Gradient Fallback */}
         <div
-          className={`w-full h-64 md:h-72 lg:h-80 bg-cover bg-center shadow-md relative ${isOwner ? '' : ''}`}
-          style={{ backgroundImage: `url(${currentUser?.coverpic || "https://picsum.photos/1600/400"})` }}
+          className={`w-full h-24 sm:h-32 md:h-48 lg:h-56 relative overflow-hidden ${
+            !hasCoverImage ? 'bg-gradient-to-r from-primary via-purple-600 to-primary' : ''
+          }`}
         >
-          <div className="absolute inset-0 bg-background/40" />
+          {hasCoverImage && (
+            <Image
+              src={currentUser.coverpic}
+              alt="Banner"
+              fill
+              className="object-cover"
+              priority
+            />
+          )}
+          
+          {/* Owner: Change Banner Button */}
           {isOwner && (
             <>
               <input
@@ -48,30 +63,30 @@ const PaymentProfileSection = ({
               />
               <button
                 type="button"
-                className={`absolute bottom-4 right-4 z-10 bg-primary text-text px-4 py-2 rounded-lg shadow hover:bg-primary/90 transition font-semibold text-sm flex items-center gap-2 ${isUploadingCover ? 'opacity-60 cursor-not-allowed' : ''}`}
+                className={`absolute bottom-2 right-2 md:bottom-4 md:right-4 z-10 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow hover:bg-black/80 transition text-xs md:text-sm font-medium flex items-center gap-1.5 ${isUploadingCover ? 'opacity-60 cursor-not-allowed' : ''}`}
                 onClick={() => !isUploadingCover && coverInputRef.current.click()}
                 disabled={isUploadingCover}
               >
-                {isUploadingCover ? <FaSpinner className="animate-spin text-text text-lg" /> : null}
-                Change Banner
+                {isUploadingCover ? <FaSpinner className="animate-spin text-sm" /> : <FaPen className="text-xs" />}
+                <span className="hidden sm:inline">Change Banner</span>
+                <span className="sm:hidden">Edit</span>
               </button>
             </>
           )}
         </div>
-        {/* Profile image, centered and overlapping bottom edge, with upload for owner */}
-        <div className="absolute left-1/2 bottom-0 translate-x-[-50%] translate-y-1/2 flex justify-center items-center w-full pointer-events-none">
-          <div className={`w-36 h-36 md:w-40 md:h-40 bg-text rounded-full shadow-lg border-4 border-text overflow-hidden flex items-center justify-center relative ${isOwner ? 'group cursor-pointer' : ''}`}
+
+        {/* Profile image, centered and overlapping bottom edge */}
+        <div className="absolute left-1/2 bottom-0 translate-x-[-50%] translate-y-1/2 flex justify-center items-center w-full pointer-events-none z-10">
+          <div 
+            className={`w-32 h-32 sm:w-32 sm:h-32 md:w-40 md:h-40 bg-background rounded-full shadow-lg border-4 border-white/20 overflow-hidden flex items-center justify-center relative ${isOwner ? 'group cursor-pointer pointer-events-auto' : ''}`}
             onClick={isOwner && !isUploadingProfile ? () => profileInputRef.current.click() : undefined}
             style={{ opacity: isUploadingProfile ? 0.6 : 1 }}
           >
-            <Image
-              src={currentUser?.profilepic || "https://picsum.photos/200"}
+            <img
+              src={profileImageUrl}
               alt="Profile"
-              fill
-              sizes="(max-width: 768px) 144px, 160px"
-              className="object-cover rounded-full"
+              className="w-full h-full object-cover rounded-full"
               style={{ filter: isUploadingProfile ? 'blur(2px)' : 'none' }}
-              priority
             />
             {isOwner && (
               <>
@@ -83,7 +98,7 @@ const PaymentProfileSection = ({
                   onChange={handleProfileChange}
                   disabled={isUploadingProfile}
                 />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-auto">
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                   <div className="bg-background/70 backdrop-blur-md rounded-full p-3 flex items-center justify-center">
                     {isUploadingProfile ? <FaSpinner className="animate-spin text-primary text-xl" /> : <FaPen className="text-xl text-primary" />}
                   </div>
@@ -93,6 +108,7 @@ const PaymentProfileSection = ({
           </div>
         </div>
       </div>
+
       {/* Add margin below the banner to account for the overlapping profile image */}
       <div className="h-20" />
 
@@ -104,7 +120,7 @@ const PaymentProfileSection = ({
         {isOwner && (
           <div className="flex justify-center mb-3">
             <span className="text-sm text-text/60 bg-background/50 px-3 py-1 rounded-lg">
-              {(currentUser.followersArray?.length || currentUser.followers || 0).toLocaleString()} follower{(currentUser.followersArray?.length || currentUser.followers || 0) !== 1 ? 's' : ''}
+              {(currentUser?.followersArray?.length || currentUser?.followers || 0).toLocaleString()} follower{(currentUser?.followersArray?.length || currentUser?.followers || 0) !== 1 ? 's' : ''}
             </span>
           </div>
         )}
@@ -112,12 +128,11 @@ const PaymentProfileSection = ({
         {/* Follow Button */}
         <div className="flex justify-center mb-1">
           <FollowButton 
-            creatorId={currentUser._id}
+            creatorId={currentUser?._id}
             creatorName={username}
-            initialFollowerCount={currentUser.followersArray?.length || currentUser.followers || 0}
-            showFollowerCount={false} // We're showing it separately above for creators
+            initialFollowerCount={currentUser?.followersArray?.length || currentUser?.followers || 0}
+            showFollowerCount={false}
             onFollowChange={(isFollowing, newCount) => {
-              // Update local state to reflect changes
               setcurrentUser(prev => ({
                 ...prev,
                 followers: newCount,
@@ -132,7 +147,7 @@ const PaymentProfileSection = ({
           <div className="relative">
             <textarea
               className="w-full mt-1 bg-background text-text text-sm text-center rounded-lg p-2 pb-6 resize-none focus:outline-none transition-all duration-200 border-0 placeholder-text/40"
-              value={currentUser.description || ""}
+              value={currentUser?.description || ""}
               onChange={(e) => setcurrentUser({ ...currentUser, description: e.target.value })}
               onBlur={handleSaveDescription}
               placeholder="Add a description..."
@@ -140,70 +155,10 @@ const PaymentProfileSection = ({
             <FaPen className="absolute bottom-2 right-2 text-text/40 text-xs pointer-events-none" />
           </div>
         ) : (
-          <p className="text-sm text-text/60 text-center mt-2">{currentUser.description}</p>
+          <p className="text-sm text-text/60 text-center mt-2">{currentUser?.description}</p>
         )}
 
-        {/* Perk Section - Combined Display and Edit */}
-        {/* COMMENTED OUT - Perk feature temporarily disabled */}
-        {/* {isOwner && (
-          <div className="mt-4 space-y-3">
-            <div className="relative">
-              <input
-                type="text"
-                className={`w-full bg-background text-text text-sm text-center rounded-lg p-3 pr-8 focus:outline-none transition-all duration-200 border-0 placeholder-text/40 ${isEventActive ? 'opacity-50 cursor-not-allowed' : ''}`}
-                value={currentUser.perk || ""}
-                onClick={() => !isEventActive && setIsEditing(true)}
-                onFocus={() => !isEventActive && setIsEditing(true)}
-                onChange={(e) => !isEventActive && setcurrentUser({ ...currentUser, perk: e.target.value })}
-                onBlur={!isEventActive ? handleSavePerk : undefined}
-                placeholder={isEventActive ? "Cannot edit perk during active event" : "Set your perk for top donors..."}
-                disabled={isEventActive}
-                readOnly={isEventActive}
-              />
-              <FaPen className={`absolute top-1/2 right-3 transform -translate-y-1/2 text-xs pointer-events-none ${isEventActive ? 'text-text/20' : 'text-text/40'}`} />
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <label className={`text-text/70 text-sm font-medium whitespace-nowrap ${isEventActive ? 'opacity-50' : ''}`}>Perk for Top</label>
-              <input
-                type="number"
-                min="1"
-                max="100"
-                className={`flex-1 bg-background text-text text-sm text-center rounded-lg p-2 focus:outline-none transition-all duration-200 border-0 placeholder-text/40 ${isEventActive ? 'opacity-50 cursor-not-allowed' : ''}`}
-                value={currentUser.perkRank || 5}
-                onChange={(e) => {
-                  if (!isEventActive) {
-                    const value = Math.min(Math.max(1, Number(e.target.value)), 100);
-                    setcurrentUser({ ...currentUser, perkRank: value });
-                  }
-                }}
-                onBlur={!isEventActive ? handleSavePerk : undefined}
-                placeholder="5"
-                disabled={isEventActive}
-                readOnly={isEventActive}
-              />
-              <span className={`text-text/70 text-sm ${isEventActive ? 'opacity-50' : ''}`}>donors</span>
-            </div>
-            <p className={`text-text/50 text-xs text-center ${isEventActive ? 'opacity-50' : ''}`}>
-              {isEventActive 
-                ? "Perk settings are locked during active events" 
-                : "Top donors will be highlighted in the leaderboard and eligible for your perk"
-              }
-            </p>
-          </div>
-        )} */}
-
-        {/* Perk Display for Non-Owners */}
-        {/* COMMENTED OUT - Perk feature temporarily disabled */}
-        {/* {!isOwner && isEventActive && currentUser.perk && (
-          <div className="mt-4 bg-black p-3 rounded-lg">
-            <div className="text-text/90 text-sm text-center">
-              🎁 <span className="font-medium text-primary/40">Top {currentUser.perkRank || 5} Perk : </span> {currentUser.perk}
-            </div>
-          </div>
-        )} */}
-
-        {/* Owner-only controls */}
+        {/* Owner-only Event Controls */}
         {isOwner && (
           <div className="mt-4 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">

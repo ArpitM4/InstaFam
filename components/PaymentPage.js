@@ -854,7 +854,7 @@ const PaymentPage = ({ username }) => {
           </button>
           <button
             onClick={proceedWithEventStart}
-            className="flex-1 px-4 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-white transition-colors text-sm font-medium"
+            className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-primary via-purple-500 to-rose-500 text-white transition-all text-sm font-medium shadow-md hover:scale-[1.04] hover:brightness-110 border-0"
           >
             Continue Testing
           </button>
@@ -883,7 +883,9 @@ const PaymentPage = ({ username }) => {
         theme="light"
         style={{ top: 72 }}
       />
-      <div id="thisone" className="min-h-screen bg-background text-text flex flex-col items-center pb-28">
+      <div id="thisone" className="min-h-screen bg-background text-text flex flex-col items-center pb-36 relative overflow-x-hidden">
+        {/* Radial gradient background overlay */}
+        <div className="absolute inset-0 -z-10 pointer-events-none" style={{background: 'radial-gradient(ellipse 80% 60% at 50% 20%, #e11d48 0%, #6366f1 60%, #18181b 100%)'}} />
         <PaymentProfileSection
           username={username}
           currentUser={currentUser}
@@ -909,8 +911,8 @@ const PaymentPage = ({ username }) => {
         />
         
         {/* NEW TAB NAVIGATION UI - Replaces the old InteractionSection placement */}
-        <div className="w-full max-w-5xl mt-8 border-b border-text/10">
-          <div className="flex justify-center items-center gap-6 flex-wrap">
+        <div className="w-full max-w-5xl mt-12 border-b border-text/10">
+          <div className="flex justify-center items-center gap-8 flex-wrap">
             {/* Dynamically render navigation buttons based on visibleSections */}
                        {visibleSections.includes('links') && (
               <button
@@ -1093,9 +1095,9 @@ const PaymentPage = ({ username }) => {
 
           {activeTab === 'subscription' && (
             <div className="w-full max-w-5xl mt-8 flex justify-center">
-              <div className="bg-dropdown-hover rounded-2xl p-12 text-center border border-text/10">
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
                 <div className="text-6xl mb-4"></div>
-                <h2 className="text-2xl font-bold text-text mb-2">Subscription</h2>
+                <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-rose-400 mb-2">Subscription</h2>
                 <p className="text-primary text-lg font-semibold">Coming Soon</p>
                 <p className="text-text/40 text-sm mt-2">Exclusive subscription tiers with special perks and content</p>
                 <p className="text-text/40 text-sm mt-2">Get Discounts using FamPoints.</p>
@@ -1105,9 +1107,9 @@ const PaymentPage = ({ username }) => {
 
           {activeTab === 'courses' && (
             <div className="w-full max-w-5xl mt-8 flex justify-center">
-              <div className="bg-dropdown-hover rounded-2xl p-12 text-center border border-text/10">
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
                 <div className="text-6xl mb-4"></div>
-                <h2 className="text-2xl font-bold text-text mb-2">Courses</h2>
+                <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-rose-400 mb-2">Courses</h2>
                 <p className="text-primary text-lg font-semibold">Coming Soon</p>
                 <p className="text-text/40 text-sm mt-2">Educational courses and tutorials from your favorite creators</p>
                 <p className="text-text/40 text-sm mt-2">Get Discounts using FamPoints.</p>
@@ -1117,9 +1119,9 @@ const PaymentPage = ({ username }) => {
 
           {activeTab === 'giveaway' && (
             <div className="w-full max-w-5xl mt-8 flex justify-center">
-              <div className="bg-dropdown-hover rounded-2xl p-12 text-center border border-text/10">
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
                 <div className="text-6xl mb-4"></div>
-                <h2 className="text-2xl font-bold text-text mb-2">Giveaway Picker</h2>
+                <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-rose-400 mb-2">Giveaway Picker</h2>
                 <p className="text-primary text-lg font-semibold">Coming Soon</p>
                 <p className="text-text/40 text-sm mt-2">Host giveaways and pick winners fairly using our picker tool</p>
                 <p className="text-text/40 text-sm mt-2">Engage your community with exciting giveaways.</p>
@@ -1129,7 +1131,7 @@ const PaymentPage = ({ username }) => {
         </div>
 
                   {activeTab === 'contribute' && (
- <div className="mt-6 text-center p-4 bg-dropdown-hover rounded-lg">
+ <div className="mt-6 text-center p-4 bg-white/5 backdrop-blur-md rounded-lg shadow border border-white/10" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
       
        
           <p className="text-success text-sm font-medium">
@@ -1143,7 +1145,7 @@ const PaymentPage = ({ username }) => {
       {/* Customization Modal */}
       {showCustomizeModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-dropdown-hover rounded-xl p-4 sm:p-6 md:p-8 max-w-md sm:max-w-lg md:max-w-2xl w-full border border-text/10 shadow-2xl my-8">
+          <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 sm:p-6 md:p-8 max-w-md sm:max-w-lg md:max-w-2xl w-full border border-white/10 shadow-2xl my-8" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-text flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 text-primary" viewBox="0 0 20 20" fill="currentColor">
@@ -1203,7 +1205,7 @@ const PaymentPage = ({ username }) => {
               </button>
               <button
                 onClick={handleSaveCustomization}
-                className="flex-1 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-primary text-text rounded-lg hover:bg-primary/90 transition-colors font-medium"
+                className="flex-1 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-primary via-purple-500 to-rose-500 text-white rounded-lg shadow-md hover:scale-[1.04] hover:brightness-110 transition-all font-medium border-0"
               >
                 Save
               </button>

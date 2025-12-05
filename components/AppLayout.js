@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -13,19 +13,47 @@ export default function AppLayout({ children }) {
   const { data: session, status } = useSession();
   const { userData, accountType } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [navbarVisible, setNavbarVisible] = useState(true);
+  const lastScrollY = useRef(0);
 
   // Define main routes where sidebar should stay expanded
   const mainRoutes = ['/', '/explore', '/my-fam-points', '/account', '/search'];
   
+  // Check if current page is a creator page
+  const isCreatorPage = !mainRoutes.some(route => pathname === route || pathname.startsWith(route + '/')) && pathname !== '/';
+
   // Auto-collapse sidebar on creator pages (dynamic routes)
   useEffect(() => {
-    const isMainRoute = mainRoutes.some(route => pathname === route || pathname.startsWith(route + '/'));
-    const isCreatorPage = !isMainRoute && pathname !== '/';
-    
     if (isCreatorPage) {
       setSidebarOpen(false);
     }
-  }, [pathname]);
+  }, [pathname, isCreatorPage]);
+
+  // Handle scroll for navbar hide/show on creator pages
+  useEffect(() => {
+    if (!isCreatorPage) {
+      setNavbarVisible(true);
+      return;
+    }
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Show navbar when scrolling up or at top
+      if (currentScrollY < lastScrollY.current || currentScrollY < 50) {
+        setNavbarVisible(true);
+      } 
+      // Hide navbar when scrolling down
+      else if (currentScrollY > lastScrollY.current && currentScrollY > 50) {
+        setNavbarVisible(false);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isCreatorPage]);
 
   // For non-authenticated users, just render children (login/signup pages, etc.)
   if (status === "loading") {
@@ -39,7 +67,9 @@ export default function AppLayout({ children }) {
   return (
     <div className="min-h-screen bg-background">
       {/* Top Navbar - Full Width */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-white/10">
+      <header className={`fixed top-0 left-0 right-0 z-50 bg-background border-b border-white/10 transition-transform duration-300 ${
+        navbarVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}>
         <div className="flex items-center justify-between px-4 py-3">
           {/* Left Side - Hamburger + Logo */}
           <div className="flex items-center gap-4">
@@ -205,7 +235,10 @@ export default function AppLayout({ children }) {
         }`}
       >
         {/* Page Content */}
-        <div className={mainRoutes.includes(pathname) ? 'p-6' : ''}>
+        <div 
+        // className={mainRoutes.includes(pathname) ? 'p-6' : ''}
+        className={mainRoutes.includes(pathname) ? 'p-6' : 'p-2'}
+        >
           {children}
         </div>
       </main>

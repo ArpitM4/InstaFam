@@ -291,7 +291,7 @@ const Account = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin h-8 w-8 rounded-full border-2 border-primary border-t-transparent mb-4 mx-auto"></div>
-          <p className="text-text">Loading</p>
+          <p className="text-white/60">Loading your account...</p>
         </div>
       </div>
     );
@@ -327,25 +327,47 @@ const Account = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"
-        style={{ top: 50 }}
+        theme="dark"
+        style={{ top: 70 }}
       />
 
-      <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8 pt-20">
-        <div className="w-full max-w-lg space-y-8">
-          {/* Header */}
-          <div className="text-center">
-            <h1 className="text-3xl font-light text-primary mb-3">Account Settings</h1>
+      <div className="min-h-screen">
+        <div className="max-w-md mx-auto">
+          {/* Header Section */}
+          <div className="mb-6">
+            <h1 className="text-xl font-semibold text-white">Account Settings</h1>
+            <p className="text-sm text-white/50">Manage your profile</p>
           </div>
 
-          {/* Form Container */}
-          <div className="bg-dropdown-hover rounded-lg p-6 space-y-6 shadow-sm">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              
+          {/* Profile Preview Card */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-4">
+            <div className="flex items-center gap-3">
+              <img
+                src={form.profilepic || `https://api.dicebear.com/7.x/initials/svg?seed=${form.name || 'User'}&backgroundColor=6366f1`}
+                alt="Profile"
+                className="w-12 h-12 rounded-full object-cover border border-white/20"
+              />
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base font-medium text-white truncate">{form.name || 'Your Name'}</h2>
+                <p className="text-sm text-white/50">@{form.username || 'username'}</p>
+              </div>
+              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                form.accountType === 'Creator' 
+                  ? 'bg-purple-500/20 text-purple-400' 
+                  : 'bg-blue-500/20 text-blue-400'
+              }`}>
+                {form.accountType || 'User'}
+              </span>
+            </div>
+          </div>
+
+          {/* Form Card */}
+          <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+            <form onSubmit={handleSubmit}>
               {/* Name Field */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-text/70">
-                  Name <span className="text-error">*</span>
+              <div className="p-4 border-b border-white/10">
+                <label className="block text-xs font-medium text-white/70 mb-1.5">
+                  Name <span className="text-rose-400">*</span>
                 </label>
                 <input
                   type="text"
@@ -353,80 +375,141 @@ const Account = () => {
                   value={form.name || ""}
                   onChange={handleChange}
                   placeholder="Enter your name"
-                  className={`w-full px-3 py-3 rounded-lg bg-background text-text placeholder-background focus:outline-none transition-all duration-200 border-0 ${
-                    formErrors.name ? 'ring-2 ring-error' : ''
+                  className={`w-full px-3 py-2 text-sm rounded-lg bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all border ${
+                    formErrors.name ? 'border-rose-500' : 'border-white/10 hover:border-white/20'
                   }`}
                   required
                 />
                 {formErrors.name && (
-                  <p className="text-error text-xs">Name is required</p>
+                  <p className="text-rose-400 text-xs mt-1">Name is required</p>
+                )}
+              </div>
+
+              {/* Username Field */}
+              <div className="p-4 border-b border-white/10">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-medium text-white/70">
+                    Username <span className="text-rose-400">*</span>
+                  </label>
+                  {form.instagram?.isVerified && (
+                    <span className="text-emerald-400 text-xs">Verified</span>
+                  )}
+                </div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-sm">@</span>
+                  <input
+                    type="text"
+                    name="username"
+                    value={form.username || ""}
+                    onChange={handleChange}
+                    placeholder="username"
+                    disabled={form.instagram?.isVerified}
+                    className={`w-full pl-7 pr-3 py-2 text-sm rounded-lg transition-all border ${
+                      form.instagram?.isVerified
+                        ? "bg-white/5 text-white/50 cursor-not-allowed border-white/5"
+                        : formErrors.username
+                          ? "bg-white/5 text-white placeholder-white/30 focus:outline-none border-rose-500"
+                          : "bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-primary/50 border-white/10 hover:border-white/20"
+                    }`}
+                    required
+                  />
+                </div>
+                {formErrors.username && (
+                  <p className="text-rose-400 text-xs mt-1">Username is required</p>
+                )}
+                {form.instagram?.isVerified && (
+                  <p className="text-white/40 text-xs mt-1">Locked after verification</p>
                 )}
               </div>
 
               {/* Email Field (Read-only) */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-text/70">Email</label>
+              <div className="p-4 border-b border-white/10">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-medium text-white/70">Email</label>
+                  <span className="text-white/40 text-xs">Read-only</span>
+                </div>
                 <input
                   type="email"
                   value={form.email || ""}
                   readOnly
                   disabled
-                  className="w-full px-3 py-3 rounded-lg bg-background/30 text-text/50 placeholder-background cursor-not-allowed border-0"
+                  className="w-full px-3 py-2 text-sm rounded-lg bg-white/5 text-white/50 cursor-not-allowed border border-white/5"
                 />
-                <p className="text-text/50 text-xs">Email cannot be changed</p>
-              </div>
-
-              {/* Instagram Username */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-text/70">
-                  Username <span className="text-error">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="username"
-                  value={form.username || ""}
-                  onChange={handleChange}
-                  placeholder="Choose a username"
-                  disabled={form.instagram?.isVerified}
-                  className={`w-full px-3 py-3 rounded-lg transition-all duration-200 border-0 ${
-                    form.instagram?.isVerified
-                      ? "bg-background/30 text-text/50 cursor-not-allowed"
-                      : formErrors.username
-                        ? "bg-background text-text placeholder-background focus:outline-none ring-2 ring-error"
-                        : "bg-background text-text placeholder-background focus:outline-none"
-                  }`}
-                  required
-                />
-                {formErrors.username && (
-                  <p className="text-error text-xs">Username is required</p>
-                )}
-                {form.instagram?.isVerified && (
-                  <p className="text-accent text-xs">Username is locked after verification</p>
-                )}
               </div>
 
               {/* Account Type */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-text/70">Account Type</label>
-                <select
-                  name="accountType"
-                  value={form.accountType || "User"}
-                  onChange={handleChange}
-                  className="w-full px-3 py-3 rounded-lg bg-background text-text focus:outline-none transition-all duration-200 border-0"
-                >
-                  <option value="User">User</option>
-                  <option value="Creator">Creator</option>
-                </select>
+              <div className="p-4 border-b border-white/10">
+                <label className="block text-xs font-medium text-white/70 mb-2">Account Type</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // Only allow switching to User if not already a Creator
+                      if (form.accountType !== 'Creator') {
+                        setForm(prev => ({ ...prev, accountType: 'User' }));
+                      }
+                    }}
+                    disabled={form.accountType === 'Creator'}
+                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                      form.accountType === 'User'
+                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
+                        : form.accountType === 'Creator'
+                          ? 'bg-white/5 text-white/30 border border-white/5 cursor-not-allowed'
+                          : 'bg-white/5 text-white/50 border border-white/10 hover:border-white/20'
+                    }`}
+                  >
+                    User
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForm(prev => ({ ...prev, accountType: 'Creator' }))}
+                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                      form.accountType === 'Creator'
+                        ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
+                        : 'bg-white/5 text-white/50 border border-white/10 hover:border-white/20'
+                    }`}
+                  >
+                    Creator
+                  </button>
+                </div>
+                {form.accountType === 'Creator' && (
+                  <p className="text-white/40 text-xs mt-2">Creator accounts cannot be changed back to User</p>
+                )}
               </div>
 
               {/* Submit Button */}
-              <button
-                type="submit"
-                className="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                Save Changes
-              </button>
+              <div className="p-4">
+                <button
+                  type="submit"
+                  className="w-full bg-primary hover:bg-primary/90 text-white py-2.5 px-4 rounded-lg text-sm font-medium transition-all"
+                >
+                  Save Changes
+                </button>
+              </div>
             </form>
+          </div>
+
+          {/* Quick Links Card */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4 mt-4">
+            <h3 className="text-xs font-medium text-white/50 mb-3">Quick Links</h3>
+            <div className="grid grid-cols-2 gap-2">
+              <a href="/creator/dashboard" className="flex items-center gap-2 p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group">
+                <div className="w-7 h-7 rounded-md bg-purple-500/20 flex items-center justify-center">
+                  <svg className="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                  </svg>
+                </div>
+                <span className="text-xs text-white/70 group-hover:text-white transition-colors">Dashboard</span>
+              </a>
+              <a href="/my-fam-points" className="flex items-center gap-2 p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group">
+                <div className="w-7 h-7 rounded-md bg-amber-500/20 flex items-center justify-center">
+                  <svg className="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <span className="text-xs text-white/70 group-hover:text-white transition-colors">FamPoints</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
