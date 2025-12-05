@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const ExplorePage = () => {
@@ -48,14 +49,16 @@ const ExplorePage = () => {
                 className="group bg-dropdown-hover rounded-2xl p-6 hover:bg-dropdown-hover/80 transition-all duration-300 hover:scale-[1.02]"
               >
                 <div className="flex flex-col items-center space-y-4">
-                  <div className="relative">
-                    <img
+                  <div className="relative w-16 h-16">
+                    <Image
                       src={
                         user.profilepic ||
                         `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(user.username)}`
                       }
                       alt="profile"
-                      className="w-16 h-16 rounded-full object-cover bg-white"
+                      fill
+                      sizes="64px"
+                      className="rounded-full object-cover bg-white"
                     />
                   </div>
                   <div className="text-center">

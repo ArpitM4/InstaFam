@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
 import { FaPlus, FaTimes, FaTrash } from 'react-icons/fa';
+import Image from 'next/image';
 
 const LinksSection = ({ currentUser }) => {
   const { data: session } = useSession();
@@ -231,11 +232,14 @@ const LinksSection = ({ currentUser }) => {
                 key={social._id}
                 frontContent={
                   <div className="flex flex-col items-center justify-center h-full p-2">
-                    <div className="w-12 h-12 mb-2 flex items-center justify-center">
-                      <img 
+                    <div className="w-12 h-12 mb-2 flex items-center justify-center relative">
+                      <Image 
                         src={platformData.logo} 
                         alt={platformData.name}
-                        className="w-full h-full object-contain"
+                        fill
+                        sizes="48px"
+                        className="object-contain"
+                        unoptimized
                       />
                     </div>
                     <p className="font-medium text-text text-xs text-center">{platformData.name}</p>
@@ -294,12 +298,14 @@ const LinksSection = ({ currentUser }) => {
             <FlipCard
               key={fav._id}
               frontContent={
-                <div className="flex flex-col items-center justify-center h-full overflow-hidden">
+                <div className="flex flex-col items-center justify-center h-full overflow-hidden relative">
                   {fav.image ? (
-                    <img 
+                    <Image 
                       src={fav.image} 
                       alt={fav.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                      className="object-cover"
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center h-full p-4">
@@ -476,15 +482,17 @@ const LinksSection = ({ currentUser }) => {
                 )}
                 {favouriteForm.image && (
                   <div className="relative w-full h-32 rounded-lg overflow-hidden border border-text/10">
-                    <img 
+                    <Image 
                       src={favouriteForm.image} 
                       alt="Preview"
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="100%"
+                      className="object-cover"
                     />
                     <button
                       type="button"
                       onClick={() => setFavouriteForm({ ...favouriteForm, image: '' })}
-                      className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition-colors"
+                      className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition-colors z-10"
                     >
                       <FaTimes className="text-sm" />
                     </button>

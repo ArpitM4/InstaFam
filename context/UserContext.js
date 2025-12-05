@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { fetchuser } from '@/actions/useractions';
@@ -24,55 +24,48 @@ export const UserProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const lastFetchRef = useRef(0);
   const isFetchingRef = useRef(false);
+  const initialFetchDoneRef = useRef(false);
 
-  // Function to refresh user data
+  // Function to refresh user data - memoized with useCallback
   const refreshUserData = useCallback(async (force = false) => {
-    if (!session?.user?.name) {
+    // Use email for fetching as it's more reliable than name/username
+    const userIdentifier = session?.user?.email;
+    
+    if (!userIdentifier) {
       setUserData(null);
       setUserPoints(0);
       setIsLoading(false);
       return;
     }
 
-    // Prevent too frequent refreshes unless forced
+    // Prevent too frequent refreshes unless forced (increased to 5 seconds)
     const now = Date.now();
-    if (!force && now - lastFetchRef.current < 2000) {
-      console.log('🔄 UserContext: Skipping refresh (too soon)');
+    if (!force && now - lastFetchRef.current < 5000) {
       return;
     }
 
     // Prevent concurrent fetches
     if (isFetchingRef.current) {
-      console.log('🔄 UserContext: Skipping refresh (already fetching)');
       return;
     }
 
     isFetchingRef.current = true;
     setIsLoading(true);
+    
     try {
-      console.log('🔄 UserContext: Refreshing user data for:', session.user.name);
-      
-      // Fetch user data
-      const user = await fetchuser(session.user.name);
-      setUserData(user);
-      lastFetchRef.current = now;
-      
-      // Fetch user points
-      try {
-        const pointsRes = await fetch('/api/points', {
+      // Fetch user data and points in parallel for better performance
+      const [user, pointsResponse] = await Promise.all([
+        fetchuser(userIdentifier),
+        fetch('/api/points', {
           cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache',
-          }
-        });
-        if (pointsRes.ok) {
-          const pointsData = await pointsRes.json();
-          setUserPoints(pointsData.totalPoints || 0);
-          console.log('🔄 UserContext: Updated points:', pointsData.totalPoints || 0);
-        }
-      } catch (error) {
-        console.error('Failed to fetch points:', error);
-      }
+          headers: { 'Cache-Control': 'no-cache' }
+        }).then(res => res.ok ? res.json() : { totalPoints: 0 }).catch(() => ({ totalPoints: 0 }))
+      ]);
+      
+      setUserData(user);
+      setUserPoints(pointsResponse.totalPoints || 0);
+      lastFetchRef.current = now;
+      initialFetchDoneRef.current = true;
     } catch (error) {
       console.error('Failed to refresh user data:', error);
       setUserData(null);
@@ -81,92 +74,85 @@ export const UserProvider = ({ children }) => {
       setIsLoading(false);
       isFetchingRef.current = false;
     }
-  }, [session?.user?.name]);
+  }, [session?.user?.email]);
 
-  // Function to update points without full refresh
+  // Function to update points without full refresh - optimized
   const updatePoints = useCallback(async () => {
     try {
       const pointsRes = await fetch('/api/points', {
         cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache',
-        }
+        headers: { 'Cache-Control': 'no-cache' }
       });
       if (pointsRes.ok) {
         const pointsData = await pointsRes.json();
         setUserPoints(pointsData.totalPoints || 0);
-        console.log('🔄 UserContext: Points updated:', pointsData.totalPoints || 0);
       }
     } catch (error) {
       console.error('Failed to update points:', error);
     }
   }, []);
 
-  // Function to update user data (e.g., after profile changes)
+  // Function to update user data locally without API call
   const updateUserData = useCallback((newData) => {
-    setUserData(prev => ({ ...prev, ...newData }));
-    console.log('🔄 UserContext: User data updated:', newData);
+    setUserData(prev => prev ? { ...prev, ...newData } : newData);
   }, []);
 
-  // Initial data fetch when session changes
+  // SINGLE effect for initial data fetch when session changes
   useEffect(() => {
+    // Skip if still loading session
     if (status === 'loading') return;
     
-    if (status === 'authenticated' && session?.user?.name) {
-      refreshUserData(true);
-    } else {
+    // Handle unauthenticated state
+    if (status !== 'authenticated' || !session?.user?.email) {
       setUserData(null);
       setUserPoints(0);
       setIsLoading(false);
+      initialFetchDoneRef.current = false;
+      return;
     }
-  }, [session?.user?.name, status, refreshUserData]);
-
-  // Refresh data when session user changes - REMOVED to prevent duplicate calls
-  // The above useEffect already handles this
-
-  // Refresh user data when navigating to dashboard or account pages
-  useEffect(() => {
-    if (session?.user?.name && (pathname === '/dashboard' || pathname === '/account')) {
+    
+    // Only fetch if we haven't done initial fetch for this session
+    if (!initialFetchDoneRef.current) {
       refreshUserData(true);
     }
-  }, [pathname, session?.user?.name, refreshUserData]);
+  }, [status, session?.user?.email, refreshUserData]);
+
+  // Separate effect for pathname changes - only trigger on dashboard/account
+  useEffect(() => {
+    if (
+      status === 'authenticated' && 
+      session?.user?.email && 
+      initialFetchDoneRef.current &&
+      (pathname === '/creator/dashboard' || pathname === '/account')
+    ) {
+      // Use regular refresh (respects throttling)
+      refreshUserData(false);
+    }
+  }, [pathname, status, session?.user?.email, refreshUserData]);
 
   // Listen to global events for updates
   useEffect(() => {
-    const handlePaymentSuccess = () => {
-      updatePoints();
-    };
-
-    const handleProfileUpdate = () => {
-      // Don't call refreshUserData here to prevent loops
-      // The Account component already updates via updateUserData
-      console.log('🔄 UserContext: Profile update event received (skipping refresh)');
-    };
-
+    const handlePaymentSuccess = () => updatePoints();
     const handleAccountTypeChange = ({ accountType }) => {
-      setUserData(prev => ({ ...prev, accountType }));
+      setUserData(prev => prev ? { ...prev, accountType } : prev);
     };
-
-    const handlePointsUpdate = ({ points }) => {
-      setUserPoints(points);
-    };
+    const handlePointsUpdate = ({ points }) => setUserPoints(points);
 
     // Subscribe to events
     eventBus.on(EVENTS.PAYMENT_SUCCESS, handlePaymentSuccess);
-    eventBus.on(EVENTS.PROFILE_UPDATE, handleProfileUpdate);
     eventBus.on(EVENTS.ACCOUNT_TYPE_CHANGE, handleAccountTypeChange);
     eventBus.on(EVENTS.POINTS_UPDATE, handlePointsUpdate);
 
     // Cleanup
     return () => {
       eventBus.off(EVENTS.PAYMENT_SUCCESS, handlePaymentSuccess);
-      eventBus.off(EVENTS.PROFILE_UPDATE, handleProfileUpdate);
       eventBus.off(EVENTS.ACCOUNT_TYPE_CHANGE, handleAccountTypeChange);
       eventBus.off(EVENTS.POINTS_UPDATE, handlePointsUpdate);
     };
   }, [updatePoints]);
 
-  const value = {
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
     userData,
     userPoints,
     isLoading: isLoading || status === 'loading',
@@ -175,7 +161,7 @@ export const UserProvider = ({ children }) => {
     updateUserData,
     accountType: userData?.accountType,
     isAuthenticated: status === 'authenticated',
-  };
+  }), [userData, userPoints, isLoading, status, refreshUserData, updatePoints, updateUserData]);
 
   return (
     <UserContext.Provider value={value}>

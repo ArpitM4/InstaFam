@@ -5,7 +5,7 @@ export default function robots() {
         userAgent: '*',
         allow: '/',
         disallow: [
-          '/dashboard/',
+          '/creator/',
           '/upload-blog/',
           '/api/',
           '/admin/',
@@ -20,7 +20,7 @@ export default function robots() {
         userAgent: 'Googlebot',
         allow: '/',
         disallow: [
-          '/dashboard/',
+          '/creator/',
           '/upload-blog/',
           '/api/',
           '/admin/',

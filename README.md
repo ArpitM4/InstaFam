@@ -92,289 +92,148 @@ Sygil/
 │   ├── Dashboard.js
 │   ├── DashboardLayout.js
 │   ├── FollowButton.js
-│   ├── Footer.js
-│   ├── Navbar.js
-│   ├── NotificationBell.js
-│   ├── PaymentInteractionSection.js
-│   ├── PaymentPage.js
-│   ├── PaymentProfileSection.js
-│   ├── SessionWrapper.js
-│   ├── VaultSection.js
-│   └── ...
-├── actions/                      # Server Actions
-│   ├── notificationActions.js
-│   ├── useractions.js
-│   ├── vaultActions.js
-├── models/                       # MongoDB Models
-│   ├── Blog.js
-│   ├── Bonus.js
-│   ├── Event.js
-│   ├── Notification.js
-│   ├── Payment.js
-│   ├── PointTransaction.js
-│   ├── Redemption.js
-│   ├── User.js
-│   ├── VaultItem.js
-│   └── ...
-├── db/                           # Database Configuration
-│   ├── ConnectDb.js
-│   └── mongodb.js
-├── public/                       # Static Assets
-│   ├── file.svg
-│   ├── globe.svg
-│   ├── next.svg
-│   ├── site.webmanifest
-│   ├── Text.png
-│   ├── vercel.svg
-│   ├── vid.mp4
-│   ├── window.svg
-│   └── ...
-├── scripts/                      # Migration & utility scripts
-│   ├── migrate_payments_to_userid.cjs
-│   ├── migrate_payments_to_userid.js
-│   ├── migrate_payments_to_userid.mjs
-│   └── ...
-├── utils/                        # Utility Functions
-│   ├── loadrazorpay.js
-│   ├── loadStripe.js
-│   ├── notificationHelpers.js
-│   └── ...
-├── context/                      # React Contexts
-│   ├── FastAuthContext.js
-│   ├── ThemeContext.js
-├── hooks/                        # Custom React Hooks
-│   ├── useAuthSession.js
-│   ├── usePreloadUserData.js
-├── .env.local                    # Environment variables
-├── README.md                     # Project documentation
-└── ...
-```
+# InstaFam (Sygil) — Creator Monetization Platform
 
-## 🚀 **App Directory (Next.js 14 App Router)**
+![Logo](public/Text.png)
 
-```
-app/
-├── api/                         # API Routes
-│   ├── auth/
-│   │   └── [...nextauth]/
-│   │       └── route.js         # NextAuth Configuration
-│   ├── notifications/
-│   │   ├── route.js            # Main notifications API
-│   │   ├── [id]/route.js       # Mark notification as read
-│   │   ├── mark-all-read/route.js
-│   │   └── followers/
-│   │       ├── event/route.js   # Notify followers of events
-│   │       └── vault/route.js   # Notify followers of vault items
-│   ├── users/
-│   │   └── [id]/
-│   │       └── follow/route.js  # Follow/Unfollow API
-│   ├── vault/
-│   │   ├── add/route.js        # Add vault items
-│   │   └── redeem/route.js     # Redeem vault items
-│   ├── explore/route.js        # Explore creators
-│   ├── search/route.js         # Search functionality
-│   └── payments/route.js       # Payment processing
-├── dashboard/                   # Dashboard Routes
-│   ├── page.js                 # General dashboard
-│   ├── payment/page.js         # Payment info
-│   ├── vault/page.js           # My vault
-│   └── requests/page.js        # Vault requests
-├── test-notifications/
-│   └── page.js                 # Notification testing
-├── test-follow/
-│   └── page.js                 # Follow system testing
-├── [username]/
-│   └── page.js                 # Creator profile pages
-├── login/page.js               # Login page
-├── my-fam-points/page.js       # User points page
-├── explore/page.js             # Explore creators
-├── search/page.js              # Search page
-├── layout.js                   # Root layout
-├── page.js                     # Home page
-└── globals.css                 # Global styles
-```
+This repository contains InstaFam (internal name Sygil), a creator monetization platform built with Next.js (App Router) and MongoDB. The app enables creators to accept contributions, offer perks via a vault, and manage fan engagement with a points-based economy.
 
-## 🧩 **Components Directory**
+This README has been updated to reflect the current state of the codebase and recent changes.
 
-```
-components/
-├── dashboard/                   # Dashboard Components
-│   ├── GeneralSettings.js      # Instagram verification
-│   ├── PaymentInfo.js          # Earnings & payment details
-│   ├── MyVault.js              # Vault items management
-│   └── VaultRequests.js        # Q&A system & redemptions
-├── Account.js                   # User account management
-├── Dashboard.js                 # Legacy dashboard (redirects)
-├── DashboardLayout.js          # Shared dashboard layout
-├── FollowButton.js             # Follow/unfollow functionality
-├── Footer.js                   # Site footer
-├── Navbar.js                   # Main navigation
-├── NotificationBell.js         # Notification dropdown
-├── PaymentInteractionSection.js # Payment UI components
-├── PaymentPage.js              # Creator profile/payment page
-├── PaymentProfileSection.js    # Profile display section
-├── SessionWrapper.js           # NextAuth session wrapper
-└── VaultSection.js             # Vault items display
-```
+## What’s New / Current State
 
-## 🗃️ **Models Directory (MongoDB Schemas)**
+- Added per-page visibility customization for creator profile sections. Creators can enable/disable sections (contribute, vault, links, subscription, courses, giveaway, community, merchandise) and the site prevents direct URL access to disabled sections.
+- Created standalone pages for `subscription`, `courses`, and `giveaway` under `app/[username]/`.
+- Payment page (`PaymentPage`) now supports dynamic visible sections, owner-only controls, and a responsive customize modal.
+- Leaderboard amounts are blurred for non-owners; owners see full amounts.
+- Fixed serialization issues: all APIs and server actions serialize Mongo ObjectIds and Dates to plain objects to avoid Next.js client component warnings.
+- Database migration scripts added and executed to remove `merchandise` from defaults and update existing users' `visibleSections`:
+	- `scripts/remove-merchandise-section.mjs`
+	- `scripts/set-default-sections.mjs`
+- Default `visibleSections` changed to `['contribute','vault','links']` (merchandise removed from default).
 
-```
-models/
-├── User.js                     # User schema with follow system
-├── Notification.js             # Notification system
-├── Payment.js                  # Payment transactions
-├── VaultItem.js               # Vault items/perks
-└── Redemption.js              # Vault redemptions
-```
+## Key Features (short)
 
-## ⚡ **Actions Directory (Server Actions)**
+- Creator pages with modular sections (contribute, vault, links, community, subscription, courses, giveaway).
+- Customizable visible sections stored per-user in `User.visibleSections`.
+- PayPal integration for donations with server-side capture handling and ranking (ranked vs unranked donations).
+- FamPoints economy with point awards and expiry system.
+- Vault system for digital/physical perks, requests, and automated refunds for expired requests.
+- Admin capabilities: bonus distribution, analytics, verification workflows.
+- Notifications (polling-based), follow system, and explore/search pages.
 
-```
-actions/
-├── useractions.js             # User-related server actions
-└── notificationActions.js     # Notification server actions
-```
+## Important Implementation Notes
 
-## 🛠️ **Utils Directory**
+- Authentication: NextAuth with JWT strategy; session callback now uses JWT claims for user data (optimized - no DB query on every session check). User data is refreshed periodically every 5 minutes.
+- APIs: Many API routes are dynamic and return serialized plain objects (ObjectId.toString and ISO date strings) to be safe for client components.
+- Images: Components now use Next.js `Image` component for optimized loading with automatic resizing and lazy loading.
 
-```
-utils/
-├── notificationHelpers.js     # Notification creation helpers
-└── notificationHelpers.js     # Follow system notifications
-```
+## Performance Optimizations (Implemented)
 
-## 🗄️ **Database Configuration**
+The following optimizations have been applied to improve page load times and reduce server load:
 
-```
-db/
-└── ConnectDb.js               # MongoDB connection setup
-```
+### Database Layer
+- **Indexes**: Added compound indexes to `User` (email, username), `Payment` (to_user + createdAt, from_user + createdAt), and `PointTransaction` (userId + type + createdAt, userId + used + expired).
+- **Connection Pooling**: MongoDB connections now use optimized pool settings (minPoolSize: 5, maxPoolSize: 10) to reduce connection overhead.
+- **Run index sync**: Execute `node scripts/sync-indexes.mjs` to ensure all indexes are created in MongoDB.
 
+### NextAuth Session
+- Removed DB query from session callback - now uses JWT claims directly.
+- User data stored in JWT token and refreshed every 5 minutes instead of on every request.
+- Eliminates "slow session detection" issue.
 
+### Image Optimization
+- Migrated from raw `<img>` tags to Next.js `Image` component across:
+  - `PaymentProfileSection.js` (profile pictures)
+  - `Navbar.js` (logo)
+  - `LinksSection.js` (social icons, product images)
+  - `app/explore/page.js` (creator avatars)
+  - `app/search/[query]/page.js` (user avatars)
+- Added image domain patterns to `next.config.mjs` for external images.
 
-## 📋 **Latest Features**
+### Component Optimization
+- **Dynamic Imports**: Heavy components (PaymentInteractionSection, VaultSection, LinksSection, etc.) are now dynamically imported with loading states.
+- **Memoization**: Added `useCallback` for event handlers and `useMemo` for computed values (isOwner, isEventActive) in PaymentPage.
+- **UserContext**: Consolidated duplicate useEffect calls, added parallel data fetching with Promise.all, increased throttle to 5 seconds.
 
-- **FamPoints Expiry System:** Points expire after 60 days, with user warnings and a full expiry dashboard.
-- **Admin Bonus Capability:** Admins can award and track monthly bonuses for creators.
-- **Admin FamPoints Dashboard:** Monitor all FamPoints activity, expiry, and bonuses from a central admin dashboard.
-- **Multi-provider OAuth** (Google, GitHub) via NextAuth.js
-- **Role-based dashboards** for creators and admins
-- **Admin dashboard** with analytics, bonus management, verification, and search
-- **Google Analytics integration** for site-wide stats
-- **Monthly bonus system** for creators based on vault activity
-- **Vault system** for digital/physical perks, redemptions, and Q&A
-- **Real-time notification system** (polling, grouping, event alerts)
-- **Payment integrations** (PayPal, Razorpay)
-- **Points-based economy** (FamPoints)
-- **Creator profiles** with dynamic routing
-- **Explore, search, and follow system**
-- **Responsive UI** with Tailwind CSS, light/dark mode
-- **Accessibility and error boundaries**
-- **Automated refunds for expired vault requests**
-- **Comprehensive API routes for all features**
+### API Response Caching
+- `/api/explore`: 5 minute cache (s-maxage=300, stale-while-revalidate=600)
+- `/api/search`: 1 minute cache (s-maxage=60, stale-while-revalidate=120)
+- `/api/customize-sections` (GET): 2 minute cache
+- `/api/links` (GET): 2 minute cache
 
-For more details, see the feature sections above and the codebase for implementation specifics.
+### Resource Hints
+- Added preconnect/dns-prefetch for external domains (picsum.photos, api.dicebear.com, cdn.simpleicons.org, res.cloudinary.com, paypal.com) in layout.js.
 
-## � **Technical Stack**
+## Code Structure (high-level)
 
-- **Framework**: Next.js 14 with App Router
-- **Database**: MongoDB with Mongoose
-- **Authentication**: NextAuth.js
-- **Styling**: Tailwind CSS (configured in globals.css)
-- **Notifications**: Custom real-time system with 30s polling
-- **Payment**: Razorpay integration
-- **Session Management**: NextAuth with custom callbacks
+Key folders:
 
+- `app/` — Next.js App Router pages and API routes (including `app/[username]/` for creator pages).
+- `components/` — UI components (PaymentPage, DashboardLayout, Navbar, etc.).
+- `models/` — Mongoose schemas (`User`, `Payment`, `PointTransaction`, etc.).
+- `actions/` — Server actions and helpers (`useractions.js`, `vaultActions.js`).
+- `db/` — `ConnectDb.js` for MongoDB connection.
+- `scripts/` — migration/maintenance scripts (e.g., updating `visibleSections`).
 
-## 📊 **Current Database Relations**
+## Developer Setup
 
-- **Users** have followers/following arrays
-- **Notifications** reference Users (recipient/sender)
-- **VaultItems** belong to Users (creators)
-- **Redemptions** link Users (fans) to VaultItems
-- **Bonuses** track monthly creator bonuses
-- **Payments** track transactions between Users
+1. Clone and install:
 
-This structure supports a full social media platform with creator monetization, fan engagement, and real-time notifications.
-- A MongoDB instance (local or cloud-based like MongoDB Atlas)
-- A PayPal account to handle payments.
-- Google & GitHub OAuth credentials for social logins.
-# 🕒 **Automated Vault Request Refunds**
-
-Expired vault requests (older than 30 days and still pending) are automatically refunded to users via a scheduled cron job. No manual action is required—refunds are processed daily to ensure user protection and system reliability.
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/your-username/sygil.git
-cd sygil
-```
-
-### 2. Install Dependencies
-
-```bash
+```powershell
+git clone <repo-url>
+cd InstaFam
 npm install
-# or
-yarn install
-# or
-pnpm install
 ```
 
-### 3. Set Up Environment Variables
+2. Environment variables — create `.env.local` with the required values (MongoDB URI, NextAuth secrets, OAuth credentials, PayPal keys).
 
-Create a file named `.env.local` in the root of the project and add the following variables.
+3. Run dev server:
 
-```env
-# MongoDB Connection String
-MONGODB_URI=your_mongodb_connection_string
-
-# NextAuth Configuration
-NEXTAUTH_SECRET=a_super_secret_string_for_jwt_hashing
-NEXT_PUBLIC_URL=https://www.sygil.app
-
-# NextAuth Providers (OAuth Credentials)
-GOOGLE_ID=your_google_client_id
-GOOGLE_SECRET=your_google_client_secret
-GITHUB_ID=your_github_client_id
-GITHUB_SECRET=your_github_client_secret
-
-# PayPal API Keys
-NEXT_PUBLIC_PAYPAL_CLIENT_ID=your_paypal_client_id
-PAYPAL_CLIENT_SECRET=your_paypal_client_secret
-
-# Razorpay (Optional, if you wish to use it)
-KEY_SECRET=your_razorpay_key_secret
-```
-
-### 4. Run the Development Server
-
-```bash
+```powershell
 npm run dev
-# or
-yarn dev
 # or
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Notable Files / Routes
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- `app/[username]/page.js` — Main creator payment/profile page (uses `PaymentPage` component).
+- `app/[username]/subscription/page.js` — Subscription section page.
+- `app/[username]/courses/page.js` — Courses section page.
+- `app/[username]/giveaway/page.js` — Giveaway section page.
+- `app/api/customize-sections/route.js` — GET/POST API to read/update `visibleSections`.
+- `components/PaymentPage.js` — Main page for creator profile; implements section toggles, customize modal, event/payment logic.
+- `actions/useractions.js` — Server-side data helpers (`fetchuser`, `fetchpayments`, `updateProfile`, etc.) with `.lean()` and serialization.
+- `models/User.js` — User schema contains `visibleSections` (default updated to `['contribute','vault','links']`).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Database & Migration
 
-## Learn More
+- `visibleSections` stored on `User` documents (array of strings). Valid values: `contribute`, `vault`, `links`, `merchandise`, `community`, `subscription`, `courses`, `giveaway`.
+- Migration scripts included to update existing users and remove `merchandise` from defaults. If you run into pages appearing unexpectedly, re-run `scripts/set-default-sections.mjs`.
 
-To learn more about Next.js, take a look at the following resources:
+## Developer Commands
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```powershell
+# Sync database indexes (run after deployment or when adding new indexes)
+node scripts/sync-indexes.mjs
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Update default visible sections for existing users
+node scripts/set-default-sections.mjs
+```
 
-## Deploy on Vercel
+## Troubleshooting
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- If a disabled section is still accessible: verify `visibleSections` in the user's document and ensure migration scripts were run.
+- If Next.js complains about serialization: look for any remaining Mongoose ObjectIds/Dates being sent directly to client components.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+If you want, I can:
+
+- Apply the suggested performance improvements (indexes, session optimization, image migration) in small, testable PRs.
+- Generate a concise developer-debt checklist and prioritized implementation plan.
+
+— End of README update
+```
 

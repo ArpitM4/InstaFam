@@ -22,7 +22,35 @@ const nextConfig = {
         port: "",
         pathname: "/a/**",
       },
-
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.simpleicons.org",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        port: "",
+        pathname: "/**",
+      },
+      // Allow any HTTPS image (fallback for user-uploaded content)
+      {
+        protocol: "https",
+        hostname: "**",
+      },
     ],
   },
 };

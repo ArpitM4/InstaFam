@@ -3,10 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { FaUser } from "react-icons/fa";
-import { FaMoon, FaSun } from "react-icons/fa";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useTheme } from "@/context/ThemeContext";
 import { useUser } from "@/context/UserContext";
 import NotificationBell from "./NotificationBell";
 
@@ -15,7 +14,6 @@ const Navbar = () => {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { theme, toggleTheme, ThemeToggle } = useTheme();
   
   // Use the UserContext for user data and reactive updates
   const { 
@@ -34,11 +32,14 @@ const Navbar = () => {
     <nav className="absolute bg-black shadow-md py-2 z-30 w-full border-b-2 border-dropdown-border">
   <div className="mx-5 flex items-center justify-between">
     {/* Logo */}
-    <Link href="/" className="block w-[110px] md:w-[200px] lg:w-[200px] xl:w-[150px]">
-      <img
+    <Link href="/" className="block w-[110px] md:w-[200px] lg:w-[200px] xl:w-[150px] relative h-[40px] md:h-[50px]">
+      <Image
         src="/Text.png"
         alt="Sygil Logo"
-        className="w-full h-auto"
+        fill
+        sizes="(max-width: 768px) 110px, 200px"
+        className="object-contain"
+        priority
       />
     </Link>
 
@@ -76,7 +77,7 @@ const Navbar = () => {
               <Link href="/account" className="block px-5 py-3 hover:bg-dropdown-hover transition">Profile</Link>
               <Link href="/my-fam-points" className="block px-5 py-3 hover:bg-dropdown-hover transition">My Fam Points</Link>
               {accountType === "Creator" && (
-                <Link href="/dashboard" className="block px-5 py-3 hover:bg-dropdown-hover transition">Creator Dashboard</Link>
+                <Link href="/creator/dashboard" className="block px-5 py-3 hover:bg-dropdown-hover transition">Creator Dashboard</Link>
               )}
               <div className="border-t border-dropdown-border my-1"></div>
               <button onClick={signOut} className="block w-full text-left px-5 py-2 hover:bg-dropdown-hover transition">Logout</button>
@@ -127,7 +128,7 @@ const Navbar = () => {
         My Fam Points
       </Link>
       {accountType === "Creator" && (
-        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Creator Dashboard</Link>
+        <Link href="/creator/dashboard" onClick={() => setMobileMenuOpen(false)} className="block hover:text-primary">Creator Dashboard</Link>
       )}
       <div className="border-t border-dropdown-border"></div>
       <button onClick={() => { signOut(); setMobileMenuOpen(false); }} className="block hover:text-primary">Logout</button>

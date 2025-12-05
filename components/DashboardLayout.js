@@ -56,9 +56,9 @@ const DashboardLayout = ({ children }) => {
           <h2 className="text-xl font-bold mb-8 text-text/90">Creator Dashboard</h2>
           <nav className="space-y-1">
             <Link
-              href="/dashboard"
+              href="/creator/dashboard"
               className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
-                isActive('/dashboard')
+                isActive('/creator/dashboard')
                   ? 'bg-primary/10 text-primary font-medium shadow-sm'
                   : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
               }`}
@@ -66,9 +66,9 @@ const DashboardLayout = ({ children }) => {
               General
             </Link>
             <Link
-              href="/dashboard/payment"
+              href="/creator/payment"
               className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
-                isActive('/dashboard/payment')
+                isActive('/creator/payment')
                   ? 'bg-primary/10 text-primary font-medium shadow-sm'
                   : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
               }`}
@@ -76,9 +76,9 @@ const DashboardLayout = ({ children }) => {
               Leaderboard Payout
             </Link>
             <Link
-              href="/dashboard/unranked-donations"
+              href="/creator/unranked-donations"
               className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
-                isActive('/dashboard/unranked-donations')
+                isActive('/creator/unranked-donations')
                   ? 'bg-primary/10 text-primary font-medium shadow-sm'
                   : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
               }`}
@@ -88,9 +88,9 @@ const DashboardLayout = ({ children }) => {
             {user?.instagram?.isVerified && (
               <>
                 <Link
-                  href="/dashboard/vault"
+                  href="/creator/vault"
                   className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
-                    isActive('/dashboard/vault')
+                    isActive('/creator/vault')
                       ? 'bg-primary/10 text-primary font-medium shadow-sm'
                       : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
                   }`}
@@ -98,9 +98,9 @@ const DashboardLayout = ({ children }) => {
                   My Vault
                 </Link>
                 <Link
-                  href="/dashboard/requests"
+                  href="/creator/requests"
                   className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
-                    isActive('/dashboard/requests')
+                    isActive('/creator/requests')
                       ? 'bg-primary/10 text-primary font-medium shadow-sm'
                       : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
                   }`}
@@ -108,9 +108,9 @@ const DashboardLayout = ({ children }) => {
                   Vault Requests
                 </Link>
                 {/* <Link
-                  href="/dashboard/vault-payouts"
+                  href="/creator/vault-payouts"
                   className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
-                    isActive('/dashboard/vault-payouts')
+                    isActive('/creator/vault-payouts')
                       ? 'bg-primary/10 text-primary font-medium shadow-sm'
                       : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
                   }`}
@@ -148,9 +148,9 @@ const DashboardLayout = ({ children }) => {
       <div className="md:hidden bg-background/80 backdrop-blur-sm px-4 py-4 shadow-sm">
         <div className="flex space-x-2 overflow-x-auto custom-scrollbar">
           <Link
-            href="/dashboard"
+            href="/creator/dashboard"
             className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
-              isActive('/dashboard')
+              isActive('/creator/dashboard')
                 ? 'bg-primary/10 text-primary shadow-sm'
                 : 'bg-dropdown-hover text-text/70 hover:text-text'
             }`}
@@ -158,9 +158,9 @@ const DashboardLayout = ({ children }) => {
             General
           </Link>
           <Link
-            href="/dashboard/payment"
+            href="/creator/payment"
             className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
-              isActive('/dashboard/payment')
+              isActive('/creator/payment')
                 ? 'bg-primary/10 text-primary shadow-sm'
                 : 'bg-dropdown-hover text-text/70 hover:text-text'
             }`}
@@ -168,9 +168,9 @@ const DashboardLayout = ({ children }) => {
             Payout
           </Link>
           <Link
-            href="/dashboard/unranked-donations"
+            href="/creator/unranked-donations"
             className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
-              isActive('/dashboard/unranked-donations')
+              isActive('/creator/unranked-donations')
                 ? 'bg-primary/10 text-primary shadow-sm'
                 : 'bg-dropdown-hover text-text/70 hover:text-text'
             }`}
@@ -180,9 +180,9 @@ const DashboardLayout = ({ children }) => {
           {user?.instagram?.isVerified && (
             <>
               <Link
-                href="/dashboard/vault"
+                href="/creator/vault"
                 className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
-                  isActive('/dashboard/vault')
+                  isActive('/creator/vault')
                     ? 'bg-primary/10 text-primary shadow-sm'
                     : 'bg-dropdown-hover text-text/70 hover:text-text'
                 }`}
@@ -190,9 +190,9 @@ const DashboardLayout = ({ children }) => {
                 Vault
               </Link>
               <Link
-                href="/dashboard/requests"
+                href="/creator/requests"
                 className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
-                  isActive('/dashboard/requests')
+                  isActive('/creator/requests')
                     ? 'bg-primary/10 text-primary shadow-sm'
                     : 'bg-dropdown-hover text-text/70 hover:text-text'
                 }`}
@@ -200,9 +200,9 @@ const DashboardLayout = ({ children }) => {
                 Requests
               </Link>
               {/* <Link
-                href="/dashboard/vault-payouts"
+                href="/creator/vault-payouts"
                 className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
-                  isActive('/dashboard/vault-payouts')
+                  isActive('/creator/vault-payouts')
                     ? 'bg-primary/10 text-primary shadow-sm'
                     : 'bg-dropdown-hover text-text/70 hover:text-text'
                 }`}

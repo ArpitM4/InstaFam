@@ -8,7 +8,6 @@ import PerformanceMonitor from "@/components/PerformanceMonitor";
 import GoogleOneTap from "@/components/GoogleOneTap";
 import FloatingCreatorChecklist from "@/components/FloatingCreatorChecklist";
 import { Analytics } from "@vercel/analytics/next";
-import { ThemeProvider } from "@/context/ThemeContext";
 import { UserProvider } from "@/context/UserContext";
 // Initialize FamPoints expiry system
 import "@/utils/initializeExpiry";
@@ -123,6 +122,13 @@ export default function RootLayout({ children }) {
         <link rel="dns-prefetch" href="https://vercel.live" />
         <link rel="preconnect" href="https://accounts.google.com" />
         
+        {/* Preconnect to image CDNs and external services */}
+        <link rel="preconnect" href="https://picsum.photos" />
+        <link rel="preconnect" href="https://api.dicebear.com" />
+        <link rel="preconnect" href="https://cdn.simpleicons.org" />
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://www.paypal.com" />
+        
         {/* Google Identity Services */}
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -212,18 +218,16 @@ export default function RootLayout({ children }) {
       </head>
       <body className="antialiased">
         <SessionWrapper>  
-          <ThemeProvider>
-            <UserProvider>
-              <PerformanceMonitor />
-              <Navbar />
-              <GoogleOneTap />
-              <FloatingCreatorChecklist />
-              <main role="main">
-                {children}
-              </main>
-              <Footer />
-            </UserProvider>
-          </ThemeProvider>
+          <UserProvider>
+            <PerformanceMonitor />
+            <Navbar />
+            <GoogleOneTap />
+            <FloatingCreatorChecklist />
+            <main role="main">
+              {children}
+            </main>
+            <Footer />
+          </UserProvider>
           <Analytics />
         </SessionWrapper> 
       </body>

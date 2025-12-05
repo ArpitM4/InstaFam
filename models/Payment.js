@@ -13,7 +13,12 @@ const PaymentSchema = new Schema({
     done: { type: Boolean, default: false }    
 });
 
-
+// Performance indexes for faster queries
+PaymentSchema.index({ to_user: 1, createdAt: -1 }); // Creator leaderboard queries
+PaymentSchema.index({ from_user: 1, createdAt: -1 }); // User payment history
+PaymentSchema.index({ eventId: 1 }); // Event-specific payments
+PaymentSchema.index({ oid: 1 }); // PayPal order lookups
+PaymentSchema.index({ done: 1, createdAt: -1 }); // Pending payment queries
 
 // Clear the cached model to ensure schema updates take effect
 if (mongoose.models.Payment) {

@@ -77,7 +77,7 @@ const NotificationBell = () => {
         break;
       case 'vault_redeemed':
         // Redirect to Dashboard Requests
-        window.location.href = '/dashboard/requests';
+        window.location.href = '/creator/requests';
         break;
       case 'creator_event_started':
       case 'creator_new_vault_item':

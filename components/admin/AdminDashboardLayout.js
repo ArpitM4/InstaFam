@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import { 
   Search, 
   UserCheck, 
@@ -57,7 +56,6 @@ const sidebarItems = [
 function AdminDashboardLayoutInner({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const { theme, ThemeToggle } = useTheme();
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text)] flex flex-row">
@@ -104,9 +102,6 @@ function AdminDashboardLayoutInner({ children }) {
         </nav>
         {/* Sidebar footer pinned to bottom */}
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex flex-col gap-4">
-          <div className="flex items-center justify-center">
-            <ThemeToggle />
-          </div>
           <Link 
             href="/"
             className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-[var(--text)] hover:text-[var(--primary)] bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
@@ -126,10 +121,7 @@ function AdminDashboardLayoutInner({ children }) {
             >
               <Menu className="h-6 w-6" />
             </button>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-semibold text-[var(--text)]">Admin Panel</h1>
-              <ThemeToggle />
-            </div>
+            <h1 className="text-lg font-semibold text-[var(--text)]">Admin Panel</h1>
           </div>
         </div>
         {/* Page content */}
@@ -142,11 +134,5 @@ function AdminDashboardLayoutInner({ children }) {
 }
 
 export default function AdminDashboardLayout({ children }) {
-  return (
-    <ThemeProvider>
-      <AdminDashboardLayoutInner>
-        {children}
-      </AdminDashboardLayoutInner>
-    </ThemeProvider>
-  );
+  return <AdminDashboardLayoutInner>{children}</AdminDashboardLayoutInner>;
 }

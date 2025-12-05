@@ -8,11 +8,11 @@ function UsernameModal({ open, onSubmit, loading, error }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-white dark:bg-background p-8 rounded-lg shadow-lg w-full max-w-sm flex flex-col items-center">
+      <div className="bg-background p-8 rounded-lg shadow-lg w-full max-w-sm flex flex-col items-center">
         <h2 className="text-xl font-bold mb-4 text-center">Choose a Username</h2>
         <input
           type="text"
-          className="w-full px-4 py-2 rounded border border-primary focus:ring-2 focus:ring-primary outline-none mb-2 text-black dark:text-white bg-white dark:bg-background"
+          className="w-full px-4 py-2 rounded border border-primary focus:ring-2 focus:ring-primary outline-none mb-2 text-white bg-background"
           placeholder="Enter a username"
           value={username}
           onChange={e => setUsername(e.target.value)}
@@ -38,11 +38,11 @@ function NameModal({ open, onSubmit, loading, error }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-white dark:bg-background p-8 rounded-lg shadow-lg w-full max-w-sm flex flex-col items-center">
+      <div className="bg-background p-8 rounded-lg shadow-lg w-full max-w-sm flex flex-col items-center">
         <h2 className="text-xl font-bold mb-4 text-center">Enter Your Name</h2>
         <input
           type="text"
-          className="w-full px-4 py-2 rounded border border-primary focus:ring-2 focus:ring-primary outline-none mb-2 text-black dark:text-white bg-white dark:bg-background"
+          className="w-full px-4 py-2 rounded border border-primary focus:ring-2 focus:ring-primary outline-none mb-2 text-white bg-background"
           placeholder="Enter your name"
           value={name}
           onChange={e => setName(e.target.value)}
@@ -69,12 +69,10 @@ import { emitProfileUpdate, emitAccountTypeChange } from '@/utils/eventBus'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bounce } from 'react-toastify';
-import { useTheme } from "@/context/ThemeContext";
 
 const Account = () => {
   const { data: session, update, status } = useSession();
   const router = useRouter();
-  const { theme, toggleTheme } = useTheme();
   const { refreshUserData, updateUserData } = useUser(); // For updating user data in navbar
 
   const [form, setForm] = useState({
@@ -210,16 +208,6 @@ const Account = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm(prevForm => ({ ...prevForm, [name]: value }));
-    
-    // Handle theme change immediately
-    if (name === "theme") {
-      const newTheme = value.toLowerCase(); // Convert "Dark"/"Light" to "dark"/"light"
-      
-      // Update theme context by toggling if needed
-      if ((newTheme === 'dark' && theme === 'light') || (newTheme === 'light' && theme === 'dark')) {
-        toggleTheme();
-      }
-    }
   };
 
   // Validation state for form fields
@@ -292,7 +280,7 @@ const Account = () => {
     // Redirect to dashboard if user changed from User to Creator
     if (isChangingToCreator) {
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push('/creator/dashboard');
       }, 1500); // Delay to show the success toast
     }
   };
@@ -429,36 +417,6 @@ const Account = () => {
                   <option value="User">User</option>
                   <option value="Creator">Creator</option>
                 </select>
-              </div>
-
-              {/* Theme Selection */}
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-text/70">Theme</label>
-                <div className="flex space-x-6">
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="radio"
-                      name="theme"
-                      value="Dark"
-                      checked={theme === 'dark'}
-                      onChange={handleChange}
-                      className="mr-2 text-primary focus:ring-2 focus:ring-primary/50"
-                    />
-                    <span className="text-text/90">Dark</span>
-                  </label>
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="radio"
-                      name="theme"
-                      value="Light"
-                      checked={theme === 'light'}
-                      onChange={handleChange}
-                      className="mr-2 text-primary focus:ring-2 focus:ring-primary/50"
-                    />
-                    <span className="text-text/90">Light</span>
-                  </label>
-                </div>
-                <p className="text-text/50 text-xs">Choose your preferred theme</p>
               </div>
 
               {/* Submit Button */}

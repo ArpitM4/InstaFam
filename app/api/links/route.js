@@ -36,10 +36,15 @@ export async function GET(req) {
       createdAt: fav.createdAt?.toISOString()
     }));
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       socials: serializedSocials,
       favourites: serializedFavourites
     });
+    
+    // Cache for 2 minutes - links don't change frequently
+    response.headers.set('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=300');
+    
+    return response;
   } catch (error) {
     console.error("Error fetching links:", error);
     return NextResponse.json({ error: "Failed to fetch links" }, { status: 500 });

@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { FaPen, FaSpinner, FaExclamationTriangle } from "react-icons/fa";
 import FollowButton from "./FollowButton";
 
@@ -63,11 +64,14 @@ const PaymentProfileSection = ({
             onClick={isOwner && !isUploadingProfile ? () => profileInputRef.current.click() : undefined}
             style={{ opacity: isUploadingProfile ? 0.6 : 1 }}
           >
-            <img
+            <Image
               src={currentUser?.profilepic || "https://picsum.photos/200"}
               alt="Profile"
-              className="w-full h-full object-cover rounded-full"
+              fill
+              sizes="(max-width: 768px) 144px, 160px"
+              className="object-cover rounded-full"
               style={{ filter: isUploadingProfile ? 'blur(2px)' : 'none' }}
+              priority
             />
             {isOwner && (
               <>

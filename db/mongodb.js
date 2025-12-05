@@ -5,7 +5,18 @@ if (!process.env.MONGODB_URI) {
 }
 
 const uri = process.env.MONGODB_URI;
-const options = {};
+
+// Optimized connection options for better performance
+const options = {
+  maxPoolSize: 10, // Maximum number of connections in the pool
+  minPoolSize: 5, // Minimum number of connections to maintain
+  maxIdleTimeMS: 60000, // Close connections idle for more than 60 seconds
+  serverSelectionTimeoutMS: 5000, // Timeout for server selection
+  socketTimeoutMS: 45000, // Timeout for socket operations
+  connectTimeoutMS: 10000, // Timeout for initial connection
+  retryWrites: true,
+  retryReads: true,
+};
 
 let client;
 let clientPromise;

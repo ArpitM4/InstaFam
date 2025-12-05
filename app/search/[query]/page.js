@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -76,11 +77,15 @@ const SearchResults = ({ params }) => {
               key={user._id}
               className="w-full max-w-xl p-5 bg-secondary/10 border border-secondary/20 backdrop-blur-lg rounded-xl shadow-md flex items-center space-x-4 hover:scale-[1.01] transition"
             >
-              <img
-                src={user.profilepic || "https://picsum.photos/100"}
-                alt="profile"
-                className="w-16 h-16 rounded-full object-cover border border-primary/50"
-              />
+              <div className="relative w-16 h-16 flex-shrink-0">
+                <Image
+                  src={user.profilepic || "https://picsum.photos/100"}
+                  alt="profile"
+                  fill
+                  sizes="64px"
+                  className="rounded-full object-cover border border-primary/50"
+                />
+              </div>
               <div className="flex-1">
                 <Link href={`/${user.username}`}>
                   <p className="text-xl font-semibold hover:underline hover:text-primary transition">

@@ -38,7 +38,7 @@ const VaultPayouts = () => {
         setPayoutData(result.data);
       } else if (response.status === 403) {
         toast.error("Access denied. Creator account required.");
-        router.push("/dashboard");
+        router.push("/creator/dashboard");
       } else {
         toast.error("Failed to fetch payout data");
       }
@@ -227,7 +227,7 @@ const VaultPayouts = () => {
               </div>
               <p className="text-text/60 mb-6">No vault redemptions yet</p>
               <button
-                onClick={() => router.push('/dashboard/vault')}
+                onClick={() => router.push('/creator/vault')}
                 className="px-6 py-3 bg-primary rounded-lg hover:bg-primary/90 text-sm font-medium text-white transition-colors"
               >
                 Manage Vault Items

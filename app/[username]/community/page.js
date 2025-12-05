@@ -35,7 +35,7 @@ const UsernamePage = async ({ params }) => {
                 ? "Please complete your payment information in the dashboard to activate your creator page."
                 : "Your account is not verified. Please complete Instagram verification and payment information in the dashboard to activate your creator page."}
             </p>
-            <a href="/dashboard" className="inline-block mt-4 px-6 py-3 bg-primary text-text rounded-md font-semibold hover:bg-primary/80 transition">Go to Dashboard</a>
+            <a href="/creator/dashboard" className="inline-block mt-4 px-6 py-3 bg-primary text-text rounded-md font-semibold hover:bg-primary/80 transition">Go to Dashboard</a>
           </div>
         </div>
       );

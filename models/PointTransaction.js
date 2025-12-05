@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 const { Schema, model } = mongoose;
 
 const PointTransactionSchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   type: { 
     type: String, 
     enum: ['Earned', 'Spent', 'Refund', 'Expired', 'Bonus'], 
@@ -78,6 +78,12 @@ PointTransactionSchema.pre('save', function(next) {
   
   next();
 });
+
+// Performance indexes for faster queries
+PointTransactionSchema.index({ userId: 1, type: 1, createdAt: -1 }); // User transaction history by type
+PointTransactionSchema.index({ userId: 1, used: 1, expired: 1 }); // Available points calculation
+PointTransactionSchema.index({ expiresAt: 1, expired: 1 }); // Expiry processing job
+PointTransactionSchema.index({ createdAt: -1 }); // Recent transactions
 
 // Force model recreation by deleting existing cached model
 if (mongoose.models.PointTransaction) {

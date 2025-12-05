@@ -22,9 +22,14 @@ export async function GET(req) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       visibleSections: user.visibleSections || ['contribute', 'vault', 'links']
     });
+    
+    // Cache for 2 minutes - profile customization doesn't change frequently
+    response.headers.set('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=300');
+    
+    return response;
   } catch (error) {
     console.error("Error fetching visible sections:", error);
     return NextResponse.json({ error: "Failed to fetch sections" }, { status: 500 });

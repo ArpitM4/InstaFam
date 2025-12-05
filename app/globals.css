@@ -6,30 +6,36 @@
 
 /* Theme Variables */
 :root {
-  /* Light Mode - Default */
-  --text: #040406;
-  --background: #fff5fc;
-  --primary: #fb0582;
-  --secondary: #020024;
-  --accent: #ffbb00;
-  --success: #22c55e;
-  --error: #ef4444;
-  --dropdown-border: #e5e7eb; /* Light gray for light mode */
-  --dropdown-hover: #f3f4f6; /* Darker shade of white for light mode */
+  /* TEXT + BACKGROUND */
+  --text: #F0F1F5;
+  --text-muted: #A1A1AA;
+  --background: #050507;
+  --background-soft: #0B0C0F;
+  --background-hover: #111215;
+
+  /* BRAND COLORS */
+  --primary: #FF2F72;       /* Neon pink */
+  --primary-light: #FF5C8E;
+  --primary-dark: #C02055;
+
+  --secondary: #FF6A2F;     /* Neon orange */
+  --secondary-light: #FF8A50;
+  --secondary-dark: #C04E22;
+
+  --accent: #00E5D4;        /* Electric aqua */
+  --accent-light: #4FFDF0;
+  --accent-dark: #009C8E;
+
+  --success: #22c55e; --error: #FF3355;
+  --dropdown-border: #17181B; 
+  --dropdown-hover: rgba(255,255,255,0.08);
+
+  /* GRADIENT (Your Logo Gradient) */
+  --gradient-primary: linear-gradient(135deg, #FF2F72 0%, #FF6A2F 100%);
+  --gradient-primary-soft: linear-gradient(135deg, #FF4B86 0%, #FF8A50 100%);
+  --gradient-radial: radial-gradient(circle, #FF2F72 0%, #FF6A2F 100%);
 }
 
-[data-theme='dark'] {
-  --text: #ffffff;
-  --background: #000000;
-  --primary: #fb0582;
-  --secondary: #dddbff;
-  --accent: #fdcc03;
-  --success: #22c55e;
-  --error: #ef4444;
-  --dropdown-border: #374151; /* Dark gray for dark mode */
-  --dropdown-hover: #212328; /* Dark hover background for dark mode */
-
-}
 
 body {
   color: var(--text);

@@ -14,6 +14,13 @@ export async function GET(req) {
     { $project: { username: 1, _id: 1, profilepic: 1 } }
   ]);
 
-  return Response.json(creators);
+  // Add cache headers - cache for 5 minutes, stale-while-revalidate for 10 minutes
+  return new Response(JSON.stringify(creators), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+    },
+  });
 }
 

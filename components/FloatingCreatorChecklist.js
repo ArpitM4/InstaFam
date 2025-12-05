@@ -255,7 +255,7 @@ const FloatingCreatorChecklist = () => {
                       <button
                         onClick={() => {
                           // Navigate to settings to claim discount
-                          window.location.href = '/dashboard?tab=general';
+                          window.location.href = '/creator/dashboard?tab=general';
                         }}
                         className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105"
                       >

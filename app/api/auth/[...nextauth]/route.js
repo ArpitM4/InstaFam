@@ -177,27 +177,58 @@ export const authOptions = {
       return true;
     },
 
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger }) {
       // Add user data to JWT token on first login
       if (user) {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
         
-        // For credentials login, we have the user ID from authorize
-        if (account?.provider === 'credentials') {
-          token.userId = user.id;
-        } else {
-          // For OAuth, find the user ID from database
-          try {
-            await connectDB();
-            const dbUser = await User.findOne({ email: user.email });
-            if (dbUser) {
-              token.userId = dbUser._id.toString();
-            }
-          } catch (error) {
-            console.error('Error finding user ID in JWT callback:', error);
+        // Fetch full user data from database for ALL providers (credentials, OAuth, etc.)
+        try {
+          await connectDB();
+          const dbUser = await User.findOne({ email: user.email }).select('_id username name accountType points profilepic').lean();
+          if (dbUser) {
+            token.userId = dbUser._id.toString();
+            token.username = dbUser.username;
+            token.name = dbUser.username || dbUser.name || token.email?.split('@')[0];
+            token.accountType = dbUser.accountType;
+            token.points = dbUser.points || 0;
+            token.profilepic = dbUser.profilepic;
+            token.hasUsername = !!dbUser.username;
+            token.lastRefresh = Date.now();
           }
+        } catch (error) {
+          console.error('Error finding user data in JWT callback:', error);
+          // Fallback for credentials login if DB fails
+          if (account?.provider === 'credentials' || account?.provider === 'googleonetap') {
+            token.userId = user.id;
+          }
+        }
+      }
+      
+      // Refresh user data periodically (every 5 minutes), on explicit trigger, or if accountType is missing
+      const needsRefresh = trigger === 'update' || 
+                          !token.accountType || 
+                          !token.lastRefresh || 
+                          (Date.now() - token.lastRefresh > 5 * 60 * 1000);
+      
+      if (needsRefresh && token.email) {
+        try {
+          await connectDB();
+          const dbUser = await User.findOne({ email: token.email }).select('_id username name accountType points profilepic').lean();
+          if (dbUser) {
+            token.userId = dbUser._id.toString();
+            token.username = dbUser.username;
+            token.name = dbUser.username || dbUser.name || token.email?.split('@')[0];
+            token.accountType = dbUser.accountType;
+            token.points = dbUser.points || 0;
+            token.profilepic = dbUser.profilepic;
+            token.hasUsername = !!dbUser.username;
+            token.lastRefresh = Date.now();
+          }
+        } catch (error) {
+          console.error('Error refreshing JWT token:', error);
         }
       }
       
@@ -205,29 +236,14 @@ export const authOptions = {
     },
 
     async session({ session, token }) {
-      // Add user ID from token to session
+      // OPTIMIZED: Use JWT claims directly instead of DB query on every session
       if (token) {
         session.user.id = token.userId || token.id;
-      }
-      
-      // Always fetch fresh user data from database for session
-      try {
-        await connectDB();
-        const dbUser = await User.findOne({ email: session.user.email });
-        
-        if (dbUser) {
-          // Update session with current database values
-          session.user.id = dbUser._id.toString();
-          session.user.name = dbUser.username || dbUser.name || session.user.email?.split('@')[0];
-          session.user.accountType = dbUser.accountType;
-          session.user.points = dbUser.points || 0;
-          session.user.profilepic = dbUser.profilepic;
-          session.user.hasUsername = !!dbUser.username;
-        }
-      } catch (error) {
-        console.error('Error fetching user in session callback:', error);
-        // Don't break the session, just use token data
-        session.user.name = token.name || session.user.email?.split('@')[0];
+        session.user.name = token.username || token.name || session.user.email?.split('@')[0];
+        session.user.accountType = token.accountType;
+        session.user.points = token.points || 0;
+        session.user.profilepic = token.profilepic;
+        session.user.hasUsername = token.hasUsername;
       }
       
       return session;

@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaSpinner } from "react-icons/fa";
@@ -15,13 +15,36 @@ import { fetchuser, fetchpayments, updateProfile, createEvent, endEvent, fetchEv
 import { useUser } from "@/context/UserContext";
 import { emitPaymentSuccess } from "@/utils/eventBus";
 import PaymentProfileSection from "./PaymentProfileSection";
-import PaymentInteractionSection from "./PaymentInteractionSection";
-import VaultSection from "./VaultSection";
-import LinksSection from "./LinksSection";
-import MerchandiseSection from "./MerchandiseSection";
-import GiveawaySection from "./GiveawaySection";
-import CommunitySection from "./CommunitySection";
 import ErrorBoundary from "./ErrorBoundary";
+
+// Dynamic imports for heavy components (loaded only when needed)
+const PaymentInteractionSection = dynamic(() => import("./PaymentInteractionSection"), {
+  loading: () => <div className="w-full max-w-5xl mt-8 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>,
+  ssr: false
+});
+
+const VaultSection = dynamic(() => import("./VaultSection"), {
+  loading: () => <div className="w-full max-w-5xl mt-8 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>
+});
+
+const LinksSection = dynamic(() => import("./LinksSection"), {
+  loading: () => <div className="w-full max-w-5xl mt-8 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>
+});
+
+const MerchandiseSection = dynamic(() => import("./MerchandiseSection"), {
+  loading: () => <div className="w-full max-w-5xl mt-8 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>
+});
+
+const GiveawaySection = dynamic(() => import("./GiveawaySection"), {
+  loading: () => <div className="w-full max-w-5xl mt-8 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>
+});
+
+const CommunitySection = dynamic(() => import("./CommunitySection"), {
+  loading: () => <div className="w-full max-w-5xl mt-8 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>
+});
+
+// PayPal imports moved to PaymentInteractionSection to avoid loading on non-payment tabs
+const { PayPalScriptProvider, PayPalButtons } = require("@paypal/react-paypal-js");
 
 // Save payment after capture (send captureDetails to backend)
 const savePayment = async (paymentDetails, captureDetails, currentEvent = null, donorName = null) => {
@@ -220,7 +243,8 @@ const PaymentPage = ({ username }) => {
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
   const [tempVisibleSections, setTempVisibleSections] = useState([]);
 
-  const isOwner = session?.user?.name === username;
+  // Memoize computed values for performance
+  const isOwner = useMemo(() => session?.user?.name === username, [session?.user?.name, username]);
 
   // --- Data Fetching and Effects ---
   const fetchActiveEvent = async (userId) => {
@@ -406,37 +430,38 @@ const PaymentPage = ({ username }) => {
     }
   }, [currentUser?.eventEnd, currentEvent, username]);
 
-  // --- Event Handlers ---
-  const handleChange = (e) => {
-    setPaymentform({ ...paymentform, [e.target.name]: e.target.value });
-  };
+  // --- Event Handlers (memoized with useCallback for performance) ---
+  const handleChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setPaymentform(prev => ({ ...prev, [name]: value }));
+  }, []);
   
-    const handleSaveDescription = async () => {
-        const res = await updateProfile(
-            { email: currentUser.email, description: currentUser.description },
-            username
-        );
-        if (res?.error) {
-            toast.error(res.error);
-        } else {
-            toast.success("Description updated successfully!");
-            setIsEditing(false);
-        }
-    };
+  const handleSaveDescription = useCallback(async () => {
+    const res = await updateProfile(
+      { email: currentUser.email, description: currentUser.description },
+      username
+    );
+    if (res?.error) {
+      toast.error(res.error);
+    } else {
+      toast.success("Description updated successfully!");
+      setIsEditing(false);
+    }
+  }, [currentUser?.email, currentUser?.description, username]);
 
-  const handleSavePerk = async () => {
+  const handleSavePerk = useCallback(async () => {
     const res = await updateProfile({ 
       email: currentUser.email, 
       perk: currentUser.perk,
       perkRank: currentUser.perkRank || 5
     }, username);
     if (!res?.error) toast.success("Perk saved!");
-  };
+  }, [currentUser?.email, currentUser?.perk, currentUser?.perkRank, username]);
 
-  const handleStartEvent = async () => {
+  const handleStartEvent = useCallback(async () => {
     // Show beta popup first
     setShowBetaPopup(true);
-  };
+  }, []);
 
   const proceedWithEventStart = async () => {
     try {
@@ -718,8 +743,10 @@ const PaymentPage = ({ username }) => {
     }
   };
     
-  // Check if event is active - use currentEvent as primary source of truth
-  const isEventActive = currentEvent !== null || (currentUser?.eventStart && currentUser?.eventEnd && new Date(currentUser.eventEnd) > new Date());
+  // Check if event is active - use currentEvent as primary source of truth (memoized)
+  const isEventActive = useMemo(() => {
+    return currentEvent !== null || (currentUser?.eventStart && currentUser?.eventEnd && new Date(currentUser.eventEnd) > new Date());
+  }, [currentEvent, currentUser?.eventStart, currentUser?.eventEnd]);
 
   // FamPoints Celebration Popup Component
   const FamPointsPopup = () => (

@@ -86,8 +86,11 @@ const UserSchema = new Schema({
   }
 });
 
-// Remove the old index definition - we'll handle this differently
-// UserSchema.index({ username: 1 }, { unique: true, sparse: true, partialFilterExpression: { username: { $exists: true, $ne: null, $ne: "" } } });
+// Performance indexes for faster queries
+// Note: email already has unique: true which creates an index
+UserSchema.index({ username: 1 }); // Fast username lookups (profile pages)
+UserSchema.index({ accountType: 1 }); // Filter by creator/user type
+UserSchema.index({ createdAt: -1 }); // Sort by newest users
 
 // Clear any existing model to force recreation
 if (mongoose.models.User) {
