@@ -19,8 +19,11 @@ export default function AppLayout({ children }) {
   // Define main routes where sidebar should stay expanded
   const mainRoutes = ['/', '/explore', '/my-fam-points', '/account', '/search'];
   
-  // Check if current page is a creator page
-  const isCreatorPage = !mainRoutes.some(route => pathname === route || pathname.startsWith(route + '/')) && pathname !== '/';
+  // Check if current page is a creator dashboard route (has its own layout)
+  const isCreatorDashboardRoute = pathname.startsWith('/creator');
+  
+  // Check if current page is a creator profile page (dynamic routes like /username)
+  const isCreatorPage = !mainRoutes.some(route => pathname === route || pathname.startsWith(route + '/')) && pathname !== '/' && !isCreatorDashboardRoute;
 
   // Auto-collapse sidebar on creator pages (dynamic routes)
   useEffect(() => {
@@ -61,6 +64,11 @@ export default function AppLayout({ children }) {
   }
 
   if (!session) {
+    return <>{children}</>;
+  }
+
+  // For /creator routes, just render children (DashboardLayout handles its own layout)
+  if (isCreatorDashboardRoute) {
     return <>{children}</>;
   }
 

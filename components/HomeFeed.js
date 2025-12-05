@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useUser } from "@/context/UserContext";
-import { FaCoins, FaStar, FaGift, FaSearch } from "react-icons/fa";
+import { FaCoins, FaStar, FaGift, FaSearch, FaExternalLinkAlt } from "react-icons/fa";
 
 // Simple hash function to generate consistent "random" values per creator
 function hashCode(str) {
@@ -93,9 +93,11 @@ function CreatorCard({ creator, showFollowedBadge = false }) {
 }
 
 export default function HomeFeed() {
-  const { userData } = useUser();
+  const { userData, accountType } = useUser();
   const [followedCreators, setFollowedCreators] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const isCreator = accountType === "Creator";
 
   useEffect(() => {
     const fetchFollowedCreators = async () => {
@@ -122,6 +124,66 @@ export default function HomeFeed() {
 
   return (
     <>
+      {/* Your Page Section - Only for Creators */}
+      {isCreator && userData && (
+        <div className="mb-10">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-2xl font-bold text-white mb-1">Your Page</h1>
+              <div className="w-12 h-1 bg-primary rounded-full"></div>
+            </div>
+            <Link
+              href={`/${userData.username}`}
+              className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-gray-300 hover:text-white transition-all duration-200 text-sm font-medium"
+            >
+              View Page
+              <FaExternalLinkAlt className="text-xs" />
+            </Link>
+          </div>
+          
+          <Link href={`/${userData.username}`} className="block max-w-sm">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 hover:bg-white/10 transition-all duration-300 border border-white/5 hover:border-primary/30">
+              {/* Profile Picture */}
+              <div className="flex justify-center mb-4">
+                <div className="relative w-20 h-20">
+                  {userData.profilepic ? (
+                    <Image
+                      src={userData.profilepic}
+                      alt={userData.name || userData.username}
+                      fill
+                      className="rounded-full object-cover border-2 border-primary/30"
+                    />
+                  ) : (
+                    <img
+                      src={`https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(userData.username)}`}
+                      alt={userData.name || userData.username}
+                      className="w-full h-full rounded-full object-cover border-2 border-primary/30"
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Creator Name */}
+              <h3 className="font-semibold text-white text-center text-lg mb-1">
+                {userData.name || userData.username}
+              </h3>
+
+              {/* Creator Username */}
+              <p className="text-sm text-gray-400 text-center mb-3">
+                @{userData.username}
+              </p>
+
+              {/* Followers Count */}
+              <div className="flex items-center justify-center gap-4 text-sm text-gray-300">
+                <span>
+                  <strong className="text-white">{userData.followersArray?.length || userData.followers || 0}</strong> followers
+                </span>
+              </div>
+            </div>
+          </Link>
+        </div>
+      )}
+
       {/* Following Section */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white mb-1">Following</h1>

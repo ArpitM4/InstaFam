@@ -1096,7 +1096,6 @@ const PaymentPage = ({ username }) => {
           {activeTab === 'subscription' && (
             <div className="w-full max-w-5xl mt-8 flex justify-center">
               <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
-                <div className="text-6xl mb-4"></div>
                 <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-rose-400 mb-2">Subscription</h2>
                 <p className="text-primary text-lg font-semibold">Coming Soon</p>
                 <p className="text-text/40 text-sm mt-2">Exclusive subscription tiers with special perks and content</p>
@@ -1108,7 +1107,6 @@ const PaymentPage = ({ username }) => {
           {activeTab === 'courses' && (
             <div className="w-full max-w-5xl mt-8 flex justify-center">
               <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
-                <div className="text-6xl mb-4"></div>
                 <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-rose-400 mb-2">Courses</h2>
                 <p className="text-primary text-lg font-semibold">Coming Soon</p>
                 <p className="text-text/40 text-sm mt-2">Educational courses and tutorials from your favorite creators</p>
@@ -1120,7 +1118,6 @@ const PaymentPage = ({ username }) => {
           {activeTab === 'giveaway' && (
             <div className="w-full max-w-5xl mt-8 flex justify-center">
               <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
-                <div className="text-6xl mb-4"></div>
                 <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-rose-400 mb-2">Giveaway Picker</h2>
                 <p className="text-primary text-lg font-semibold">Coming Soon</p>
                 <p className="text-text/40 text-sm mt-2">Host giveaways and pick winners fairly using our picker tool</p>

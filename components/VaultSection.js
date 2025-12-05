@@ -381,8 +381,8 @@ const VaultSection = ({ currentUser }) => {
           Exclusive digital content available for Fam Points
         </p>
         {session && (
-          <div className="bg-primary/20 text-primary px-4 py-2 rounded-lg inline-block">
-            🪙 Your Fam Points: {userPoints}
+          <div className="bg-gradient-to-r from-primary/20 via-purple-500/20 to-rose-500/20 text-primary px-4 py-2 rounded-xl inline-block border border-primary/20">
+            Your Fam Points: {userPoints}
           </div>
         )}
       </div>
@@ -394,9 +394,9 @@ const VaultSection = ({ currentUser }) => {
           const isRedeeming = redeeming[item._id];
 
           return (
-            <div key={item._id} className="bg-dropdown-hover rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+            <div key={item._id} className="rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl border border-white/10" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)'}}>
               {/* Item Header */}
-              <div className="p-4 border-b border-text/10">
+              <div className="p-4 border-b border-white/10">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">{getFileTypeIcon(item.fileType)}</span>
@@ -406,7 +406,7 @@ const VaultSection = ({ currentUser }) => {
                       </span>
                     )}
                   </div>
-                  <span className="bg-primary/20 text-primary px-2 py-1 rounded-lg text-sm font-medium">
+                  <span className="bg-gradient-to-r from-primary/20 to-purple-500/20 text-primary px-3 py-1 rounded-xl text-sm font-medium border border-primary/20">
                     {item.pointCost} points
                   </span>
                 </div>
@@ -474,10 +474,10 @@ const VaultSection = ({ currentUser }) => {
                   <button
                     onClick={() => handleRedeem(item)}
                     disabled={isRedeeming}
-                    className={`w-full py-2 px-4 rounded-lg font-medium transition-colors shadow-sm ${
+                    className={`w-full py-2.5 px-4 rounded-xl font-medium transition-all duration-300 shadow-md ${
                       isRedeeming
                         ? 'bg-primary/50 text-background cursor-not-allowed'
-                        : 'bg-primary text-black hover:bg-primary/90'
+                        : 'bg-gradient-to-r from-primary via-purple-500 to-rose-500 text-white hover:shadow-lg hover:scale-[1.02]'
                     }`}
                   >
                     {isRedeeming ? (
@@ -497,7 +497,7 @@ const VaultSection = ({ currentUser }) => {
       </div>
 
       {session && vaultItems.length > 0 && (
-        <div className="mt-6 text-center p-4 bg-dropdown-hover rounded-lg">
+        <div className="mt-6 text-center p-4 rounded-2xl border border-white/10" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'}}>
           <p className="text-text/60 text-sm">
             💡 <strong>Tip:</strong> Support {currentUser?.username || 'this creator'} to earn more Fam Points and unlock exclusive content!
           </p>

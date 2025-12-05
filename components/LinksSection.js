@@ -208,7 +208,7 @@ const LinksSection = ({ currentUser }) => {
       <div className="flex justify-end mb-4">
         <button
           onClick={() => setShowShareModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:scale-105"
+          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary via-purple-500 to-rose-500 text-white rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-primary/25 hover:scale-105 border-0"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -276,7 +276,7 @@ const LinksSection = ({ currentUser }) => {
           {isOwner && (
             <button
               onClick={() => setShowSocialModal(true)}
-              className="aspect-square bg-dropdown-hover border-2 border-dashed border-text/20 rounded-xl hover:border-primary hover:bg-dropdown-hover/80 transition-all duration-300 flex flex-col items-center justify-center group"
+              className="aspect-square border-2 border-dashed border-white/20 rounded-xl hover:border-primary/50 transition-all duration-300 flex flex-col items-center justify-center group" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)'}}
             >
               <FaPlus className="text-3xl text-text/40 group-hover:text-primary transition-colors" />
               <p className="text-text/60 text-xs mt-2 group-hover:text-primary transition-colors">Add Social</p>
@@ -346,7 +346,7 @@ const LinksSection = ({ currentUser }) => {
           {isOwner && (
             <button
               onClick={() => setShowFavouriteModal(true)}
-              className="aspect-square bg-dropdown-hover border-2 border-dashed border-text/20 rounded-xl hover:border-primary hover:bg-dropdown-hover/80 transition-all duration-300 flex flex-col items-center justify-center group"
+              className="aspect-square border-2 border-dashed border-white/20 rounded-xl hover:border-primary/50 transition-all duration-300 flex flex-col items-center justify-center group" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)'}}
             >
               <FaPlus className="text-3xl text-text/40 group-hover:text-primary transition-colors" />
               <p className="text-text/60 text-xs mt-2 group-hover:text-primary transition-colors">Add Favourite</p>
@@ -537,12 +537,12 @@ const FlipCard = ({ frontContent, backContent }) => {
     >
       <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`}>
         {/* Front of the card */}
-        <div className="flip-card-front bg-dropdown-hover rounded-xl border border-text/10 shadow-sm hover:shadow-md transition-shadow">
+        <div className="flip-card-front rounded-xl border border-white/10 shadow-lg transition-shadow" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(8px)'}}>
           {frontContent}
         </div>
         
         {/* Back of the card */}
-        <div className="flip-card-back bg-primary/10 rounded-xl border border-primary/20 shadow-sm">
+        <div className="flip-card-back rounded-xl border border-primary/30 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(225,29,72,0.15) 0%, rgba(99,102,241,0.15) 100%)'}}>
           {backContent}
         </div>
       </div>

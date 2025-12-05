@@ -76,8 +76,8 @@ const PaymentInteractionSection = ({
         <div className="w-full flex flex-col md:flex-row gap-6">
           {/* Leaderboard - ONLY show when event is active - Visible to ALL users */}
           {isEventActive && (
-            <div className="flex-1 bg-dropdown-hover rounded-lg shadow-sm p-4 mx-2 md:mx-0"> 
-              <h2 className="text-2xl font-semibold text-primary mb-4">Leaderboard</h2>
+            <div className="flex-1 rounded-2xl shadow-lg p-5 mx-2 md:mx-0 border border-white/10" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)'}}> 
+              <h2 className="text-2xl font-semibold bg-gradient-to-r from-primary via-purple-400 to-rose-400 bg-clip-text text-transparent mb-4">Leaderboard</h2>
               {leaderboardData.length === 0 ? (
                 paymentsLoading ? (
                   <div className="flex items-center justify-center py-8">
@@ -119,8 +119,8 @@ const PaymentInteractionSection = ({
 
           {/* Donation Form - ALWAYS ACTIVE */}
           {/* When no event: centered with max-width, When event active: flex-1 */}
-          <div className={`bg-dropdown-hover rounded-lg shadow-sm p-4 mx-2 md:mx-0 ${isEventActive ? 'flex-1' : 'w-full md:max-w-md md:mx-auto'}`}>
-            <h2 className="text-2xl text-primary mb-4">
+          <div className={`rounded-2xl shadow-lg p-5 mx-2 md:mx-0 border border-white/10 ${isEventActive ? 'flex-1' : 'w-full md:max-w-md md:mx-auto'}`} style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)'}}>
+            <h2 className="text-2xl bg-gradient-to-r from-primary via-purple-400 to-rose-400 bg-clip-text text-transparent mb-4">
               Support {currentUser?.name || "Creator"}
             </h2>
             

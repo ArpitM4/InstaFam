@@ -96,11 +96,11 @@ const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFoll
         onClick={handleFollowToggle}
         disabled={loading}
         className={`
-          px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 min-w-[90px]
-          ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
+          px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 min-w-[100px] shadow-md
+          ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 hover:shadow-lg'}
           ${isFollowing 
-            ? 'bg-text/10 text-text border border-text/20 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20' 
-            : 'bg-primary text-white hover:bg-primary/90 shadow-lg'
+            ? 'bg-white/10 text-text border border-white/20 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30' 
+            : 'bg-gradient-to-r from-primary via-purple-500 to-rose-500 text-white border-0'
           }
         `}
       >

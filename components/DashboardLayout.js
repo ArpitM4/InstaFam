@@ -5,6 +5,9 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { fetchuser } from "@/actions/useractions";
 import Link from "next/link";
+import Image from "next/image";
+import { FaBars, FaHome, FaMoneyBillWave, FaDonate, FaLock, FaInbox, FaExternalLinkAlt, FaGraduationCap } from "react-icons/fa";
+import NotificationBell from "./NotificationBell";
 
 const DashboardLayout = ({ children }) => {
   const { data: session, status } = useSession();
@@ -12,6 +15,7 @@ const DashboardLayout = ({ children }) => {
   const pathname = usePathname();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -48,131 +52,197 @@ const DashboardLayout = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen pt-20 bg-background text-text">
-      {/* Desktop Layout */}
-      <div className="hidden md:flex">
-        {/* Sidebar */}
-        <aside className="w-64 bg-background/60 backdrop-blur-sm p-6 space-y-2 min-h-screen">
-          <h2 className="text-xl font-bold mb-8 text-text/90">Creator Dashboard</h2>
-          <nav className="space-y-1">
-            <Link
-              href="/creator/dashboard"
-              className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
-                isActive('/creator/dashboard')
-                  ? 'bg-primary/10 text-primary font-medium shadow-sm'
-                  : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
-              }`}
+    <div className="min-h-screen bg-background text-text">
+      {/* Top Navbar - Full Width (Same as AppLayout) */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-white/10">
+        <div className="flex items-center justify-between px-4 py-3">
+          {/* Left Side - Hamburger + Logo */}
+          <div className="flex items-center gap-4">
+            {/* Hamburger Menu Button */}
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="hidden md:flex p-2 rounded-full hover:bg-white/10 transition-colors"
+              aria-label="Toggle sidebar"
             >
-              General
+              <FaBars className="text-xl text-white" />
+            </button>
+            
+            {/* Logo */}
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/Text.png"
+                alt="Sygil"
+                width={100}
+                height={32}
+                className="h-8 w-auto"
+                priority
+              />
             </Link>
-            <Link
-              href="/creator/payment"
-              className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
-                isActive('/creator/payment')
-                  ? 'bg-primary/10 text-primary font-medium shadow-sm'
-                  : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
-              }`}
-            >
-              Leaderboard Payout
+          </div>
+
+          {/* Right Side - Notifications & Profile */}
+          <div className="flex items-center gap-4">
+            <NotificationBell />
+            
+            <Link href="/account" className="relative w-9 h-9">
+              {user?.profilepic ? (
+                <Image
+                  src={user.profilepic}
+                  alt="Profile"
+                  fill
+                  className="rounded-full object-cover border-2 border-white/10"
+                />
+              ) : (
+                <img
+                  src={`https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(session?.user?.email || 'user')}`}
+                  alt="Profile"
+                  className="w-full h-full rounded-full object-cover border-2 border-white/10"
+                />
+              )}
             </Link>
-            <Link
-              href="/creator/unranked-donations"
-              className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
-                isActive('/creator/unranked-donations')
-                  ? 'bg-primary/10 text-primary font-medium shadow-sm'
-                  : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
-              }`}
-            >
-              Unranked Donations
-            </Link>
-            {user?.instagram?.isVerified && (
+          </div>
+        </div>
+      </header>
+
+      {/* Desktop Sidebar - Toggleable (Same style as AppLayout) */}
+      <aside 
+        className={`hidden md:flex fixed left-0 top-14 h-[calc(100vh-56px)] bg-background flex-col py-4 px-2 z-40 transition-all duration-300 ${
+          sidebarOpen ? 'w-56' : 'w-[72px]'
+        }`}
+      >
+        {/* Navigation */}
+        <nav className="flex-1 space-y-1">
+          {/* General */}
+          <Link
+            href="/creator/dashboard"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+              isActive('/creator/dashboard')
+                ? 'bg-white/10 text-white'
+                : 'text-gray-300 hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <FaHome className="text-xl flex-shrink-0" />
+            {sidebarOpen && <span className="font-medium">General</span>}
+          </Link>
+
+          {/* Leaderboard Payout */}
+          <Link
+            href="/creator/payment"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+              isActive('/creator/payment')
+                ? 'bg-white/10 text-white'
+                : 'text-gray-300 hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <FaMoneyBillWave className="text-xl flex-shrink-0" />
+            {sidebarOpen && <span className="font-medium">Leaderboard Payout</span>}
+          </Link>
+
+          {/* Unranked Donations */}
+          <Link
+            href="/creator/unranked-donations"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+              isActive('/creator/unranked-donations')
+                ? 'bg-white/10 text-white'
+                : 'text-gray-300 hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <FaDonate className="text-xl flex-shrink-0" />
+            {sidebarOpen && <span className="font-medium">Unranked Donations</span>}
+          </Link>
+
+          {/* Vault-related links (only for verified users) */}
+          {user?.instagram?.isVerified && (
+            <>
+              {/* My Vault */}
+              <Link
+                href="/creator/vault"
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                  isActive('/creator/vault')
+                    ? 'bg-white/10 text-white'
+                    : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <FaLock className="text-xl flex-shrink-0" />
+                {sidebarOpen && <span className="font-medium">My Vault</span>}
+              </Link>
+
+              {/* Vault Requests */}
+              <Link
+                href="/creator/requests"
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                  isActive('/creator/requests')
+                    ? 'bg-white/10 text-white'
+                    : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <FaInbox className="text-xl flex-shrink-0" />
+                {sidebarOpen && <span className="font-medium">Vault Requests</span>}
+              </Link>
+            </>
+          )}
+
+          {/* Divider */}
+          <div className="my-4 border-t border-white/10" />
+
+          {/* Your Page - Opens in new tab */}
+          <a
+            href={`/${session?.user?.name}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-gray-300 hover:bg-white/5 hover:text-white"
+          >
+            <FaExternalLinkAlt className="text-lg flex-shrink-0" />
+            {sidebarOpen && (
               <>
-                <Link
-                  href="/creator/vault"
-                  className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
-                    isActive('/creator/vault')
-                      ? 'bg-primary/10 text-primary font-medium shadow-sm'
-                      : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
-                  }`}
-                >
-                  My Vault
-                </Link>
-                <Link
-                  href="/creator/requests"
-                  className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
-                    isActive('/creator/requests')
-                      ? 'bg-primary/10 text-primary font-medium shadow-sm'
-                      : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
-                  }`}
-                >
-                  Vault Requests
-                </Link>
-                {/* <Link
-                  href="/creator/vault-payouts"
-                  className={`block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
-                    isActive('/creator/vault-payouts')
-                      ? 'bg-primary/10 text-primary font-medium shadow-sm'
-                      : 'hover:bg-dropdown-hover text-text/80 hover:text-text'
-                  }`}
-                >
-                  Vault Bonuses
-                </Link> */}
+                <span className="font-medium">Your Page</span>
+                <svg className="w-3 h-3 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
               </>
             )}
-            <div className="pt-4">
-              <Link
-                href={`/${session?.user?.name}`}
-                className="block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 hover:bg-dropdown-hover text-text/60 hover:text-text/80 text-sm"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Your Page
-              </Link>
-              <Link
-                href="/blogs"
-                className="block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 hover:bg-dropdown-hover text-text/60 hover:text-text/80 text-sm"
-              >
-                Creator School
-              </Link>
-            </div>
-          </nav>
-        </aside>
+          </a>
 
-        {/* Main Content */}
-        <main className="flex-1 p-8 pb-20 bg-background">
-          {children}
-        </main>
-      </div>
+          {/* Creator School */}
+          <Link
+            href="/blogs"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-gray-300 hover:bg-white/5 hover:text-white"
+          >
+            <FaGraduationCap className="text-xl flex-shrink-0" />
+            {sidebarOpen && <span className="font-medium">Creator School</span>}
+          </Link>
+        </nav>
+      </aside>
 
-      {/* Mobile Navigation */}
-      <div className="md:hidden bg-background/80 backdrop-blur-sm px-4 py-4 shadow-sm">
+      {/* Mobile Navigation - Horizontal scrollable tabs */}
+      <div className="md:hidden fixed top-14 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm px-4 py-3 border-b border-white/10">
         <div className="flex space-x-2 overflow-x-auto custom-scrollbar">
           <Link
             href="/creator/dashboard"
-            className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
+            className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${
               isActive('/creator/dashboard')
-                ? 'bg-primary/10 text-primary shadow-sm'
-                : 'bg-dropdown-hover text-text/70 hover:text-text'
+                ? 'bg-white/10 text-white'
+                : 'bg-white/5 text-gray-300 hover:text-white'
             }`}
           >
             General
           </Link>
           <Link
             href="/creator/payment"
-            className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
+            className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${
               isActive('/creator/payment')
-                ? 'bg-primary/10 text-primary shadow-sm'
-                : 'bg-dropdown-hover text-text/70 hover:text-text'
+                ? 'bg-white/10 text-white'
+                : 'bg-white/5 text-gray-300 hover:text-white'
             }`}
           >
             Payout
           </Link>
           <Link
             href="/creator/unranked-donations"
-            className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
+            className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${
               isActive('/creator/unranked-donations')
-                ? 'bg-primary/10 text-primary shadow-sm'
-                : 'bg-dropdown-hover text-text/70 hover:text-text'
+                ? 'bg-white/10 text-white'
+                : 'bg-white/5 text-gray-300 hover:text-white'
             }`}
           >
             Unranked
@@ -181,56 +251,58 @@ const DashboardLayout = ({ children }) => {
             <>
               <Link
                 href="/creator/vault"
-                className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
+                className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${
                   isActive('/creator/vault')
-                    ? 'bg-primary/10 text-primary shadow-sm'
-                    : 'bg-dropdown-hover text-text/70 hover:text-text'
+                    ? 'bg-white/10 text-white'
+                    : 'bg-white/5 text-gray-300 hover:text-white'
                 }`}
               >
                 Vault
               </Link>
               <Link
                 href="/creator/requests"
-                className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
+                className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${
                   isActive('/creator/requests')
-                    ? 'bg-primary/10 text-primary shadow-sm'
-                    : 'bg-dropdown-hover text-text/70 hover:text-text'
+                    ? 'bg-white/10 text-white'
+                    : 'bg-white/5 text-gray-300 hover:text-white'
                 }`}
               >
                 Requests
               </Link>
-              {/* <Link
-                href="/creator/vault-payouts"
-                className={`flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm ${
-                  isActive('/creator/vault-payouts')
-                    ? 'bg-primary/10 text-primary shadow-sm'
-                    : 'bg-dropdown-hover text-text/70 hover:text-text'
-                }`}
-              >
-                Payouts
-              </Link> */}
             </>
           )}
-          <Link
+          <a
             href={`/${session?.user?.name}`}
-            className="flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm bg-dropdown-hover text-text/60 hover:text-text/80"
             target="_blank"
             rel="noopener noreferrer"
+            className="flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm bg-white/5 text-gray-300 hover:text-white"
           >
             Your Page
-          </Link>
+          </a>
           <Link
             href="/blogs"
-            className="flex-shrink-0 py-2 px-4 text-center rounded-lg font-medium transition-all duration-200 text-sm bg-dropdown-hover text-text/60 hover:text-text/80"
+            className="flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm bg-white/5 text-gray-300 hover:text-white"
           >
             Creator School
           </Link>
         </div>
       </div>
 
-      {/* Mobile Main Content */}
-      <main className="md:hidden p-4 pb-20 bg-background">
-        {children}
+      {/* Main Content Area */}
+      <main 
+        className={`pt-14 min-h-screen pb-20 md:pb-0 transition-all duration-300 ${
+          sidebarOpen ? 'md:ml-56' : 'md:ml-[72px]'
+        }`}
+      >
+        {/* Desktop Content */}
+        <div className="hidden md:block p-8">
+          {children}
+        </div>
+        
+        {/* Mobile Content - Extra padding for fixed tabs */}
+        <div className="md:hidden p-4 pt-16">
+          {children}
+        </div>
       </main>
     </div>
   );

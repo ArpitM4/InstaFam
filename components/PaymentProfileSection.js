@@ -113,8 +113,8 @@ const PaymentProfileSection = ({
       <div className="h-20" />
 
       {/* Profile Info Box */}
-      <div className="relative mt-6 w-full max-w-md mx-auto p-4 bg-dropdown-hover rounded-lg shadow-sm">
-        <h1 className="text-xl font-light text-primary text-center mb-3">@{username}</h1>
+      <div className="relative mt-6 w-full max-w-md mx-auto p-5 rounded-2xl shadow-lg border border-white/10" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)'}}>
+        <h1 className="text-xl font-semibold bg-gradient-to-r from-primary via-purple-400 to-rose-400 bg-clip-text text-transparent text-center mb-3">@{username}</h1>
         
         {/* Follower Count for Creator's Own Page */}
         {isOwner && (
