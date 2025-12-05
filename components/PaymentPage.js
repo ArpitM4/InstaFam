@@ -854,7 +854,7 @@ const PaymentPage = ({ username }) => {
           </button>
           <button
             onClick={proceedWithEventStart}
-            className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-primary via-purple-500 to-rose-500 text-white transition-all text-sm font-medium shadow-md hover:scale-[1.04] hover:brightness-110 border-0"
+            className="btn-gradient flex-1 px-4 py-2.5 rounded-lg text-white transition-all text-sm font-medium shadow-md hover:scale-[1.04] hover:brightness-110 border-0"
           >
             Continue Testing
           </button>
@@ -883,9 +883,9 @@ const PaymentPage = ({ username }) => {
         theme="light"
         style={{ top: 72 }}
       />
-      <div id="thisone" className="min-h-screen bg-background text-text flex flex-col items-center pb-36 relative overflow-x-hidden">
+      <div id="thisone" className="min-h-screen text-text flex flex-col items-center pb-36 relative overflow-x-hidden" style={{backgroundColor: 'var(--background-creator)'}}>
         {/* Radial gradient background overlay */}
-        <div className="absolute inset-0 -z-10 pointer-events-none" style={{background: 'radial-gradient(ellipse 80% 60% at 50% 20%, #e11d48 0%, #6366f1 60%, #18181b 100%)'}} />
+        <div className="absolute inset-0 -z-10 pointer-events-none" style={{background: 'radial-gradient(ellipse 80% 60% at 50% 20%, rgba(225,29,72,0.4) 0%, rgba(99,102,241,0.3) 40%, #14141f 100%)'}} />
         <PaymentProfileSection
           username={username}
           currentUser={currentUser}
@@ -1096,7 +1096,7 @@ const PaymentPage = ({ username }) => {
           {activeTab === 'subscription' && (
             <div className="w-full max-w-5xl mt-8 flex justify-center">
               <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
-                <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-rose-400 mb-2">Subscription</h2>
+                <h2 className="text-2xl font-bold text-gradient-primary mb-2">Subscription</h2>
                 <p className="text-primary text-lg font-semibold">Coming Soon</p>
                 <p className="text-text/40 text-sm mt-2">Exclusive subscription tiers with special perks and content</p>
                 <p className="text-text/40 text-sm mt-2">Get Discounts using FamPoints.</p>
@@ -1107,7 +1107,7 @@ const PaymentPage = ({ username }) => {
           {activeTab === 'courses' && (
             <div className="w-full max-w-5xl mt-8 flex justify-center">
               <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
-                <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-rose-400 mb-2">Courses</h2>
+                <h2 className="text-2xl font-bold text-gradient-primary mb-2">Courses</h2>
                 <p className="text-primary text-lg font-semibold">Coming Soon</p>
                 <p className="text-text/40 text-sm mt-2">Educational courses and tutorials from your favorite creators</p>
                 <p className="text-text/40 text-sm mt-2">Get Discounts using FamPoints.</p>
@@ -1118,7 +1118,7 @@ const PaymentPage = ({ username }) => {
           {activeTab === 'giveaway' && (
             <div className="w-full max-w-5xl mt-8 flex justify-center">
               <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
-                <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-rose-400 mb-2">Giveaway Picker</h2>
+                <h2 className="text-2xl font-bold text-gradient-primary mb-2">Giveaway Picker</h2>
                 <p className="text-primary text-lg font-semibold">Coming Soon</p>
                 <p className="text-text/40 text-sm mt-2">Host giveaways and pick winners fairly using our picker tool</p>
                 <p className="text-text/40 text-sm mt-2">Engage your community with exciting giveaways.</p>
@@ -1202,7 +1202,7 @@ const PaymentPage = ({ username }) => {
               </button>
               <button
                 onClick={handleSaveCustomization}
-                className="flex-1 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-primary via-purple-500 to-rose-500 text-white rounded-lg shadow-md hover:scale-[1.04] hover:brightness-110 transition-all font-medium border-0"
+                className="btn-gradient flex-1 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-white rounded-lg shadow-md hover:scale-[1.04] hover:brightness-110 transition-all font-medium border-0"
               >
                 Save
               </button>

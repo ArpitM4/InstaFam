@@ -36,6 +36,7 @@ function CreatorCard({ creator, showFollowedBadge = false }) {
               src={creator.profilepic}
               alt={creator.name || creator.username}
               fill
+              sizes="80px"
               className="rounded-full object-cover border-2 border-white/10"
             />
           ) : (
@@ -151,6 +152,7 @@ export default function HomeFeed() {
                       src={userData.profilepic}
                       alt={userData.name || userData.username}
                       fill
+                      sizes="80px"
                       className="rounded-full object-cover border-2 border-primary/30"
                     />
                   ) : (

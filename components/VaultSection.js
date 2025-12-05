@@ -381,7 +381,7 @@ const VaultSection = ({ currentUser }) => {
           Exclusive digital content available for Fam Points
         </p>
         {session && (
-          <div className="bg-gradient-to-r from-primary/20 via-purple-500/20 to-rose-500/20 text-primary px-4 py-2 rounded-xl inline-block border border-primary/20">
+          <div className="bg-gradient-primary-soft text-primary px-4 py-2 rounded-xl inline-block border border-primary/20">
             Your Fam Points: {userPoints}
           </div>
         )}
@@ -477,7 +477,7 @@ const VaultSection = ({ currentUser }) => {
                     className={`w-full py-2.5 px-4 rounded-xl font-medium transition-all duration-300 shadow-md ${
                       isRedeeming
                         ? 'bg-primary/50 text-background cursor-not-allowed'
-                        : 'bg-gradient-to-r from-primary via-purple-500 to-rose-500 text-white hover:shadow-lg hover:scale-[1.02]'
+                        : 'btn-gradient text-white hover:shadow-lg hover:scale-[1.02]'
                     }`}
                   >
                     {isRedeeming ? (

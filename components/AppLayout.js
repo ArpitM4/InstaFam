@@ -113,6 +113,7 @@ export default function AppLayout({ children }) {
                   src={userData.profilepic}
                   alt="Profile"
                   fill
+                  sizes="36px"
                   className="rounded-full object-cover border-2 border-white/10"
                 />
               ) : (

@@ -33,6 +33,7 @@ function CreatorCard({ creator }) {
               src={creator.profilepic}
               alt={creator.name || creator.username}
               fill
+              sizes="80px"
               className="rounded-full object-cover border-2 border-white/10"
             />
           ) : (

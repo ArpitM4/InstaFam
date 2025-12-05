@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa';
+import Footer from "@/components/Footer";
 
 // Floating Star Component
 function Star({ style, size = 'sm', delay = 0 }) {
@@ -424,6 +425,9 @@ export default function MarketingSplash() {
           </div>
         </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </>
   );
 }

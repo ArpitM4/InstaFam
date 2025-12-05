@@ -2,7 +2,6 @@
 import { Inter } from 'next/font/google';
 import "./globals.css";
 import AppLayout from "@/components/AppLayout";
-import Footer from "@/components/Footer";
 import SessionWrapper from "@/components/SessionWrapper";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
 import GoogleOneTap from "@/components/GoogleOneTap";
@@ -227,7 +226,6 @@ export default function RootLayout({ children }) {
                 {children}
               </main>
             </AppLayout>
-            <Footer />
           </UserProvider>
           <Analytics />
         </SessionWrapper> 

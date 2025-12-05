@@ -90,6 +90,7 @@ const DashboardLayout = ({ children }) => {
                   src={user.profilepic}
                   alt="Profile"
                   fill
+                  sizes="36px"
                   className="rounded-full object-cover border-2 border-white/10"
                 />
               ) : (

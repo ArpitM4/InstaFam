@@ -11,6 +11,8 @@
   --text-muted: #A1A1AA;
   /* --background: #0b0b16; */
   --background: #000000;
+  --background-creator: #07070b;
+
   --background-soft: #0B0C0F;
   --background-hover: #111215;
 
@@ -32,7 +34,7 @@
   --dropdown-hover: rgba(255,255,255,0.08);
 
   /* GRADIENT (Your Logo Gradient) */
-  --gradient-primary: linear-gradient(135deg, #FF2F72 0%, #FF6A2F 100%);
+  --gradient-primary: linear-gradient(135deg, #FF2F72 0%,#FF4B86 50%, #FF6A2F 100%);
   --gradient-primary-soft: linear-gradient(135deg, #FF4B86 0%, #FF8A50 100%);
   --gradient-radial: radial-gradient(circle, #FF2F72 0%, #FF6A2F 100%);
 
@@ -394,7 +396,7 @@ body {
   outline: none;
 }
 
-/* Login button gradient */
+/* Gradient utilities using CSS variables */
 .btn-gradient {
   background: var(--gradient-primary);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -403,6 +405,19 @@ body {
 .btn-gradient:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 20px rgba(255, 47, 114, 0.4);
+}
+
+/* Gradient text utility */
+.text-gradient-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Soft gradient background for cards/badges */
+.bg-gradient-primary-soft {
+  background: linear-gradient(135deg, rgba(255, 47, 114, 0.15) 0%, rgba(255, 106, 47, 0.15) 100%);
 }
 
 .animate-fadeIn {

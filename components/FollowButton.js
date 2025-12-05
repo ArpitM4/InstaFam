@@ -100,7 +100,7 @@ const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFoll
           ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 hover:shadow-lg'}
           ${isFollowing 
             ? 'bg-white/10 text-text border border-white/20 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30' 
-            : 'bg-gradient-to-r from-primary via-purple-500 to-rose-500 text-white border-0'
+            : 'btn-gradient text-white border-0'
           }
         `}
       >
