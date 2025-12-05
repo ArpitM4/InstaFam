@@ -5,13 +5,14 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { FaUser } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import NotificationBell from "./NotificationBell";
 
 const Navbar = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -27,6 +28,11 @@ const Navbar = () => {
 
   // Show loading state while session or user data is being fetched
   const isLoading = status === "loading" || (isAuthenticated && userLoading);
+
+  // Hide navbar on homepage for non-logged-in users (landing page has its own header)
+  if (pathname === '/' && !session && status !== 'loading') {
+    return null;
+  }
 
   return (
     <nav className="absolute bg-black shadow-md py-2 z-30 w-full border-b-2 border-dropdown-border">
