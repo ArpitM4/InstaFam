@@ -3,10 +3,18 @@ import React from 'react'
 import "../app/globals.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faInstagram } from '@fortawesome/free-brands-svg-icons'
+import { useSession } from 'next-auth/react'
 
 
 
 const Footer = () => {
+  const { data: session } = useSession();
+  
+  // Hide footer when user is logged in (they use the Sidebar layout)
+  if (session) {
+    return null;
+  }
+
   return (
 <footer className="relative z-20 bg-transparent text-white py-10">
   <div className="max-w-screen-xl mx-auto px-6">

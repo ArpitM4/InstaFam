@@ -196,10 +196,10 @@ const MyFamPointsPage = () => {
 
   if (status === "loading" || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-text">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-text/70">Loading your Fam Points...</p>
+          <p className="text-gray-400">Loading your Fam Points...</p>
         </div>
       </div>
     );
@@ -210,13 +210,13 @@ const MyFamPointsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20 text-text py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="border-b border-text/20 pb-6 mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">My Fam Points</h1>
-          <p className="text-text/70">Track your points and redemptions</p>
-        </div>
+    <div className="max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-white mb-1">My Fam Points</h1>
+        <div className="w-12 h-1 bg-primary rounded-full"></div>
+        <p className="text-gray-400 text-sm mt-4">Track your points and redemptions</p>
+      </div>
 
         {/* Points Summary Card */}
         <div className="bg-dropdown-hover rounded-lg p-6 mb-8 text-center">
@@ -595,12 +595,11 @@ const MyFamPointsPage = () => {
         <div className="text-center mt-8">
           <button
             onClick={() => router.back()}
-            className="bg-background/50 hover:bg-background/70 text-text px-6 py-2 rounded-lg font-medium transition-colors"
+            className="bg-white/5 hover:bg-white/10 text-white px-6 py-2 rounded-lg font-medium transition-colors"
           >
             ← Back
           </button>
         </div>
-      </div>
     </div>
   );
 };

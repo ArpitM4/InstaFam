@@ -883,7 +883,7 @@ const PaymentPage = ({ username }) => {
         theme="light"
         style={{ top: 72 }}
       />
-      <div id="thisone" className="min-h-screen bg-background text-text flex flex-col items-center py-12 pb-28  px-2">
+      <div id="thisone" className="min-h-screen bg-background text-text flex flex-col items-center pb-28">
         <PaymentProfileSection
           username={username}
           currentUser={currentUser}

@@ -158,7 +158,7 @@ const NotificationBell = () => {
       <button
         ref={bellRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-text hover:text-gray-400 transition-colors"
+        className="relative p-2 text-gray-300 hover:text-white transition-colors"
       >
         <svg
           className="w-6 h-6"
@@ -176,7 +176,7 @@ const NotificationBell = () => {
         
         {/* Unread Badge */}
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+          <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -186,15 +186,15 @@ const NotificationBell = () => {
       {isOpen && (
         <div
           ref={dropdownRef}
-          className="absolute right-0 mt-2 w-80 bg-black text-white border border-dropdown-border rounded-lg shadow-lg z-50 max-h-96 overflow-hidden"
+          className="absolute right-0 mt-2 w-80 bg-background/95 backdrop-blur-xl text-white border border-white/10 rounded-2xl shadow-2xl z-50 max-h-96 overflow-hidden"
         >
           {/* Header */}
-          <div className="p-4 border-b border-dropdown-border flex justify-between items-center">
-            <h3 className="font-semibold text-lg">Notifications</h3>
+          <div className="p-4 border-b border-white/10 flex justify-between items-center">
+            <h3 className="font-semibold text-lg text-white">Notifications</h3>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
-                className="text-sm text-primary hover:text-primary/80"
+                className="text-sm text-primary hover:text-primary/80 transition-colors"
               >
                 Mark all read
               </button>
@@ -204,12 +204,12 @@ const NotificationBell = () => {
           {/* Notifications List */}
           <div className="max-h-80 overflow-y-auto custom-scrollbar">
             {loading ? (
-              <div className="p-4 text-center text-white/60">
+              <div className="p-4 text-center text-gray-400">
                 <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
                 Loading notifications...
               </div>
             ) : notifications.length === 0 ? (
-              <div className="p-8 text-center text-white/60">
+              <div className="p-8 text-center text-gray-400">
                 <p className="text-sm">No notifications yet</p>
               </div>
             ) : (
@@ -217,7 +217,7 @@ const NotificationBell = () => {
                 <div
                   key={notification._id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`p-4 border-b border-dropdown-border hover:bg-dropdown-hover cursor-pointer transition-colors ${
+                  className={`p-4 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors ${
                     !notification.isRead ? 'bg-primary/5 border-l-4 border-l-primary' : ''
                   }`}
                 >
@@ -226,13 +226,13 @@ const NotificationBell = () => {
                       {getNotificationIcon(notification.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm mb-1">
+                      <p className="font-medium text-sm mb-1 text-white">
                         {notification.title}
                       </p>
-                      <p className="text-white/70 text-sm mb-2">
+                      <p className="text-gray-400 text-sm mb-2">
                         {notification.message}
                       </p>
-                      <p className="text-white/50 text-xs">
+                      <p className="text-gray-500 text-xs">
                         {formatTimeAgo(notification.createdAt)}
                       </p>
                     </div>
@@ -247,13 +247,13 @@ const NotificationBell = () => {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="p-3 border-t border-dropdown-border text-center">
+            <div className="p-3 border-t border-white/10 text-center">
               <button
                 onClick={() => {
                   setIsOpen(false);
                   // Could navigate to a full notifications page in the future
                 }}
-                className="text-sm text-primary hover:text-primary/80"
+                className="text-sm text-primary hover:text-primary/80 transition-colors"
               >
                 View all notifications
               </button>

@@ -9,7 +9,8 @@
   /* TEXT + BACKGROUND */
   --text: #F0F1F5;
   --text-muted: #A1A1AA;
-  --background: #050507;
+  /* --background: #0b0b16; */
+  --background: #000000;
   --background-soft: #0B0C0F;
   --background-hover: #111215;
 

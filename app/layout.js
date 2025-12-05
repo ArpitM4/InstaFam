@@ -1,7 +1,7 @@
 
 import { Inter } from 'next/font/google';
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import AppLayout from "@/components/AppLayout";
 import Footer from "@/components/Footer";
 import SessionWrapper from "@/components/SessionWrapper";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
@@ -220,12 +220,13 @@ export default function RootLayout({ children }) {
         <SessionWrapper>  
           <UserProvider>
             <PerformanceMonitor />
-            <Navbar />
             <GoogleOneTap />
             <FloatingCreatorChecklist />
-            <main role="main">
-              {children}
-            </main>
+            <AppLayout>
+              <main role="main">
+                {children}
+              </main>
+            </AppLayout>
             <Footer />
           </UserProvider>
           <Analytics />
