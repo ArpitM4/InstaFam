@@ -131,18 +131,32 @@ export default function SetupPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#0a0a15] text-white p-4">
-            <div className="max-w-md w-full glass-card p-8 rounded-2xl">
-                <h1 className="text-3xl font-bold text-center mb-2 gradient-text">Complete Setup</h1>
-                <p className="text-center text-gray-400 mb-8">Tell us a bit about yourself</p>
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
+
+            {/* Background Effects */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[120px] -z-10" style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)' }} />
+            <div className="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full blur-[100px] -z-10" style={{ backgroundColor: 'rgba(255, 47, 114, 0.1)' }} />
+
+            <div className="max-w-md w-full p-8 rounded-3xl border shadow-2xl relative z-10 backdrop-blur-xl"
+                style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                    borderColor: 'rgba(255, 255, 255, 0.08)',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+                }}>
+
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold mb-2 text-white">Welcome to Sygil</h1>
+                    <p style={{ color: 'var(--text-muted)' }}>Let's get your profile ready</p>
+                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Avatar Selection */}
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-primary/50 group cursor-pointer">
+                    <div className="flex flex-col items-center gap-6">
+                        <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 group cursor-pointer transition-all duration-300 hover:scale-105 shadow-lg"
+                            style={{ borderColor: 'var(--primary)' }}>
                             {isUploading ? (
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20">
+                                    <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                 </div>
                             ) : (
                                 <Image
@@ -150,13 +164,14 @@ export default function SetupPage() {
                                     alt="Avatar"
                                     fill
                                     className="object-cover"
-                                    unoptimized // Fix for external images
+                                    unoptimized
                                 />
                             )}
 
                             {/* Overlay for upload hint */}
-                            <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                                <span className="text-xs font-medium">Upload</span>
+                            <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer z-10">
+                                <FaUser className="mb-1 text-white" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-white">Upload</span>
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -166,37 +181,34 @@ export default function SetupPage() {
                             </label>
                         </div>
 
-                        <div className="flex gap-4 text-sm">
+                        <div className="flex gap-3 text-sm">
                             <button
                                 type="button"
                                 onClick={() => {
                                     const seed = Math.random().toString(36).substring(7);
                                     setAvatarUrl(`https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}`);
                                 }}
-                                className="text-primary hover:text-primary-light flex items-center gap-2"
+                                className="px-4 py-2 rounded-full border transition-colors flex items-center gap-2 hover:bg-white/5"
+                                style={{ borderColor: 'rgba(255,255,255,0.1)', color: 'var(--primary)' }}
                             >
                                 <FaMagic /> Randomize
                             </button>
-                            <label className="text-gray-400 hover:text-white cursor-pointer flex items-center gap-2">
-                                <FaUser /> Upload Photo
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={handleImageUpload}
-                                />
-                            </label>
                         </div>
                     </div>
 
                     {/* Name */}
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-gray-300">Display Name</label>
+                        <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>Display Name</label>
                         <input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 focus:border-primary focus:outline-none transition-colors"
+                            className="w-full rounded-xl px-4 py-3.5 font-medium transition-all focus:ring-2 focus:ring-primary/50 outline-none"
+                            style={{
+                                backgroundColor: 'rgba(255,255,255,0.05)',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                color: 'var(--text)'
+                            }}
                             placeholder="John Doe"
                             required
                         />
@@ -204,16 +216,21 @@ export default function SetupPage() {
 
                     {/* Username */}
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-gray-300">Username</label>
+                        <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>Username</label>
                         <div className="relative">
                             <input
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                                className={`w-full bg-white/5 border rounded-lg px-4 py-3 focus:outline-none transition-colors ${usernameAvailable === true ? 'border-green-500/50' :
-                                    usernameAvailable === false ? 'border-red-500/50' :
-                                        'border-white/10 focus:border-primary'
-                                    }`}
+                                className="w-full rounded-xl px-4 py-3.5 font-medium transition-all focus:ring-2 focus:ring-primary/50 outline-none"
+                                style={{
+                                    backgroundColor: 'rgba(255,255,255,0.05)',
+                                    border: `1px solid ${usernameAvailable === true ? 'var(--success)' :
+                                            usernameAvailable === false ? 'var(--error)' :
+                                                'rgba(255,255,255,0.1)'
+                                        }`,
+                                    color: 'var(--text)'
+                                }}
                                 placeholder="johndoe"
                                 required
                                 minLength={3}
@@ -221,54 +238,64 @@ export default function SetupPage() {
                             <div className="absolute right-4 top-1/2 -translate-y-1/2">
                                 {isCheckingUsername && <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />}
                                 {!isCheckingUsername && username.length >= 3 && (
-                                    usernameAvailable ? <FaCheck className="text-green-500" /> : <FaTimes className="text-red-500" />
+                                    usernameAvailable ? <FaCheck style={{ color: 'var(--success)' }} /> : <FaTimes style={{ color: 'var(--error)' }} />
                                 )}
                             </div>
                         </div>
                         {usernameAvailable === false && (
-                            <p className="text-xs text-red-500 mt-1">Username is taken</p>
+                            <p className="text-xs mt-2 font-medium" style={{ color: 'var(--error)' }}>Username is taken</p>
                         )}
                     </div>
 
                     {/* Account Type */}
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-gray-300">I want to be a...</label>
+                        <label className="block text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>I want to be a...</label>
                         <div className="grid grid-cols-2 gap-4">
                             <button
                                 type="button"
                                 onClick={() => setAccountType("User")}
-                                className={`p-4 rounded-xl border transition-all duration-200 ${accountType === "User"
-                                    ? "bg-primary/20 border-primary text-white"
-                                    : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                                className={`p-4 rounded-2xl border-2 transition-all duration-200 text-left relative overflow-hidden group ${accountType === "User"
+                                        ? "bg-primary/10 border-primary"
+                                        : "bg-transparent border-white/10 hover:border-white/20 hover:bg-white/5"
                                     }`}
                             >
-                                <div className="text-lg font-bold mb-1">User</div>
-                                <div className="text-xs opacity-70">Explore & Support</div>
+                                <div className={`text-lg font-bold mb-1 ${accountType === "User" ? "text-primary" : "text-white"}`}>User</div>
+                                <div className="text-xs" style={{ color: 'var(--text-muted)' }}>Explore & Support</div>
+                                {accountType === "User" && <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_var(--primary)]" />}
                             </button>
+
                             <button
                                 type="button"
                                 onClick={() => setAccountType("Creator")}
-                                className={`p-4 rounded-xl border transition-all duration-200 ${accountType === "Creator"
-                                    ? "bg-secondary/20 border-secondary text-white"
-                                    : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                                className={`p-4 rounded-2xl border-2 transition-all duration-200 text-left relative overflow-hidden group ${accountType === "Creator"
+                                        ? "bg-secondary/10 border-secondary"
+                                        : "bg-transparent border-white/10 hover:border-white/20 hover:bg-white/5"
                                     }`}
                             >
-                                <div className="text-lg font-bold mb-1">Creator</div>
-                                <div className="text-xs opacity-70">Create & Earn</div>
+                                <div className={`text-lg font-bold mb-1 ${accountType === "Creator" ? "text-secondary" : "text-white"}`}>Creator</div>
+                                <div className="text-xs" style={{ color: 'var(--text-muted)' }}>Create & Earn</div>
+                                {accountType === "Creator" && <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-secondary shadow-[0_0_10px_var(--secondary)]" />}
                             </button>
                         </div>
                     </div>
 
                     {error && (
-                        <p className="text-red-500 text-sm text-center bg-red-500/10 py-2 rounded-lg">{error}</p>
+                        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-center">
+                            <p className="text-sm font-medium" style={{ color: 'var(--error)' }}>{error}</p>
+                        </div>
                     )}
 
                     <button
                         type="submit"
                         disabled={loading || !usernameAvailable || !name}
-                        className="w-full btn-gradient py-3 rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] transition-all"
+                        className="w-full btn-gradient py-4 rounded-xl font-bold text-lg text-white shadow-lg hover:shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                     >
-                        {loading ? "Setting up..." : "Complete Setup"}
+                        {loading ? (
+                            <div className="flex items-center justify-center gap-2">
+                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <span>Setting up...</span>
+                            </div>
+                        ) : "Complete Setup"}
                     </button>
                 </form>
             </div>
