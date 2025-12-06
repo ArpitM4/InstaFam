@@ -152,7 +152,7 @@ export default function CreatorsPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-transparent to-transparent z-10"></div>
                 {/* Magic Man Visual */}
                 <Image
-                  src="/characters/MagicMan.png"
+                  src="/characters/magicman.png"
                   alt="The Sygil Magician"
                   fill
                   unoptimized
@@ -279,7 +279,12 @@ export default function CreatorsPage() {
                 </h2>
                 <p className="text-lg text-[var(--text-muted)] leading-relaxed">
                   Sygil gives you powerful tools to turn casual followers into loyal supporters.
-                  Fans earn FamPoints, climb leaderboards, redeem perks, and get rewarded for their engagement.
+                  <br></br>
+
+                  1. Fans Contribute
+                  <br></br>
+
+                  2. Fans earn FamPoints, climb leaderboards, redeem perks, and get rewarded for their engagement.
                 </p>
               </div>
 
@@ -453,7 +458,7 @@ export default function CreatorsPage() {
                 {/* Decorative BookMan */}
                 <div className="absolute -bottom-10 -right-5 w-24 h-24 opacity-20 group-hover:opacity-100 transition-opacity">
                   <Image
-                    src="/characters/BookMan.png"
+                    src="/characters/bookman.png"
                     alt="BookMan"
                     fill
                     className="object-contain"
@@ -463,8 +468,6 @@ export default function CreatorsPage() {
 
                 <div className="relative z-10">
                   <div className="flex gap-3 mb-4">
-                    {/* <FaPalette className="text-4xl text-blue-500" />
-                    <FaBrain className="text-4xl text-green-500" /> */}
                   </div>
                   <h3 className="text-xl font-bold mb-3">Artists & Experts</h3>
                   <ul className="space-y-2 text-[var(--text-muted)] text-sm">
@@ -484,7 +487,7 @@ export default function CreatorsPage() {
           <div className="relative z-10">
             <div className="inline-block relative mb-3">
               <Image
-                src="/characters/SmallCat.png"
+                src="/characters/smallcat.png"
                 alt="Cat"
                 width={60}
                 height={60}
