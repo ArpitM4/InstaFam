@@ -23,7 +23,7 @@ export const fetchuser = async (identifier) => {
     console.log('🔍 fetchuser Debug - User accountType:', u.accountType);
   }
   if (!u) return null;
-  
+
   // Convert ObjectIds to strings to prevent serialization issues
   const user = {
     ...u,
@@ -50,15 +50,15 @@ export const fetchuser = async (identifier) => {
     followersArray: u.followersArray?.map(id => id.toString()) || [],
     following: u.following?.map(id => id.toString()) || []
   };
-  
+
   console.log('🔍 fetchuser Debug - Final user object accountType:', user.accountType);
   return user;
 };
 
-export const fetchpayments = async (username, eventStart = null) => {
+export const fetchpayments = async (userId, eventStart = null) => {
   await connectDb();
 
-  const query = { to_user: username };
+  const query = { to_user: userId };
 
   // If eventStart is passed, filter by it
   if (eventStart) {
@@ -117,7 +117,7 @@ export const updateProfile = async (data, oldusername) => {
     delete ndata.username;
   }
   await User.updateOne({ email: ndata.email }, ndata);
-  
+
   // Return only success status, don't return the full user object
   // to avoid circular reference issues in Next.js serialization
   return { success: true };
@@ -128,7 +128,7 @@ export const updateProfile = async (data, oldusername) => {
 
 
 // actions/useractions.js
-export const updatePaymentInfo = async ({ phone, upi }, username) => {
+export const updatePaymentInfo = async ({ phone, upi }, email) => {
   await connectDb();
 
   const paymentInfo = {
@@ -136,30 +136,12 @@ export const updatePaymentInfo = async ({ phone, upi }, username) => {
     ...(upi && { upi }),
   };
 
-  const res = await User.updateOne({ username }, { $set: { paymentInfo } });
+  const res = await User.updateOne({ email }, { $set: { paymentInfo } });
 
 };
 
 
-export const generateInstagramOTP = async (username) => {
-  await connectDb();
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const otpGeneratedAt = new Date();
-
-  await User.updateOne(
-    { username },
-    {
-      $set: {
-        "instagram.otp": otp,
-        "instagram.otpGeneratedAt": otpGeneratedAt,
-        "instagram.isVerified": false
-      }
-    }
-  );
-
-  return otp;
-};
 
 // Event-related functions
 export const fetchEvents = async (userId, type = 'history') => {
@@ -173,7 +155,7 @@ export const fetchEvents = async (userId, type = 'history') => {
 
     await connectDB();
     const session = await getServerSession(nextAuthConfig);
-    
+
     if (!session?.user?.email) {
       throw new Error('Unauthorized');
     }
@@ -186,11 +168,11 @@ export const fetchEvents = async (userId, type = 'history') => {
 
     if (type === 'current') {
       // Find the current active event for this user
-      const event = await Event.findOne({ 
-        creatorId: creator._id, 
-        status: 'active' 
+      const event = await Event.findOne({
+        creatorId: creator._id,
+        status: 'active'
       });
-      
+
       if (event) {
         // Convert to plain object to avoid serialization issues
         const plainEvent = event.toObject();
@@ -211,8 +193,8 @@ export const fetchEvents = async (userId, type = 'history') => {
     } else {
       // Get all events this creator has ever started
       console.log('DEBUG: Looking for events for creator:', creator._id, creator.email);
-      const events = await Event.find({ 
-        creatorId: creator._id 
+      const events = await Event.find({
+        creatorId: creator._id
       }).sort({ createdAt: -1 });
 
       console.log('DEBUG: Found events:', events.length);
@@ -224,7 +206,7 @@ export const fetchEvents = async (userId, type = 'history') => {
       const eventsWithPayments = await Promise.all(
         events.map(async (event) => {
           console.log('DEBUG: Processing event:', event._id, 'from', event.startTime, 'to', event.endTime);
-          
+
           // Find payments made to this creator during the event's time period
           const payments = await Payment.find({
             to_user: creator._id,
@@ -267,12 +249,12 @@ export const fetchEvents = async (userId, type = 'history') => {
       );
 
       console.log('DEBUG: Final eventsWithPayments:', eventsWithPayments.length);
-      
+
       // Also calculate total earnings from ALL payments to this user (not just event-based)
       const allPayments = await Payment.find({ to_user: creator._id });
       const totalAllEarnings = allPayments.reduce((sum, payment) => sum + payment.amount, 0);
       console.log('DEBUG: Total earnings from all payments:', totalAllEarnings);
-      
+
       return {
         events: eventsWithPayments,
         totalEarnings: totalAllEarnings,
@@ -295,7 +277,7 @@ export const createEvent = async (eventData) => {
 
     await connectDB();
     const session = await getServerSession(nextAuthConfig);
-    
+
     if (!session?.user?.email) {
       throw new Error('Unauthorized');
     }
@@ -307,11 +289,11 @@ export const createEvent = async (eventData) => {
     }
 
     // Check if user already has an active event
-    const existingEvent = await Event.findOne({ 
-      creatorId: creator._id, 
-      status: 'active' 
+    const existingEvent = await Event.findOne({
+      creatorId: creator._id,
+      status: 'active'
     });
-    
+
     if (existingEvent) {
       throw new Error('You already have an active event. Please end your current event before creating a new one.');
     }
@@ -325,7 +307,7 @@ export const createEvent = async (eventData) => {
     });
 
     await newEvent.save();
-    
+
     // Convert to plain object to avoid serialization issues
     const plainEvent = newEvent.toObject();
     return {
@@ -355,7 +337,7 @@ export const endEvent = async (eventId) => {
 
     await connectDB();
     const session = await getServerSession(nextAuthConfig);
-    
+
     if (!session?.user?.email) {
       throw new Error('Unauthorized');
     }
@@ -367,11 +349,11 @@ export const endEvent = async (eventId) => {
     }
 
     // Find and update the event
-    const event = await Event.findOne({ 
-      _id: eventId, 
-      creatorId: creator._id 
+    const event = await Event.findOne({
+      _id: eventId,
+      creatorId: creator._id
     });
-    
+
     if (!event) {
       throw new Error('Event not found or you do not have permission to end this event.');
     }

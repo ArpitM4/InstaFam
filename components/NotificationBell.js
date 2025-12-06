@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { fetchNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/actions/notificationActions';
+import { FaCommentDots, FaGift, FaBullhorn, FaMoneyBillWave, FaUserPlus, FaCalendarAlt, FaLockOpen, FaBell } from 'react-icons/fa';
 
 const NotificationBell = () => {
   const { data: session } = useSession();
@@ -25,7 +26,7 @@ const NotificationBell = () => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        dropdownRef.current && 
+        dropdownRef.current &&
         !dropdownRef.current.contains(event.target) &&
         !bellRef.current.contains(event.target)
       ) {
@@ -55,9 +56,9 @@ const NotificationBell = () => {
   const handleNotificationClick = async (notification) => {
     if (!notification.isRead) {
       await markNotificationAsRead(notification._id);
-      setNotifications(prev => 
-        prev.map(n => 
-          n._id === notification._id 
+      setNotifications(prev =>
+        prev.map(n =>
+          n._id === notification._id
             ? { ...n, isRead: true }
             : n
         )
@@ -83,7 +84,7 @@ const NotificationBell = () => {
       case 'creator_new_vault_item':
         // Redirect to creator's payment page
         let creatorUsername = null;
-        
+
         // Try to get username from notification data
         if (notification.data?.creatorName) {
           creatorUsername = notification.data.creatorName;
@@ -93,7 +94,7 @@ const NotificationBell = () => {
           console.warn('No creatorName in notification data, using senderId as fallback');
           creatorUsername = notification.senderId;
         }
-        
+
         if (creatorUsername) {
           window.location.href = `/${creatorUsername}`;
         } else {
@@ -119,23 +120,21 @@ const NotificationBell = () => {
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'creator_answered':
-        return '💬';
+        return <FaCommentDots className="text-blue-400" />;
       case 'vault_redeemed':
-        return '🎁';
+        return <FaGift className="text-pink-400" />;
       case 'system_message':
-        return '📢';
+        return <FaBullhorn className="text-yellow-400" />;
       case 'payment_received':
-        return '💰';
-      case 'verification_approved':
-        return '✅';
+        return <FaMoneyBillWave className="text-green-400" />;
       case 'new_follower':
-        return '👤';
+        return <FaUserPlus className="text-purple-400" />;
       case 'creator_event_started':
-        return '🔔';
+        return <FaCalendarAlt className="text-orange-400" />;
       case 'creator_new_vault_item':
-        return '🔔';
+        return <FaLockOpen className="text-cyan-400" />;
       default:
-        return '🔔';
+        return <FaBell className="text-gray-400" />;
     }
   };
 
@@ -173,7 +172,7 @@ const NotificationBell = () => {
             d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
           />
         </svg>
-        
+
         {/* Unread Badge */}
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
@@ -217,9 +216,8 @@ const NotificationBell = () => {
                 <div
                   key={notification._id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`p-4 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors ${
-                    !notification.isRead ? 'bg-primary/5 border-l-4 border-l-primary' : ''
-                  }`}
+                  className={`p-4 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors ${!notification.isRead ? 'bg-primary/5 border-l-4 border-l-primary' : ''
+                    }`}
                 >
                   <div className="flex items-start space-x-3">
                     <div className="text-2xl flex-shrink-0">

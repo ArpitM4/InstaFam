@@ -70,15 +70,7 @@ export const notifyPaymentReceived = async (creatorId, fanName, amount, paymentI
   });
 };
 
-export const notifyVerificationApproved = async (userId) => {
-  return await createNotification({
-    recipientId: userId,
-    type: 'verification_approved',
-    title: 'Instagram verification approved!',
-    message: 'Your Instagram account has been successfully verified. You can now access all creator features.',
-    data: {}
-  });
-};
+
 
 // Follow system notifications
 export const notifyNewFollower = async (creatorId, fanId, fanName) => {
@@ -95,9 +87,9 @@ export const notifyNewFollower = async (creatorId, fanId, fanName) => {
 // Event & Vault notifications for followers
 export const notifyFollowersNewEvent = async (creatorId, creatorName, followers) => {
   if (!followers || followers.length === 0) return [];
-  
+
   const notifications = [];
-  
+
   for (const followerId of followers) {
     try {
       const notification = await createNotification({
@@ -113,15 +105,15 @@ export const notifyFollowersNewEvent = async (creatorId, creatorName, followers)
       console.error(`Error notifying follower ${followerId}:`, error);
     }
   }
-  
+
   return notifications;
 };
 
 export const notifyFollowersNewVaultItem = async (creatorId, creatorName, vaultItemTitle, vaultItemId, followers) => {
   if (!followers || followers.length === 0) return [];
-  
+
   const notifications = [];
-  
+
   for (const followerId of followers) {
     try {
       const notification = await createNotification({
@@ -137,6 +129,6 @@ export const notifyFollowersNewVaultItem = async (creatorId, creatorName, vaultI
       console.error(`Error notifying follower ${followerId}:`, error);
     }
   }
-  
+
   return notifications;
 };

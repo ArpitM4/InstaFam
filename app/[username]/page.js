@@ -9,50 +9,33 @@ const UsernamePage = async ({ params }) => {
   const user = await fetchuser(params.username);
   const session = await getServerSession(nextAuthConfig);
 
-  // Check for missing payment info
-  const hasPaymentInfo = user?.paymentInfo?.phone || user?.paymentInfo?.upi;
-  const isVerified = user?.instagram?.isVerified;
-  
+  // Check visibility
+  const isHidden = user?.visibility === "hidden";
+
   // Check if current session user is the same as the profile being viewed
   const isOwnProfile = session?.user?.email === user?.email;
 
   if (!user) {
     notFound();
-  } else if (!isVerified || !hasPaymentInfo) {
-    // If it's the user's own profile, show profile incomplete message
-    if (isOwnProfile) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-background text-text">
-          <div className="max-w-lg w-full p-8 bg-secondary/10 border border-secondary/20 rounded-xl shadow-md text-center">
-            <h1 className="text-2xl font-bold text-error mb-4">Profile Incomplete</h1>
-            <p className="text-lg text-text/80 mb-2">
-              {isVerified
-                ? "Please complete your payment information in the dashboard to activate your creator page."
-                : "Your account is not verified. Please complete Instagram verification and payment information in the dashboard to activate your creator page."}
-            </p>
-            <a href="/creator/dashboard" className="inline-block mt-4 px-6 py-3 bg-primary text-text rounded-md font-semibold hover:bg-primary/80 transition">Go to Dashboard</a>
-          </div>
+  } else if (isHidden && !isOwnProfile) {
+    // If it's another user visiting a hidden page, show coming soon message
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a15] text-white">
+        <div className="max-w-lg w-full p-8 glass-card rounded-2xl text-center border border-white/10">
+          <div className="text-6xl mb-6">🙈</div>
+          <h1 className="text-3xl font-bold gradient-text mb-4">Profile Hidden</h1>
+          <p className="text-lg text-gray-300 mb-4">
+            @{params.username} is currently working on their page.
+          </p>
+          <p className="text-sm text-gray-500 mb-8">
+            Check back soon!
+          </p>
+          <a href="/" className="inline-block px-8 py-3 btn-gradient text-white rounded-xl font-bold hover:scale-105 transition-transform">
+            Explore Sygil
+          </a>
         </div>
-      );
-    } else {
-      // If it's another user visiting, show coming soon message
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-background text-text">
-          <div className="max-w-lg w-full p-8 bg-secondary/10 border border-secondary/20 rounded-xl shadow-md text-center">
-            <h1 className="text-3xl font-bold text-primary mb-4">🚀 Coming Soon</h1>
-            <p className="text-lg text-text/80 mb-4">
-              This creator page is currently being set up and will be available soon.
-            </p>
-            <p className="text-sm text-text/60 mb-6">
-              The creator is working on completing their profile and payment setup.
-            </p>
-            <a href="/explore" className="inline-block px-6 py-3 bg-primary text-text rounded-md font-semibold hover:bg-primary/80 transition">
-              Explore Other Creators
-            </a>
-          </div>
-        </div>
-      );
-    }
+      </div>
+    );
   }
 
   return <PaymentPage username={params.username} />;

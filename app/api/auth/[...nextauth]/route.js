@@ -51,7 +51,7 @@ export const authOptions = {
         try {
           await connectDB();
           const user = await User.findOne({ email: credentials.email });
-          
+
           if (!user || !user.password) {
             return null;
           }
@@ -77,7 +77,7 @@ export const authOptions = {
         }
       }
     }),
-    
+
     // Google One Tap Provider with detailed logging
     CredentialsProvider({
       id: 'googleonetap',
@@ -145,13 +145,13 @@ export const authOptions = {
         // Credentials are already validated in authorize()
         return true;
       }
-      
+
       // For OAuth providers, ensure user exists or create them
       if (account?.provider === 'google' || account?.provider === 'github') {
         try {
           await connectDB();
           let existingUser = await User.findOne({ email: user.email });
-          
+
           if (existingUser) {
             // Check if this is an unverified email/password account
             if (existingUser.password && !existingUser.emailVerified) {
@@ -173,7 +173,7 @@ export const authOptions = {
           return false;
         }
       }
-      
+
       return true;
     },
 
@@ -183,11 +183,11 @@ export const authOptions = {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
-        
+
         // Fetch full user data from database for ALL providers (credentials, OAuth, etc.)
         try {
           await connectDB();
-          const dbUser = await User.findOne({ email: user.email }).select('_id username name accountType points profilepic').lean();
+          const dbUser = await User.findOne({ email: user.email }).select('_id username name accountType points profilepic setupCompleted visibility').lean();
           if (dbUser) {
             token.userId = dbUser._id.toString();
             token.username = dbUser.username;
@@ -196,6 +196,8 @@ export const authOptions = {
             token.points = dbUser.points || 0;
             token.profilepic = dbUser.profilepic;
             token.hasUsername = !!dbUser.username;
+            token.setupCompleted = dbUser.setupCompleted;
+            token.visibility = dbUser.visibility;
             token.lastRefresh = Date.now();
           }
         } catch (error) {
@@ -206,17 +208,17 @@ export const authOptions = {
           }
         }
       }
-      
+
       // Refresh user data periodically (every 5 minutes), on explicit trigger, or if accountType is missing
-      const needsRefresh = trigger === 'update' || 
-                          !token.accountType || 
-                          !token.lastRefresh || 
-                          (Date.now() - token.lastRefresh > 5 * 60 * 1000);
-      
+      const needsRefresh = trigger === 'update' ||
+        !token.accountType ||
+        !token.lastRefresh ||
+        (Date.now() - token.lastRefresh > 5 * 60 * 1000);
+
       if (needsRefresh && token.email) {
         try {
           await connectDB();
-          const dbUser = await User.findOne({ email: token.email }).select('_id username name accountType points profilepic').lean();
+          const dbUser = await User.findOne({ email: token.email }).select('_id username name accountType points profilepic setupCompleted visibility').lean();
           if (dbUser) {
             token.userId = dbUser._id.toString();
             token.username = dbUser.username;
@@ -225,13 +227,15 @@ export const authOptions = {
             token.points = dbUser.points || 0;
             token.profilepic = dbUser.profilepic;
             token.hasUsername = !!dbUser.username;
+            token.setupCompleted = dbUser.setupCompleted;
+            token.visibility = dbUser.visibility;
             token.lastRefresh = Date.now();
           }
         } catch (error) {
           console.error('Error refreshing JWT token:', error);
         }
       }
-      
+
       return token;
     },
 
@@ -244,15 +248,17 @@ export const authOptions = {
         session.user.points = token.points || 0;
         session.user.profilepic = token.profilepic;
         session.user.hasUsername = token.hasUsername;
+        session.user.setupCompleted = token.setupCompleted;
+        session.user.visibility = token.visibility;
       }
-      
+
       return session;
     },
   },
 
   pages: {
-    signIn: '/login',
-    error: '/login',
+    signIn: '/',
+    error: '/',
   },
 
   // Remove adapter-specific settings for JWT strategy

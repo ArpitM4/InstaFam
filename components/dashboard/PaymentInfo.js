@@ -26,13 +26,13 @@ const PaymentInfo = () => {
       const user = await fetchuser(session.user.email);
       console.log('PaymentInfo: fetchuser returned:', user);
       setForm(user);
-      
+
       if (user?._id) {
         console.log('PaymentInfo: About to call fetchEvents with userId:', user._id);
         // Fetch event history
         const eventData = await fetchEvents(user._id, 'history');
         console.log('PaymentInfo: fetchEvents returned:', eventData);
-        
+
         if (eventData && typeof eventData === 'object' && eventData.events) {
           // New structure with events and totalEarnings
           setEvents(eventData.events || []);
@@ -45,7 +45,7 @@ const PaymentInfo = () => {
           setTotalEarning(total);
           setTotalPayments(eventData?.reduce((acc, event) => acc + (event.paymentCount || 0), 0) || 0);
         }
-        
+
         console.log('PaymentInfo: final totalEarning:', eventData?.totalEarnings || 0);
         console.log('PaymentInfo: final totalPayments:', eventData?.totalPayments || 0);
       } else {
@@ -72,12 +72,12 @@ const PaymentInfo = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const phone = form.paymentInfo?.phone || "";
     const upi = form.paymentInfo?.upi || "";
 
     try {
-      await updatePaymentInfo({ phone, upi }, session.user.name);
+      await updatePaymentInfo({ phone, upi }, session.user.email);
       toast.success("Payout information updated successfully!");
     } catch (error) {
       toast.error("Failed to update payout information");
@@ -109,24 +109,24 @@ const PaymentInfo = () => {
   const formatDateRange = (startDate, endDate) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
-    const startFormatted = start.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      hour: '2-digit', 
+
+    const startFormatted = start.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
       minute: '2-digit',
       hour12: true
     });
-    
-    const endFormatted = end.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
+
+    const endFormatted = end.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
       year: 'numeric',
-      hour: '2-digit', 
+      hour: '2-digit',
       minute: '2-digit',
       hour12: true
     });
-    
+
     return `${startFormatted} - ${endFormatted}`;
   };
 
@@ -209,7 +209,7 @@ const PaymentInfo = () => {
                         </div>
                       </div>
                     </button>
-                    
+
                     {/* Accordion Content */}
                     {isExpanded && (
                       <div className="p-4 bg-background/10">
@@ -226,7 +226,7 @@ const PaymentInfo = () => {
                             )}
                           </div>
                         </div>
-                        
+
                         {event.payments && event.payments.length > 0 ? (
                           <div className="space-y-2">
                             <h5 className="text-sm font-medium text-yellow-500 mb-3">
@@ -298,21 +298,10 @@ const PaymentInfo = () => {
             </div>
             <button
               type="submit"
-              disabled={!form?.instagram?.isVerified}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                form?.instagram?.isVerified
-                  ? "bg-primary hover:bg-primary/90 text-white"
-                  : "bg-text/20 cursor-not-allowed text-text/50"
-              }`}
+              className="px-6 py-3 rounded-lg font-medium transition-colors bg-primary hover:bg-primary/90 text-white"
             >
               Save Payout Details
             </button>
-
-            {!form?.instagram?.isVerified && (
-              <p className="text-sm text-text/60 bg-background/30 rounded-lg p-3">
-                Verify your Instagram account first to update payout information
-              </p>
-            )}
           </form>
         </div>
       </section>

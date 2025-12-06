@@ -21,7 +21,7 @@ function CreatorCard({ creator, showFollowedBadge = false }) {
   // Generate consistent FamPoints based on username hash
   const hash = hashCode(creator.username || creator._id || 'default');
   const dummyFamPoints = (hash % 450) + 50; // Range: 50-500
-  
+
   // Check if creator has active event or new perk (consistent based on hash)
   const hasActiveEvent = creator.hasActiveEvent || (hash % 10 > 6);
   const hasNewPerk = !hasActiveEvent && (creator.hasNewPerk || (hash % 10 > 7));
@@ -38,13 +38,14 @@ function CreatorCard({ creator, showFollowedBadge = false }) {
               fill
               sizes="80px"
               className="rounded-full object-cover border-2 border-white/10"
+              unoptimized
             />
           ) : (
-            <img
-              src={`https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(creator.username)}`}
-              alt={creator.name || creator.username}
-              className="w-full h-full rounded-full object-cover border-2 border-white/10"
-            />
+            <div className="w-full h-full rounded-full bg-white/10 flex items-center justify-center border-2 border-white/10">
+              <span className="text-2xl font-bold text-white/30">
+                {(creator.name || creator.username || 'U')[0].toUpperCase()}
+              </span>
+            </div>
           )}
           {showFollowedBadge && (
             <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
@@ -141,7 +142,7 @@ export default function HomeFeed() {
               <FaExternalLinkAlt className="text-xs" />
             </Link>
           </div>
-          
+
           <Link href={`/${userData.username}`} className="block max-w-sm">
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 hover:bg-white/10 transition-all duration-300 border border-white/5 hover:border-primary/30">
               {/* Profile Picture */}
@@ -154,13 +155,14 @@ export default function HomeFeed() {
                       fill
                       sizes="80px"
                       className="rounded-full object-cover border-2 border-primary/30"
+                      unoptimized
                     />
                   ) : (
-                    <img
-                      src={`https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(userData.username)}`}
-                      alt={userData.name || userData.username}
-                      className="w-full h-full rounded-full object-cover border-2 border-primary/30"
-                    />
+                    <div className="w-full h-full rounded-full bg-white/10 flex items-center justify-center border-2 border-primary/30">
+                      <span className="text-2xl font-bold text-white/30">
+                        {(userData.name || userData.username || 'U')[0].toUpperCase()}
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>

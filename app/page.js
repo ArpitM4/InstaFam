@@ -2,11 +2,20 @@
 import "./globals.css";
 import SEO from "@/components/SEO";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import MarketingSplash from "@/components/MarketingSplash";
 import HomeFeed from "@/components/HomeFeed";
 
 export default function Home() {
   const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (session?.user && !session.user.setupCompleted) {
+      router.push("/setup");
+    }
+  }, [session, router]);
 
   // Show loading state while checking session
   if (status === "loading") {
@@ -25,7 +34,7 @@ export default function Home() {
         url="https://www.sygil.app"
         image="https://www.sygil.app/og-home.jpg"
       />
-      
+
       {session ? <HomeFeed /> : <MarketingSplash />}
     </>
   );

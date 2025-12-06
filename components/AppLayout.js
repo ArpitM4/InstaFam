@@ -18,10 +18,10 @@ export default function AppLayout({ children }) {
 
   // Define main routes where sidebar should stay expanded
   const mainRoutes = ['/', '/explore', '/my-fam-points', '/account', '/search'];
-  
+
   // Check if current page is a creator dashboard route (has its own layout)
   const isCreatorDashboardRoute = pathname.startsWith('/creator');
-  
+
   // Check if current page is a creator profile page (dynamic routes like /username)
   const isCreatorPage = !mainRoutes.some(route => pathname === route || pathname.startsWith(route + '/')) && pathname !== '/' && !isCreatorDashboardRoute;
 
@@ -41,16 +41,16 @@ export default function AppLayout({ children }) {
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
+
       // Show navbar when scrolling up or at top
       if (currentScrollY < lastScrollY.current || currentScrollY < 50) {
         setNavbarVisible(true);
-      } 
+      }
       // Hide navbar when scrolling down
       else if (currentScrollY > lastScrollY.current && currentScrollY > 50) {
         setNavbarVisible(false);
       }
-      
+
       lastScrollY.current = currentScrollY;
     };
 
@@ -75,9 +75,8 @@ export default function AppLayout({ children }) {
   return (
     <div className="min-h-screen bg-background">
       {/* Top Navbar - Full Width */}
-      <header className={`fixed top-0 left-0 right-0 z-50 bg-background border-b border-white/10 transition-transform duration-300 ${
-        navbarVisible ? 'translate-y-0' : '-translate-y-full'
-      }`}>
+      <header className={`fixed top-0 left-0 right-0 z-50 bg-background border-b border-white/10 transition-transform duration-300 ${navbarVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}>
         <div className="flex items-center justify-between px-4 py-3">
           {/* Left Side - Hamburger + Logo */}
           <div className="flex items-center gap-4">
@@ -89,7 +88,7 @@ export default function AppLayout({ children }) {
             >
               <FaBars className="text-xl text-white" />
             </button>
-            
+
             {/* Logo */}
             <Link href="/" className="flex items-center">
               <Image
@@ -106,7 +105,7 @@ export default function AppLayout({ children }) {
           {/* Right Side - Notifications & Profile */}
           <div className="flex items-center gap-4">
             <NotificationBell />
-            
+
             <Link href="/account" className="relative w-9 h-9">
               {userData?.profilepic ? (
                 <Image
@@ -115,13 +114,14 @@ export default function AppLayout({ children }) {
                   fill
                   sizes="36px"
                   className="rounded-full object-cover border-2 border-white/10"
+                  unoptimized
                 />
               ) : (
-                <img
-                  src={`https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(session?.user?.email || 'user')}`}
-                  alt="Profile"
-                  className="w-full h-full rounded-full object-cover border-2 border-white/10"
-                />
+                <div className="w-full h-full rounded-full bg-white/10 flex items-center justify-center border-2 border-white/10">
+                  <span className="text-xs font-bold text-white/50">
+                    {session?.user?.name?.[0]?.toUpperCase() || 'U'}
+                  </span>
+                </div>
               )}
             </Link>
           </div>
@@ -129,21 +129,19 @@ export default function AppLayout({ children }) {
       </header>
 
       {/* Desktop Sidebar - Toggleable */}
-      <aside 
-        className={`hidden md:flex fixed left-0 top-14 h-[calc(100vh-56px)] bg-background flex-col py-4 px-2 z-40 transition-all duration-300 ${
-          sidebarOpen ? 'w-56' : 'w-[72px]'
-        }`}
+      <aside
+        className={`hidden md:flex fixed left-0 top-14 h-[calc(100vh-56px)] bg-background flex-col py-4 px-2 z-40 transition-all duration-300 ${sidebarOpen ? 'w-56' : 'w-[72px]'
+          }`}
       >
         {/* Navigation */}
         <nav className="flex-1 space-y-1">
           {/* Home */}
           <Link
             href="/"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-              pathname === "/"
-                ? "bg-white/10 text-white"
-                : "text-gray-300 hover:bg-white/5 hover:text-white"
-            }`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${pathname === "/"
+              ? "bg-white/10 text-white"
+              : "text-gray-300 hover:bg-white/5 hover:text-white"
+              }`}
           >
             <FaHome className="text-xl flex-shrink-0" />
             {sidebarOpen && <span className="font-medium">Home</span>}
@@ -152,11 +150,10 @@ export default function AppLayout({ children }) {
           {/* Explore */}
           <Link
             href="/explore"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-              pathname === "/explore"
-                ? "bg-white/10 text-white"
-                : "text-gray-300 hover:bg-white/5 hover:text-white"
-            }`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${pathname === "/explore"
+              ? "bg-white/10 text-white"
+              : "text-gray-300 hover:bg-white/5 hover:text-white"
+              }`}
           >
             <FaCompass className="text-xl flex-shrink-0" />
             {sidebarOpen && <span className="font-medium">Explore</span>}
@@ -165,11 +162,10 @@ export default function AppLayout({ children }) {
           {/* My FamPoints */}
           <Link
             href="/my-fam-points"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-              pathname === "/my-fam-points"
-                ? "bg-white/10 text-white"
-                : "text-gray-300 hover:bg-white/5 hover:text-white"
-            }`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${pathname === "/my-fam-points"
+              ? "bg-white/10 text-white"
+              : "text-gray-300 hover:bg-white/5 hover:text-white"
+              }`}
           >
             <FaCoins className="text-xl flex-shrink-0" />
             {sidebarOpen && <span className="font-medium">My FamPoints</span>}
@@ -205,9 +201,8 @@ export default function AppLayout({ children }) {
           {/* Home */}
           <Link
             href="/"
-            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-200 ${
-              pathname === "/" ? "text-white" : "text-gray-400"
-            }`}
+            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-200 ${pathname === "/" ? "text-white" : "text-gray-400"
+              }`}
           >
             <FaHome className="text-xl" />
             <span className="text-xs">Home</span>
@@ -216,9 +211,8 @@ export default function AppLayout({ children }) {
           {/* Explore */}
           <Link
             href="/explore"
-            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-200 ${
-              pathname === "/explore" ? "text-white" : "text-gray-400"
-            }`}
+            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-200 ${pathname === "/explore" ? "text-white" : "text-gray-400"
+              }`}
           >
             <FaCompass className="text-xl" />
             <span className="text-xs">Explore</span>
@@ -227,9 +221,8 @@ export default function AppLayout({ children }) {
           {/* My FamPoints */}
           <Link
             href="/my-fam-points"
-            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-200 ${
-              pathname === "/my-fam-points" ? "text-white" : "text-gray-400"
-            }`}
+            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-200 ${pathname === "/my-fam-points" ? "text-white" : "text-gray-400"
+              }`}
           >
             <FaCoins className="text-xl" />
             <span className="text-xs">FamPoints</span>
@@ -238,15 +231,14 @@ export default function AppLayout({ children }) {
       </nav>
 
       {/* Main Content Area */}
-      <main 
-        className={`pt-14 min-h-screen pb-20 md:pb-0 transition-all duration-300 ${
-          sidebarOpen ? 'md:ml-56' : 'md:ml-[72px]'
-        }`}
+      <main
+        className={`pt-14 min-h-screen pb-20 md:pb-0 transition-all duration-300 ${sidebarOpen ? 'md:ml-56' : 'md:ml-[72px]'
+          }`}
       >
         {/* Page Content */}
-        <div 
-        // className={mainRoutes.includes(pathname) ? 'p-6' : ''}
-        className={mainRoutes.includes(pathname) ? 'p-6' : 'p-2'}
+        <div
+          // className={mainRoutes.includes(pathname) ? 'p-6' : ''}
+          className={mainRoutes.includes(pathname) ? 'p-6' : 'p-2'}
         >
           {children}
         </div>

@@ -16,6 +16,7 @@ import { useUser } from "@/context/UserContext";
 import { emitPaymentSuccess } from "@/utils/eventBus";
 import PaymentProfileSection from "./PaymentProfileSection";
 import ErrorBoundary from "./ErrorBoundary";
+import VisibilityToggle from "./VisibilityToggle";
 
 // Dynamic imports for heavy components (loaded only when needed)
 const PaymentInteractionSection = dynamic(() => import("./PaymentInteractionSection"), {
@@ -55,7 +56,7 @@ const savePayment = async (paymentDetails, captureDetails, currentEvent = null, 
      * - UNRANKED: No event active (currentEvent is null)
      */
     const isRanked = currentEvent !== null;
-    
+
     const paymentData = {
       orderID: paymentDetails.orderID,
       amount: paymentDetails.amount,
@@ -77,11 +78,11 @@ const savePayment = async (paymentDetails, captureDetails, currentEvent = null, 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(paymentData)
     });
-    
+
     if (res.ok) {
       const data = await res.json();
       console.log('PayPal API response:', data); // Debug log
-      
+
       // Check if payment was successful (either data.success or capture status COMPLETED)
       if (data.success || (data.capture && data.capture.status === "COMPLETED")) {
         // Show appropriate success message based on donation type
@@ -138,7 +139,7 @@ const PaymentPage = ({ username }) => {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+
   // Safe access to UserContext with fallback
   let updatePoints;
   try {
@@ -166,9 +167,9 @@ const PaymentPage = ({ username }) => {
   useEffect(() => {
     const pathParts = window.location.pathname.split('/');
     const section = pathParts[pathParts.length - 1];
-    
+
     const validSections = ['contribute', 'vault', 'community', 'links', 'merchandise', 'subscription', 'courses', 'giveaway'];
-    
+
     if (validSections.includes(section)) {
       setActiveTab(section);
     } else if (pathParts.length === 2 || section === username) {
@@ -181,7 +182,7 @@ const PaymentPage = ({ username }) => {
   const handleTabChange = (tab) => {
     // Set active tab FIRST for immediate UI feedback
     setActiveTab(tab);
-    
+
     // Update URL in browser without navigation (no page reload)
     const newUrl = tab === 'links' ? `/${username}` : `/${username}/${tab}`;
     window.history.replaceState(null, '', newUrl);
@@ -256,7 +257,7 @@ const PaymentPage = ({ username }) => {
         if (data.event) {
           console.log('Active event found:', data.event);
           setCurrentEvent(data.event); // Get the current active event
-          
+
           // Return the event so caller can use it immediately
           return data.event;
         } else {
@@ -292,23 +293,23 @@ const PaymentPage = ({ username }) => {
       const userPromise = fetchuser(username);
       const eventPromise = fetchActiveEvent();
       const sectionsPromise = fetchVisibleSections();
-      
+
       const [user, activeEvent] = await Promise.all([userPromise, eventPromise, sectionsPromise]);
-      
+
       if (user) {
         setUserId(user._id);
-        
+
         // Sync user state with event data if active event exists
         if (activeEvent) {
           const eventStart = new Date(activeEvent.startTime);
           const eventEnd = new Date(activeEvent.endTime);
-          
+
           setcurrentUser({
             ...user,
             eventStart: eventStart,
             eventEnd: eventEnd
           });
-          
+
           // Fetch payments based on ACTIVE EVENT data
           if (eventEnd > new Date()) {
             console.log('Fetching payments for active event:', activeEvent._id);
@@ -321,7 +322,7 @@ const PaymentPage = ({ username }) => {
         } else {
           // No active event - set user and check for past events
           setcurrentUser(user);
-          
+
           if (user.eventStart && user.eventEnd && new Date(user.eventEnd) > new Date()) {
             // User has valid event fields (shouldn't happen without active event, but handle it)
             console.log('Fetching payments based on user event fields');
@@ -381,12 +382,12 @@ const PaymentPage = ({ username }) => {
   }, [showFamPointsPopup]);
 
 
-  
+
   // Countdown timer effect - watch both currentUser.eventEnd and currentEvent
   useEffect(() => {
     // Use currentEvent.endTime as fallback if currentUser.eventEnd not set yet
     const eventEndTime = currentUser?.eventEnd || currentEvent?.endTime;
-    
+
     if (eventEndTime) {
       const interval = setInterval(() => {
         const now = new Date();
@@ -397,25 +398,25 @@ const PaymentPage = ({ username }) => {
           clearInterval(interval);
           setTimeLeft(null);
           setCurrentEvent(null); // Clear current event state
-          
+
           // Event has expired - automatically end it
           console.log('Event expired, automatically ending...');
-          
+
           // Update the backend first
-          updateProfile({ 
-            eventStart: null, 
-            eventEnd: null 
+          updateProfile({
+            eventStart: null,
+            eventEnd: null
           }, username).then(() => {
             // Clear the user's event fields after successful backend update
-            setcurrentUser(prevUser => ({ 
-              ...prevUser, 
-              eventStart: null, 
-              eventEnd: null 
+            setcurrentUser(prevUser => ({
+              ...prevUser,
+              eventStart: null,
+              eventEnd: null
             }));
           }).catch(error => {
             console.error('Error clearing expired event fields:', error);
           });
-          
+
         } else {
           const days = Math.floor(diff / (1000 * 60 * 60 * 24));
           const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -435,7 +436,7 @@ const PaymentPage = ({ username }) => {
     const { name, value } = e.target;
     setPaymentform(prev => ({ ...prev, [name]: value }));
   }, []);
-  
+
   const handleSaveDescription = useCallback(async () => {
     const res = await updateProfile(
       { email: currentUser.email, description: currentUser.description },
@@ -450,8 +451,8 @@ const PaymentPage = ({ username }) => {
   }, [currentUser?.email, currentUser?.description, username]);
 
   const handleSavePerk = useCallback(async () => {
-    const res = await updateProfile({ 
-      email: currentUser.email, 
+    const res = await updateProfile({
+      email: currentUser.email,
       perk: currentUser.perk,
       perkRank: currentUser.perkRank || 5
     }, username);
@@ -468,7 +469,7 @@ const PaymentPage = ({ username }) => {
       const durationMs = Number(eventDuration) * 24 * 60 * 60 * 1000;
       const start = new Date();
       const end = new Date(start.getTime() + durationMs);
-      
+
       // First, create the event in the database
       const eventData = {
         title: 'Event', // Default title since you don't use titles
@@ -476,30 +477,30 @@ const PaymentPage = ({ username }) => {
         startTime: start,
         endTime: end
       };
-      
+
       console.log('Creating event with data:', eventData);
       const createdEvent = await createEvent(eventData);
       console.log('Event created successfully:', createdEvent._id);
-      
+
       // Set currentEvent state immediately
       setCurrentEvent(createdEvent);
-      
+
       // Then update the user profile with event times
       const res = await updateProfile(
         { eventStart: start, eventEnd: end },
         username
       );
-      
+
       if (res?.error) {
         toast.error(res.error);
       } else {
         toast.success("Event started!");
         // Use functional update to avoid stale closure issues
         setcurrentUser(prevUser => ({ ...prevUser, eventStart: start, eventEnd: end }));
-        
+
         // Clear previous event's payments when starting a new event
         setPayments([]);
-        
+
         // Notify followers about the new event
         try {
           await fetch('/api/notifications/followers/event', {
@@ -530,14 +531,14 @@ const PaymentPage = ({ username }) => {
     try {
       console.log('=== STARTING END EVENT PROCESS ===');
       console.log('Current user ID:', currentUser._id);
-      
+
       // First, find and end the active event in the database
       try {
         // Get the current active event for this user using the server action
         console.log('Fetching current active event...');
         const activeEvent = await fetchEvents(currentUser._id, 'current');
         console.log('Found active event:', activeEvent);
-        
+
         if (activeEvent && activeEvent._id) {
           console.log('Ending event with ID:', activeEvent._id);
           const endedEvent = await endEvent(activeEvent._id);
@@ -554,7 +555,7 @@ const PaymentPage = ({ username }) => {
         // Don't continue if database update fails
         return;
       }
-      
+
       // Then clear the user profile event fields
       console.log('Clearing user profile event fields...');
       const res = await updateProfile({ eventStart: null, eventEnd: null }, username);
@@ -571,7 +572,7 @@ const PaymentPage = ({ username }) => {
       toast.error(error.message || 'Failed to end event');
     }
   };
-  
+
   // --- Image Upload Handlers ---
   const handleProfileChange = async (e) => {
     const file = e.target.files[0];
@@ -637,7 +638,7 @@ const PaymentPage = ({ username }) => {
         toast.error("User not loaded.");
         throw new Error("User not loaded");
       }
-      
+
       // Call backend to create order
       const res = await fetch('/api/paypal', {
         method: 'POST',
@@ -648,14 +649,14 @@ const PaymentPage = ({ username }) => {
           message: paymentform.message
         })
       });
-      
+
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-      
+
       const dataRes = await res.json();
       console.log('PayPal order creation response:', dataRes); // Debug log
-      
+
       if (dataRes.id) {
         return dataRes.id;
       } else {
@@ -710,20 +711,20 @@ const PaymentPage = ({ username }) => {
                 setPaymentsLoading(false);
               }
             }
-            
+
             // Show FamPoints popup ONLY if points >= 1 (payment >= $10)
             if (res.pointsAwarded && res.pointsAwarded >= 1) {
               setEarnedFamPoints(res.pointsAwarded);
               setShowFamPointsPopup(true);
             }
-            
+
             // Reset payment form for next contribution
             setPaymentform({
               name: session?.user?.name || "",
               message: "",
               amount: ""
             });
-            
+
             // Don't redirect - stay on payment page to show updated leaderboard
           } else {
             toast.error("Payment failed. Please contact support.");
@@ -742,7 +743,7 @@ const PaymentPage = ({ username }) => {
       setIsPaying(false);
     }
   };
-    
+
   // Check if event is active - use currentEvent as primary source of truth (memoized)
   const isEventActive = useMemo(() => {
     return currentEvent !== null || (currentUser?.eventStart && currentUser?.eventEnd && new Date(currentUser.eventEnd) > new Date());
@@ -757,13 +758,13 @@ const PaymentPage = ({ username }) => {
           <div className="text-6xl mb-3">🎉</div>
           <h2 className="text-2xl font-bold text-primary mb-1">Congratulations!</h2>
         </div>
-        
+
         {/* Content */}
         <div className="relative p-8 text-center">
           <p className="text-text/80 text-lg mb-6">
             You have received
           </p>
-          
+
           {/* FamPoints Display */}
           <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-6">
             <div className="flex items-center justify-center gap-3">
@@ -776,12 +777,12 @@ const PaymentPage = ({ username }) => {
               </div>
             </div>
           </div>
-          
+
           <p className="text-text/70 text-sm leading-relaxed">
             Keep earning FamPoints with every contribution to unlock exclusive perks and rewards!
           </p>
         </div>
-        
+
         {/* Auto-close indicator */}
         <div className="px-8 pb-6 text-center">
           <div className="h-1 bg-text/5 rounded-full overflow-hidden">
@@ -803,13 +804,13 @@ const PaymentPage = ({ username }) => {
           <h2 className="text-xl font-bold text-text mb-1">We're Currently in Beta</h2>
           <p className="text-primary text-sm font-medium">Thank you for checking out Sygil! 🎉</p>
         </div>
-        
+
         {/* Content */}
         <div className="p-6 space-y-4">
           <p className="text-text/80 text-sm leading-relaxed">
             Right now, we're in the development & testing phase. Our payment gateway is still in test mode, which means transactions will not be processed for real earnings yet.
           </p>
-          
+
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <span className="text-orange-400 text-sm mt-0.5">👉</span>
@@ -817,14 +818,14 @@ const PaymentPage = ({ username }) => {
                 Please do not start creating or sharing your Sygil page with fans at this stage, as it is not live or active for public use.
               </p>
             </div>
-            
+
             <div className="flex items-start gap-3">
               <span className="text-orange-400 text-sm mt-0.5">👉</span>
               <p className="text-text/70 text-sm leading-relaxed">
                 We're actively onboarding creators and gathering feedback to make the platform stronger before launch.
               </p>
             </div>
-            
+
             <div className="flex items-start gap-3">
               <span className="text-orange-400 text-sm mt-0.5">👉</span>
               <p className="text-text/70 text-sm leading-relaxed">
@@ -832,18 +833,18 @@ const PaymentPage = ({ username }) => {
               </p>
             </div>
           </div>
-          
+
           <div className="bg-primary/5 rounded-lg p-4 mt-4">
             <p className="text-text/80 text-sm leading-relaxed">
               We truly appreciate your patience and support as an early creator — your feedback will help shape Sygil into the go-to platform for fan-powered growth. 💜
             </p>
           </div>
-          
+
           <div className="text-center pt-2">
             <p className="text-text/60 text-xs font-medium">— Team Sygil</p>
           </div>
         </div>
-        
+
         {/* Actions */}
         <div className="bg-background/50 p-4 flex gap-3">
           <button
@@ -867,7 +868,7 @@ const PaymentPage = ({ username }) => {
     <>
       {/* FamPoints Celebration Popup */}
       {showFamPointsPopup && <FamPointsPopup />}
-      
+
       {/* Beta Popup */}
       {showBetaPopup && <BetaPopup />}
       <ToastContainer
@@ -883,9 +884,9 @@ const PaymentPage = ({ username }) => {
         theme="light"
         style={{ top: 72 }}
       />
-      <div id="thisone" className="min-h-screen text-text flex flex-col items-center pb-36 relative overflow-x-hidden" style={{backgroundColor: 'var(--background-creator)'}}>
+      <div id="thisone" className="min-h-screen text-text flex flex-col items-center pb-36 relative overflow-x-hidden" style={{ backgroundColor: 'var(--background-creator)' }}>
         {/* Radial gradient background overlay */}
-        <div className="absolute inset-0 -z-10 pointer-events-none" style={{background: 'radial-gradient(ellipse 80% 60% at 50% 20%, rgba(225,29,72,0.4) 0%, rgba(99,102,241,0.3) 40%, #14141f 100%)'}} />
+        <div className="absolute inset-0 -z-10 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 20%, rgba(225,29,72,0.4) 0%, rgba(99,102,241,0.3) 40%, #14141f 100%)' }} />
         <PaymentProfileSection
           username={username}
           currentUser={currentUser}
@@ -909,19 +910,18 @@ const PaymentPage = ({ username }) => {
           isEventActive={isEventActive}
           setShowBetaPopup={setShowBetaPopup}
         />
-        
+
         {/* NEW TAB NAVIGATION UI - Replaces the old InteractionSection placement */}
         <div className="w-full max-w-5xl mt-12 border-b border-text/10">
           <div className="flex justify-center items-center gap-8 flex-wrap">
             {/* Dynamically render navigation buttons based on visibleSections */}
-                       {visibleSections.includes('links') && (
+            {visibleSections.includes('links') && (
               <button
                 onClick={() => handleTabChange('links')}
-                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                  activeTab === 'links'
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'links'
                     ? 'text-primary border-b-2 border-primary'
                     : 'text-text/60 hover:text-text border-b-2 border-transparent'
-                }`}
+                  }`}
               >
                 Links
               </button>
@@ -930,107 +930,106 @@ const PaymentPage = ({ username }) => {
             {visibleSections.includes('contribute') && (
               <button
                 onClick={() => handleTabChange('contribute')}
-                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                  activeTab === 'contribute'
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'contribute'
                     ? 'text-primary border-b-2 border-primary'
                     : 'text-text/60 hover:text-text border-b-2 border-transparent'
-                }`}
+                  }`}
               >
                 Contribute
               </button>
             )}
-            
+
             {visibleSections.includes('vault') && (
               <button
                 onClick={() => handleTabChange('vault')}
-                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                  activeTab === 'vault'
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'vault'
                     ? 'text-primary border-b-2 border-primary'
                     : 'text-text/60 hover:text-text border-b-2 border-transparent'
-                }`}
+                  }`}
               >
                 Vault
               </button>
             )}
-            
- 
-            
+
+
+
             {visibleSections.includes('community') && (
               <button
                 onClick={() => handleTabChange('community')}
-                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                  activeTab === 'community'
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'community'
                     ? 'text-primary border-b-2 border-primary'
                     : 'text-text/60 hover:text-text border-b-2 border-transparent'
-                }`}
+                  }`}
               >
                 Community
               </button>
             )}
-            
+
             {visibleSections.includes('merchandise') && (
               <button
                 onClick={() => handleTabChange('merchandise')}
-                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                  activeTab === 'merchandise'
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'merchandise'
                     ? 'text-primary border-b-2 border-primary'
                     : 'text-text/60 hover:text-text border-b-2 border-transparent'
-                }`}
+                  }`}
               >
                 Merchandise
               </button>
             )}
-            
+
             {visibleSections.includes('subscription') && (
               <button
                 onClick={() => handleTabChange('subscription')}
-                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                  activeTab === 'subscription'
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'subscription'
                     ? 'text-primary border-b-2 border-primary'
                     : 'text-text/60 hover:text-text border-b-2 border-transparent'
-                }`}
+                  }`}
               >
                 Subscription
               </button>
             )}
-            
+
             {visibleSections.includes('courses') && (
               <button
                 onClick={() => handleTabChange('courses')}
-                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                  activeTab === 'courses'
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'courses'
                     ? 'text-primary border-b-2 border-primary'
                     : 'text-text/60 hover:text-text border-b-2 border-transparent'
-                }`}
+                  }`}
               >
                 Courses
               </button>
             )}
-            
+
             {visibleSections.includes('giveaway') && (
               <button
                 onClick={() => handleTabChange('giveaway')}
-                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${
-                  activeTab === 'giveaway'
+                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'giveaway'
                     ? 'text-primary border-b-2 border-primary'
                     : 'text-text/60 hover:text-text border-b-2 border-transparent'
-                }`}
+                  }`}
               >
                 Giveaway
               </button>
             )}
-            
+
             {/* Customizable button - only visible to page owner */}
             {isOwner && (
-              <button
-                onClick={handleOpenCustomize}
-                className="px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 text-text/60 hover:text-primary border-b-2 border-transparent flex items-center gap-2"
-                title="Customize visible sections"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                </svg>
-              </button>
+              <>
+                <VisibilityToggle
+                  isVisible={currentUser.visibility || "hidden"}
+                  onToggle={(newVisibility) => setcurrentUser(prev => ({ ...prev, visibility: newVisibility }))}
+                />
+                <button
+                  onClick={handleOpenCustomize}
+                  className="px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 text-text/60 hover:text-primary border-b-2 border-transparent flex items-center gap-2"
+                  title="Customize visible sections"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -1062,7 +1061,7 @@ const PaymentPage = ({ username }) => {
                   <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-6 text-center">
                     <h3 className="text-lg font-medium text-red-400 mb-2">Payment System Unavailable</h3>
                     <p className="text-red-300 mb-4">We're experiencing technical difficulties with our payment system. Please try again later.</p>
-                    <button 
+                    <button
                       onClick={() => {
                         setHasError(false);
                         window.location.reload();
@@ -1095,7 +1094,7 @@ const PaymentPage = ({ username }) => {
 
           {activeTab === 'subscription' && (
             <div className="w-full max-w-5xl mt-8 flex justify-center">
-              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)' }}>
                 <h2 className="text-2xl font-bold text-gradient-primary mb-2">Subscription</h2>
                 <p className="text-primary text-lg font-semibold">Coming Soon</p>
                 <p className="text-text/40 text-sm mt-2">Exclusive subscription tiers with special perks and content</p>
@@ -1106,7 +1105,7 @@ const PaymentPage = ({ username }) => {
 
           {activeTab === 'courses' && (
             <div className="w-full max-w-5xl mt-8 flex justify-center">
-              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)' }}>
                 <h2 className="text-2xl font-bold text-gradient-primary mb-2">Courses</h2>
                 <p className="text-primary text-lg font-semibold">Coming Soon</p>
                 <p className="text-text/40 text-sm mt-2">Educational courses and tutorials from your favorite creators</p>
@@ -1117,7 +1116,7 @@ const PaymentPage = ({ username }) => {
 
           {activeTab === 'giveaway' && (
             <div className="w-full max-w-5xl mt-8 flex justify-center">
-              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-12 text-center border border-white/10 shadow-lg" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)' }}>
                 <h2 className="text-2xl font-bold text-gradient-primary mb-2">Giveaway Picker</h2>
                 <p className="text-primary text-lg font-semibold">Coming Soon</p>
                 <p className="text-text/40 text-sm mt-2">Host giveaways and pick winners fairly using our picker tool</p>
@@ -1127,14 +1126,14 @@ const PaymentPage = ({ username }) => {
           )}
         </div>
 
-                  {activeTab === 'contribute' && (
- <div className="mt-6 text-center p-4 bg-white/5 backdrop-blur-md rounded-lg shadow border border-white/10" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
-      
-       
-          <p className="text-success text-sm font-medium">
-            💡 Multiple donations stack up! Keep contributing to climb higher on the leaderboard.
-          </p>
-                </div>   )}
+        {activeTab === 'contribute' && (
+          <div className="mt-6 text-center p-4 bg-white/5 backdrop-blur-md rounded-lg shadow border border-white/10" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)' }}>
+
+
+            <p className="text-success text-sm font-medium">
+              💡 Multiple donations stack up! Keep contributing to climb higher on the leaderboard.
+            </p>
+          </div>)}
 
 
       </div>
@@ -1142,7 +1141,7 @@ const PaymentPage = ({ username }) => {
       {/* Customization Modal */}
       {showCustomizeModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 sm:p-6 md:p-8 max-w-md sm:max-w-lg md:max-w-2xl w-full border border-white/10 shadow-2xl my-8" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)'}}>
+          <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 sm:p-6 md:p-8 max-w-md sm:max-w-lg md:max-w-2xl w-full border border-white/10 shadow-2xl my-8" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)' }}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-text flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 text-primary" viewBox="0 0 20 20" fill="currentColor">

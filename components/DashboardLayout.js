@@ -19,7 +19,7 @@ const DashboardLayout = ({ children }) => {
 
   useEffect(() => {
     if (status === "loading") return;
-    
+
     if (!session) {
       router.push("/login");
     } else {
@@ -66,7 +66,7 @@ const DashboardLayout = ({ children }) => {
             >
               <FaBars className="text-xl text-white" />
             </button>
-            
+
             {/* Logo */}
             <Link href="/" className="flex items-center">
               <Image
@@ -83,7 +83,7 @@ const DashboardLayout = ({ children }) => {
           {/* Right Side - Notifications & Profile */}
           <div className="flex items-center gap-4">
             <NotificationBell />
-            
+
             <Link href="/account" className="relative w-9 h-9">
               {user?.profilepic ? (
                 <Image
@@ -106,21 +106,19 @@ const DashboardLayout = ({ children }) => {
       </header>
 
       {/* Desktop Sidebar - Toggleable (Same style as AppLayout) */}
-      <aside 
-        className={`hidden md:flex fixed left-0 top-14 h-[calc(100vh-56px)] bg-background flex-col py-4 px-2 z-40 transition-all duration-300 ${
-          sidebarOpen ? 'w-56' : 'w-[72px]'
-        }`}
+      <aside
+        className={`hidden md:flex fixed left-0 top-14 h-[calc(100vh-56px)] bg-background flex-col py-4 px-2 z-40 transition-all duration-300 ${sidebarOpen ? 'w-56' : 'w-[72px]'
+          }`}
       >
         {/* Navigation */}
         <nav className="flex-1 space-y-1">
           {/* General */}
           <Link
             href="/creator/dashboard"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-              isActive('/creator/dashboard')
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/creator/dashboard')
                 ? 'bg-white/10 text-white'
                 : 'text-gray-300 hover:bg-white/5 hover:text-white'
-            }`}
+              }`}
           >
             <FaHome className="text-xl flex-shrink-0" />
             {sidebarOpen && <span className="font-medium">General</span>}
@@ -129,11 +127,10 @@ const DashboardLayout = ({ children }) => {
           {/* Leaderboard Payout */}
           <Link
             href="/creator/payment"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-              isActive('/creator/payment')
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/creator/payment')
                 ? 'bg-white/10 text-white'
                 : 'text-gray-300 hover:bg-white/5 hover:text-white'
-            }`}
+              }`}
           >
             <FaMoneyBillWave className="text-xl flex-shrink-0" />
             {sidebarOpen && <span className="font-medium">Leaderboard Payout</span>}
@@ -142,46 +139,43 @@ const DashboardLayout = ({ children }) => {
           {/* Unranked Donations */}
           <Link
             href="/creator/unranked-donations"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-              isActive('/creator/unranked-donations')
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/creator/unranked-donations')
                 ? 'bg-white/10 text-white'
                 : 'text-gray-300 hover:bg-white/5 hover:text-white'
-            }`}
+              }`}
           >
             <FaDonate className="text-xl flex-shrink-0" />
             {sidebarOpen && <span className="font-medium">Unranked Donations</span>}
           </Link>
 
           {/* Vault-related links (only for verified users) */}
-          {user?.instagram?.isVerified && (
-            <>
-              {/* My Vault */}
-              <Link
-                href="/creator/vault"
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                  isActive('/creator/vault')
-                    ? 'bg-white/10 text-white'
-                    : 'text-gray-300 hover:bg-white/5 hover:text-white'
-                }`}
-              >
-                <FaLock className="text-xl flex-shrink-0" />
-                {sidebarOpen && <span className="font-medium">My Vault</span>}
-              </Link>
 
-              {/* Vault Requests */}
-              <Link
-                href="/creator/requests"
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                  isActive('/creator/requests')
-                    ? 'bg-white/10 text-white'
-                    : 'text-gray-300 hover:bg-white/5 hover:text-white'
+          <>
+            {/* My Vault */}
+            <Link
+              href="/creator/vault"
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/creator/vault')
+                  ? 'bg-white/10 text-white'
+                  : 'text-gray-300 hover:bg-white/5 hover:text-white'
                 }`}
-              >
-                <FaInbox className="text-xl flex-shrink-0" />
-                {sidebarOpen && <span className="font-medium">Vault Requests</span>}
-              </Link>
-            </>
-          )}
+            >
+              <FaLock className="text-xl flex-shrink-0" />
+              {sidebarOpen && <span className="font-medium">My Vault</span>}
+            </Link>
+
+            {/* Vault Requests */}
+            <Link
+              href="/creator/requests"
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/creator/requests')
+                  ? 'bg-white/10 text-white'
+                  : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                }`}
+            >
+              <FaInbox className="text-xl flex-shrink-0" />
+              {sidebarOpen && <span className="font-medium">Vault Requests</span>}
+            </Link>
+          </>
+
 
           {/* Divider */}
           <div className="my-4 border-t border-white/10" />
@@ -220,58 +214,53 @@ const DashboardLayout = ({ children }) => {
         <div className="flex space-x-2 overflow-x-auto custom-scrollbar">
           <Link
             href="/creator/dashboard"
-            className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${
-              isActive('/creator/dashboard')
+            className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${isActive('/creator/dashboard')
                 ? 'bg-white/10 text-white'
                 : 'bg-white/5 text-gray-300 hover:text-white'
-            }`}
+              }`}
           >
             General
           </Link>
           <Link
             href="/creator/payment"
-            className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${
-              isActive('/creator/payment')
+            className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${isActive('/creator/payment')
                 ? 'bg-white/10 text-white'
                 : 'bg-white/5 text-gray-300 hover:text-white'
-            }`}
+              }`}
           >
             Payout
           </Link>
           <Link
             href="/creator/unranked-donations"
-            className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${
-              isActive('/creator/unranked-donations')
+            className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${isActive('/creator/unranked-donations')
                 ? 'bg-white/10 text-white'
                 : 'bg-white/5 text-gray-300 hover:text-white'
-            }`}
+              }`}
           >
             Unranked
           </Link>
-          {user?.instagram?.isVerified && (
-            <>
-              <Link
-                href="/creator/vault"
-                className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${
-                  isActive('/creator/vault')
-                    ? 'bg-white/10 text-white'
-                    : 'bg-white/5 text-gray-300 hover:text-white'
+
+          <>
+            <Link
+              href="/creator/vault"
+              className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${isActive('/creator/vault')
+                  ? 'bg-white/10 text-white'
+                  : 'bg-white/5 text-gray-300 hover:text-white'
                 }`}
-              >
-                Vault
-              </Link>
-              <Link
-                href="/creator/requests"
-                className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${
-                  isActive('/creator/requests')
-                    ? 'bg-white/10 text-white'
-                    : 'bg-white/5 text-gray-300 hover:text-white'
+            >
+              Vault
+            </Link>
+            <Link
+              href="/creator/requests"
+              className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${isActive('/creator/requests')
+                  ? 'bg-white/10 text-white'
+                  : 'bg-white/5 text-gray-300 hover:text-white'
                 }`}
-              >
-                Requests
-              </Link>
-            </>
-          )}
+            >
+              Requests
+            </Link>
+          </>
+
           <a
             href={`/${session?.user?.name}`}
             target="_blank"
@@ -290,16 +279,15 @@ const DashboardLayout = ({ children }) => {
       </div>
 
       {/* Main Content Area */}
-      <main 
-        className={`pt-14 min-h-screen pb-20 md:pb-0 transition-all duration-300 ${
-          sidebarOpen ? 'md:ml-56' : 'md:ml-[72px]'
-        }`}
+      <main
+        className={`pt-14 min-h-screen pb-20 md:pb-0 transition-all duration-300 ${sidebarOpen ? 'md:ml-56' : 'md:ml-[72px]'
+          }`}
       >
         {/* Desktop Content */}
         <div className="hidden md:block p-8">
           {children}
         </div>
-        
+
         {/* Mobile Content - Extra padding for fixed tabs */}
         <div className="md:hidden p-4 pt-16">
           {children}

@@ -82,7 +82,7 @@ const Account = () => {
     profilepic: "",
     coverpic: "",
     accountType: "User",
-    instagram: { isVerified: false },
+
   });
 
   const [loading, setLoading] = useState(true);
@@ -98,7 +98,7 @@ const Account = () => {
   const getData = useCallback(async () => {
     if (!session?.user?.email) return;
     const u = await fetchuser(session.user.email);
-    
+
     // Extract only the fields we need to avoid circular references
     setForm({
       name: u?.name || "",
@@ -107,11 +107,7 @@ const Account = () => {
       profilepic: u?.profilepic || "",
       coverpic: u?.coverpic || "",
       accountType: u?.accountType || "User",
-      instagram: {
-        otp: u?.instagram?.otp ?? null,
-        otpGeneratedAt: u?.instagram?.otpGeneratedAt ?? null,
-        isVerified: u?.instagram?.isVerified ?? false,
-      },
+
     });
     setLoading(false);
     hasLoadedData.current = true;
@@ -158,10 +154,10 @@ const Account = () => {
       setShowNameModal(true); // Open name modal after username
       toast.success("Username set successfully!", { position: "top-right", autoClose: 3000 });
       if (typeof update === 'function') await update();
-      
+
       // Emit global profile update event
       emitProfileUpdate({ username });
-      
+
       // Update user data in navbar/context (legacy support)
       if (refreshUserData) {
         refreshUserData(true);
@@ -191,10 +187,10 @@ const Account = () => {
       setShowNameModal(false);
       toast.success("Name set successfully!", { position: "top-right", autoClose: 3000 });
       if (typeof update === 'function') await update();
-      
+
       // Emit global profile update event
       emitProfileUpdate({ name });
-      
+
       // Update user data in navbar/context (legacy support)
       if (refreshUserData) {
         refreshUserData(true);
@@ -235,13 +231,13 @@ const Account = () => {
     // Get current user data to compare account type changes
     const currentUser = await fetchuser(session.user.email);
     const isChangingToCreator = currentUser?.accountType === "User" && form.accountType === "Creator";
-    
+
     let a = await updateProfile(form, session.user.name);
     await update();
-    
+
     // Trigger onboarding progress update
     await triggerProfileUpdate();
-    
+
     // Emit global profile update event (only pass necessary fields)
     emitProfileUpdate({
       name: form.name,
@@ -250,7 +246,7 @@ const Account = () => {
       profilepic: form.profilepic,
       coverpic: form.coverpic
     });
-    
+
     // Update user data in navbar/context (legacy support)
     if (refreshUserData) {
       refreshUserData(true); // Force refresh
@@ -264,12 +260,12 @@ const Account = () => {
         coverpic: form.coverpic
       });
     }
-    
+
     // If account type changed, emit specific event
     if (form.accountType && form.accountType !== currentUser?.accountType) {
       emitAccountTypeChange(form.accountType);
     }
-    
+
     toast('Profile Updated', {
       position: "top-right",
       autoClose: 5000,
@@ -342,20 +338,27 @@ const Account = () => {
           {/* Profile Preview Card */}
           <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-4">
             <div className="flex items-center gap-3">
-              <img
-                src={form.profilepic || `https://api.dicebear.com/7.x/initials/svg?seed=${form.name || 'User'}&backgroundColor=6366f1`}
-                alt="Profile"
-                className="w-12 h-12 rounded-full object-cover border border-white/20"
-              />
+              {form.profilepic ? (
+                <img
+                  src={form.profilepic}
+                  alt="Profile"
+                  className="w-12 h-12 rounded-full object-cover border border-white/20"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                  <span className="text-lg font-bold text-white/50">
+                    {(form.name || 'U')[0].toUpperCase()}
+                  </span>
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <h2 className="text-base font-medium text-white truncate">{form.name || 'Your Name'}</h2>
                 <p className="text-sm text-white/50">@{form.username || 'username'}</p>
               </div>
-              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                form.accountType === 'Creator' 
-                  ? 'bg-purple-500/20 text-purple-400' 
-                  : 'bg-blue-500/20 text-blue-400'
-              }`}>
+              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${form.accountType === 'Creator'
+                ? 'bg-purple-500/20 text-purple-400'
+                : 'bg-blue-500/20 text-blue-400'
+                }`}>
                 {form.accountType || 'User'}
               </span>
             </div>
@@ -375,9 +378,8 @@ const Account = () => {
                   value={form.name || ""}
                   onChange={handleChange}
                   placeholder="Enter your name"
-                  className={`w-full px-3 py-2 text-sm rounded-lg bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all border ${
-                    formErrors.name ? 'border-rose-500' : 'border-white/10 hover:border-white/20'
-                  }`}
+                  className={`w-full px-3 py-2 text-sm rounded-lg bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all border ${formErrors.name ? 'border-rose-500' : 'border-white/10 hover:border-white/20'
+                    }`}
                   required
                 />
                 {formErrors.name && (
@@ -391,9 +393,6 @@ const Account = () => {
                   <label className="text-xs font-medium text-white/70">
                     Username <span className="text-rose-400">*</span>
                   </label>
-                  {form.instagram?.isVerified && (
-                    <span className="text-emerald-400 text-xs">Verified</span>
-                  )}
                 </div>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-sm">@</span>
@@ -403,22 +402,15 @@ const Account = () => {
                     value={form.username || ""}
                     onChange={handleChange}
                     placeholder="username"
-                    disabled={form.instagram?.isVerified}
-                    className={`w-full pl-7 pr-3 py-2 text-sm rounded-lg transition-all border ${
-                      form.instagram?.isVerified
-                        ? "bg-white/5 text-white/50 cursor-not-allowed border-white/5"
-                        : formErrors.username
-                          ? "bg-white/5 text-white placeholder-white/30 focus:outline-none border-rose-500"
-                          : "bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-primary/50 border-white/10 hover:border-white/20"
-                    }`}
+                    className={`w-full pl-7 pr-3 py-2 text-sm rounded-lg transition-all border ${formErrors.username
+                      ? "bg-white/5 text-white placeholder-white/30 focus:outline-none border-rose-500"
+                      : "bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-primary/50 border-white/10 hover:border-white/20"
+                      }`}
                     required
                   />
                 </div>
                 {formErrors.username && (
                   <p className="text-rose-400 text-xs mt-1">Username is required</p>
-                )}
-                {form.instagram?.isVerified && (
-                  <p className="text-white/40 text-xs mt-1">Locked after verification</p>
                 )}
               </div>
 
@@ -450,24 +442,22 @@ const Account = () => {
                       }
                     }}
                     disabled={form.accountType === 'Creator'}
-                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                      form.accountType === 'User'
-                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
-                        : form.accountType === 'Creator'
-                          ? 'bg-white/5 text-white/30 border border-white/5 cursor-not-allowed'
-                          : 'bg-white/5 text-white/50 border border-white/10 hover:border-white/20'
-                    }`}
+                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${form.accountType === 'User'
+                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
+                      : form.accountType === 'Creator'
+                        ? 'bg-white/5 text-white/30 border border-white/5 cursor-not-allowed'
+                        : 'bg-white/5 text-white/50 border border-white/10 hover:border-white/20'
+                      }`}
                   >
                     User
                   </button>
                   <button
                     type="button"
                     onClick={() => setForm(prev => ({ ...prev, accountType: 'Creator' }))}
-                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                      form.accountType === 'Creator'
-                        ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
-                        : 'bg-white/5 text-white/50 border border-white/10 hover:border-white/20'
-                    }`}
+                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${form.accountType === 'Creator'
+                      ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
+                      : 'bg-white/5 text-white/50 border border-white/10 hover:border-white/20'
+                      }`}
                   >
                     Creator
                   </button>
@@ -489,28 +479,41 @@ const Account = () => {
             </form>
           </div>
 
-          {/* Quick Links Card */}
-          <div className="bg-white/5 border border-white/10 rounded-xl p-4 mt-4">
-            <h3 className="text-xs font-medium text-white/50 mb-3">Quick Links</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <a href="/creator/dashboard" className="flex items-center gap-2 p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group">
-                <div className="w-7 h-7 rounded-md bg-purple-500/20 flex items-center justify-center">
-                  <svg className="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                  </svg>
-                </div>
-                <span className="text-xs text-white/70 group-hover:text-white transition-colors">Dashboard</span>
+          {/* Creator Promo (Only for non-creators) */}
+          {form.accountType !== 'Creator' && (
+            <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-white/10 rounded-xl p-5 mt-4 text-center">
+              <h3 className="text-lg font-bold text-white mb-2">Become a Creator</h3>
+              <p className="text-sm text-white/60 mb-4">Start your journey and earn from your passion.</p>
+
+              <a
+                href={`/${form.username}`}
+                className="block w-full bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-lg text-sm font-medium transition-all mb-3"
+              >
+                Visit Your Page
               </a>
-              <a href="/my-fam-points" className="flex items-center gap-2 p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group">
-                <div className="w-7 h-7 rounded-md bg-amber-500/20 flex items-center justify-center">
-                  <svg className="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <span className="text-xs text-white/70 group-hover:text-white transition-colors">FamPoints</span>
+
+              <a
+                href="/creators"
+                className="text-xs text-primary hover:text-primary-light transition-colors flex items-center justify-center gap-1"
+              >
+                Learn more about being a creator
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </a>
             </div>
-          </div>
+          )}
+
+          {/* Logout Button */}
+          <button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="w-full mt-4 flex items-center justify-center gap-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 py-3 rounded-xl transition-all text-sm font-medium"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Log Out
+          </button>
         </div>
       </div>
     </>

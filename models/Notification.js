@@ -18,7 +18,7 @@ const notificationSchema = new Schema({
       'vault_redeemed',         // Fan redeemed non-digital vault item
       'system_message',         // Admin/system message
       'payment_received',       // Payment notification
-      'verification_approved',  // Instagram verification approved
+
       'new_follower',          // Someone followed the user
       'creator_event_started',  // Creator started a new event (for followers)
       'creator_new_vault_item'  // Creator added new vault item (for followers)

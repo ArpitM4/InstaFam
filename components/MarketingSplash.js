@@ -148,24 +148,24 @@ function CosmicBackground() {
       <Comet style={{ top: '30%', left: '80%' }} delay={2} />
 
       {/* Floating orbs/planets */}
-      <FloatingOrb 
-        style={{ top: '5%', right: '25%' }} 
-        colors={['#FFB347', '#FF6B35']} 
-        size={25} 
-        delay={0.5} 
+      <FloatingOrb
+        style={{ top: '5%', right: '25%' }}
+        colors={['#FFB347', '#FF6B35']}
+        size={25}
+        delay={0.5}
       />
-      <FloatingOrb 
-        style={{ top: '8%', right: '30%' }} 
-        colors={['#EC4899', '#8B5CF6']} 
-        size={12} 
-        delay={1.2} 
+      <FloatingOrb
+        style={{ top: '8%', right: '30%' }}
+        colors={['#EC4899', '#8B5CF6']}
+        size={12}
+        delay={1.2}
       />
 
       {/* Coin */}
       <CoinIcon style={{ top: '6%', right: '22%' }} delay={0.8} />
 
       {/* Bottom glow effect */}
-      <div 
+      <div
         className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] rounded-full opacity-30"
         style={{
           background: 'radial-gradient(ellipse, var(--star-gold) 0%, transparent 70%)',
@@ -182,12 +182,13 @@ export default function MarketingSplash() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   // Form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
+  const [otp, setOtp] = useState('');
+  const [showOtpInput, setShowOtpInput] = useState(false);
+
 
   const handleCredentialsAuth = async (e) => {
     e.preventDefault();
@@ -209,36 +210,64 @@ export default function MarketingSplash() {
         router.refresh();
       }
     } else {
-      try {
-        const res = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, username, email, password })
-        });
+      // Signup Flow
+      if (!showOtpInput) {
+        // Step 1: Send OTP
+        try {
+          const res = await fetch('/api/auth/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
 
-        const data = await res.json();
+          const data = await res.json();
 
-        if (!res.ok) {
-          setError(data.error || 'Failed to create account');
-          setLoading(false);
-          return;
+          if (!res.ok) {
+            setError(data.error || 'Failed to create account');
+            setLoading(false);
+            return;
+          }
+
+          setShowOtpInput(true);
+          setError('');
+          // toast.success('OTP sent to your email!'); // Toast not imported, skipping
+        } catch (err) {
+          setError('Something went wrong');
         }
+      } else {
+        // Step 2: Verify OTP
+        try {
+          const res = await fetch('/api/auth/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, otp })
+          });
 
-        const result = await signIn('credentials', {
-          email,
-          password,
-          redirect: false
-        });
+          const data = await res.json();
 
-        if (result?.error) {
-          setError('Account created! Please login.');
-          setIsLogin(true);
-        } else {
-          router.push('/');
-          router.refresh();
+          if (!res.ok) {
+            setError(data.error || 'Invalid OTP');
+            setLoading(false);
+            return;
+          }
+
+          // Auto login after verification
+          const result = await signIn('credentials', {
+            email,
+            password,
+            redirect: false
+          });
+
+          if (result?.error) {
+            setError('Account verified! Please login.');
+            setIsLogin(true);
+          } else {
+            router.push('/setup'); // Redirect to setup for new users
+            router.refresh();
+          }
+        } catch (err) {
+          setError('Verification failed');
         }
-      } catch (err) {
-        setError('Something went wrong');
       }
       setLoading(false);
     }
@@ -251,7 +280,7 @@ export default function MarketingSplash() {
   return (
     <>
       <CosmicBackground />
-      
+
       {/* Floating Logo */}
       <Link href="/" className="fixed top-6 left-6 z-50">
         <Image
@@ -263,7 +292,7 @@ export default function MarketingSplash() {
           priority
         />
       </Link>
-      
+
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Main Content */}
         <div className="flex-1 flex flex-col lg:flex-row items-center justify-center px-4 sm:px-6 lg:px-12 py-20 lg:py-0 gap-8 lg:gap-16">
@@ -273,7 +302,7 @@ export default function MarketingSplash() {
             <h1 className="text-4xl sm:text-7xl lg:text-6xl font-bold gradient-text tracking-wide mb-4">
               Ask More From Your Favourite Creators !
             </h1>
-            
+
             {/* Tagline */}
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-text mb-2">
               Connect. Create. Ascend.
@@ -316,33 +345,8 @@ export default function MarketingSplash() {
 
               {/* Auth Form */}
               <form onSubmit={handleCredentialsAuth} className="space-y-4">
-                {!isLogin && (
-                  <>
-                    <div>
-                      <label className="block text-text text-sm font-medium mb-2">Name</label>
-                      <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Your Name"
-                        className="glass-input w-full px-4 py-3 rounded-lg text-text placeholder-text-muted"
-                        required={!isLogin}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-text text-sm font-medium mb-2">Username</label>
-                      <input
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s/g, ''))}
-                        placeholder="username"
-                        className="glass-input w-full px-4 py-3 rounded-lg text-text placeholder-text-muted"
-                        required={!isLogin}
-                      />
-                    </div>
-                  </>
-                )}
-                
+
+
                 <div>
                   <label className="block text-text text-sm font-medium mb-2">Email Address</label>
                   <input
@@ -376,6 +380,24 @@ export default function MarketingSplash() {
                   </div>
                 </div>
 
+                {showOtpInput && !isLogin && (
+                  <div>
+                    <label className="block text-text text-sm font-medium mb-2">Verification Code</label>
+                    <input
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      placeholder="Enter 6-digit OTP"
+                      className="glass-input w-full px-4 py-3 rounded-lg text-text placeholder-text-muted tracking-widest text-center font-mono text-lg"
+                      required={showOtpInput}
+                      maxLength={6}
+                    />
+                    <p className="text-xs text-text-muted mt-2 text-center">
+                      Check your email for the code
+                    </p>
+                  </div>
+                )}
+
                 {error && (
                   <p className="text-error text-sm">{error}</p>
                 )}
@@ -385,7 +407,7 @@ export default function MarketingSplash() {
                   disabled={loading}
                   className="btn-gradient w-full py-3 rounded-lg text-white font-semibold disabled:opacity-50"
                 >
-                  {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Sign Up')}
+                  {loading ? 'Please wait...' : (isLogin ? 'Login' : (showOtpInput ? 'Verify & Signup' : 'Sign Up'))}
                 </button>
               </form>
 
@@ -404,7 +426,9 @@ export default function MarketingSplash() {
                 <button
                   onClick={() => {
                     setIsLogin(!isLogin);
+                    setShowOtpInput(false);
                     setError('');
+                    setOtp('');
                   }}
                   className="text-primary hover:text-primary-light font-semibold transition-colors"
                 >
@@ -414,8 +438,8 @@ export default function MarketingSplash() {
 
               {/* Creator Link */}
               <div className="text-center mt-6 pt-6 border-t border-card-border">
-                <Link 
-                  href="/creators" 
+                <Link
+                  href="/creators"
                   className="text-text-muted hover:text-primary text-sm transition-colors"
                 >
                   Are you a Creator? →
@@ -425,7 +449,7 @@ export default function MarketingSplash() {
           </div>
         </div>
       </div>
-      
+
       {/* Footer */}
       <Footer />
     </>

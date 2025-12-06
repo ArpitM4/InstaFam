@@ -11,8 +11,8 @@ const UserSchema = new Schema({
   username: { type: String, required: false, default: null },
   password: { type: String },
   name: { type: String },
-  profilepic: { type: String},
-  coverpic: { type: String},
+  profilepic: { type: String },
+  coverpic: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   followers: { type: Number, default: 0 }, // Legacy count field - kept for backward compatibility
@@ -28,11 +28,18 @@ const UserSchema = new Schema({
     phone: String,
     upi: String,
   },
-  instagram: {
-    otp: String,
-    otpGeneratedAt: Date,
-    isVerified: { type: Boolean, default: false },
+
+  // New fields for Onboarding Overhaul
+  visibility: {
+    type: String,
+    enum: ["hidden", "public"],
+    default: "hidden"
   },
+  setupCompleted: {
+    type: Boolean,
+    default: false
+  },
+
   description: { type: String, default: "Welcome to my Sygil" },
   leaderboard: {
     isActive: Boolean,
@@ -46,21 +53,6 @@ const UserSchema = new Schema({
   points: { type: Number, default: 0 },
   vaultEarningsBalance: { type: Number, default: 0 },
   isReal: { type: Boolean, default: true },
-  
-  // Creator Onboarding System
-  creatorOnboarding: {
-    discountCode: { type: String, default: null }, // Stores claimed discount codes
-    onboardingCompleted: { type: Boolean, default: false },
-    checklist: {
-      isVerified: { type: Boolean, default: false },
-      paymentDetailsAdded: { type: Boolean, default: false },
-      profilePageCreated: { type: Boolean, default: false },
-      firstEventStarted: { type: Boolean, default: false },
-      firstVaultItemAdded: { type: Boolean, default: false }
-    },
-    onboardingStartedAt: { type: Date, default: null },
-    onboardingCompletedAt: { type: Date, default: null }
-  },
 
   // Social Media Links - Array of social media profiles
   socials: [{
