@@ -155,6 +155,7 @@ export default function CreatorsPage() {
                   src="/characters/MagicMan.png"
                   alt="The Sygil Magician"
                   fill
+                  unoptimized
                   className="object-contain drop-shadow-[0_0_50px_rgba(139,92,246,0.3)]"
                 />
 
@@ -163,7 +164,7 @@ export default function CreatorsPage() {
                   <div className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">New Superfan</div>
                   <div className="flex items-center gap-2 mt-1">
                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500"></div>
-                    <span className="font-bold text-sm">+500 XP</span>
+                    <span className="font-bold text-sm">+500 FP</span>
                   </div>
                 </div>
 
@@ -394,8 +395,8 @@ export default function CreatorsPage() {
 
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="text-center mb-12">
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">How Different Creators Use Sygil</h2>
-              <p className="text-lg text-[var(--text-muted)]">Flexible by design — power your specific community.</p>
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">How Different Creators Use Sygil </h2>
+              <p className="text-lg text-[var(--text-muted)]">Offer perks in exchange for FamPoints </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -409,8 +410,8 @@ export default function CreatorsPage() {
                   <h3 className="text-xl font-bold mb-3">YouTubers</h3>
                   <ul className="space-y-2 text-[var(--text-muted)] text-sm">
                     <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Offer shoutouts</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Pinned comments</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> BTS content</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Real Life Meetup</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Thanks at the end of video</li>
                   </ul>
                 </div>
               </div>
@@ -440,9 +441,9 @@ export default function CreatorsPage() {
 
                   <h3 className="text-xl font-bold mb-3">Streamers</h3>
                   <ul className="space-y-2 text-[var(--text-muted)] text-sm">
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Gamified donations</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Supporter ranking</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> VIP perks</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> 1 v 1</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" />Gameplay Settings</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Add to clan</li>
                   </ul>
                 </div>
               </div>
@@ -462,8 +463,8 @@ export default function CreatorsPage() {
                   <h3 className="text-xl font-bold mb-3">Artists & Experts</h3>
                   <ul className="space-y-2 text-[var(--text-muted)] text-sm">
                     <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Sell assets/notes</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Early previews</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Community building</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" />Brush Settings / Color Palettes</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Exclusive Wallpaper Pack</li>
                   </ul>
                 </div>
               </div>
