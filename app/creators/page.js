@@ -92,7 +92,7 @@ export default function CreatorsPage() {
               </div>
 
               <h1 className="text-4xl md:text-6xl font-black mb-4 leading-tight tracking-tight">
-                Earn From Anything You Do <span className="gradient-text block mt-1">- Literally Anything.</span>
+                Earn From Anything You Do <span className="gradient-text block mt-1 pb-2">- Literally Anything.</span>
               </h1>
 
               <p className="text-lg text-[var(--text-muted)] mb-6 max-w-xl leading-relaxed">
