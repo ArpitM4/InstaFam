@@ -7,17 +7,25 @@ import { useSession } from 'next-auth/react'
 
 
 
-const Footer = () => {
+const Footer = ({ forceShow = false }) => {
   const { data: session } = useSession();
   
   // Hide footer when user is logged in (they use the Sidebar layout)
-  if (session) {
+  // Unless forceShow is true (used on marketing pages like /creators)
+  if (session && !forceShow) {
     return null;
   }
 
   return (
-<footer className="relative z-20 bg-transparent text-white py-10">
-  <div className="max-w-screen-xl mx-auto px-6">
+<footer className="relative z-20 text-white py-10">
+  {/* Gradient glow from the bottom */}
+  <div 
+    className="absolute inset-0 pointer-events-none"
+    style={{ 
+      background: 'linear-gradient(0deg, rgba(255,47,114,0.15) 0%, rgba(255,47,114,0.05) 30%, transparent 70%)' 
+    }}
+  />
+  <div className="max-w-screen-xl mx-auto px-6 relative z-10">
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       
       {/* Column 1: Brand/Logo Section */}

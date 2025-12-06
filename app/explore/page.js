@@ -131,6 +131,7 @@ const ExplorePage = () => {
 
   return (
     <>
+    <div className="p-6">
       {/* Search Bar */}
       <div className="mb-8">
         <form onSubmit={handleSearch} className="max-w-2xl">
@@ -170,6 +171,7 @@ const ExplorePage = () => {
           ))}
         </div>
       )}
+      </div>
     </>
   );
 };

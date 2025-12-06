@@ -11,8 +11,8 @@ const UserSchema = new Schema({
   username: { type: String, required: false, default: null },
   password: { type: String },
   name: { type: String },
-  profilepic: { type: String, default: "https://picsum.photos/200" },
-  coverpic: { type: String, default: "https://picsum.photos/1600/400" },
+  profilepic: { type: String},
+  coverpic: { type: String},
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   followers: { type: Number, default: 0 }, // Legacy count field - kept for backward compatibility

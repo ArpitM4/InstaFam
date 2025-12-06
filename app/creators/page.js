@@ -408,14 +408,7 @@ export default function CreatorsPage() {
         </section>
 
         {/* ==================== FINAL CTA SECTION ==================== */}
-        <section className="py-24 text-center relative overflow-hidden">
-          {/* Gradient background from bottom - pink glow at the bottom */}
-          <div 
-            className="absolute inset-0" 
-            style={{ 
-              background: 'linear-gradient(0deg, rgba(255,47,114,0.25) 0%, rgba(255,47,114,0.08) 40%, var(--background) 100%)' 
-            }} 
-          />
+        <section className="py-24 text-center relative overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
           <div className="relative z-10">
             <h2 className="text-4xl md:text-6xl font-bold mb-8 text-text">Ready to Upgrade Your Bio?</h2>
             <p className="mb-10" style={{ color: 'var(--text-muted)' }}>Join the waitlist today and get early access to the Super Chat Killer.</p>
@@ -443,7 +436,7 @@ export default function CreatorsPage() {
         </section>
 
         {/* Footer */}
-        <Footer />
+        <Footer forceShow={true} />
       </div>
     </>
   );

@@ -5,7 +5,6 @@ import AppLayout from "@/components/AppLayout";
 import SessionWrapper from "@/components/SessionWrapper";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
 import GoogleOneTap from "@/components/GoogleOneTap";
-import FloatingCreatorChecklist from "@/components/FloatingCreatorChecklist";
 import { Analytics } from "@vercel/analytics/next";
 import { UserProvider } from "@/context/UserContext";
 // Initialize FamPoints expiry system
@@ -220,7 +219,6 @@ export default function RootLayout({ children }) {
           <UserProvider>
             <PerformanceMonitor />
             <GoogleOneTap />
-            <FloatingCreatorChecklist />
             <AppLayout>
               <main role="main">
                 {children}
