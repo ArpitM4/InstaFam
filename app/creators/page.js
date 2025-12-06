@@ -452,7 +452,13 @@ export default function CreatorsPage() {
               <div className="glass-card p-5 rounded-2xl relative overflow-hidden group bg-[#151515]">
                 {/* Decorative BookMan */}
                 <div className="absolute -bottom-10 -right-5 w-24 h-24 opacity-20 group-hover:opacity-100 transition-opacity">
-                  <Image src="/characters/BookMan.png" alt="BookMan" fill className="object-contain" />
+                  <Image
+                    src="/characters/BookMan.png"
+                    alt="BookMan"
+                    fill
+                    className="object-contain"
+                    unoptimized
+                  />
                 </div>
 
                 <div className="relative z-10">
@@ -477,7 +483,14 @@ export default function CreatorsPage() {
         <section className="py-16 text-center relative overflow-hidden bg-[#0a0a0a]">
           <div className="relative z-10">
             <div className="inline-block relative mb-3">
-              <Image src="/characters/SmallCat.png" alt="Cat" width={60} height={60} className="object-contain" />
+              <Image
+                src="/characters/SmallCat.png"
+                alt="Cat"
+                width={60}
+                height={60}
+                className="object-contain"
+                unoptimized
+              />
             </div>
 
             <h2 className="text-3xl md:text-5xl font-black mb-6 text-text">Ready to Upgrade Your Bio?</h2>
