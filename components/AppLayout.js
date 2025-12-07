@@ -58,6 +58,12 @@ export default function AppLayout({ children }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isCreatorPage]);
 
+  // For /creators landing page, always just render children (it has its own navbar)
+  // This check must come BEFORE session checks to avoid hydration mismatches
+  if (pathname === '/creators') {
+    return <>{children}</>;
+  }
+
   // For non-authenticated users, just render children (login/signup pages, etc.)
   if (status === "loading") {
     return <>{children}</>;
@@ -68,7 +74,7 @@ export default function AppLayout({ children }) {
   }
 
   // For /creator routes, just render children (DashboardLayout handles its own layout)
-  if (isCreatorDashboardRoute || pathname === '/creators') {
+  if (isCreatorDashboardRoute) {
     return <>{children}</>;
   }
 

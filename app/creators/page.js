@@ -8,6 +8,7 @@ import SEO from "@/components/SEO";
 import { useSession } from "next-auth/react";
 import { useUser } from "@/context/UserContext";
 import Footer from "@/components/Footer";
+import CreatorNavbar from "@/components/CreatorNavbar";
 import {
   FaRocket, FaBolt, FaCrown, FaGem, FaTrophy, FaArrowRight,
   FaYoutube, FaInstagram, FaTwitch, FaPalette, FaBrain,
@@ -70,21 +71,8 @@ export default function CreatorsPage() {
         url="https://www.sygil.app/creators"
         image="https://www.sygil.app/og-creators.jpg"
       />
+      <CreatorNavbar />
 
-      {/* Floating Navbar */}
-      <nav className="fixed top-0 left-0 w-full z-50 px-6 py-4 flex justify-between items-center pointer-events-none bg-black md:bg-transparent">
-        {/* Logo */}
-        <Link href="/" className="pointer-events-auto transition-transform hover:scale-105">
-          <Image src="/Text.png" alt="Sygil" width={100} height={32} className="h-8 w-auto" priority />
-        </Link>
-
-        {/* Get Started Button */}
-        <Link href={session ? (userData?.accountType === 'Creator' || userData?.accountType === 'VCreator' ? `/${session.user.name}` : '/setup') : '/'} className="pointer-events-auto">
-          <button className="bg-white text-black px-5 py-2.5 rounded-full font-bold text-sm hover:scale-105 transition-transform shadow-lg hover:shadow-xl">
-            Get Started for Free
-          </button>
-        </Link>
-      </nav>
 
       <div className="relative min-h-screen text-white overflow-x-hidden bg-[#0a0a0a]">
 
@@ -640,7 +628,6 @@ export default function CreatorsPage() {
 
         <Footer forceShow={true} />
       </div >
-
     </>
   );
 }

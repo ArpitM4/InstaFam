@@ -1,0 +1,32 @@
+"use client";
+import Link from "next/link";
+import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { useUser } from "@/context/UserContext";
+
+export default function CreatorNavbar() {
+    const { data: session } = useSession();
+    const { userData } = useUser();
+
+    const getStartedHref = session
+        ? (userData?.accountType === 'Creator' || userData?.accountType === 'VCreator'
+            ? `/${session.user.name}`
+            : '/setup')
+        : '/';
+
+    return (
+        <nav className="fixed top-0 left-0 w-full z-50 px-6 py-4 flex justify-between items-center pointer-events-none bg-black md:bg-transparent">
+            {/* Logo */}
+            <Link href="/" className="pointer-events-auto transition-transform hover:scale-105">
+                <Image src="/Text.png" alt="Sygil" width={100} height={32} className="h-8 w-auto" priority />
+            </Link>
+
+            {/* Get Started Button */}
+            <Link href={getStartedHref} className="pointer-events-auto">
+                <button className="bg-white text-black px-5 py-2.5 rounded-full font-bold text-sm hover:scale-105 transition-transform shadow-lg hover:shadow-xl">
+                    Get Started for Free
+                </button>
+            </Link>
+        </nav>
+    );
+}

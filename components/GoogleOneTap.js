@@ -14,7 +14,7 @@ export default function GoogleOneTap() {
   const handleCredentialResponse = async (response) => {
     try {
       setIsAuthenticating(true);
-      
+
       const res = await signIn('googleonetap', {
         credential: response.credential,
         redirect: false, // This is crucial to prevent page reload
@@ -44,28 +44,25 @@ export default function GoogleOneTap() {
     // We only want this effect to run if the user is unauthenticated
     // AND we haven't initialized the script yet.
     if (status === 'unauthenticated' && !initialized.current) {
-      
-      // Add CSS to ensure navbar stays on top and shift Google One Tap down
+
+      // Add CSS to ensure Google One Tap appears below the navbar
       const style = document.createElement('style');
       style.textContent = `
-        nav, .navbar, header {
-          z-index: 1000000 !important;
-          position: relative !important;
-        }
         #credential_picker_container {
-          top: 60px !important;
+          top: 70px !important;
+          z-index: 999999 !important;
         }
         .fedcm-idp-signin-status {
-          top: 60px !important;
+          top: 70px !important;
         }
       `;
       document.head.appendChild(style);
-      
+
       // Check if the Google Identity Services library is available on the window object
       if (window.google?.accounts?.id) {
         // Mark as initialized so this doesn't run again on re-renders
-        initialized.current = true; 
-        
+        initialized.current = true;
+
         try {
           window.google.accounts.id.initialize({
             client_id: process.env.NEXT_PUBLIC_GOOGLE_ID,
@@ -87,7 +84,7 @@ export default function GoogleOneTap() {
         const timeout = setTimeout(() => {
           if (window.google?.accounts?.id && !initialized.current) {
             initialized.current = true;
-            
+
             try {
               window.google.accounts.id.initialize({
                 client_id: process.env.NEXT_PUBLIC_GOOGLE_ID,
@@ -119,5 +116,5 @@ export default function GoogleOneTap() {
         <span className="text-text">Signing you in...</span>
       </div>
     </div>
-  ) : null; 
+  ) : null;
 }
