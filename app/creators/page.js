@@ -197,36 +197,44 @@ export default function CreatorsPage() {
                 {
                   title: "YOU'RE OFFERING THEM LESS",
                   desc: "Fans want attention and recognition. Shoutouts, replies and reposts are worth paying for - most creators never monetize them.",
-                  bgClass: "bg-gradient-to-b from-black to-indigo-800"
+                  bgClass: "bg-gradient-to-b from-black to-indigo-800",
+                  image: "/Img1.png"
                 },
                 {
                   title: "QR / SUPERCHAT TIPS",
                   desc: "A QR code donation is a thank-you moment — it rarely builds loyalty or habit. Convert one-time tips into repeat support.",
-                  bgClass: "bg-gradient-to-b from-black to-amber-800"
+                  bgClass: "bg-gradient-to-b from-black to-amber-800",
+                  image: "/Img2.png"
                 },
                 {
                   title: "SUBSCRIPTION FATIGUE",
-                  desc: "Not every fan can pay $5/month. Subscriptions are powerful but not the only path to income.",
-                  bgClass: "bg-gradient-to-b from-black to-rose-800"
+                  desc: "Subscriptions aren't the problem — having them scattered across multiple platforms is..",
+                  bgClass: "bg-gradient-to-b from-black to-rose-800",
+                  image: "/Img3.png"
                 },
                 {
                   title: "FRAGMENTED TOOLS",
                   desc: "Link-in-bio for links. Patreon for subs. Ko-fi for tips. Discord for chat. Your fans are scattered everywhere.",
-                  bgClass: "bg-gradient-to-b from-black to-red-800"
+                  bgClass: "bg-gradient-to-b from-black to-red-800",
+                  image: "/Img4.png"
                 },
               ].map((card, i) => (
-                <div key={i} className={`relative min-w-[85vw] md:min-w-0 md:w-auto snap-center rounded-[2rem] p-6 h-[500px] flex flex-col group overflow-hidden border border-black/60 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:brightness-110 ${card.bgClass}`}>
+                <div key={i} className={`relative min-w-[85vw] md:min-w-0 md:w-auto snap-center rounded-[2rem] p-6 h-[520px] flex flex-col group overflow-hidden border border-black/60 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:brightness-110 ${card.bgClass}`}>
 
                   {/* Title */}
                   <h3 className="text-2xl font-black uppercase leading-[0.9] tracking- mb-6 relative z-10 w-3/4 text-white">
                     {card.title}
                   </h3>
 
-                  {/* Image Placeholder */}
-                  <div className="flex-1 relative w-full rounded-xl overflow-hidden bg-black/30 border border-white/5 backdrop-blur-sm mb-6 transition-all group-hover:border-white/20">
-                    <div className="absolute inset-0 flex items-center justify-center text-white/20 text-xs font-mono uppercase">
-                      [Image Placeholder]
-                    </div>
+                  {/* Image */}
+                  <div className="flex-1 relative w-full rounded-xl overflow-hidden  order border-white/5 backdrop-blur-sm mb-6 transition-all group-hover:border-white/20">
+                    <Image
+                      src={card.image}
+                      alt={card.title}
+                      fill
+                      className="object-contain object-center group-hover:scale-105 transition-transform duration-500"
+                      unoptimized
+                    />
                   </div>
 
                   {/* Description */}
@@ -286,33 +294,16 @@ export default function CreatorsPage() {
                 </div>
               </div>
 
-              {/* Right: Phone Mockup */}
-              <div className="relative h-[420px] w-full flex items-center justify-center">
-                <div className="relative z-10 w-64 md:w-72 h-[420px] rounded-[2rem] shadow-2xl overflow-hidden border-8 bg-[#0a0a0a] border-[#222]" style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
-                  <div className="h-full w-full p-4 flex flex-col bg-[#050505]">
-                    <div className="w-full h-28 rounded-xl mb-4 p-4 flex items-end relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-b from-purple-500/50 to-blue-500/10"></div>
-                      <div className="w-12 h-12 rounded-full border-2 border-[#050505] bg-[#333] relative z-10" />
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="h-2 w-24 rounded bg-white/20 mb-4" />
-                      <div className="h-14 w-full rounded-xl bg-white/5 border border-white/5 p-3 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded bg-[var(--primary)]/20" />
-                        <div className="h-2 w-20 rounded bg-white/10" />
-                      </div>
-
-                      <div className="h-14 w-full rounded-xl bg-white/5 border border-white/5 p-3 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded bg-green-500/20" />
-                        <div className="h-2 w-24 rounded bg-white/10" />
-                      </div>
-
-                      <div className="h-28 w-full rounded-xl p-4 bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-white/10 mt-2">
-                        <div className="h-2 w-20 rounded bg-[var(--primary)] mb-2" />
-                        <div className="h-2 w-32 rounded bg-white/10" />
-                      </div>
-                    </div>
-                  </div>
+              {/* Right: Phone Image */}
+              <div className="relative h-[550px] w-full flex items-center justify-center">
+                <div className="relative z-10 w-64 md:w-80 h-[550px]">
+                  <Image
+                    src="/Phone.png"
+                    alt="Sygil App Preview"
+                    fill
+                    className="object-contain drop-shadow-2xl"
+                    unoptimized
+                  />
                 </div>
 
                 {/* Floating Cards */}
@@ -323,6 +314,10 @@ export default function CreatorsPage() {
                 <div className="absolute bottom-28 -left-4 p-3 rounded-xl border border-white/10 bg-[#111]/90 backdrop-blur-md shadow-xl hidden md:flex flex-col items-start">
                   <FaComments className="w-5 h-5 mb-2 text-blue-400" />
                   <div className="text-xs font-bold text-white">Fan Chat</div>
+                </div>
+                <div className="absolute top-1/2 -right-16 p-3 rounded-xl border border-white/10 bg-[#111]/90 backdrop-blur-md shadow-xl hidden md:flex items-center gap-2">
+                  <FaLink className="w-4 h-4 text-purple-400" />
+                  <div className="text-xs font-bold text-white">sygil.app/emma_explore</div>
                 </div>
               </div>
             </div>
