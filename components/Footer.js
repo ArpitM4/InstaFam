@@ -27,7 +27,7 @@ const Footer = ({ forceShow = false }) => {
           <div className="space-y-4">
             <div className="relative w-40 h-14">
               <Image
-                src="/Sygil.png"
+                src="/SygilFull.png"
                 alt="Sygil"
                 fill
                 className="object-contain object-left"
