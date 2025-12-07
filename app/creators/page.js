@@ -187,7 +187,7 @@ export default function CreatorsPage() {
 
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12 animate-float-slow">
-              <h2 className="text-3xl md:text-5xl font-black mb-4 leading-tight">
+              <h2 className="text-3xl md:text-5xl font-black mb-4">
                 You're Leaving a LOT of Money on the Table. Here's Why.
               </h2>
               <p className="text-lg text-[var(--text-muted)] max-w-2xl mx-auto leading-relaxed">
@@ -197,63 +197,55 @@ export default function CreatorsPage() {
 
             <div className="grid md:grid-cols-2 gap-6">
               {/* Problem 1 */}
-              <div className="glass-card p-6 rounded-2xl bg-[#151515] hover:bg-white/5 transition-all duration-300 group border border-white/5">
-                <div className="flex flex-col items-center text-center h-full">
-                  <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4 text-red-500 group-hover:scale-110 transition-transform">
-                    <FaLink className="text-xl" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">Fragmented Tools</h3>
-                  <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                    Link-in-bio for links. Patreon for subs. Ko-fi for tips. Discord for chat.
-                    <br /><span className="text-white font-medium mt-1 block">Your fans are scattered everywhere.</span>
-                  </p>
+              <div className="glass-card p-8 rounded-2xl bg-[#151515] hover:bg-white/5 transition-all duration-300 group border border-white/5 h-full flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-6 text-red-500 group-hover:scale-110 transition-transform">
+                  <FaLink className="text-3xl" />
                 </div>
+                <h3 className="text-2xl font-bold mb-4">Fragmented Tools</h3>
+                <p className="text-lg text-[var(--text-muted)] leading-relaxed">
+                  Link-in-bio for links. Patreon for subs. Ko-fi for tips. Discord for chat.
+                  <br /><span className="text-white font-medium mt-2 block">Your fans are scattered everywhere.</span>
+                </p>
               </div>
 
               {/* Problem 2 */}
-              <div className="glass-card p-6 rounded-2xl bg-[#151515] hover:bg-white/5 transition-all duration-300 group border border-white/5">
-                <div className="flex flex-col items-center text-center h-full">
-                  <div className="w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center mb-4 text-orange-500 group-hover:scale-110 transition-transform">
-                    <FaCoins className="text-xl" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">QR / Superchat Tips</h3>
-                  <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                    Superchat is too Expensive.
-                    <br />
-                    A QR code donation is a "Thank you & Goodbye".
-                    <br /><span className="text-white font-medium mt-1 block">It builds zero loyalty and no recurring habit.</span>
-                  </p>
+              <div className="glass-card p-8 rounded-2xl bg-[#151515] hover:bg-white/5 transition-all duration-300 group border border-white/5 h-full flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-orange-500/10 flex items-center justify-center mb-6 text-orange-500 group-hover:scale-110 transition-transform">
+                  <FaCoins className="text-3xl" />
                 </div>
+                <h3 className="text-2xl font-bold mb-4">QR / Superchat Tips</h3>
+                <p className="text-lg text-[var(--text-muted)] leading-relaxed">
+                  Superchat is too Expensive.
+                  <br />
+                  A QR code donation is a "Thank you & Goodbye".
+                  <br /><span className="text-white font-medium mt-2 block">It builds zero loyalty and no recurring habit.</span>
+                </p>
               </div>
 
               {/* Problem 3 */}
-              <div className="glass-card p-6 rounded-2xl bg-[#151515] hover:bg-white/5 transition-all duration-300 group border border-white/5">
-                <div className="flex flex-col items-center text-center h-full">
-                  <div className="w-12 h-12 rounded-full bg-pink-500/10 flex items-center justify-center mb-4 text-pink-500 group-hover:scale-110 transition-transform">
-                    <FaRocket className="text-xl" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">Subscription Fatigue</h3>
-                  <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                    Not every fan can pay $5/month.
-                    <br /><span className="text-white font-medium mt-1 block">You're leaving 99% of your potential support on the table.</span>
-                  </p>
+              <div className="glass-card p-8 rounded-2xl bg-[#151515] hover:bg-white/5 transition-all duration-300 group border border-white/5 h-full flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-pink-500/10 flex items-center justify-center mb-6 text-pink-500 group-hover:scale-110 transition-transform">
+                  <FaRocket className="text-3xl" />
                 </div>
+                <h3 className="text-2xl font-bold mb-4">Subscription Fatigue</h3>
+                <p className="text-lg text-[var(--text-muted)] leading-relaxed">
+                  Not every fan can pay $5/month.
+                  <br /><span className="text-white font-medium mt-2 block">You're leaving 99% of your potential support on the table.</span>
+                </p>
               </div>
 
               {/* Problem 4 */}
-              <div className="glass-card p-6 rounded-2xl bg-[#151515] hover:bg-white/5 transition-all duration-300 group border border-white/5">
-                <div className="flex flex-col items-center text-center h-full">
-                  <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center mb-4 text-purple-500 group-hover:scale-110 transition-transform">
-                    <FaComments className="text-xl" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">Your Fans Aren't Paying Less</h3>
-                  <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                    You’re Offering Them Less.
-                    <br />
-                    They want interactions, recognition, responses.
-                    <br /><span className="text-white font-medium mt-1 block">These moments are worth paying for, but creators rarely monetize them.</span>
-                  </p>
+              <div className="glass-card p-8 rounded-2xl bg-[#151515] hover:bg-white/5 transition-all duration-300 group border border-white/5 h-full flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-purple-500/10 flex items-center justify-center mb-6 text-purple-500 group-hover:scale-110 transition-transform">
+                  <FaComments className="text-3xl" />
                 </div>
+                <h3 className="text-2xl font-bold mb-4">Your Fans Aren't Paying Less</h3>
+                <p className="text-lg text-[var(--text-muted)] leading-relaxed">
+                  You’re Offering Them Less.
+                  <br />
+                  They want interactions, recognition, responses.
+                  <br /><span className="text-white font-medium mt-2 block">These moments are worth paying for, but creators rarely monetize them.</span>
+                </p>
               </div>
             </div>
           </div>
@@ -342,12 +334,12 @@ export default function CreatorsPage() {
                 { icon: FaGift, color: "text-pink-400", title: "Redeemable Perks", desc: "Offer shoutouts, exclusive DMs, or files. Fans redeem points for real value." },
                 { icon: FaLink, color: "text-green-400", title: "Beautiful Identity", desc: "All your links, perks, and rewards in one stunning, customizable page." },
               ].map((item, i) => (
-                <div key={i} className="glass-card p-6 rounded-2xl hover:bg-white/5 transition-all duration-300 transform hover:-translate-y-2 group bg-[#151515]">
-                  <div className={`text-3xl mb-4 ${item.color} group-hover:scale-110 transition-transform duration-300 inline-block`}>
+                <div key={i} className="glass-card p-8 rounded-2xl hover:bg-white/5 transition-all duration-300 transform hover:-translate-y-2 group bg-[#151515] flex flex-col h-full">
+                  <div className={`text-4xl mb-6 ${item.color} group-hover:scale-110 transition-transform duration-300 inline-block`}>
                     <item.icon />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                  <p className="text-sm text-[var(--text-muted)] leading-relaxed">{item.desc}</p>
+                  <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
+                  <p className="text-lg text-[var(--text-muted)] leading-relaxed flex-grow">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -355,36 +347,36 @@ export default function CreatorsPage() {
             {/* 3. Coming Soon Section */}
             <div>
               <div className="text-center mb-10">
-                <h3 className="text-3xl md:text-5xl font-black mb-4 leading-tight">Coming Soon to Sygil</h3>
-                <p className="text-lg text-[var(--text-muted)] leading-relaxed">Start with donations. Grow with the ecosystem</p>
+                <h3 className="text-2xl md:text-3xl font-bold">Coming Soon to Sygil</h3>
+                <p className="text-sm text-[var(--text-muted)] mt-1">Start with donations. Grow with the ecosystem</p>
               </div>
 
               <div className="grid md:grid-cols-3 gap-6">
                 {/* Giveaways */}
-                <div className="glass-card p-6 rounded-2xl border border-white/5 bg-[#111]/50 opacity-80 hover:opacity-100 transition-opacity">
-                  <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center mb-3 text-orange-500">
-                    <FaGift className="text-lg" />
+                <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#111]/50 opacity-80 hover:opacity-100 transition-opacity flex flex-col h-full">
+                  <div className="w-16 h-16 rounded-full bg-orange-500/10 flex items-center justify-center mb-6 text-orange-500">
+                    <FaGift className="text-3xl" />
                   </div>
-                  <h4 className="text-lg font-bold mb-1">Viral Giveaways</h4>
-                  <p className="text-xs text-[var(--text-muted)]">Run automated giveaways to grow your reach. Fans enter by following or tipping.</p>
+                  <h4 className="text-2xl font-bold mb-4">Viral Giveaways</h4>
+                  <p className="text-lg text-[var(--text-muted)] flex-grow">Run automated giveaways to grow your reach. Fans enter by following or tipping.</p>
                 </div>
 
                 {/* Subscriptions */}
-                <div className="glass-card p-6 rounded-2xl border border-white/5 bg-[#111]/50 opacity-80 hover:opacity-100 transition-opacity">
-                  <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center mb-3 text-yellow-500">
-                    <FaCrown className="text-lg" />
+                <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#111]/50 opacity-80 hover:opacity-100 transition-opacity flex flex-col h-full">
+                  <div className="w-16 h-16 rounded-full bg-yellow-500/10 flex items-center justify-center mb-6 text-yellow-500">
+                    <FaCrown className="text-3xl" />
                   </div>
-                  <h4 className="text-lg font-bold mb-1">Subscriptions</h4>
-                  <p className="text-xs text-[var(--text-muted)]">Build recurring revenue. Offer exclusive badges and content to monthly supporters.</p>
+                  <h4 className="text-2xl font-bold mb-4">Subscriptions</h4>
+                  <p className="text-lg text-[var(--text-muted)] flex-grow">Build recurring revenue. Offer exclusive badges and content to monthly supporters.</p>
                 </div>
 
                 {/* Merchandise */}
-                <div className="glass-card p-6 rounded-2xl border border-white/5 bg-[#111]/50 opacity-80 hover:opacity-100 transition-opacity">
-                  <div className="w-10 h-10 rounded-full bg-pink-500/10 flex items-center justify-center mb-3 text-pink-500">
-                    <FaShoppingBag className="text-lg" />
+                <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#111]/50 opacity-80 hover:opacity-100 transition-opacity flex flex-col h-full">
+                  <div className="w-16 h-16 rounded-full bg-pink-500/10 flex items-center justify-center mb-6 text-pink-500">
+                    <FaShoppingBag className="text-3xl" />
                   </div>
-                  <h4 className="text-lg font-bold mb-1">Merchandise Store</h4>
-                  <p className="text-xs text-[var(--text-muted)]">Sell your custom merch directly from your page. No inventory headaches.</p>
+                  <h4 className="text-2xl font-bold mb-4">Merchandise Store</h4>
+                  <p className="text-lg text-[var(--text-muted)] flex-grow">Sell your custom merch directly from your page. No inventory headaches.</p>
                 </div>
               </div>
             </div>
@@ -400,61 +392,61 @@ export default function CreatorsPage() {
 
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-5xl font-black mb-4 leading-tight">How Different Creators Use Sygil </h2>
-              <p className="text-lg text-[var(--text-muted)] leading-relaxed">Offer perks in exchange for FamPoints </p>
+              <h2 className="text-3xl md:text-5xl font-black mb-3">How Different Creators Use Sygil </h2>
+              <p className="text-lg text-[var(--text-muted)]">Offer perks in exchange for FamPoints </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* YouTubers */}
-              <div className="glass-card p-5 rounded-2xl relative overflow-hidden group bg-[#151515]">
+              <div className="glass-card p-8 rounded-2xl relative overflow-hidden group bg-[#151515] flex flex-col h-full">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <FaYoutube className="text-8xl text-red-600" />
                 </div>
-                <div className="relative z-10">
+                <div className="relative z-10 flex flex-col h-full">
 
-                  <h3 className="text-xl font-bold mb-3">YouTubers</h3>
-                  <ul className="space-y-2 text-[var(--text-muted)] text-sm">
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Offer shoutouts</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Real Life Meetup</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Thanks at the end of video</li>
+                  <h3 className="text-2xl font-bold mb-4">YouTubers</h3>
+                  <ul className="space-y-3 text-[var(--text-muted)] text-base flex-grow">
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-sm" /> Offer shoutouts</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-sm" /> Real Life Meetup</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-sm" /> Thanks at the end of video</li>
                   </ul>
                 </div>
               </div>
 
               {/* Instagram */}
-              <div className="glass-card p-5 rounded-2xl relative overflow-hidden group bg-[#151515]">
+              <div className="glass-card p-8 rounded-2xl relative overflow-hidden group bg-[#151515] flex flex-col h-full">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <FaInstagram className="text-8xl text-pink-600" />
                 </div>
-                <div className="relative z-10">
+                <div className="relative z-10 flex flex-col h-full">
 
-                  <h3 className="text-xl font-bold mb-3">Instagram</h3>
-                  <ul className="space-y-2 text-[var(--text-muted)] text-sm">
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Story reposts</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Exclusive photos</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Close Friends</li>
+                  <h3 className="text-2xl font-bold mb-4">Instagram</h3>
+                  <ul className="space-y-3 text-[var(--text-muted)] text-base flex-grow">
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-sm" /> Story reposts</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-sm" /> Exclusive photos</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-sm" /> Close Friends</li>
                   </ul>
                 </div>
               </div>
 
               {/* Streamers */}
-              <div className="glass-card p-5 rounded-2xl relative overflow-hidden group bg-[#151515]">
+              <div className="glass-card p-8 rounded-2xl relative overflow-hidden group bg-[#151515] flex flex-col h-full">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <FaTwitch className="text-8xl text-purple-600" />
                 </div>
-                <div className="relative z-10">
+                <div className="relative z-10 flex flex-col h-full">
 
-                  <h3 className="text-xl font-bold mb-3">Streamers</h3>
-                  <ul className="space-y-2 text-[var(--text-muted)] text-sm">
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> 1 v 1</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" />Gameplay Settings</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Add to clan</li>
+                  <h3 className="text-2xl font-bold mb-4">Streamers</h3>
+                  <ul className="space-y-3 text-[var(--text-muted)] text-base flex-grow">
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-sm" /> 1 v 1</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-sm" />Gameplay Settings</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-sm" /> Add to clan</li>
                   </ul>
                 </div>
               </div>
 
               {/* Artists & Coaches */}
-              <div className="glass-card p-5 rounded-2xl relative overflow-hidden group bg-[#151515]">
+              <div className="glass-card p-8 rounded-2xl relative overflow-hidden group bg-[#151515] flex flex-col h-full">
                 {/* Decorative BookMan */}
                 <div className="absolute -bottom-10 -right-5 w-24 h-24 opacity-20 group-hover:opacity-100 transition-opacity">
                   <Image
@@ -466,14 +458,14 @@ export default function CreatorsPage() {
                   />
                 </div>
 
-                <div className="relative z-10">
+                <div className="relative z-10 flex flex-col h-full">
                   <div className="flex gap-3 mb-4">
                   </div>
-                  <h3 className="text-xl font-bold mb-3">Artists & Experts</h3>
-                  <ul className="space-y-2 text-[var(--text-muted)] text-sm">
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Sell assets/notes</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" />Brush Settings / Color Palettes</li>
-                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-[10px]" /> Exclusive Wallpaper Pack</li>
+                  <h3 className="text-2xl font-bold mb-4">Artists & Experts</h3>
+                  <ul className="space-y-3 text-[var(--text-muted)] text-base flex-grow">
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-sm" /> Sell assets/notes</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-sm" />Brush Settings / Color Palettes</li>
+                    <li className="flex items-center gap-2"><FaCheck className="text-[var(--success)] text-sm" /> Exclusive Wallpaper Pack</li>
                   </ul>
                 </div>
               </div>
