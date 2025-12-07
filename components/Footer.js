@@ -1,5 +1,6 @@
 "use client"
 import React from 'react'
+import Image from 'next/image'
 import "../app/globals.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faInstagram } from '@fortawesome/free-brands-svg-icons'
@@ -24,7 +25,14 @@ const Footer = ({ forceShow = false }) => {
 
           {/* Column 1: Brand/Logo Section */}
           <div className="space-y-4">
-            <h2 className="text-3xl font-bold gradient-text">Sygil</h2>
+            <div className="relative w-40 h-14">
+              <Image
+                src="/Sygil.png"
+                alt="Sygil"
+                fill
+                className="object-contain object-left"
+              />
+            </div>
             <p className="text-lg text-gray-300">
               Designed for creators. Built for connection.        </p>
           </div>

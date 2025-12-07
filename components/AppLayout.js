@@ -68,7 +68,7 @@ export default function AppLayout({ children }) {
   }
 
   // For /creator routes, just render children (DashboardLayout handles its own layout)
-  if (isCreatorDashboardRoute) {
+  if (isCreatorDashboardRoute || pathname === '/creators') {
     return <>{children}</>;
   }
 
