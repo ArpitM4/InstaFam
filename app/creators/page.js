@@ -91,7 +91,7 @@ export default function CreatorsPage() {
                 <span className="text-sm font-bold tracking-wider uppercase text-[var(--star-gold)]">Trusted by Top Creators</span>
               </div>
 
-              <h1 className="text-4xl md:text-6xl font-black mb-4 leading-tight tracking-tight">
+              <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight tracking-tight">
                 Earn From Anything You Do <span className="gradient-text block mt-1 pb-2">- Literally Anything.</span>
               </h1>
 
@@ -187,7 +187,7 @@ export default function CreatorsPage() {
 
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12 animate-float-slow">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <h2 className="text-3xl md:text-5xl font-black mb-4 leading-tight">
                 You're Leaving a LOT of Money on the Table. Here's Why.
               </h2>
               <p className="text-lg text-[var(--text-muted)] max-w-2xl mx-auto leading-relaxed">
@@ -355,8 +355,8 @@ export default function CreatorsPage() {
             {/* 3. Coming Soon Section */}
             <div>
               <div className="text-center mb-10">
-                <h3 className="text-2xl md:text-3xl font-bold">Coming Soon to Sygil</h3>
-                <p className="text-sm text-[var(--text-muted)] mt-1">Start with donations. Grow with the ecosystem</p>
+                <h3 className="text-3xl md:text-5xl font-black mb-4 leading-tight">Coming Soon to Sygil</h3>
+                <p className="text-lg text-[var(--text-muted)] leading-relaxed">Start with donations. Grow with the ecosystem</p>
               </div>
 
               <div className="grid md:grid-cols-3 gap-6">
@@ -400,8 +400,8 @@ export default function CreatorsPage() {
 
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="text-center mb-12">
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">How Different Creators Use Sygil </h2>
-              <p className="text-lg text-[var(--text-muted)]">Offer perks in exchange for FamPoints </p>
+              <h2 className="text-3xl md:text-5xl font-black mb-4 leading-tight">How Different Creators Use Sygil </h2>
+              <p className="text-lg text-[var(--text-muted)] leading-relaxed">Offer perks in exchange for FamPoints </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
