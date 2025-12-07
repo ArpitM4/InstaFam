@@ -77,26 +77,26 @@ export default function CreatorsPage() {
       <div className="relative min-h-screen text-white overflow-x-hidden bg-[#0a0a0a]">
 
         {/* ==================== SECTION 1: HERO ==================== */}
-        <section className="min-h-screen flex flex-col items-center justify-center text-center px-4 relative pt-20 border-b border-white/5 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-[#0a0a0a] to-[#0a0a0a]">
-          <div className="max-w-7xl mx-auto z-10 w-full grid lg:grid-cols-2 gap-8 items-center">
+        <section className="min-h-screen flex flex-col items-center justify-center text-center px-4 relative pt-20 border-b border-white/5 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-[#0a0a0a] to-[#0a0a0a] overflow-hidden">
+          <div className="max-w-7xl mx-auto z-10 w-full grid lg:grid-cols-2 gap-8 items-center overflow-hidden">
 
             {/* Text Content */}
-            <div className="text-center md:text-left order-2 lg:order-1 w-full">
+            <div className="text-center md:text-left order-2 lg:order-1">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-[var(--primary)]/30 mb-6 animate-pulse-slow">
                 <FaCrown className="text-[var(--star-gold)]" />
                 <span className="text-sm font-semibold tracking-wider uppercase text-[var(--star-gold)]">Trusted by Top Creators</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-8 leading-tight">
+              <h1 className="text-[1.85rem] sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 sm:mb-8 leading-[1.1]">
                 Earn From Anything You Do
-                <span className="gradient-text block mt-1 pb-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black">-Literally Anything.</span>
+                <span className="gradient-text block mt-1 pb-2 text-[1.85rem] sm:text-4xl md:text-5xl lg:text-6xl font-black">-Literally Anything.</span>
               </h1>
               <p className="text-sm sm:text-base md:text-lg text-[var(--text-muted)] mb-6 max-w-xl mx-auto md:mx-0 leading-relaxed">
                 Monetize your attention — your way. <span className="text-white font-medium">Sygil is the creator platform built for the new era</span> — where fans earn rewards, unlock perks, and support you directly.
               </p>
 
               {/* Username / CTA area */}
-              <div className="max-w-md mx-auto md:mx-0 w-full">
+              <div className="max-w-md">
                 {session ? (
                   <Link href={userData?.accountType === 'Creator' || userData?.accountType === 'VCreator' ? `/${session.user.name}` : '/setup'}>
                     <button className="w-auto px-8 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold rounded-full transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:scale-[1.02] text-sm border border-white/10">
@@ -104,10 +104,10 @@ export default function CreatorsPage() {
                     </button>
                   </Link>
                 ) : (
-                  <div className="relative group w-full">
+                  <div className="relative group">
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur opacity-25 group-hover:opacity-60 transition duration-200"></div>
-                    <div className="relative flex items-center bg-[#0a0a0a] rounded-full p-1 border border-white/10 shadow-2xl w-full">
-                      <span className="pl-3 sm:pl-4 pr-1 sm:pr-3 text-[var(--text-muted)] font-medium select-none text-sm sm:text-base whitespace-nowrap">sygil.app/</span>
+                    <div className="relative flex items-center bg-[#0a0a0a] rounded-full p-1 border border-white/10 shadow-2xl">
+                      <span className="pl-4 pr-3 text-[var(--text-muted)] font-medium select-none text-base">sygil.app/</span>
                       <input
                         type="text"
                         className="flex-1 bg-transparent border-none outline-none text-white font-semibold text-base placeholder-gray-600 p-2 w-full min-w-0"
@@ -124,7 +124,7 @@ export default function CreatorsPage() {
                           Create Page <FaArrowRight size={12} />
                         </button>
                       ) : (
-                        <button onClick={checkUsername} disabled={isChecking || !username} className="px-3 sm:px-5 py-3 bg-white text-black hover:bg-gray-200 disabled:opacity-50 font-semibold rounded-full transition-all min-w-[80px] sm:min-w-[100px] flex justify-center whitespace-nowrap text-sm flex-shrink-0">
+                        <button onClick={checkUsername} disabled={isChecking || !username} className="px-5 py-3 bg-white text-black hover:bg-gray-200 disabled:opacity-50 font-semibold rounded-full transition-all min-w-[100px] flex justify-center whitespace-nowrap text-sm">
                           {isChecking ? <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" /> : "Check"}
                         </button>
                       )}
@@ -132,7 +132,7 @@ export default function CreatorsPage() {
                   </div>
                 )}
 
-                <div className="h-6 mt-3 text-sm pl-4 font-medium flex justify-center md:justify-start">
+                <div className="h-6 mt-3 text-sm pl-4 font-medium">
                   {!session && isAvailable === true && <span className="text-green-500 flex items-center gap-1"><FaCheck /> Username available!</span>}
                   {!session && isAvailable === false && <span className="text-red-500 flex items-center gap-1"><FaTimes /> Username taken.</span>}
                 </div>
@@ -140,8 +140,8 @@ export default function CreatorsPage() {
             </div>
 
             {/* Hero Image - 3D Character */}
-            <div className="flex-1 lg:order-2 relative flex justify-center">
-              <div className="relative w-[400px] h-[500px] md:w-[500px] md:h-[600px] animate-float">
+            <div className="flex-1 lg:order-2 relative flex justify-center w-full max-w-full overflow-hidden">
+              <div className="relative w-full max-w-[280px] h-[350px] sm:max-w-[400px] sm:h-[500px] md:max-w-[500px] md:h-[600px] animate-float">
                 <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-transparent to-transparent z-10">
                 </div> {/* Magic Man Visual */}
                 <Image src="/magicman.png" alt="The Sygil Magician" fill unoptimized className="object-contain drop-shadow-[0_0_50px_rgba(139,92,246,0.3)]" />
