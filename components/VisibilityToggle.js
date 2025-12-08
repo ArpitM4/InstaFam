@@ -3,7 +3,7 @@ import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "sonner";
 
-export default function VisibilityToggle({ isVisible, onToggle }) {
+export default function VisibilityToggle({ isVisible, onToggle, onShareModal }) {
     const [loading, setLoading] = useState(false);
 
     const handleToggle = async () => {
@@ -17,7 +17,13 @@ export default function VisibilityToggle({ isVisible, onToggle }) {
             if (res.ok) {
                 onToggle(data.visibility);
                 toast.success(`Page is now ${data.visibility}`);
+
+                // If successfully set to public and onShareModal callback provided, open share modal
+                if (data.visibility === "public" && onShareModal) {
+                    onShareModal();
+                }
             } else {
+                // Show the specific error message (e.g., missing requirements)
                 toast.error(data.error || "Failed to toggle visibility");
             }
         } catch (error) {

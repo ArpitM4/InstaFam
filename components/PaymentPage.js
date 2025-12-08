@@ -16,6 +16,7 @@ import { emitPaymentSuccess } from "@/utils/eventBus";
 import PaymentProfileSection from "./PaymentProfileSection";
 import ErrorBoundary from "./ErrorBoundary";
 import VisibilityToggle from "./VisibilityToggle";
+import CreatorOnboardingGuide from "./CreatorOnboardingGuide";
 
 // Dynamic imports for heavy components (loaded only when needed)
 const PaymentInteractionSection = dynamic(() => import("./PaymentInteractionSection"), {
@@ -224,6 +225,10 @@ const PaymentPage = ({ username }) => {
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
   const [tempVisibleSections, setTempVisibleSections] = useState([]);
 
+  // Onboarding state
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+
   // Memoize computed values for performance
   const isOwner = useMemo(() => session?.user?.name === username, [session?.user?.name, username]);
 
@@ -369,6 +374,30 @@ const PaymentPage = ({ username }) => {
     };
     fetchFanPoints();
   }, [session, currentUser?._id, isOwner]);
+
+  // Check onboarding status for page owner
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      // Only check for owner with hidden page who hasn't completed onboarding
+      if (isOwner && currentUser?.visibility === "hidden") {
+        try {
+          const response = await fetch("/api/onboarding");
+          if (response.ok) {
+            const data = await response.json();
+            // Show onboarding only if not completed
+            if (!data.onboardingCompleted) {
+              setShowOnboarding(true);
+            }
+          }
+        } catch (error) {
+          console.error("Error checking onboarding status:", error);
+        }
+      }
+    };
+    if (currentUser?._id) {
+      checkOnboarding();
+    }
+  }, [isOwner, currentUser?.visibility, currentUser?._id]);
 
   // Auto-close FamPoints popup after 3 seconds
   useEffect(() => {
@@ -870,6 +899,32 @@ const PaymentPage = ({ username }) => {
 
       {/* Beta Popup */}
       {showBetaPopup && <BetaPopup />}
+
+      {/* Creator Onboarding Guide */}
+      {showOnboarding && isOwner && (
+        <CreatorOnboardingGuide
+          hasProfilePic={!!currentUser?.profilepic}
+          hasCoverPic={!!currentUser?.coverpic}
+          hasSocialLinks={currentUser?.socials && currentUser.socials.length > 0}
+          onProfileClick={() => {
+            profileInputRef.current?.click();
+            setShowOnboarding(false);
+          }}
+          onCoverClick={() => {
+            coverInputRef.current?.click();
+            setShowOnboarding(false);
+          }}
+          onLinksTabClick={() => {
+            handleTabChange('links');
+            setShowOnboarding(false);
+          }}
+          onSetPublicClick={() => {
+            setShowShareModal(true);
+          }}
+          onComplete={() => setShowOnboarding(false)}
+          onSkip={() => setShowOnboarding(false)}
+        />
+      )}
       <div id="thisone" className="min-h-screen text-text flex flex-col items-center pb-36 relative overflow-x-hidden" style={{ backgroundColor: 'var(--background-creator)' }}>
         {/* Radial gradient background overlay */}
         <div className="absolute inset-0 -z-10 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 20%, rgba(225,29,72,0.4) 0%, rgba(99,102,241,0.3) 40%, #14141f 100%)' }} />
@@ -1005,6 +1060,7 @@ const PaymentPage = ({ username }) => {
                 <VisibilityToggle
                   isVisible={currentUser.visibility || "hidden"}
                   onToggle={(newVisibility) => setcurrentUser(prev => ({ ...prev, visibility: newVisibility }))}
+                  onShareModal={() => setShowShareModal(true)}
                 />
                 <button
                   onClick={handleOpenCustomize}
@@ -1212,6 +1268,61 @@ const PaymentPage = ({ username }) => {
               >
                 Save
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+          <div className="bg-dropdown-hover rounded-2xl border border-text/10 shadow-2xl max-w-md w-full p-6 relative" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)' }}>
+            <button
+              onClick={() => setShowShareModal(false)}
+              className="absolute top-4 right-4 text-text/60 hover:text-text transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="text-center">
+              <div className="text-5xl mb-4">🎉</div>
+              <h3 className="text-2xl font-bold text-primary mb-2">Your Page is Ready!</h3>
+              <p className="text-text/60 mb-6">Share your Sygil page with your fans and community</p>
+
+              <div className="bg-background/50 border border-text/10 rounded-lg p-4 mb-4">
+                <p className="text-text font-mono text-sm break-all">
+                  {typeof window !== 'undefined' && `${window.location.origin}/${username}`}
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowShareModal(false)}
+                  className="flex-1 px-4 py-2 bg-text/10 text-text rounded-lg hover:bg-text/20 transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const pageUrl = `${window.location.origin}/${username}`;
+                    navigator.clipboard.writeText(pageUrl).then(() => {
+                      toast.success('Link copied to clipboard!');
+                    }).catch(() => {
+                      toast.error('Failed to copy link');
+                    });
+                  }}
+                  className="flex-1 px-4 py-2 btn-gradient text-white rounded-lg flex items-center justify-center gap-2 border-0"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copy Link
+                </button>
+              </div>
             </div>
           </div>
         </div>

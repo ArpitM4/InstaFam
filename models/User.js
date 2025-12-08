@@ -39,6 +39,10 @@ const UserSchema = new Schema({
     type: Boolean,
     default: false
   },
+  onboardingCompleted: {
+    type: Boolean,
+    default: false
+  },
 
   description: { type: String, default: "Welcome to my Sygil" },
   leaderboard: {
