@@ -6,23 +6,11 @@ import { useEffect, useState } from "react";
 import { FaCoins, FaGift, FaSearch } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
-// Simple hash function to generate consistent "random" values per creator
-function hashCode(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash;
-    }
-    return Math.abs(hash);
-}
-
-// Creator Card Component
-function CreatorCard({ creator }) {
-    const hash = hashCode(creator.username || creator._id || 'default');
-    const dummyFamPoints = (hash % 450) + 50;
-    const hasActiveEvent = (hash % 10 > 6);
-    const hasNewPerk = !hasActiveEvent && (hash % 10 > 7);
+// Creator Card Component - accepts famPoints as prop
+function CreatorCard({ creator, famPoints = 0 }) {
+    // Check if creator has active event or new perk from actual data
+    const hasActiveEvent = creator.hasActiveEvent;
+    const hasNewPerk = creator.hasNewPerk;
 
     return (
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 hover:bg-white/10 transition-all duration-300 border border-white/5 hover:border-white/10">
@@ -58,13 +46,15 @@ function CreatorCard({ creator }) {
                 {creator.bio || creator.tagline || `@${creator.username}`}
             </p>
 
-            {/* FamPoints */}
-            <div className="flex items-center justify-center gap-2 mb-3">
-                <FaCoins className="text-yellow-500" />
-                <span className="text-sm text-gray-300">
-                    Your FamPoints: <strong className="text-white">{dummyFamPoints}</strong>
-                </span>
-            </div>
+            {/* FamPoints - Only show if user has points with this creator */}
+            {famPoints > 0 && (
+                <div className="flex items-center justify-center gap-2 mb-3">
+                    <FaCoins className="text-yellow-500" />
+                    <span className="text-sm text-gray-300">
+                        Your FamPoints: <strong className="text-white">{famPoints}</strong>
+                    </span>
+                </div>
+            )}
 
             {/* Active Badge */}
             {(hasActiveEvent || hasNewPerk) && (
@@ -91,7 +81,34 @@ const ExploreClient = ({ initialCreators }) => {
     const [creators, setCreators] = useState(initialCreators || []);
     const [allCreators, setAllCreators] = useState(initialCreators || []);
     const [searchQuery, setSearchQuery] = useState("");
+    const [pointsMap, setPointsMap] = useState({}); // Map of creatorId -> points
     const router = useRouter();
+
+    // Fetch user's FamPoints for all creators they have points with
+    useEffect(() => {
+        const fetchUserPoints = async () => {
+            try {
+                const res = await fetch('/api/points');
+                if (res.ok) {
+                    const data = await res.json();
+                    // Create a lookup map: creatorId -> points
+                    const map = {};
+                    if (data.pointsByCreator) {
+                        data.pointsByCreator.forEach(creator => {
+                            if (creator.points > 0) {
+                                map[creator.creatorId] = creator.points;
+                            }
+                        });
+                    }
+                    setPointsMap(map);
+                }
+            } catch (err) {
+                console.error('Error fetching user points:', err);
+            }
+        };
+
+        fetchUserPoints();
+    }, []);
 
     // Filter creators based on search query
     useEffect(() => {
@@ -147,7 +164,7 @@ const ExploreClient = ({ initialCreators }) => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {creators.map((user) => (
                         <Link key={user._id} href={`/${user.username}`}>
-                            <CreatorCard creator={user} />
+                            <CreatorCard creator={user} famPoints={pointsMap[user._id] || 0} />
                         </Link>
                     ))}
                 </div>

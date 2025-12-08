@@ -5,26 +5,11 @@ import Image from "next/image";
 import { useUser } from "@/context/UserContext";
 import { FaCoins, FaStar, FaGift, FaSearch, FaExternalLinkAlt } from "react-icons/fa";
 
-// Simple hash function to generate consistent "random" values per creator
-function hashCode(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash);
-}
-
-// Creator Card Component
-function CreatorCard({ creator, showFollowedBadge = false }) {
-  // Generate consistent FamPoints based on username hash
-  const hash = hashCode(creator.username || creator._id || 'default');
-  const dummyFamPoints = (hash % 450) + 50; // Range: 50-500
-
-  // Check if creator has active event or new perk (consistent based on hash)
-  const hasActiveEvent = creator.hasActiveEvent || (hash % 10 > 6);
-  const hasNewPerk = !hasActiveEvent && (creator.hasNewPerk || (hash % 10 > 7));
+// Creator Card Component - now accepts famPoints as prop
+function CreatorCard({ creator, showFollowedBadge = false, famPoints = 0 }) {
+  // Check if creator has active event or new perk from actual data
+  const hasActiveEvent = creator.hasActiveEvent;
+  const hasNewPerk = creator.hasNewPerk;
 
   return (
     <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 hover:bg-white/10 transition-all duration-300 border border-white/5 hover:border-white/10">
@@ -65,13 +50,15 @@ function CreatorCard({ creator, showFollowedBadge = false }) {
         {creator.bio || creator.tagline || `@${creator.username}`}
       </p>
 
-      {/* FamPoints */}
-      <div className="flex items-center justify-center gap-2 mb-3">
-        <FaCoins className="text-yellow-500" />
-        <span className="text-sm text-gray-300">
-          Your FamPoints: <strong className="text-white">{dummyFamPoints}</strong>
-        </span>
-      </div>
+      {/* FamPoints - Only show if user has points with this creator */}
+      {famPoints > 0 && (
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <FaCoins className="text-yellow-500" />
+          <span className="text-sm text-gray-300">
+            Your FamPoints: <strong className="text-white">{famPoints}</strong>
+          </span>
+        </div>
+      )}
 
       {/* Active Badge */}
       {(hasActiveEvent || hasNewPerk) && (
@@ -94,15 +81,43 @@ function CreatorCard({ creator, showFollowedBadge = false }) {
   );
 }
 
+
 export default function HomeFeed() {
   const { userData, accountType } = useUser();
   const [followedCreators, setFollowedCreators] = useState([]);
   const [topCreators, setTopCreators] = useState([]);
   const [loading, setLoading] = useState(true);
   const [topCreatorsLoading, setTopCreatorsLoading] = useState(false);
+  const [pointsMap, setPointsMap] = useState({}); // Map of creatorId -> points
 
   const isCreator = accountType === "Creator";
   const hasFollowing = userData?.following && userData.following.length > 0;
+
+  // Fetch user's FamPoints for all creators they have points with
+  useEffect(() => {
+    const fetchUserPoints = async () => {
+      try {
+        const res = await fetch('/api/points');
+        if (res.ok) {
+          const data = await res.json();
+          // Create a lookup map: creatorId -> points
+          const map = {};
+          if (data.pointsByCreator) {
+            data.pointsByCreator.forEach(creator => {
+              if (creator.points > 0) {
+                map[creator.creatorId] = creator.points;
+              }
+            });
+          }
+          setPointsMap(map);
+        }
+      } catch (err) {
+        console.error('Error fetching user points:', err);
+      }
+    };
+
+    fetchUserPoints();
+  }, []);
 
   useEffect(() => {
     const fetchFollowedCreators = async () => {
@@ -230,7 +245,7 @@ export default function HomeFeed() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {followedCreators.map((creator) => (
                 <Link key={creator._id} href={`/${creator.username}`}>
-                  <CreatorCard creator={creator} showFollowedBadge={true} />
+                  <CreatorCard creator={creator} showFollowedBadge={true} famPoints={pointsMap[creator._id] || 0} />
                 </Link>
               ))}
             </div>
@@ -253,7 +268,7 @@ export default function HomeFeed() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {topCreators.map((creator) => (
                 <Link key={creator._id} href={`/${creator.username}`}>
-                  <CreatorCard creator={creator} />
+                  <CreatorCard creator={creator} famPoints={pointsMap[creator._id] || 0} />
                 </Link>
               ))}
             </div>
