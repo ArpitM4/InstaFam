@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { FaUser, FaMagic, FaCheck, FaTimes, FaPen } from "react-icons/fa";
+import { emitProfileUpdate } from "@/utils/eventBus";
 
 export default function SetupPage() {
     const router = useRouter();
@@ -115,6 +116,14 @@ export default function SetupPage() {
                     profilepic: avatarUrl,
                     setupCompleted: true
                 }
+            });
+
+            // Emit profile update event to refresh navbar and other components
+            emitProfileUpdate({
+                name,
+                username,
+                profilepic: avatarUrl,
+                accountType
             });
 
             // Redirect based on account type

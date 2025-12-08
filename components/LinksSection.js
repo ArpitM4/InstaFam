@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 import { FaPlus, FaTimes, FaTrash } from 'react-icons/fa';
 import Image from 'next/image';
+import ShareModal from "./ShareModal";
 
 const LinksSection = ({ currentUser }) => {
     const { data: session } = useSession();
@@ -48,16 +49,7 @@ const LinksSection = ({ currentUser }) => {
         }
     };
 
-    // Copy creator page link to clipboard
-    const handleCopyLink = () => {
-        const pageUrl = `${window.location.origin}/${currentUser.username}`;
-        navigator.clipboard.writeText(pageUrl).then(() => {
-            toast.success('Link copied to clipboard!');
-            setShowShareModal(false);
-        }).catch(() => {
-            toast.error('Failed to copy link');
-        });
-    };
+
 
     // Add a new social link
     const handleAddSocial = async (e) => {
@@ -392,42 +384,69 @@ const LinksSection = ({ currentUser }) => {
             {/* Modal for adding social */}
             {showSocialModal && (
                 <Modal onClose={() => setShowSocialModal(false)}>
-                    <h3 className="text-xl font-bold text-text mb-4">Add Social Link</h3>
-                    <form onSubmit={handleAddSocial} className="space-y-4">
-                        <input
-                            type="text"
-                            placeholder="Platform Name (e.g., Instagram, Twitter)"
-                            value={socialForm.platform}
-                            onChange={(e) => setSocialForm({ ...socialForm, platform: e.target.value })}
-                            className="w-full px-4 py-2 bg-background text-text rounded-lg focus:outline-none focus:ring-2 focus:ring-primary border border-text/10"
-                        />
-                        <input
-                            type="text"
-                            placeholder="Username (e.g., @yourname)"
-                            value={socialForm.username}
-                            onChange={(e) => setSocialForm({ ...socialForm, username: e.target.value })}
-                            className="w-full px-4 py-2 bg-background text-text rounded-lg focus:outline-none focus:ring-2 focus:ring-primary border border-text/10"
-                        />
-                        <input
-                            type="url"
-                            placeholder="Full Link (e.g., https://instagram.com/yourname)"
-                            value={socialForm.link}
-                            onChange={(e) => setSocialForm({ ...socialForm, link: e.target.value })}
-                            className="w-full px-4 py-2 bg-background text-text rounded-lg focus:outline-none focus:ring-2 focus:ring-primary border border-text/10"
-                        />
-                        <div className="flex gap-3">
+                    {/* Header with gradient accent */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-text">Add Social Link</h3>
+                                <p className="text-sm text-text/50">Connect your social media profile</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form onSubmit={handleAddSocial} className="space-y-5">
+                        <div>
+                            <label className="block text-sm font-medium text-text/80 mb-2">Platform Name</label>
+                            <input
+                                type="text"
+                                placeholder="e.g., Instagram, Twitter, YouTube"
+                                value={socialForm.platform}
+                                onChange={(e) => setSocialForm({ ...socialForm, platform: e.target.value })}
+                                className="w-full px-4 py-3 text-text rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder-text/30 transition-all duration-200"
+                                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-text/80 mb-2">Username</label>
+                            <input
+                                type="text"
+                                placeholder="@yourhandle"
+                                value={socialForm.username}
+                                onChange={(e) => setSocialForm({ ...socialForm, username: e.target.value })}
+                                className="w-full px-4 py-3 text-text rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder-text/30 transition-all duration-200"
+                                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-text/80 mb-2">Profile URL</label>
+                            <input
+                                type="url"
+                                placeholder="https://instagram.com/yourhandle"
+                                value={socialForm.link}
+                                onChange={(e) => setSocialForm({ ...socialForm, link: e.target.value })}
+                                className="w-full px-4 py-3 text-text rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder-text/30 transition-all duration-200"
+                                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}
+                            />
+                        </div>
+                        <div className="flex gap-3 pt-2">
                             <button
                                 type="button"
                                 onClick={() => setShowSocialModal(false)}
-                                className="flex-1 px-4 py-2 bg-text/10 text-text rounded-lg hover:bg-text/20 transition-colors"
+                                className="flex-1 px-4 py-3 bg-white/5 text-text rounded-xl hover:bg-white/10 transition-all duration-200 font-medium border border-white/10"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                                className="flex-1 px-4 py-3 btn-gradient text-white rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2"
                             >
-                                Add
+                                <FaPlus className="text-sm" />
+                                Add Link
                             </button>
                         </div>
                     </form>
@@ -435,113 +454,116 @@ const LinksSection = ({ currentUser }) => {
             )}
 
             {/* Share Modal */}
-            {showShareModal && (
-                <Modal onClose={() => setShowShareModal(false)}>
-                    <div className="text-center">
-                        <h3 className="text-2xl font-bold text-primary mb-2">Share {currentUser.username || currentUser.name}'s Page</h3>
-                        <p className="text-text/60 mb-6">Copy the link below to share</p>
-
-                        <div className="bg-dropdown-hover border border-text/10 rounded-lg p-4 mb-4">
-                            <p className="text-text font-mono text-sm break-all">
-                                {typeof window !== 'undefined' && `${window.location.origin}/${currentUser.username}`}
-                            </p>
-                        </div>
-
-                        <div className="flex gap-3">
-                            <button
-                                type="button"
-                                onClick={() => setShowShareModal(false)}
-                                className="flex-1 px-4 py-2 bg-text/10 text-text rounded-lg hover:bg-text/20 transition-colors"
-                            >
-                                Close
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleCopyLink}
-                                className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                </svg>
-                                Copy Link
-                            </button>
-                        </div>
-                    </div>
-                </Modal>
-            )}
+            <ShareModal
+                isOpen={showShareModal}
+                onClose={() => setShowShareModal(false)}
+                username={currentUser.username}
+                title="Share Your Sygil Page"
+            />
 
             {/* Modal for adding favourite */}
             {showFavouriteModal && (
                 <Modal onClose={() => setShowFavouriteModal(false)}>
-                    <h3 className="text-xl font-bold text-text mb-4">Add Favourite Product</h3>
-                    <form onSubmit={handleAddFavourite} className="space-y-4">
-                        <input
-                            type="text"
-                            placeholder="Product/Affiliate Name"
-                            value={favouriteForm.name}
-                            onChange={(e) => setFavouriteForm({ ...favouriteForm, name: e.target.value })}
-                            className="w-full px-4 py-2 bg-background text-text rounded-lg focus:outline-none focus:ring-2 focus:ring-primary border border-text/10"
-                        />
-                        <input
-                            type="url"
-                            placeholder="Affiliate/Product Link"
-                            value={favouriteForm.link}
-                            onChange={(e) => setFavouriteForm({ ...favouriteForm, link: e.target.value })}
-                            className="w-full px-4 py-2 bg-background text-text rounded-lg focus:outline-none focus:ring-2 focus:ring-primary border border-text/10"
-                        />
-
-                        {/* Image Upload Section */}
-                        <div>
-                            <label className="block text-sm font-medium text-text/70 mb-2">Product Image (Optional)</label>
-                            <div className="flex flex-col gap-2">
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageUpload}
-                                    disabled={uploadingImage}
-                                    className="w-full px-4 py-2 bg-background text-text rounded-lg focus:outline-none focus:ring-2 focus:ring-primary border border-text/10 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-primary file:text-white hover:file:bg-primary/90 file:cursor-pointer"
-                                />
-                                {uploadingImage && (
-                                    <div className="flex items-center gap-2 text-primary text-sm">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                                        <span>Uploading...</span>
-                                    </div>
-                                )}
-                                {favouriteForm.image && (
-                                    <div className="relative w-full h-32 rounded-lg overflow-hidden border border-text/10">
-                                        <Image
-                                            src={favouriteForm.image}
-                                            alt="Preview"
-                                            fill
-                                            sizes="100%"
-                                            className="object-cover"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setFavouriteForm({ ...favouriteForm, image: '' })}
-                                            className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition-colors z-10"
-                                        >
-                                            <FaTimes className="text-sm" />
-                                        </button>
-                                    </div>
-                                )}
+                    {/* Header with gradient accent */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+                                <span className="text-xl">⭐</span>
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-text">Add Favourite / Affiliate</h3>
+                                <p className="text-sm text-text/50">Showcase products you love</p>
                             </div>
                         </div>
+                    </div>
 
-                        <div className="flex gap-3">
+                    <form onSubmit={handleAddFavourite} className="space-y-5">
+                        <div>
+                            <label className="block text-sm font-medium text-text/80 mb-2">Product Name</label>
+                            <input
+                                type="text"
+                                placeholder="e.g., My Favourite Camera"
+                                value={favouriteForm.name}
+                                onChange={(e) => setFavouriteForm({ ...favouriteForm, name: e.target.value })}
+                                className="w-full px-4 py-3 text-text rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder-text/30 transition-all duration-200"
+                                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-text/80 mb-2">Product / Affiliate Link</label>
+                            <input
+                                type="url"
+                                placeholder="https://example.com/product"
+                                value={favouriteForm.link}
+                                onChange={(e) => setFavouriteForm({ ...favouriteForm, link: e.target.value })}
+                                className="w-full px-4 py-3 text-text rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder-text/30 transition-all duration-200"
+                                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}
+                            />
+                        </div>
+
+                        {/* Image Upload Section - Redesigned */}
+                        <div>
+                            <label className="block text-sm font-medium text-text/80 mb-2">Product Image <span className="text-text/40">(Optional)</span></label>
+                            {!favouriteForm.image ? (
+                                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 rounded-xl cursor-pointer bg-white/5 hover:bg-white/10 hover:border-primary/50 transition-all duration-200">
+                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                        {uploadingImage ? (
+                                            <>
+                                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-2"></div>
+                                                <p className="text-sm text-primary">Uploading...</p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <svg className="w-8 h-8 text-text/40 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <p className="text-sm text-text/50">Click to upload image</p>
+                                            </>
+                                        )}
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        disabled={uploadingImage}
+                                        className="hidden"
+                                    />
+                                </label>
+                            ) : (
+                                <div className="relative w-full h-32 rounded-xl overflow-hidden border border-white/10">
+                                    <Image
+                                        src={favouriteForm.image}
+                                        alt="Preview"
+                                        fill
+                                        sizes="100%"
+                                        className="object-cover"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setFavouriteForm({ ...favouriteForm, image: '' })}
+                                        className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white p-2 rounded-full hover:bg-red-500 transition-all duration-200 z-10"
+                                    >
+                                        <FaTimes className="text-sm" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex gap-3 pt-2">
                             <button
                                 type="button"
                                 onClick={() => setShowFavouriteModal(false)}
-                                className="flex-1 px-4 py-2 bg-text/10 text-text rounded-lg hover:bg-text/20 transition-colors"
+                                className="flex-1 px-4 py-3 bg-white/5 text-text rounded-xl hover:bg-white/10 transition-all duration-200 font-medium border border-white/10"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 disabled={uploadingImage}
-                                className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 px-4 py-3 btn-gradient text-white rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Add
+                                <FaPlus className="text-sm" />
+                                Add Product
                             </button>
                         </div>
                     </form>
@@ -644,18 +666,33 @@ const FlipCard = ({ frontContent, backContent, link }) => {
 
 
 
-// Modal Component
+// Modal Component - Premium Design
 const Modal = ({ children, onClose }) => {
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-            <div className="bg-dropdown-hover rounded-2xl border border-text/10 shadow-2xl max-w-md w-full p-6 relative">
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-text/60 hover:text-text transition-colors"
-                >
-                    <FaTimes className="text-xl" />
-                </button>
-                {children}
+        <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
+            onClick={(e) => e.target === e.currentTarget && onClose()}
+        >
+            <div
+                className="relative max-w-md w-full animate-in fade-in slide-in-from-bottom-4 duration-300"
+                style={{
+                    background: 'rgba(0, 0, 0, 0.75)',
+                    backdropFilter: 'blur(20px) saturate(180%)',
+                    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                    borderRadius: '1.25rem',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset'
+                }}
+            >
+                <div className="p-6">
+                    <button
+                        onClick={onClose}
+                        className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-text/50 hover:bg-white/10 hover:text-text transition-all duration-200"
+                    >
+                        <FaTimes className="text-sm" />
+                    </button>
+                    {children}
+                </div>
             </div>
         </div>
     );

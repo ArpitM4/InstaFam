@@ -25,10 +25,16 @@ export default function GoogleOneTap() {
         setIsAuthenticating(false);
         // Optional: Add a toast notification for the user here if login fails
       } else if (res?.ok) {
-        // Success! Wait a moment for session to update, then redirect
-        setTimeout(() => {
-          setIsAuthenticating(false); // Clear loading state before redirect
-          router.push('/account');
+        // Success! Check if user needs setup
+        setTimeout(async () => {
+          setIsAuthenticating(false);
+          const sessionRes = await fetch('/api/auth/session');
+          const session = await sessionRes.json();
+          if (session?.user?.setupCompleted) {
+            router.push('/');
+          } else {
+            router.push('/setup');
+          }
         }, 1000);
       } else {
         // Handle unexpected response

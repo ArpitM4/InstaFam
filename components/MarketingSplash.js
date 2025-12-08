@@ -39,7 +39,14 @@ export default function MarketingSplash() {
         setError(result.error);
         setLoading(false);
       } else {
-        router.push('/');
+        // Check if setup is needed by fetching user data
+        const sessionRes = await fetch('/api/auth/session');
+        const session = await sessionRes.json();
+        if (session?.user?.setupCompleted) {
+          router.push('/');
+        } else {
+          router.push('/setup');
+        }
         router.refresh();
       }
     } else {
@@ -107,7 +114,7 @@ export default function MarketingSplash() {
   };
 
   const handleGoogleSignIn = () => {
-    signIn('google');
+    signIn('google', { callbackUrl: '/setup' });
   };
 
   return (

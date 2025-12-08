@@ -30,7 +30,7 @@ export const UserProvider = ({ children }) => {
   const refreshUserData = useCallback(async (force = false) => {
     // Use email for fetching as it's more reliable than name/username
     const userIdentifier = session?.user?.email;
-    
+
     if (!userIdentifier) {
       setUserData(null);
       setUserPoints(0);
@@ -51,7 +51,7 @@ export const UserProvider = ({ children }) => {
 
     isFetchingRef.current = true;
     setIsLoading(true);
-    
+
     try {
       // Fetch user data and points in parallel for better performance
       const [user, pointsResponse] = await Promise.all([
@@ -61,7 +61,7 @@ export const UserProvider = ({ children }) => {
           headers: { 'Cache-Control': 'no-cache' }
         }).then(res => res.ok ? res.json() : { totalPoints: 0 }).catch(() => ({ totalPoints: 0 }))
       ]);
-      
+
       setUserData(user);
       setUserPoints(pointsResponse.totalPoints || 0);
       lastFetchRef.current = now;
@@ -101,7 +101,7 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     // Skip if still loading session
     if (status === 'loading') return;
-    
+
     // Handle unauthenticated state
     if (status !== 'authenticated' || !session?.user?.email) {
       setUserData(null);
@@ -110,7 +110,7 @@ export const UserProvider = ({ children }) => {
       initialFetchDoneRef.current = false;
       return;
     }
-    
+
     // Only fetch if we haven't done initial fetch for this session
     if (!initialFetchDoneRef.current) {
       refreshUserData(true);
@@ -120,8 +120,8 @@ export const UserProvider = ({ children }) => {
   // Separate effect for pathname changes - only trigger on dashboard/account
   useEffect(() => {
     if (
-      status === 'authenticated' && 
-      session?.user?.email && 
+      status === 'authenticated' &&
+      session?.user?.email &&
       initialFetchDoneRef.current &&
       (pathname === '/creator/dashboard' || pathname === '/account')
     ) {
@@ -137,19 +137,29 @@ export const UserProvider = ({ children }) => {
       setUserData(prev => prev ? { ...prev, accountType } : prev);
     };
     const handlePointsUpdate = ({ points }) => setUserPoints(points);
+    const handleProfileUpdate = (data) => {
+      // If data is provided, update locally; otherwise force refresh from server
+      if (data && Object.keys(data).length > 0) {
+        setUserData(prev => prev ? { ...prev, ...data } : data);
+      } else {
+        refreshUserData(true);
+      }
+    };
 
     // Subscribe to events
     eventBus.on(EVENTS.PAYMENT_SUCCESS, handlePaymentSuccess);
     eventBus.on(EVENTS.ACCOUNT_TYPE_CHANGE, handleAccountTypeChange);
     eventBus.on(EVENTS.POINTS_UPDATE, handlePointsUpdate);
+    eventBus.on(EVENTS.PROFILE_UPDATE, handleProfileUpdate);
 
     // Cleanup
     return () => {
       eventBus.off(EVENTS.PAYMENT_SUCCESS, handlePaymentSuccess);
       eventBus.off(EVENTS.ACCOUNT_TYPE_CHANGE, handleAccountTypeChange);
       eventBus.off(EVENTS.POINTS_UPDATE, handlePointsUpdate);
+      eventBus.off(EVENTS.PROFILE_UPDATE, handleProfileUpdate);
     };
-  }, [updatePoints]);
+  }, [updatePoints, refreshUserData]);
 
   // Memoize context value to prevent unnecessary re-renders
   const value = useMemo(() => ({

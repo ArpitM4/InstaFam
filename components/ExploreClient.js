@@ -133,7 +133,7 @@ const ExploreClient = ({ initialCreators }) => {
     };
 
     return (
-        <div className="p-6">
+        <div className="px-6 pb-6 pt-2">
             {/* Search Bar */}
             <div className="mb-8">
                 <form onSubmit={handleSearch} className="max-w-2xl">

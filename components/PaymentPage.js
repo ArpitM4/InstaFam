@@ -19,6 +19,7 @@ import VisibilityToggle from "./VisibilityToggle";
 import CreatorOnboardingGuide from "./CreatorOnboardingGuide";
 
 import PaymentInteractionSection from "./PaymentInteractionSection";
+import ShareModal from "./ShareModal";
 
 const VaultSection = dynamic(() => import("./VaultSection"), {
   loading: () => <div className="w-full max-w-5xl mt-8 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>
@@ -907,7 +908,10 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
           hasProfilePic={!!currentUser?.profilepic}
           hasCoverPic={!!currentUser?.coverpic}
           hasSocialLinks={currentUser?.socials && currentUser.socials.length > 0}
-          onComplete={() => setShowOnboarding(false)}
+          onComplete={() => {
+            setShowOnboarding(false);
+            setShowShareModal(true);
+          }}
         />
       )}
       <div id="thisone" className="min-h-screen text-text flex flex-col items-center pb-36 relative overflow-x-hidden" style={{ backgroundColor: 'var(--background-creator)' }}>
@@ -1259,59 +1263,12 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
       )}
 
       {/* Share Modal */}
-      {showShareModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-          <div className="bg-dropdown-hover rounded-2xl border border-text/10 shadow-2xl max-w-md w-full p-6 relative" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)' }}>
-            <button
-              onClick={() => setShowShareModal(false)}
-              className="absolute top-4 right-4 text-text/60 hover:text-text transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            <div className="text-center">
-              <div className="text-5xl mb-4">🎉</div>
-              <h3 className="text-2xl font-bold text-primary mb-2">Your Page is Ready!</h3>
-              <p className="text-text/60 mb-6">Share your Sygil page with your fans and community</p>
-
-              <div className="bg-background/50 border border-text/10 rounded-lg p-4 mb-4">
-                <p className="text-text font-mono text-sm break-all">
-                  {typeof window !== 'undefined' && `${window.location.origin}/${username}`}
-                </p>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowShareModal(false)}
-                  className="flex-1 px-4 py-2 bg-text/10 text-text rounded-lg hover:bg-text/20 transition-colors"
-                >
-                  Close
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const pageUrl = `${window.location.origin}/${username}`;
-                    navigator.clipboard.writeText(pageUrl).then(() => {
-                      toast.success('Link copied to clipboard!');
-                    }).catch(() => {
-                      toast.error('Failed to copy link');
-                    });
-                  }}
-                  className="flex-1 px-4 py-2 btn-gradient text-white rounded-lg flex items-center justify-center gap-2 border-0"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                  Copy Link
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        username={username}
+        title="Your Page is Ready!"
+      />
     </>
   );
 };
