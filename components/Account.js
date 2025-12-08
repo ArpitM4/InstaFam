@@ -1,64 +1,6 @@
 "use client"
 import React, { useEffect, useState, useCallback, useRef } from 'react'
-// Simple modal component for username
-function UsernameModal({ open, onSubmit, loading, error }) {
-  const [username, setUsername] = useState("");
-  useEffect(() => { if (!open) setUsername(""); }, [open]);
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-background p-8 rounded-lg shadow-lg w-full max-w-sm flex flex-col items-center">
-        <h2 className="text-xl font-bold mb-4 text-center">Choose a Username</h2>
-        <input
-          type="text"
-          className="w-full px-4 py-2 rounded border border-primary focus:ring-2 focus:ring-primary outline-none mb-2 text-white bg-background"
-          placeholder="Enter a username"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-          disabled={loading}
-        />
-        {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
-        <button
-          className="w-full bg-primary hover:bg-primary/80 text-white font-semibold py-2 rounded disabled:opacity-60"
-          onClick={() => onSubmit(username)}
-          disabled={loading || !username.trim()}
-        >
-          {loading ? "Checking..." : "Save Username"}
-        </button>
-      </div>
-    </div>
-  );
-}
 
-// Simple modal component for name
-function NameModal({ open, onSubmit, loading, error }) {
-  const [name, setName] = useState("");
-  useEffect(() => { if (!open) setName(""); }, [open]);
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-background p-8 rounded-lg shadow-lg w-full max-w-sm flex flex-col items-center">
-        <h2 className="text-xl font-bold mb-4 text-center">Enter Your Name</h2>
-        <input
-          type="text"
-          className="w-full px-4 py-2 rounded border border-primary focus:ring-2 focus:ring-primary outline-none mb-2 text-white bg-background"
-          placeholder="Enter your name"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          disabled={loading}
-        />
-        {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
-        <button
-          className="w-full bg-primary hover:bg-primary/80 text-white font-semibold py-2 rounded disabled:opacity-60"
-          onClick={() => onSubmit(name)}
-          disabled={loading || !name.trim()}
-        >
-          {loading ? "Checking..." : "Save Name"}
-        </button>
-      </div>
-    </div>
-  );
-}
 import { useSession, signIn, signOut } from "next-auth/react"
 import "../app/globals.css";
 import { useRouter } from 'next/navigation'
@@ -83,12 +25,7 @@ const Account = () => {
   });
 
   const [loading, setLoading] = useState(true);
-  const [showUsernameModal, setShowUsernameModal] = useState(false);
-  const [showNameModal, setShowNameModal] = useState(false);
-  const [modalError, setModalError] = useState("");
-  const [modalLoading, setModalLoading] = useState(false);
-  const [nameModalError, setNameModalError] = useState("");
-  const [nameModalLoading, setNameModalLoading] = useState(false);
+
   const hasLoadedData = useRef(false);
 
   // Only show modal on first load if username is blank
@@ -109,16 +46,16 @@ const Account = () => {
     setLoading(false);
     hasLoadedData.current = true;
     // Only show modal on first load
-    if (!u || !u.username || u.username.trim() === "") {
-      setShowUsernameModal(true);
-      setShowNameModal(false);
-    } else if (!u.name || u.name.trim() === "") {
-      setShowUsernameModal(false);
-      setShowNameModal(true);
-    } else {
-      setShowUsernameModal(false);
-      setShowNameModal(false);
-    }
+    // if (!u || !u.username || u.username.trim() === "") {
+    //   setShowUsernameModal(true);
+    //   setShowNameModal(false);
+    // } else if (!u.name || u.name.trim() === "") {
+    //   setShowUsernameModal(false);
+    //   setShowNameModal(true);
+    // } else {
+    //   setShowUsernameModal(false);
+    //   setShowNameModal(false);
+    // }
   }, [session?.user?.email]);
 
   useEffect(() => {
@@ -130,73 +67,7 @@ const Account = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, getData]);
 
-  // Modal username submit handler
-  const handleUsernameModal = async (username) => {
-    if (!username || username.trim() === "") {
-      setModalError("Username cannot be empty.");
-      toast.error("Username cannot be empty!", { position: "top-right", autoClose: 3000 });
-      return;
-    }
-    setModalLoading(true);
-    setModalError("");
-    // Try to update profile with new username
-    const res = await updateProfile({ ...form, username }, form.username);
-    if (res?.error) {
-      setModalError(res.error);
-      setModalLoading(false);
-    } else {
-      setForm(f => ({ ...f, username }));
-      setModalLoading(false);
-      setShowUsernameModal(false);
-      setShowNameModal(true); // Open name modal after username
-      toast.success("Username set successfully!", { position: "top-right", autoClose: 3000 });
-      if (typeof update === 'function') await update();
 
-      // Emit global profile update event
-      emitProfileUpdate({ username });
-
-      // Update user data in navbar/context (legacy support)
-      if (refreshUserData) {
-        refreshUserData(true);
-      }
-      if (updateUserData) {
-        updateUserData({ username });
-      }
-    }
-  };
-
-  // Modal name submit handler
-  const handleNameModal = async (name) => {
-    if (!name || name.trim() === "") {
-      setNameModalError("Name cannot be empty.");
-      toast.error("Name cannot be empty!", { position: "top-right", autoClose: 3000 });
-      return;
-    }
-    setNameModalLoading(true);
-    setNameModalError("");
-    const res = await updateProfile({ ...form, name }, form.username);
-    if (res?.error) {
-      setNameModalError(res.error);
-      setNameModalLoading(false);
-    } else {
-      setForm(f => ({ ...f, name }));
-      setNameModalLoading(false);
-      setShowNameModal(false);
-      toast.success("Name set successfully!", { position: "top-right", autoClose: 3000 });
-      if (typeof update === 'function') await update();
-
-      // Emit global profile update event
-      emitProfileUpdate({ name });
-
-      // Update user data in navbar/context (legacy support)
-      if (refreshUserData) {
-        refreshUserData(true);
-      }
-      if (updateUserData) {
-        updateUserData({ name });
-      }
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -289,18 +160,7 @@ const Account = () => {
 
   return (
     <>
-      <UsernameModal
-        open={showUsernameModal}
-        onSubmit={handleUsernameModal}
-        loading={modalLoading}
-        error={modalError}
-      />
-      <NameModal
-        open={showNameModal}
-        onSubmit={handleNameModal}
-        loading={nameModalLoading}
-        error={nameModalError}
-      />
+
 
 
 
