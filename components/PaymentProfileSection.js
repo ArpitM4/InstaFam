@@ -37,7 +37,7 @@ const PaymentProfileSection = ({
         {/* Banner Image or Gradient Fallback */}
         <div
           className={`w-full h-24 sm:h-32 md:h-48 lg:h-56 relative overflow-hidden`}
-          style={!hasCoverImage ? {background: 'var(--gradient-primary)'} : {}}
+          style={!hasCoverImage ? { background: 'var(--gradient-primary)' } : {}}
         >
           {hasCoverImage && (
             <Image
@@ -49,7 +49,7 @@ const PaymentProfileSection = ({
               priority
             />
           )}
-          
+
           {/* Owner: Change Banner Button */}
           {isOwner && (
             <>
@@ -73,11 +73,19 @@ const PaymentProfileSection = ({
               </button>
             </>
           )}
+
+          {/* Loading Overlay for Banner Upload */}
+          {isUploadingCover && (
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center z-[5]">
+              <FaSpinner className="animate-spin text-white text-3xl mb-2" />
+              <span className="text-white text-sm font-medium">Uploading banner...</span>
+            </div>
+          )}
         </div>
 
         {/* Profile image, centered and overlapping bottom edge */}
         <div className="absolute left-1/2 bottom-0 translate-x-[-50%] translate-y-1/2 flex justify-center items-center w-full pointer-events-none z-10">
-          <div 
+          <div
             className={`w-32 h-32 sm:w-32 sm:h-32 md:w-40 md:h-40 bg-background rounded-full shadow-lg border-4 border-white/20 overflow-hidden flex items-center justify-center relative ${isOwner ? 'group cursor-pointer pointer-events-auto' : ''}`}
             onClick={isOwner && !isUploadingProfile ? () => profileInputRef.current.click() : undefined}
             style={{ opacity: isUploadingProfile ? 0.6 : 1 }}
@@ -98,11 +106,19 @@ const PaymentProfileSection = ({
                   onChange={handleProfileChange}
                   disabled={isUploadingProfile}
                 />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  <div className="bg-background/70 backdrop-blur-md rounded-full p-3 flex items-center justify-center">
-                    {isUploadingProfile ? <FaSpinner className="animate-spin text-primary text-xl" /> : <FaPen className="text-xl text-primary" />}
+                {/* Uploading Overlay for Profile Image */}
+                {isUploadingProfile ? (
+                  <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center rounded-full z-10">
+                    <FaSpinner className="animate-spin text-white text-2xl mb-1" />
+                    <span className="text-white text-xs font-medium">Uploading...</span>
                   </div>
-                </div>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="bg-background/70 backdrop-blur-md rounded-full p-3 flex items-center justify-center">
+                      <FaPen className="text-xl text-primary" />
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -113,9 +129,9 @@ const PaymentProfileSection = ({
       <div className="h-20" />
 
       {/* Profile Info Box */}
-      <div className="relative mt-6 w-full max-w-md mx-auto p-5 rounded-2xl shadow-lg border border-white/10" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)'}}>
+      <div className="relative mt-6 w-full max-w-md mx-auto p-5 rounded-2xl shadow-lg border border-white/10" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}>
         <h1 className="text-xl font-semibold text-gradient-primary text-center mb-3">@{username}</h1>
-        
+
         {/* Follower Count for Creator's Own Page */}
         {isOwner && (
           <div className="flex justify-center mb-3">
@@ -124,10 +140,10 @@ const PaymentProfileSection = ({
             </span>
           </div>
         )}
-        
+
         {/* Follow Button */}
         <div className="flex justify-center mb-1">
-          <FollowButton 
+          <FollowButton
             creatorId={currentUser?._id}
             creatorName={username}
             initialFollowerCount={currentUser?.followersArray?.length || currentUser?.followers || 0}
@@ -141,7 +157,7 @@ const PaymentProfileSection = ({
             }}
           />
         </div>
-        
+
         {/* Description */}
         {isOwner ? (
           <div className="relative">
@@ -162,34 +178,32 @@ const PaymentProfileSection = ({
         {isOwner && (
           <div className="mt-4 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
-              <input 
-                type="number" 
-                placeholder={isEventActive ? "Event is running" : "Duration in days"} 
-                value={eventDuration} 
+              <input
+                type="number"
+                placeholder={isEventActive ? "Event is running" : "Duration in days"}
+                value={eventDuration}
                 onChange={(e) => !isEventActive && setEventDuration(e.target.value)}
                 className={`w-full sm:min-w-[160px] sm:flex-1 px-3 py-2 bg-background text-text rounded-lg focus:outline-none transition-all duration-200 border-0 placeholder-text/40 ${isEventActive ? 'opacity-50 cursor-not-allowed' : ''}`}
                 disabled={isEventActive}
                 readOnly={isEventActive}
               />
-              <button 
-                onClick={handleStartEvent} 
+              <button
+                onClick={handleStartEvent}
                 disabled={isEventActive || !eventDuration}
-                className={`w-full sm:w-auto px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm ${
-                  isEventActive || !eventDuration 
-                    ? 'bg-gray-500 text-gray-300 cursor-not-allowed opacity-50' 
-                    : 'bg-success hover:bg-success/90 text-white hover:shadow-md'
-                }`}
+                className={`w-full sm:w-auto px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm ${isEventActive || !eventDuration
+                  ? 'bg-gray-500 text-gray-300 cursor-not-allowed opacity-50'
+                  : 'bg-success hover:bg-success/90 text-white hover:shadow-md'
+                  }`}
               >
                 {isEventActive ? 'Event Active' : 'Start Event'}
               </button>
-              <button 
-                onClick={handleEndEvent} 
+              <button
+                onClick={handleEndEvent}
                 disabled={!isEventActive}
-                className={`w-full sm:w-auto px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm ${
-                  !isEventActive 
-                    ? 'bg-gray-500 text-gray-300 cursor-not-allowed opacity-50' 
-                    : 'bg-error hover:bg-error/90 text-white hover:shadow-md'
-                }`}
+                className={`w-full sm:w-auto px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm ${!isEventActive
+                  ? 'bg-gray-500 text-gray-300 cursor-not-allowed opacity-50'
+                  : 'bg-error hover:bg-error/90 text-white hover:shadow-md'
+                  }`}
               >
                 End Event
               </button>

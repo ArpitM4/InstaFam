@@ -45,7 +45,7 @@ const CommunitySection = dynamic(() => import("./CommunitySection"), {
 });
 
 // PayPal imports moved to PaymentInteractionSection to avoid loading on non-payment tabs
-const { PayPalScriptProvider, PayPalButtons } = require("@paypal/react-paypal-js");
+// PayPal imports moved to PaymentInteractionSection to avoid loading on non-payment tabs
 
 // Save payment after capture (send captureDetails to backend)
 const savePayment = async (paymentDetails, captureDetails, currentEvent = null, donorName = null) => {
@@ -615,8 +615,9 @@ const PaymentPage = ({ username }) => {
         body: formData,
       });
       const data = await res.json();
-      if (data.success && data.url) {
-        setcurrentUser((prev) => ({ ...prev, profilepic: data.url }));
+      const uploadedUrl = data.url || data.secure_url;
+      if (data.success && uploadedUrl) {
+        setcurrentUser((prev) => ({ ...prev, profilepic: uploadedUrl }));
         toast.success("Profile picture updated!");
       } else {
         toast.error(data.error || "Upload failed");
@@ -641,8 +642,9 @@ const PaymentPage = ({ username }) => {
         body: formData,
       });
       const data = await res.json();
-      if (data.success && data.url) {
-        setcurrentUser((prev) => ({ ...prev, coverpic: data.url }));
+      const uploadedUrl = data.url || data.secure_url;
+      if (data.success && uploadedUrl) {
+        setcurrentUser((prev) => ({ ...prev, coverpic: uploadedUrl }));
         toast.success("Cover banner updated!");
       } else {
         toast.error(data.error || "Upload failed");
@@ -906,23 +908,7 @@ const PaymentPage = ({ username }) => {
           hasProfilePic={!!currentUser?.profilepic}
           hasCoverPic={!!currentUser?.coverpic}
           hasSocialLinks={currentUser?.socials && currentUser.socials.length > 0}
-          onProfileClick={() => {
-            profileInputRef.current?.click();
-            setShowOnboarding(false);
-          }}
-          onCoverClick={() => {
-            coverInputRef.current?.click();
-            setShowOnboarding(false);
-          }}
-          onLinksTabClick={() => {
-            handleTabChange('links');
-            setShowOnboarding(false);
-          }}
-          onSetPublicClick={() => {
-            setShowShareModal(true);
-          }}
           onComplete={() => setShowOnboarding(false)}
-          onSkip={() => setShowOnboarding(false)}
         />
       )}
       <div id="thisone" className="min-h-screen text-text flex flex-col items-center pb-36 relative overflow-x-hidden" style={{ backgroundColor: 'var(--background-creator)' }}>

@@ -97,13 +97,16 @@ function CreatorCard({ creator, showFollowedBadge = false }) {
 export default function HomeFeed() {
   const { userData, accountType } = useUser();
   const [followedCreators, setFollowedCreators] = useState([]);
+  const [topCreators, setTopCreators] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [topCreatorsLoading, setTopCreatorsLoading] = useState(false);
 
   const isCreator = accountType === "Creator";
+  const hasFollowing = userData?.following && userData.following.length > 0;
 
   useEffect(() => {
     const fetchFollowedCreators = async () => {
-      if (!userData?.following || userData.following.length === 0) {
+      if (!hasFollowing) {
         setLoading(false);
         return;
       }
@@ -122,7 +125,29 @@ export default function HomeFeed() {
     };
 
     fetchFollowedCreators();
-  }, [userData?.following]);
+  }, [hasFollowing]);
+
+  // Fetch top creators when user has no following
+  useEffect(() => {
+    const fetchTopCreators = async () => {
+      if (hasFollowing) return; // Don't fetch if user has following
+
+      setTopCreatorsLoading(true);
+      try {
+        const res = await fetch('/api/creators/random');
+        if (res.ok) {
+          const data = await res.json();
+          setTopCreators(data.creators || []);
+        }
+      } catch (err) {
+        console.error('Error fetching top creators:', err);
+      } finally {
+        setTopCreatorsLoading(false);
+      }
+    };
+
+    fetchTopCreators();
+  }, [hasFollowing]);
 
   return (
     <>
@@ -188,41 +213,70 @@ export default function HomeFeed() {
         </div>
       )}
 
-      {/* Following Section */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-1">Following</h1>
-        <div className="w-12 h-1 bg-primary rounded-full"></div>
-      </div>
-
-      {loading ? (
-        <div className="flex justify-center items-center py-20">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      ) : followedCreators.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="max-w-md mx-auto">
-            <div className="w-20 h-20 mx-auto mb-6 bg-white/5 rounded-full flex items-center justify-center">
-              <FaSearch className="text-3xl text-gray-500" />
-            </div>
-            <h2 className="text-xl font-semibold text-white mb-2">No creators yet</h2>
-            <p className="text-gray-400 mb-6">Start following creators to see their content here.</p>
-            <Link
-              href="/explore"
-              className="inline-block px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-all duration-200 font-medium"
-            >
-              Explore Creators
-            </Link>
+      {/* Conditionally show Following or Top Creators */}
+      {hasFollowing ? (
+        <>
+          {/* Following Section */}
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-white mb-1">Following</h1>
+            <div className="w-12 h-1 bg-primary rounded-full"></div>
           </div>
-        </div>
+
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {followedCreators.map((creator) => (
+                <Link key={creator._id} href={`/${creator.username}`}>
+                  <CreatorCard creator={creator} showFollowedBadge={true} />
+                </Link>
+              ))}
+            </div>
+          )}
+        </>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {followedCreators.map((creator) => (
-            <Link key={creator._id} href={`/${creator.username}`}>
-              <CreatorCard creator={creator} showFollowedBadge={true} />
-            </Link>
-          ))}
-        </div>
+        <>
+          {/* Top Creators Section */}
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-white mb-1">Top Creators</h1>
+            <div className="w-12 h-1 bg-primary rounded-full"></div>
+            <p className="text-gray-400 text-sm mt-2">Discover amazing creators to follow</p>
+          </div>
+
+          {topCreatorsLoading || loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : topCreators.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {topCreators.map((creator) => (
+                <Link key={creator._id} href={`/${creator.username}`}>
+                  <CreatorCard creator={creator} />
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <div className="max-w-md mx-auto">
+                <div className="w-20 h-20 mx-auto mb-6 bg-white/5 rounded-full flex items-center justify-center">
+                  <FaSearch className="text-3xl text-gray-500" />
+                </div>
+                <h2 className="text-xl font-semibold text-white mb-2">No creators available</h2>
+                <p className="text-gray-400 mb-6">Check back later for new creators to discover.</p>
+                <Link
+                  href="/explore"
+                  className="inline-block px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-all duration-200 font-medium"
+                >
+                  Explore Creators
+                </Link>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </>
   );
 }
+

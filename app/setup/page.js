@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { FaUser, FaMagic, FaCheck, FaTimes } from "react-icons/fa";
+import { FaUser, FaMagic, FaCheck, FaTimes, FaPen } from "react-icons/fa";
 
 export default function SetupPage() {
     const router = useRouter();
@@ -67,9 +67,10 @@ export default function SetupPage() {
                 body: formData,
             });
             const data = await res.json();
+            const uploadedUrl = data.url || data.secure_url;
 
-            if (data.success && data.url) {
-                setAvatarUrl(data.url);
+            if (data.success && uploadedUrl) {
+                setAvatarUrl(uploadedUrl);
             } else {
                 setError(data.error || "Upload failed");
             }
@@ -168,10 +169,15 @@ export default function SetupPage() {
                                 />
                             )}
 
-                            {/* Overlay for upload hint */}
-                            <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer z-10">
-                                <FaUser className="mb-1 text-white" />
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-white">Upload</span>
+                            {/* Always visible edit icon */}
+                            <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                                <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center border border-white/20 transition-all group-hover:bg-black/50">
+                                    <FaPen className="text-white w-4 h-4" />
+                                </div>
+                            </div>
+
+                            {/* Overlay for upload hint (clickable) */}
+                            <label className="absolute inset-0 flex flex-col items-center justify-center bg-transparent cursor-pointer z-20">
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -226,8 +232,8 @@ export default function SetupPage() {
                                 style={{
                                     backgroundColor: 'rgba(255,255,255,0.05)',
                                     border: `1px solid ${usernameAvailable === true ? 'var(--success)' :
-                                            usernameAvailable === false ? 'var(--error)' :
-                                                'rgba(255,255,255,0.1)'
+                                        usernameAvailable === false ? 'var(--error)' :
+                                            'rgba(255,255,255,0.1)'
                                         }`,
                                     color: 'var(--text)'
                                 }}
@@ -255,8 +261,8 @@ export default function SetupPage() {
                                 type="button"
                                 onClick={() => setAccountType("User")}
                                 className={`p-4 rounded-2xl border-2 transition-all duration-200 text-left relative overflow-hidden group ${accountType === "User"
-                                        ? "bg-primary/10 border-primary"
-                                        : "bg-transparent border-white/10 hover:border-white/20 hover:bg-white/5"
+                                    ? "bg-primary/10 border-primary"
+                                    : "bg-transparent border-white/10 hover:border-white/20 hover:bg-white/5"
                                     }`}
                             >
                                 <div className={`text-lg font-bold mb-1 ${accountType === "User" ? "text-primary" : "text-white"}`}>User</div>
@@ -268,8 +274,8 @@ export default function SetupPage() {
                                 type="button"
                                 onClick={() => setAccountType("Creator")}
                                 className={`p-4 rounded-2xl border-2 transition-all duration-200 text-left relative overflow-hidden group ${accountType === "Creator"
-                                        ? "bg-secondary/10 border-secondary"
-                                        : "bg-transparent border-white/10 hover:border-white/20 hover:bg-white/5"
+                                    ? "bg-secondary/10 border-secondary"
+                                    : "bg-transparent border-white/10 hover:border-white/20 hover:bg-white/5"
                                     }`}
                             >
                                 <div className={`text-lg font-bold mb-1 ${accountType === "Creator" ? "text-secondary" : "text-white"}`}>Creator</div>

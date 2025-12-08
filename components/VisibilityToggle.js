@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "sonner";
+import { emitAccountTypeChange } from "@/utils/eventBus";
 
 export default function VisibilityToggle({ isVisible, onToggle, onShareModal }) {
     const [loading, setLoading] = useState(false);
@@ -17,6 +18,11 @@ export default function VisibilityToggle({ isVisible, onToggle, onShareModal }) 
             if (res.ok) {
                 onToggle(data.visibility);
                 toast.success(`Page is now ${data.visibility}`);
+
+                // If successfully set to public, emit account type change for instant UI update
+                if (data.visibility === "public" && data.accountType) {
+                    emitAccountTypeChange(data.accountType);
+                }
 
                 // If successfully set to public and onShareModal callback provided, open share modal
                 if (data.visibility === "public" && onShareModal) {
