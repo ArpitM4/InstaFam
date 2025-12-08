@@ -1,6 +1,7 @@
 
 import PaymentPage from "@/components/PaymentPage";
 import { fetchuser } from "@/actions/useractions";
+import { fetchCreatorVaultItemsServer } from "@/actions/serverVaultActions";
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
@@ -38,7 +39,11 @@ const UsernamePage = async ({ params }) => {
     );
   }
 
-  return <PaymentPage username={params.username} />;
+  // Fetch vault items for the creator
+  const vaultResult = await fetchCreatorVaultItemsServer(params.username);
+  const vaultItems = vaultResult.success ? vaultResult.items : [];
+
+  return <PaymentPage username={params.username} initialUser={user} initialVaultItems={vaultItems} initialTab="links" />;
 };
 
 export default UsernamePage;

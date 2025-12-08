@@ -18,11 +18,7 @@ import ErrorBoundary from "./ErrorBoundary";
 import VisibilityToggle from "./VisibilityToggle";
 import CreatorOnboardingGuide from "./CreatorOnboardingGuide";
 
-// Dynamic imports for heavy components (loaded only when needed)
-const PaymentInteractionSection = dynamic(() => import("./PaymentInteractionSection"), {
-  loading: () => <div className="w-full max-w-5xl mt-8 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>,
-  ssr: false
-});
+import PaymentInteractionSection from "./PaymentInteractionSection";
 
 const VaultSection = dynamic(() => import("./VaultSection"), {
   loading: () => <div className="w-full max-w-5xl mt-8 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>
@@ -109,7 +105,7 @@ const savePayment = async (paymentDetails, captureDetails, currentEvent = null, 
 // --- End Mock Action Functions ---
 
 
-const PaymentPage = ({ username }) => {
+const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'links' }) => {
   // --- Image Upload Refs ---
   const profileInputRef = useRef();
   const coverInputRef = useRef();
@@ -131,8 +127,8 @@ const PaymentPage = ({ username }) => {
   }
 
   // --- State Management ---
-  const [currentUser, setcurrentUser] = useState({});
-  const [userId, setUserId] = useState(null);
+  const [currentUser, setcurrentUser] = useState(initialUser || {});
+  const [userId, setUserId] = useState(initialUser?._id || null);
   const [currentEvent, setCurrentEvent] = useState(null);
   const [payments, setPayments] = useState([]);
   const [paymentsLoading, setPaymentsLoading] = useState(true);
@@ -141,7 +137,7 @@ const PaymentPage = ({ username }) => {
   const [eventDuration, setEventDuration] = useState("");
   const [timeLeft, setTimeLeft] = useState(null);
   const [isPaying, setIsPaying] = useState(false);
-  const [activeTab, setActiveTab] = useState('links');
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   // Sync activeTab with URL path
   useEffect(() => {
@@ -275,7 +271,10 @@ const PaymentPage = ({ username }) => {
     setPaymentsLoading(true);
     try {
       // Fetch user, event, and visible sections in parallel
-      const userPromise = fetchuser(username);
+      // Use initialUser if available to match current username, otherwise fetch
+      const userPromise = (initialUser && initialUser.username === username)
+        ? Promise.resolve(initialUser)
+        : fetchuser(username);
       const eventPromise = fetchActiveEvent();
       const sectionsPromise = fetchVisibleSections();
 
@@ -1125,7 +1124,7 @@ const PaymentPage = ({ username }) => {
                   <p className="text-text/60 text-sm">🔒 Login to see your FamPoints and redeem vault items</p>
                 </div>
               )}
-              <VaultSection currentUser={currentUser} />
+              <VaultSection currentUser={currentUser} initialItems={initialVaultItems} />
             </div>
           )}
 

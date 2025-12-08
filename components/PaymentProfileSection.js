@@ -37,7 +37,7 @@ const PaymentProfileSection = ({
         {/* Banner Image or Gradient Fallback */}
         <div
           className={`w-full h-24 sm:h-32 md:h-48 lg:h-56 relative overflow-hidden`}
-          style={!hasCoverImage ? { background: 'var(--gradient-primary)' } : {}}
+          style={!hasCoverImage ? { background: 'var(--background)' } : {}}
         >
           {hasCoverImage && (
             <Image

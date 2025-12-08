@@ -1,17 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { FaUserCircle, FaSpinner } from "react-icons/fa";
-import dynamic from "next/dynamic";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
-// Dynamically import PayPal components to prevent SSR issues
-const PayPalScriptProvider = dynamic(
-  () => import("@paypal/react-paypal-js").then((mod) => mod.PayPalScriptProvider),
-  { ssr: false }
-);
-
-const PayPalButtons = dynamic(
-  () => import("@paypal/react-paypal-js").then((mod) => mod.PayPalButtons),
-  { ssr: false }
-);
+// Get PayPal client ID directly from environment
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
 const PaymentInteractionSection = ({
   session,
@@ -28,28 +20,16 @@ const PaymentInteractionSection = ({
   setPaymentform, // Add setPaymentform to allow editing name
   isOwner,
 }) => {
-  const [paypalClientId, setPaypalClientId] = useState(null);
-  const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    // Only run on client side to avoid hydration mismatch
-    const timer = setTimeout(() => {
-      setIsClient(true);
-      setPaypalClientId(process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID);
-    }, 100); // Small delay to ensure proper hydration
-    
-    return () => clearTimeout(timer);
-  }, []);
-  
   // Memoize leaderboard calculation to avoid re-computing on every render
   const leaderboardData = React.useMemo(() => {
     if (!payments || payments.length === 0) return [];
-    
+
     const aggregated = payments.reduce((acc, p) => {
       acc[p.name] = (acc[p.name] || 0) + p.amount;
       return acc;
     }, {});
-    
+
     return Object.entries(aggregated)
       .sort(([, a], [, b]) => b - a)
       .map(([name, total], i) => ({
@@ -60,7 +40,7 @@ const PaymentInteractionSection = ({
         rankEmoji: i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : ''
       }));
   }, [payments]);
-  
+
   /**
    * Handle name change
    * - For RANKED donations (event active): Allow editing username
@@ -69,14 +49,14 @@ const PaymentInteractionSection = ({
   const handleNameChange = (e) => {
     setPaymentform(prev => ({ ...prev, name: e.target.value }));
   };
-  
+
   return (
     <>
       <div className="w-full max-w-5xl mt-8 flex justify-center px-2">
         <div className="w-full flex flex-col md:flex-row gap-6">
           {/* Leaderboard - ONLY show when event is active - Visible to ALL users */}
           {isEventActive && (
-            <div className="flex-1 rounded-2xl shadow-lg p-5 mx-2 md:mx-0 border border-white/10" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)'}}> 
+            <div className="flex-1 rounded-2xl shadow-lg p-5 mx-2 md:mx-0 border border-white/10" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}>
               <h2 className="text-2xl font-semibold text-gradient-primary mb-4">Leaderboard</h2>
               {leaderboardData.length === 0 ? (
                 paymentsLoading ? (
@@ -96,13 +76,12 @@ const PaymentInteractionSection = ({
                   )}
                   <ol className="list-decimal list-inside text-text/80 space-y-2">
                     {leaderboardData.map((entry, i) => (
-                      <li key={`${entry.name}-${i}`} className={`flex justify-between items-center p-2 rounded-lg transition-all duration-200 ${
-                        entry.isTop3
-                          ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20' 
-                          : 'bg-background/30'
-                      }`}>
+                      <li key={`${entry.name}-${i}`} className={`flex justify-between items-center p-2 rounded-lg transition-all duration-200 ${entry.isTop3
+                        ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20'
+                        : 'bg-background/30'
+                        }`}>
                         <div className="flex items-center space-x-2">
-                          <FaUserCircle className={`text-xl ${entry.isTop3 ? 'text-yellow-400' : 'text-yellow-500'}`}/>
+                          <FaUserCircle className={`text-xl ${entry.isTop3 ? 'text-yellow-400' : 'text-yellow-500'}`} />
                           <span className={`font-medium ${entry.isTop3 ? 'text-yellow-100' : ''}`}>
                             {entry.rankEmoji && <span className="mr-1">{entry.rankEmoji}</span>}
                             {entry.name}
@@ -119,11 +98,11 @@ const PaymentInteractionSection = ({
 
           {/* Donation Form - ALWAYS ACTIVE */}
           {/* When no event: centered with max-width, When event active: flex-1 */}
-          <div className={`rounded-2xl shadow-lg p-5 mx-2 md:mx-0 border border-white/10 ${isEventActive ? 'flex-1' : 'w-full md:max-w-md md:mx-auto'}`} style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)'}}>
-            <h2 className="text-2xl text-gradient-primary mb-4">
+          <div className={`rounded-2xl shadow-lg p-5 mx-2 md:mx-0 border border-white/10 ${isEventActive ? 'flex-1' : 'w-full md:max-w-md md:mx-auto'}`} style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}>
+            <h2 className="text-2xl font-bold text-text mb-4">
               Support {currentUser?.name || "Creator"}
             </h2>
-            
+
             {/* Info banner for contribution type */}
             {!isEventActive && (
               <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
@@ -132,7 +111,7 @@ const PaymentInteractionSection = ({
                 </p>
               </div>
             )}
-            
+
             {isEventActive && (
               <div className="mb-4 p-3 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-lg">
                 <p className="text-yellow-300 text-sm">
@@ -140,26 +119,26 @@ const PaymentInteractionSection = ({
                 </p>
               </div>
             )}
-            
+
             {isPaying && (
               <div className="flex justify-center items-center mb-4">
                 <FaSpinner className="animate-spin text-primary text-3xl mr-2" />
                 <span className="text-primary font-semibold">Processing payment...</span>
               </div>
             )}
-            
-            <div className={`space-y-3 transition duration-200 ${isPaying ? 'pointer-events-none opacity-60 blur-sm' : ''}`}> 
+
+            <div className={`space-y-3 transition duration-200 ${isPaying ? 'pointer-events-none opacity-60 blur-sm' : ''}`}>
               <div>
                 <label className="block text-sm font-medium text-text/70 mb-1">
                   Your Name {!session && '(Required)'}
                 </label>
-                <input 
-                  type="text" 
-                  name="name" 
-                  value={paymentform.name || ""} 
+                <input
+                  type="text"
+                  name="name"
+                  value={paymentform.name || ""}
                   onChange={handleNameChange}
                   placeholder={session ? "Your name" : "Enter your name"}
-                  className="w-full px-3 py-2 rounded-lg bg-background text-text placeholder-text/40 focus:outline-none transition-all duration-200 border-0" 
+                  className="w-full px-3 py-2 rounded-lg bg-background text-text placeholder-text/40 focus:outline-none transition-all duration-200 border-0"
                   disabled={isPaying}
                   required
                 />
@@ -171,40 +150,39 @@ const PaymentInteractionSection = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-text/70 mb-1">Message</label>
-                <textarea 
-                  name="message" 
-                  onChange={handleChange} 
-                  value={paymentform.message} 
-                  placeholder="Write a message..." 
-                  rows="3" 
-                  className="w-full px-3 py-2 rounded-lg bg-background text-text placeholder-text/40 focus:outline-none transition-all duration-200 border-0" 
+                <textarea
+                  name="message"
+                  onChange={handleChange}
+                  value={paymentform.message}
+                  placeholder="Write a message..."
+                  rows="3"
+                  className="w-full px-3 py-2 rounded-lg bg-background text-text placeholder-text/40 focus:outline-none transition-all duration-200 border-0"
                   disabled={isPaying}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-text/70 mb-1">Amount</label>
-                <input 
-                  type="number" 
-                  name="amount" 
-                  value={paymentform.amount} 
-                  onChange={handleChange} 
-                  placeholder="Enter amount" 
-                  className="w-full px-3 py-2 rounded-lg bg-background text-text placeholder-text/40 focus:outline-none transition-all duration-200 border-0" 
+                <input
+                  type="number"
+                  name="amount"
+                  value={paymentform.amount}
+                  onChange={handleChange}
+                  placeholder="Enter amount"
+                  className="w-full px-3 py-2 rounded-lg bg-background text-text placeholder-text/40 focus:outline-none transition-all duration-200 border-0"
                   disabled={isPaying}
                 />
               </div>
-              
+
               {/* PayPal Button - ALWAYS AVAILABLE for everyone */}
-              {isClient && paypalClientId ? (
-                <div className="paypal-container">
-                  <PayPalScriptProvider 
-                    options={{ 
-                      "client-id": paypalClientId, 
-                      currency: "USD", 
+              <div className="min-h-[55px] mt-2">
+                <div className="w-full paypal-container">
+                  <PayPalScriptProvider
+                    options={{
+                      "client-id": PAYPAL_CLIENT_ID,
+                      currency: "USD",
                       components: "buttons",
                       "disable-funding": "credit,card"
                     }}
-                    deferLoading={false}
                   >
                     <PayPalButtons
                       style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay" }}
@@ -212,17 +190,13 @@ const PaymentInteractionSection = ({
                       onApprove={onApprove}
                       onError={(err) => {
                         console.error('PayPal Button Error:', err);
-                        // Don't show error to user as it might be temporary
                       }}
                       disabled={!paymentform.amount || Number(paymentform.amount) <= 0 || isPaying || !paymentform.name}
+                      className="w-full"
                     />
                   </PayPalScriptProvider>
                 </div>
-              ) : isClient ? (
-                <div className="text-center p-3 bg-red-500/10 text-red-400 rounded-lg">PayPal is not configured.</div>
-              ) : (
-                <div className="text-center p-3 bg-gray-500/10 text-gray-400 rounded-lg">Loading payment options...</div>
-              )}
+              </div>
             </div>
           </div>
         </div>

@@ -125,14 +125,14 @@ export default function AppLayout({ children }) {
             <NotificationBell />
 
             <Link href="/account" className="relative w-9 h-9">
-              {userData?.profilepic ? (
+              {(userData?.profilepic || session?.user?.image) ? (
                 <Image
-                  src={userData.profilepic}
+                  src={userData?.profilepic || session.user.image}
                   alt="Profile"
                   fill
                   sizes="36px"
                   className="rounded-full object-cover border-2 border-white/10"
-                  unoptimized
+                  priority
                 />
               ) : (
                 <div className="w-full h-full rounded-full bg-white/10 flex items-center justify-center border-2 border-white/10">

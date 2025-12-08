@@ -14,10 +14,10 @@ export async function GET(req) {
     return Response.json([], { status: 200 });
   }
 
-  // Fetch only verified users using index on username
+  // Fetch only public users using index on username
   const users = await User.find({
     username: { $regex: q, $options: "i" },
-    "instagram.isVerified": true, // Only verified profiles
+    visibility: "public", // Only public profiles
   }).select("username _id profilepic").lean();
 
   // Add cache headers - cache for 1 minute for search results

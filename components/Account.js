@@ -10,18 +10,18 @@ import { useUser } from '@/context/UserContext'
 import { emitProfileUpdate, emitAccountTypeChange } from '@/utils/eventBus'
 import { toast } from 'sonner';
 
-const Account = () => {
+const Account = ({ initialUser }) => {
   const { data: session, update, status } = useSession();
   const router = useRouter();
   const { refreshUserData, updateUserData } = useUser(); // For updating user data in navbar
 
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    username: "",
-    profilepic: "",
-    coverpic: "",
-    accountType: "User",
+    name: initialUser?.name || "",
+    email: initialUser?.email || "",
+    username: initialUser?.username || "",
+    profilepic: initialUser?.profilepic || "",
+    coverpic: initialUser?.coverpic || "",
+    accountType: initialUser?.accountType || "User",
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -56,7 +56,8 @@ const Account = () => {
     }
   };
 
-  const [loading, setLoading] = useState(true);
+  // If we have initialUser, we are not loading
+  const [loading, setLoading] = useState(!initialUser);
 
   const hasLoadedData = useRef(false);
 
@@ -82,11 +83,12 @@ const Account = () => {
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push('/');
-    } else if (status === "authenticated" && session && !hasLoadedData.current) {
+    } else if (status === "authenticated" && session && !hasLoadedData.current && !initialUser) {
+      // Only fetch if we don't have initialUser
       getData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, getData]);
+  }, [status, getData, initialUser]);
 
 
 

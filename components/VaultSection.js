@@ -7,12 +7,13 @@ import { toast } from 'sonner';
 import { fetchCreatorVaultItems, redeemVaultItem, fetchRedeemedItems, fetchFanRedemptions } from '@/actions/vaultActions';
 import { useUser } from '@/context/UserContext';
 import { emitPaymentSuccess } from '@/utils/eventBus';
+import { FaGem } from 'react-icons/fa';
 
-const VaultSection = ({ currentUser }) => {
+const VaultSection = ({ currentUser, initialItems }) => {
   const { data: session } = useSession();
   const { updatePoints } = useUser(); // For updating navbar points
-  const [vaultItems, setVaultItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [vaultItems, setVaultItems] = useState(initialItems || []);
+  const [loading, setLoading] = useState(!initialItems);
   const [redeeming, setRedeeming] = useState({});
   const [userPoints, setUserPoints] = useState(0);
   const [redeemedItems, setRedeemedItems] = useState([]);
@@ -20,7 +21,10 @@ const VaultSection = ({ currentUser }) => {
 
   useEffect(() => {
     if (currentUser?.username) {
-      loadVaultItems();
+      // Only fetch if we don't have initial items or if we want to refresh (optional logic)
+      if (!initialItems) {
+        loadVaultItems();
+      }
       if (session?.user?.name) {
         loadFanData();
       }
@@ -367,7 +371,12 @@ const VaultSection = ({ currentUser }) => {
   if (vaultItems.length === 0) {
     return (
       <div className="w-full max-w-5xl mt-8 flex flex-col items-center justify-center text-center p-8 text-text/60">
-        <div className="text-6xl mb-4">🗃️</div>
+        <div className="mb-6 relative group">
+          <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full group-hover:bg-primary/30 transition-all duration-500"></div>
+          <div className="relative z-10 w-24 h-24 bg-white/5 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10 shadow-xl group-hover:scale-105 transition-all duration-500 group-hover:border-primary/30">
+            <FaGem className="text-5xl text-primary drop-shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
+          </div>
+        </div>
         <h2 className="text-3xl font-bold text-secondary mb-4 uppercase tracking-wider">
           VAULT
         </h2>
