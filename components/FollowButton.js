@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFollowChange, showFollowerCount = false }) => {
   const { data: session } = useSession();
@@ -59,7 +59,7 @@ const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFoll
         const data = await response.json();
         setIsFollowing(data.isFollowing);
         setFollowerCount(data.followerCount);
-        
+
         // Call parent callback if provided
         if (onFollowChange) {
           onFollowChange(data.isFollowing, data.followerCount);
@@ -98,8 +98,8 @@ const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFoll
         className={`
           px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 min-w-[100px] shadow-md
           ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 hover:shadow-lg'}
-          ${isFollowing 
-            ? 'bg-white/10 text-text border border-white/20 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30' 
+          ${isFollowing
+            ? 'bg-white/10 text-text border border-white/20 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30'
             : 'btn-gradient text-white border-0'
           }
         `}
@@ -125,7 +125,7 @@ const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFoll
           </span>
         )}
       </button>
-      
+
       {/* Follower count display - only show if explicitly requested and not creator's own page */}
       {showFollowerCount && followerCount > 0 && (
         <span className="text-sm text-text/60">

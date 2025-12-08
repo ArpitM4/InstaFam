@@ -29,7 +29,7 @@ const UserSchema = new Schema({
     upi: String,
   },
 
-  // New fields for Onboarding Overhaul
+  // Visibility and profile setup
   visibility: {
     type: String,
     enum: ["hidden", "public"],

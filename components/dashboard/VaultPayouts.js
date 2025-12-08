@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const VaultPayouts = () => {
   const { data: session, status } = useSession();
@@ -89,8 +89,8 @@ const VaultPayouts = () => {
   };
 
   const getMonthName = (month) => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return months[month - 1];
   };
 
@@ -249,11 +249,10 @@ const VaultPayouts = () => {
                     <div>
                       <div className="flex items-center space-x-2">
                         <p className="font-medium text-text text-sm">{redemption.fanUsername}</p>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          redemption.status === 'Fulfilled'
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${redemption.status === 'Fulfilled'
                             ? 'bg-green-500/10 text-green-500'
                             : 'bg-yellow-500/10 text-yellow-500'
-                        }`}>
+                          }`}>
                           {redemption.status}
                         </span>
                       </div>

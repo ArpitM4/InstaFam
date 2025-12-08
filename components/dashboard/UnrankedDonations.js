@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { FaSpinner, FaHeart, FaCalendar, FaDollarSign } from "react-icons/fa";
 
 /**
@@ -25,13 +25,13 @@ const UnrankedDonations = () => {
     try {
       setLoading(true);
       const res = await fetch('/api/unranked-donations');
-      
+
       if (!res.ok) {
         throw new Error('Failed to fetch donations');
       }
-      
+
       const data = await res.json();
-      
+
       if (data.success) {
         setDonations(data.donations);
         setStats({
@@ -122,8 +122,8 @@ const UnrankedDonations = () => {
         ) : (
           <div className="divide-y divide-text/10">
             {donations.map((donation) => (
-              <div 
-                key={donation._id} 
+              <div
+                key={donation._id}
                 className="p-6 hover:bg-background/30 transition-colors duration-200"
               >
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0">
@@ -135,13 +135,13 @@ const UnrankedDonations = () => {
                         {donation.donorName}
                       </h3>
                     </div>
-                    
+
                     {donation.message && (
                       <p className="text-text/70 text-sm italic ml-6">
                         "{donation.message}"
                       </p>
                     )}
-                    
+
                     <div className="flex items-center space-x-2 mt-2 ml-6">
                       <FaCalendar className="text-text/40 text-xs" />
                       <p className="text-text/50 text-xs">
@@ -168,7 +168,7 @@ const UnrankedDonations = () => {
       {/* Info Footer */}
       <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
         <p className="text-blue-300 text-sm">
-          💡 <strong>Note:</strong> These are contributions made when no event was active. 
+          💡 <strong>Note:</strong> These are contributions made when no event was active.
           They don't appear on leaderboards but show genuine support from your fans!
         </p>
       </div>

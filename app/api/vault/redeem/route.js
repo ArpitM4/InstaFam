@@ -17,7 +17,7 @@ await connectDb();
 export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -40,14 +40,13 @@ export async function POST(request) {
       return NextResponse.json({ error: "Vault item not found" }, { status: 404 });
     }
 
-    // Check if fan has enough available (unexpired) points
-    const availablePoints = await getAvailablePoints(fan._id);
+    // Check if fan has enough available (unexpired) points FOR THIS CREATOR
+    const availablePoints = await getAvailablePoints(fan._id, vaultItem.creatorId);
     if (availablePoints < vaultItem.pointCost) {
-      return NextResponse.json({ 
-        error: "Insufficient points",
+      return NextResponse.json({
+        error: "Insufficient points for this creator",
         required: vaultItem.pointCost,
-        available: availablePoints,
-        total: fan.points || 0
+        available: availablePoints
       }, { status: 400 });
     }
 
@@ -62,11 +61,11 @@ export async function POST(request) {
     }
 
     // Start transaction-like operations
-    // Use FIFO point spending system
+    // Use FIFO point spending system with creatorId
     try {
-      await spendPoints(fan._id, vaultItem.pointCost, `Vault redemption: ${vaultItem.title}`);
+      await spendPoints(fan._id, vaultItem.creatorId, vaultItem.pointCost, `Vault redemption: ${vaultItem.title}`);
     } catch (pointError) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: pointError.message,
         required: vaultItem.pointCost,
         available: availablePoints
@@ -85,7 +84,7 @@ export async function POST(request) {
     const isDigitalFile = vaultItem.fileType !== 'text-reward' && vaultItem.fileType !== 'promise';
     const isPromise = vaultItem.fileType === 'promise';
     const isAutoFulfilled = isDigitalFile || isPromise; // Both digital files and promises are auto-fulfilled
-    
+
     const redemption = new Redemption({
       fanId: fan._id,
       creatorId: vaultItem.creatorId,
@@ -103,10 +102,10 @@ export async function POST(request) {
       const now = new Date();
       const currentMonth = now.getMonth() + 1;
       const currentYear = now.getFullYear();
-      
+
       // Get creator details
       const creator = await User.findById(vaultItem.creatorId);
-      
+
       // Get or create monthly bonus record
       const bonus = await Bonus.getOrCreateMonthlyBonus(
         vaultItem.creatorId,
@@ -135,8 +134,8 @@ export async function POST(request) {
       );
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: "Item redeemed successfully",
       fileUrl: vaultItem.fileUrl,
       pointsRemaining: Math.max(0, (fan.points || 0) - vaultItem.pointCost),

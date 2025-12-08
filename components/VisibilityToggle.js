@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export default function VisibilityToggle({ isVisible, onToggle }) {
     const [loading, setLoading] = useState(false);
@@ -33,8 +33,8 @@ export default function VisibilityToggle({ isVisible, onToggle }) {
             onClick={handleToggle}
             disabled={loading}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${isVisible === "public"
-                    ? "bg-green-500/10 text-green-500 hover:bg-green-500/20"
-                    : "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20"
+                ? "bg-green-500/10 text-green-500 hover:bg-green-500/20"
+                : "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20"
                 }`}
             title={isVisible === "public" ? "Page is Public" : "Page is Hidden"}
         >

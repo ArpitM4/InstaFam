@@ -4,8 +4,7 @@ import React, { useEffect, useState, useCallback, useRef, useMemo } from "react"
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ToastContainer, toast, Bounce } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "sonner";
 import { FaSpinner } from "react-icons/fa";
 import { FaUserCircle } from "react-icons/fa";
 import { FaPen } from "react-icons/fa";
@@ -87,29 +86,14 @@ const savePayment = async (paymentDetails, captureDetails, currentEvent = null, 
       if (data.success || (data.capture && data.capture.status === "COMPLETED")) {
         // Show appropriate success message based on donation type
         if (data.type === 'ranked') {
-          toast.success("Thank you for your support! ❤️ You're on the leaderboard! 🏆", {
-            position: "top-right",
-            autoClose: 5000,
-            theme: "light",
-            transition: Bounce,
-          });
+          toast.success("Thank you for your support! ❤️ You're on the leaderboard! 🏆");
         } else {
-          toast.success("Contribution successful! Thank you for your support! ❤️", {
-            position: "top-right",
-            autoClose: 5000,
-            theme: "light",
-            transition: Bounce,
-          });
+          toast.success("Contribution successful! Thank you for your support! ❤️");
         }
         return { success: true, paymentId: data.paymentId, type: data.type, pointsAwarded: data.pointsAwarded || 0 };
       } else {
         const errorMsg = data.capture && data.capture.status ? `Payment status: ${data.capture.status}` : (data.error || "Payment failed.");
-        toast.error(`Payment error: ${errorMsg}`, {
-          position: "top-right",
-          autoClose: 5000,
-          theme: "light",
-          transition: Bounce,
-        });
+        toast.error(`Payment error: ${errorMsg}`);
         return { success: false, message: errorMsg };
       }
     } else {
@@ -117,12 +101,7 @@ const savePayment = async (paymentDetails, captureDetails, currentEvent = null, 
     }
   } catch (err) {
     console.error('Error saving payment:', err);
-    toast.error('Error saving payment.', {
-      position: "top-right",
-      autoClose: 5000,
-      theme: "light",
-      transition: Bounce,
-    });
+    toast.error('Error saving payment.');
     return { success: false, message: 'Error saving payment.' };
   }
 }
@@ -240,6 +219,7 @@ const PaymentPage = ({ username }) => {
   const [showBetaPopup, setShowBetaPopup] = useState(false);
   const [showFamPointsPopup, setShowFamPointsPopup] = useState(false);
   const [earnedFamPoints, setEarnedFamPoints] = useState(0);
+  const [fanPoints, setFanPoints] = useState(null); // Points for current logged-in fan for this creator
   const [visibleSections, setVisibleSections] = useState(['contribute', 'vault', 'links']);
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
   const [tempVisibleSections, setTempVisibleSections] = useState([]);
@@ -370,6 +350,25 @@ const PaymentPage = ({ username }) => {
       setPaymentform((prev) => ({ ...prev, name: session.user.name }));
     }
   }, [session]);
+
+  // Fetch fan's FamPoints for this creator
+  useEffect(() => {
+    const fetchFanPoints = async () => {
+      if (session && currentUser?._id && !isOwner) {
+        try {
+          const response = await fetch(`/api/points?creatorId=${currentUser._id}`);
+          if (response.ok) {
+            const data = await response.json();
+            setFanPoints(data.points || 0);
+          }
+        } catch (error) {
+          console.error('Error fetching fan points:', error);
+          setFanPoints(0);
+        }
+      }
+    };
+    fetchFanPoints();
+  }, [session, currentUser?._id, isOwner]);
 
   // Auto-close FamPoints popup after 3 seconds
   useEffect(() => {
@@ -871,19 +870,6 @@ const PaymentPage = ({ username }) => {
 
       {/* Beta Popup */}
       {showBetaPopup && <BetaPopup />}
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ top: 72 }}
-      />
       <div id="thisone" className="min-h-screen text-text flex flex-col items-center pb-36 relative overflow-x-hidden" style={{ backgroundColor: 'var(--background-creator)' }}>
         {/* Radial gradient background overlay */}
         <div className="absolute inset-0 -z-10 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 20%, rgba(225,29,72,0.4) 0%, rgba(99,102,241,0.3) 40%, #14141f 100%)' }} />
@@ -919,8 +905,8 @@ const PaymentPage = ({ username }) => {
               <button
                 onClick={() => handleTabChange('links')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'links'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
                   }`}
               >
                 Links
@@ -931,8 +917,8 @@ const PaymentPage = ({ username }) => {
               <button
                 onClick={() => handleTabChange('contribute')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'contribute'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
                   }`}
               >
                 Contribute
@@ -943,8 +929,8 @@ const PaymentPage = ({ username }) => {
               <button
                 onClick={() => handleTabChange('vault')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'vault'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
                   }`}
               >
                 Vault
@@ -957,8 +943,8 @@ const PaymentPage = ({ username }) => {
               <button
                 onClick={() => handleTabChange('community')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'community'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
                   }`}
               >
                 Community
@@ -969,8 +955,8 @@ const PaymentPage = ({ username }) => {
               <button
                 onClick={() => handleTabChange('merchandise')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'merchandise'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
                   }`}
               >
                 Merchandise
@@ -981,8 +967,8 @@ const PaymentPage = ({ username }) => {
               <button
                 onClick={() => handleTabChange('subscription')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'subscription'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
                   }`}
               >
                 Subscription
@@ -993,8 +979,8 @@ const PaymentPage = ({ username }) => {
               <button
                 onClick={() => handleTabChange('courses')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'courses'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
                   }`}
               >
                 Courses
@@ -1005,8 +991,8 @@ const PaymentPage = ({ username }) => {
               <button
                 onClick={() => handleTabChange('giveaway')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'giveaway'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
                   }`}
               >
                 Giveaway
@@ -1077,7 +1063,28 @@ const PaymentPage = ({ username }) => {
           )}
 
           {activeTab === 'vault' && (
-            <VaultSection currentUser={currentUser} />
+            <div className="w-full max-w-5xl">
+              {/* FamPoints Balance Box for fans (not owners) */}
+              {session && !isOwner && fanPoints !== null && (
+                <div className="mb-6 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">🪙</span>
+                    <div>
+                      <p className="text-sm text-text/60">Your FamPoints Balance</p>
+                      <p className="text-2xl font-bold text-yellow-400">{fanPoints} points</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-text/50">Use these points to redeem vault items</p>
+                </div>
+              )}
+              {/* Prompt to login for guests */}
+              {!session && (
+                <div className="mb-6 p-4 bg-white/5 border border-text/10 rounded-xl text-center">
+                  <p className="text-text/60 text-sm">🔒 Login to see your FamPoints and redeem vault items</p>
+                </div>
+              )}
+              <VaultSection currentUser={currentUser} />
+            </div>
           )}
 
           {activeTab === 'community' && (

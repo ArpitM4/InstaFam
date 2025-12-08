@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 // Use NEXT_PUBLIC_ADMIN_EMAILS for client-side access
 const ADMIN_EMAILS = (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_ADMIN_EMAILS)
@@ -24,7 +24,7 @@ const AdminBlogActions = ({ blog, onDelete }) => {
 
   const handleDelete = async () => {
     setIsDeleting(true);
-    
+
     try {
       const response = await fetch(`/api/blogs?id=${blog._id}`, {
         method: 'DELETE',
@@ -35,7 +35,7 @@ const AdminBlogActions = ({ blog, onDelete }) => {
       if (data.success) {
         toast.success("Blog post deleted successfully!");
         setShowDeleteConfirm(false);
-        
+
         // Call onDelete callback if provided (for list pages)
         if (onDelete) {
           onDelete(blog._id);
@@ -82,7 +82,7 @@ const AdminBlogActions = ({ blog, onDelete }) => {
             <p className="text-text/70 mb-6">
               Are you sure you want to delete "{blog.title}"? This action cannot be undone.
             </p>
-            
+
             <div className="flex gap-3">
               <button
                 onClick={handleDelete}
@@ -98,7 +98,7 @@ const AdminBlogActions = ({ blog, onDelete }) => {
                   'Delete'
                 )}
               </button>
-              
+
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isDeleting}

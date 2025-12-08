@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { fetchMyVaultItems, addVaultItem, deleteVaultItem, fetchVaultHistory } from "@/actions/vaultActions";
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 const MyVault = () => {
   const [vaultItems, setVaultItems] = useState([]);
@@ -28,10 +28,10 @@ const MyVault = () => {
 
   const handleUploadMethodChange = (method) => {
     setUploadMethod(method);
-    
+
     let perkType = 'DigitalFile';
     let fileType = newVaultItem.fileType;
-    
+
     if (method === 'none') {
       perkType = 'Recognition';
       fileType = 'text-reward';
@@ -39,7 +39,7 @@ const MyVault = () => {
       perkType = 'Promise';
       fileType = 'promise';
     }
-    
+
     setNewVaultItem(prev => ({
       ...prev,
       perkType,
@@ -86,7 +86,7 @@ const MyVault = () => {
 
   const handleAddVaultItem = async (e) => {
     e.preventDefault();
-    
+
     if (!newVaultItem.title || !newVaultItem.description || !newVaultItem.pointCost) {
       toast.error('Please fill in all required fields');
       return;
@@ -219,7 +219,7 @@ const MyVault = () => {
               />
             </div>
           </div>
-          
+
           <div>
             <label className="block mb-2 text-text/70 font-medium text-sm">Description</label>
             <textarea
@@ -227,11 +227,11 @@ const MyVault = () => {
               value={newVaultItem.description}
               onChange={handleVaultItemChange}
               className="w-full p-3 rounded-xl bg-background text-text focus:ring-2 focus:ring-primary outline-none transition-all resize-none"
-              placeholder={uploadMethod === 'none' 
-                ? "Describe your Q&A reward (e.g., 'I'll answer your question in my next video' or 'Personal video response to your question')" 
+              placeholder={uploadMethod === 'none'
+                ? "Describe your Q&A reward (e.g., 'I'll answer your question in my next video' or 'Personal video response to your question')"
                 : uploadMethod === 'promise'
-                ? "Describe your promise (e.g., 'Shoutout in my next video', 'Meet & greet at next event', 'Custom social media post about you')"
-                : "Describe what fans will get when they unlock this item..."
+                  ? "Describe your promise (e.g., 'Shoutout in my next video', 'Meet & greet at next event', 'Custom social media post about you')"
+                  : "Describe what fans will get when they unlock this item..."
               }
               rows="3"
               maxLength="500"
@@ -372,11 +372,10 @@ const MyVault = () => {
           <button
             type="submit"
             disabled={vaultLoading}
-            className={`px-6 py-3 rounded-xl text-text font-medium transition-all ${
-              vaultLoading
+            className={`px-6 py-3 rounded-xl text-text font-medium transition-all ${vaultLoading
                 ? "bg-text/30 cursor-not-allowed"
                 : "bg-primary hover:bg-primary/80 hover:scale-105"
-            }`}
+              }`}
           >
             {vaultLoading ? "Adding..." : "Add to Vault"}
           </button>
@@ -387,18 +386,17 @@ const MyVault = () => {
       <section className="bg-dropdown-hover rounded-2xl p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-medium">Your Vault Management</h3>
-          
+
           <div className="flex bg-background rounded-xl p-1">
             <button
               onClick={() => {
                 setActiveVaultTab('active');
                 loadVaultItems();
               }}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeVaultTab === 'active'
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeVaultTab === 'active'
                   ? 'bg-primary text-text shadow-sm'
                   : 'text-text/60 hover:text-text hover:bg-dropdown-hover'
-              }`}
+                }`}
             >
               Active Items ({vaultItems.length})
             </button>
@@ -407,11 +405,10 @@ const MyVault = () => {
                 setActiveVaultTab('history');
                 loadVaultHistory();
               }}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeVaultTab === 'history'
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeVaultTab === 'history'
                   ? 'bg-primary text-text shadow-sm'
                   : 'text-text/60 hover:text-text hover:bg-dropdown-hover'
-              }`}
+                }`}
             >
               Vault History ({vaultHistoryItems.length})
             </button>
@@ -445,9 +442,9 @@ const MyVault = () => {
                         Archive
                       </button>
                     </div>
-                    
+
                     <p className="text-text/60 text-sm line-clamp-2">{item.description}</p>
-                    
+
                     <div className="flex items-center justify-between text-sm">
                       <span className="bg-primary/20 text-blue-300 px-3 py-1 rounded-lg font-medium">
                         {item.pointCost} points
@@ -463,7 +460,7 @@ const MyVault = () => {
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="text-xs text-text/50 flex justify-between">
                       <span>{item.unlockCount} unlocks</span>
                       <span>{new Date(item.createdAt).toLocaleDateString()}</span>
@@ -498,9 +495,9 @@ const MyVault = () => {
                         Expired
                       </span>
                     </div>
-                    
+
                     <p className="text-text/60 text-sm line-clamp-2">{item.description}</p>
-                    
+
                     <div className="flex items-center justify-between text-sm">
                       <span className="bg-text/20 text-text/60 px-3 py-1 rounded-lg">
                         {item.pointCost} points
@@ -516,7 +513,7 @@ const MyVault = () => {
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="text-xs text-text/50 flex justify-between">
                       <span>{item.unlockCount} total unlocks</span>
                       <div className="text-right">
@@ -531,7 +528,7 @@ const MyVault = () => {
           </>
         )}
       </section>
-    </div>  
+    </div>
   );
 };
 

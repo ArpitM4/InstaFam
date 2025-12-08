@@ -7,8 +7,7 @@ import PerformanceMonitor from "@/components/PerformanceMonitor";
 import GoogleOneTap from "@/components/GoogleOneTap";
 import { Analytics } from "@vercel/analytics/next";
 import { UserProvider } from "@/context/UserContext";
-// Initialize FamPoints expiry system
-import "@/utils/initializeExpiry";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
@@ -20,7 +19,7 @@ export const metadata = {
   },
   description: 'Join Sygil to connect with creators, earn points, unlock exclusive content, and support your favorite influencers through donations and premium perks. The ultimate creator-fan platform.',
   keywords: [
-    'creators', 'influencers', 'exclusive content', 'fan community', 
+    'creators', 'influencers', 'exclusive content', 'fan community',
     'creator support', 'social platform', 'content creators', 'fan engagement',
     'creator economy', 'monetization', 'vault items', 'creator dashboard',
     'fan points', 'donations', 'premium content', 'influencer marketing'
@@ -119,18 +118,18 @@ export default function RootLayout({ children }) {
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://vercel.live" />
         <link rel="preconnect" href="https://accounts.google.com" />
-        
+
         {/* Preconnect to image CDNs and external services */}
         <link rel="preconnect" href="https://picsum.photos" />
         <link rel="preconnect" href="https://api.dicebear.com" />
         <link rel="preconnect" href="https://cdn.simpleicons.org" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://www.paypal.com" />
-        
+
         {/* Google Identity Services */}
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <script src="https://apis.google.com/js/api.js" async defer></script>
-        
+
         {/* Google Analytics */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-7JF29P11H7"></script>
         <script
@@ -143,7 +142,7 @@ export default function RootLayout({ children }) {
             `,
           }}
         />
-        
+
         {/* JSON-LD Organization Schema */}
         <script
           type="application/ld+json"
@@ -204,7 +203,7 @@ export default function RootLayout({ children }) {
               },
               "featureList": [
                 "Creator profiles",
-                "Fan points system", 
+                "Fan points system",
                 "Exclusive content access",
                 "Creator donations",
                 "Content vault",
@@ -215,7 +214,20 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="antialiased">
-        <SessionWrapper>  
+        <Toaster
+          theme="dark"
+          position="top-right"
+          richColors
+          closeButton
+          toastOptions={{
+            style: {
+              background: 'rgba(23, 23, 23, 0.95)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(12px)',
+            },
+          }}
+        />
+        <SessionWrapper>
           <UserProvider>
             <PerformanceMonitor />
             <GoogleOneTap />
@@ -226,7 +238,7 @@ export default function RootLayout({ children }) {
             </AppLayout>
           </UserProvider>
           <Analytics />
-        </SessionWrapper> 
+        </SessionWrapper>
       </body>
     </html>
   );

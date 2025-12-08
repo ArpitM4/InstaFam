@@ -5,47 +5,42 @@ import { createNotification } from '@/utils/notificationHelpers';
 
 /**
  * Spend points using FIFO (First In, First Out) algorithm
- * Uses oldest unexpired points first
+ * Uses oldest unexpired points first for a SPECIFIC CREATOR
+ * @param {ObjectId} userId - The fan's user ID
+ * @param {ObjectId} creatorId - The creator whose points to spend
+ * @param {number} pointsToSpend - Amount of points to spend
+ * @param {string} reason - Description for the transaction
  */
-export async function spendPoints(userId, pointsToSpend, reason = 'Points spent') {
+export async function spendPoints(userId, creatorId, pointsToSpend, reason = 'Points spent') {
   try {
-    // Debug logging
-    console.log('🔍 spendPoints ENTRY:', { userId, pointsToSpend, reason, type: typeof pointsToSpend, timestamp: new Date().toISOString() });
-    
-    // Validate input and ensure pointsToSpend is a valid number
+    // Validate inputs
     const validPointsToSpend = typeof pointsToSpend === 'number' && !isNaN(pointsToSpend) && pointsToSpend > 0 ? pointsToSpend : 0;
-    
-    if (!userId || validPointsToSpend <= 0) {
-      throw new Error('Invalid userId or pointsToSpend value');
+
+    if (!userId || !creatorId || validPointsToSpend <= 0) {
+      throw new Error('Invalid userId, creatorId, or pointsToSpend value');
     }
 
-    console.log('🔍 spendPoints: Getting available points...');
-    
-    // Get available unexpired points, sorted by expiration (oldest first)
     const now = new Date();
+
+    // Get available unexpired points for THIS CREATOR, sorted by expiration (oldest first)
     const availablePoints = await PointTransaction.find({
       userId,
+      creatorId, // Filter by creator
       type: { $in: ['Earned', 'Bonus', 'Refund'] },
-      expired: { $ne: true }, // Handle missing expired field
-      used: { $ne: true }, // Handle missing used field
+      expired: { $ne: true },
+      used: { $ne: true },
       $or: [
-        { expiresAt: { $gt: now } }, // Has expiry date and not expired
-        { expiresAt: { $exists: false } }, // Old transactions without expiry
-        { expiresAt: null } // Transactions with null expiry
+        { expiresAt: { $gt: now } },
+        { expiresAt: { $exists: false } },
+        { expiresAt: null }
       ]
     }).sort({ expiresAt: 1, createdAt: 1 });
 
-    console.log('🔍 spendPoints: Found transactions count:', availablePoints.length);
-
-    // Calculate total available with validation
+    // Calculate total available
     const totalAvailable = availablePoints.reduce((sum, tx) => {
-      // Handle backward compatibility: use amount field first, then fallback to points_earned
       const points = tx.amount || tx.points_earned || 0;
-      const amount = typeof points === 'number' && !isNaN(points) ? points : 0;
-      return sum + amount;
+      return sum + (typeof points === 'number' && !isNaN(points) ? points : 0);
     }, 0);
-
-    console.log('🔍 spendPoints: Total available points:', totalAvailable);
 
     if (totalAvailable < validPointsToSpend) {
       throw new Error('Insufficient points');
@@ -54,123 +49,62 @@ export async function spendPoints(userId, pointsToSpend, reason = 'Points spent'
     let remainingToSpend = validPointsToSpend;
     const usedTransactions = [];
 
-    console.log('🔍 spendPoints: Starting FIFO loop...');
-
-    // Use points from oldest to newest
+    // Use points from oldest to newest (FIFO)
     for (const transaction of availablePoints) {
       if (remainingToSpend <= 0) break;
 
-      console.log('🔍 spendPoints: Processing transaction:', { 
-        transactionId: transaction._id, 
-        amount: transaction.amount, 
-        points_earned: transaction.points_earned,
-        remainingToSpend 
-      });
-
-      // Validate transaction amount with backward compatibility
-      const points = transaction.amount || transaction.points_earned || 0;
-      const txAmount = typeof points === 'number' && !isNaN(points) ? points : 0;
+      const txAmount = transaction.amount || transaction.points_earned || 0;
       if (txAmount <= 0) continue;
 
-      console.log('🔍 spendPoints: Transaction amount:', txAmount, 'Remaining to spend:', remainingToSpend);
-
       if (remainingToSpend >= txAmount) {
-        console.log('🔍 spendPoints: Using entire transaction');
         // Use entire transaction
         transaction.used = true;
         await transaction.save();
         usedTransactions.push(transaction._id);
         remainingToSpend -= txAmount;
       } else {
-        console.log('🔍 spendPoints: SPLITTING TRANSACTION - Partial use');
-        console.log('🔍 spendPoints: Original amount:', txAmount, 'Will use:', remainingToSpend, 'Will remain:', txAmount - remainingToSpend);
-        
         // Split transaction - use partial amount
-        const originalAmount = txAmount;
-        
-        // Update the correct field based on which one was used
-        if (transaction.amount !== undefined && transaction.amount !== null) {
-          console.log('🔍 spendPoints: Updating amount field');
+        if (transaction.amount !== undefined) {
           transaction.amount = txAmount - remainingToSpend;
-        } else if (transaction.points_earned !== undefined && transaction.points_earned !== null) {
-          console.log('🔍 spendPoints: Updating points_earned field and setting amount for validation');
+        }
+        if (transaction.points_earned !== undefined) {
           transaction.points_earned = txAmount - remainingToSpend;
-          // Also set amount field for validation compliance
-          transaction.amount = txAmount - remainingToSpend;
         }
         await transaction.save();
 
-        // Create record for used portion with validation
-        const usedAmount = remainingToSpend;
-        console.log('Creating split transaction:', { 
-          usedAmount, 
-          remainingToSpend, 
-          originalAmount: txAmount, 
-          type: typeof usedAmount,
-          isNaN: isNaN(usedAmount)
+        // Create record for used portion
+        const usedTx = new PointTransaction({
+          userId,
+          creatorId,
+          amount: remainingToSpend,
+          type: transaction.type,
+          source_payment_id: transaction.source_payment_id,
+          used: true,
+          expired: false,
+          expiresAt: transaction.expiresAt,
+          createdAt: transaction.createdAt
         });
-        
-        if (usedAmount > 0 && !isNaN(usedAmount)) {
-          const transactionData = {
-            userId,
-            amount: usedAmount, // Always use the new amount field for new transactions
-            type: transaction.type, // Preserve original type (Earned, Bonus, or Refund)
-            source_payment_id: transaction.source_payment_id,
-            used: true,
-            expired: false,
-            expiresAt: transaction.expiresAt,
-            createdAt: transaction.createdAt
-          };
-          
-          console.log('Split transaction data:', transactionData);
-          
-          const usedTx = new PointTransaction(transactionData);
-          await usedTx.save();
-          usedTransactions.push(usedTx._id);
-        }
+        await usedTx.save();
+        usedTransactions.push(usedTx._id);
         remainingToSpend = 0;
       }
     }
 
-    // Mark used transactions
-    for (const usedTxId of usedTransactions) {
-      await PointTransaction.findByIdAndUpdate(usedTxId, { used: true });
-    }
-
-    // Create a "Spent" transaction record to show in user's history
-    console.log('🔍 spendPoints: Creating Spent transaction record...');
+    // Create a "Spent" transaction record
     const spentTransaction = new PointTransaction({
       userId,
-      amount: -validPointsToSpend, // Negative amount to show as debit
+      creatorId,
+      amount: -validPointsToSpend,
       type: 'Spent',
-      description: reason, // Use the provided reason
-      used: false, // This transaction itself is not "used", it represents the spending
+      description: reason,
+      used: false,
       expired: false,
-      expiresAt: null, // Spent transactions don't expire
-      createdAt: new Date() // Use current timestamp
+      expiresAt: null
     });
-    
-    console.log('🔍 spendPoints: Spent transaction data:', {
-      userId: spentTransaction.userId,
-      amount: spentTransaction.amount,
-      type: spentTransaction.type,
-      description: spentTransaction.description,
-      used: spentTransaction.used
-    });
-    
     await spentTransaction.save();
-    console.log('🔍 spendPoints: Spent transaction saved with ID:', spentTransaction._id);
 
-    // Update user's total points with validation
-    const user = await User.findById(userId);
-    if (user) {
-      const currentPoints = typeof user.points === 'number' && !isNaN(user.points) ? user.points : 0;
-      user.points = Math.max(0, currentPoints - validPointsToSpend);
-      await user.save();
-    }
-
-    return { 
-      success: true, 
+    return {
+      success: true,
       spentAmount: validPointsToSpend,
       spentTransactionId: spentTransaction._id
     };
@@ -181,28 +115,29 @@ export async function spendPoints(userId, pointsToSpend, reason = 'Points spent'
 }
 
 /**
- * Calculate available (unexpired and unused) points for a user
+ * Calculate available (unexpired and unused) points for a user with a SPECIFIC CREATOR
+ * @param {ObjectId} userId - The fan's user ID
+ * @param {ObjectId} creatorId - The creator to check points for
  */
-export async function getAvailablePoints(userId) {
+export async function getAvailablePoints(userId, creatorId) {
   try {
     const now = new Date();
     const availableTransactions = await PointTransaction.find({
       userId,
-      type: { $in: ['Earned', 'Bonus', 'Refund'] }, // Only count positive transaction types
-      expired: { $ne: true }, // Handle missing expired field
-      used: { $ne: true }, // Handle missing used field
+      creatorId,
+      type: { $in: ['Earned', 'Bonus', 'Refund'] },
+      expired: { $ne: true },
+      used: { $ne: true },
       $or: [
-        { expiresAt: { $gt: now } }, // Has expiry date and not expired
-        { expiresAt: { $exists: false } }, // Old transactions without expiry
-        { expiresAt: null } // Transactions with null expiry
+        { expiresAt: { $gt: now } },
+        { expiresAt: { $exists: false } },
+        { expiresAt: null }
       ]
     });
 
     return availableTransactions.reduce((sum, tx) => {
-      // Handle backward compatibility: use amount field first, then fallback to points_earned
       const points = tx.amount || tx.points_earned || 0;
-      const amount = typeof points === 'number' && !isNaN(points) && points > 0 ? points : 0;
-      return sum + amount;
+      return sum + (typeof points === 'number' && !isNaN(points) && points > 0 ? points : 0);
     }, 0);
   } catch (error) {
     console.error('Error calculating available points:', error);
@@ -211,27 +146,123 @@ export async function getAvailablePoints(userId) {
 }
 
 /**
- * Get points that are expiring soon (within specified days)
+ * Get all points grouped by creator for a user
+ * @param {ObjectId} userId - The fan's user ID
+ * @returns {Array} Array of { creatorId, creatorUsername, creatorProfilePic, points, expiringPoints }
  */
-export async function getExpiringPoints(userId, daysAhead = 30) {
+export async function getPointsByCreator(userId) {
+  try {
+    const now = new Date();
+    const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+    // Aggregate points by creator
+    const pointsByCreator = await PointTransaction.aggregate([
+      {
+        $match: {
+          userId: userId,
+          type: { $in: ['Earned', 'Bonus', 'Refund'] },
+          expired: { $ne: true },
+          used: { $ne: true },
+          $or: [
+            { expiresAt: { $gt: now } },
+            { expiresAt: { $exists: false } },
+            { expiresAt: null }
+          ]
+        }
+      },
+      {
+        $group: {
+          _id: '$creatorId',
+          totalPoints: {
+            $sum: { $ifNull: ['$amount', { $ifNull: ['$points_earned', 0] }] }
+          },
+          expiringPoints: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $ne: ['$expiresAt', null] },
+                    { $lte: ['$expiresAt', thirtyDaysFromNow] }
+                  ]
+                },
+                { $ifNull: ['$amount', { $ifNull: ['$points_earned', 0] }] },
+                0
+              ]
+            }
+          },
+          nextExpiry: { $min: '$expiresAt' }
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'creator'
+        }
+      },
+      {
+        $unwind: '$creator'
+      },
+      {
+        $project: {
+          creatorId: '$_id',
+          creatorUsername: '$creator.username',
+          creatorName: '$creator.name',
+          creatorProfilePic: '$creator.profilepic',
+          points: '$totalPoints',
+          expiringPoints: '$expiringPoints',
+          nextExpiry: '$nextExpiry'
+        }
+      },
+      {
+        $sort: { points: -1 }
+      }
+    ]);
+
+    return pointsByCreator;
+  } catch (error) {
+    console.error('Error getting points by creator:', error);
+    return [];
+  }
+}
+
+/**
+ * Get points that are expiring soon for a specific creator
+ * @param {ObjectId} userId - The fan's user ID
+ * @param {ObjectId} creatorId - The creator to check
+ * @param {number} daysAhead - Number of days to look ahead (default 30)
+ */
+export async function getExpiringPoints(userId, creatorId, daysAhead = 30) {
   try {
     const now = new Date();
     const futureDate = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
 
-    const expiringPoints = await PointTransaction.find({
+    const query = {
       userId,
-      type: 'Earned',
+      type: { $in: ['Earned', 'Bonus', 'Refund'] },
       expired: false,
       used: false,
       expiresAt: {
         $gt: now,
         $lte: futureDate
       }
-    }).sort({ expiresAt: 1 });
+    };
+
+    // Add creatorId filter if provided
+    if (creatorId) {
+      query.creatorId = creatorId;
+    }
+
+    const expiringPoints = await PointTransaction.find(query)
+      .populate('creatorId', 'username name profilepic')
+      .sort({ expiresAt: 1 });
+
+    const totalExpiring = expiringPoints.reduce((sum, tx) => sum + (tx.amount || tx.points_earned || 0), 0);
 
     return {
       transactions: expiringPoints,
-      totalExpiring: expiringPoints.reduce((sum, tx) => sum + tx.amount, 0)
+      totalExpiring
     };
   } catch (error) {
     console.error('Error getting expiring points:', error);
@@ -248,9 +279,9 @@ export async function processExpiredPoints() {
     const now = new Date();
     console.log('Processing expired points at:', now);
 
-    // Find expired transactions
+    // Find expired transactions (group by user AND creator)
     const expiredTransactions = await PointTransaction.find({
-      type: 'Earned',
+      type: { $in: ['Earned', 'Bonus', 'Refund'] },
       expired: false,
       used: false,
       expiresAt: { $lt: now }
@@ -258,33 +289,34 @@ export async function processExpiredPoints() {
 
     console.log(`Found ${expiredTransactions.length} expired transactions`);
 
-    // Group by user
-    const userExpiries = {};
+    // Group by user AND creator
+    const userCreatorExpiries = {};
     for (const tx of expiredTransactions) {
-      const userId = tx.userId.toString();
-      if (!userExpiries[userId]) {
-        userExpiries[userId] = {
+      const key = `${tx.userId}_${tx.creatorId}`;
+      if (!userCreatorExpiries[key]) {
+        userCreatorExpiries[key] = {
+          userId: tx.userId,
+          creatorId: tx.creatorId,
           total: 0,
           transactions: []
         };
       }
 
-      userExpiries[userId].total += tx.amount;
-      userExpiries[userId].transactions.push(tx._id);
+      userCreatorExpiries[key].total += tx.amount || tx.points_earned || 0;
+      userCreatorExpiries[key].transactions.push(tx._id);
 
       // Mark as expired
       tx.expired = true;
       await tx.save();
     }
 
-    // Process each user's expired points
-    for (const [userId, data] of Object.entries(userExpiries)) {
+    // Process each user-creator combination
+    for (const [key, data] of Object.entries(userCreatorExpiries)) {
       if (data.total > 0) {
-        console.log(`Processing ${data.total} expired points for user ${userId}`);
-
         // Create expired points record
         const expiredRecord = new ExpiredPoints({
-          userId,
+          userId: data.userId,
+          creatorId: data.creatorId,
           pointsExpired: data.total,
           originalTransactions: data.transactions
         });
@@ -292,7 +324,8 @@ export async function processExpiredPoints() {
 
         // Create negative transaction for expired points
         const expiryTx = new PointTransaction({
-          userId,
+          userId: data.userId,
+          creatorId: data.creatorId,
           amount: -data.total,
           type: 'Expired',
           relatedTransactions: data.transactions,
@@ -300,20 +333,14 @@ export async function processExpiredPoints() {
         });
         await expiryTx.save();
 
-        // Update user's total points
-        const user = await User.findById(userId);
-        if (user) {
-          user.points = Math.max(0, (user.points || 0) - data.total);
-          await user.save();
-        }
-
-        // Send notification to user
+        // Send notification
         try {
+          const creator = await User.findById(data.creatorId).select('username');
           await createNotification({
-            recipientId: userId,
+            recipientId: data.userId,
             type: 'points_expired',
-            title: `${data.total} FamPoints have expired`,
-            message: `${data.total} of your FamPoints have expired after 60 days of inactivity. Use your points before they expire!`
+            title: `${data.total} FamPoints expired`,
+            message: `${data.total} of your FamPoints for ${creator?.username || 'a creator'} have expired after 60 days.`
           });
         } catch (notifError) {
           console.error('Error sending expiry notification:', notifError);
@@ -322,7 +349,10 @@ export async function processExpiredPoints() {
     }
 
     console.log('Expired points processing completed');
-    return { processedUsers: Object.keys(userExpiries).length, totalExpired: Object.values(userExpiries).reduce((sum, user) => sum + user.total, 0) };
+    return {
+      processedCombinations: Object.keys(userCreatorExpiries).length,
+      totalExpired: Object.values(userCreatorExpiries).reduce((sum, data) => sum + data.total, 0)
+    };
   } catch (error) {
     console.error('Error processing expired points:', error);
     throw error;
@@ -337,11 +367,11 @@ export async function sendExpiryWarnings(daysAhead = 7) {
     const now = new Date();
     const warningDate = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
 
-    // Find users with points expiring soon
+    // Group by user AND creator
     const expiringTransactions = await PointTransaction.aggregate([
       {
         $match: {
-          type: 'Earned',
+          type: { $in: ['Earned', 'Bonus', 'Refund'] },
           expired: false,
           used: false,
           expiresAt: {
@@ -352,22 +382,31 @@ export async function sendExpiryWarnings(daysAhead = 7) {
       },
       {
         $group: {
-          _id: '$userId',
-          totalExpiring: { $sum: '$amount' },
+          _id: { userId: '$userId', creatorId: '$creatorId' },
+          totalExpiring: { $sum: { $ifNull: ['$amount', '$points_earned'] } },
           earliestExpiry: { $min: '$expiresAt' }
         }
-      }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: '_id.creatorId',
+          foreignField: '_id',
+          as: 'creator'
+        }
+      },
+      { $unwind: '$creator' }
     ]);
 
-    console.log(`Sending expiry warnings to ${expiringTransactions.length} users`);
+    console.log(`Sending expiry warnings for ${expiringTransactions.length} user-creator combinations`);
 
-    for (const userExpiry of expiringTransactions) {
+    for (const item of expiringTransactions) {
       try {
         await createNotification({
-          recipientId: userExpiry._id,
+          recipientId: item._id.userId,
           type: 'points_expiring_soon',
-          title: `${userExpiry.totalExpiring} FamPoints expiring soon!`,
-          message: `${userExpiry.totalExpiring} of your FamPoints will expire in ${daysAhead} days. Use them before ${userExpiry.earliestExpiry.toLocaleDateString()}!`
+          title: `${item.totalExpiring} FamPoints expiring soon!`,
+          message: `${item.totalExpiring} of your FamPoints for ${item.creator.username} will expire in ${daysAhead} days. Use them in their Vault!`
         });
       } catch (notifError) {
         console.error('Error sending expiry warning:', notifError);
@@ -380,3 +419,4 @@ export async function sendExpiryWarnings(daysAhead = 7) {
     throw error;
   }
 }
+

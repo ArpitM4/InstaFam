@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect, useState, useCallback, useRef } from 'react'
-import { triggerProfileUpdate } from '@/utils/onboardingTriggers';
 // Simple modal component for username
 function UsernameModal({ open, onSubmit, loading, error }) {
   const [username, setUsername] = useState("");
@@ -66,9 +65,7 @@ import { useRouter } from 'next/navigation'
 import { fetchuser, updateProfile } from '@/actions/useractions'
 import { useUser } from '@/context/UserContext'
 import { emitProfileUpdate, emitAccountTypeChange } from '@/utils/eventBus'
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { Bounce } from 'react-toastify';
+import { toast } from 'sonner';
 
 const Account = () => {
   const { data: session, update, status } = useSession();
@@ -235,9 +232,6 @@ const Account = () => {
     let a = await updateProfile(form, session.user.name);
     await update();
 
-    // Trigger onboarding progress update
-    await triggerProfileUpdate();
-
     // Emit global profile update event (only pass necessary fields)
     emitProfileUpdate({
       name: form.name,
@@ -266,12 +260,7 @@ const Account = () => {
       emitAccountTypeChange(form.accountType);
     }
 
-    toast('Profile Updated', {
-      position: "top-right",
-      autoClose: 5000,
-      theme: "light",
-      transition: Bounce,
-    });
+    toast.success('Profile Updated');
 
     // Redirect to dashboard if user changed from User to Creator
     if (isChangingToCreator) {
@@ -313,19 +302,7 @@ const Account = () => {
         error={nameModalError}
       />
 
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-        style={{ top: 70 }}
-      />
+
 
       <div className="min-h-screen">
         <div className="max-w-md mx-auto">

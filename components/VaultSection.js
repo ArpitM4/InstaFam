@@ -3,11 +3,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { fetchCreatorVaultItems, redeemVaultItem, fetchRedeemedItems, fetchFanRedemptions } from '@/actions/vaultActions';
 import { useUser } from '@/context/UserContext';
 import { emitPaymentSuccess } from '@/utils/eventBus';
-import { fetchuser } from '@/actions/useractions';
 
 const VaultSection = ({ currentUser }) => {
   const { data: session } = useSession();
@@ -44,9 +43,15 @@ const VaultSection = ({ currentUser }) => {
 
   const loadFanData = async () => {
     try {
-      const user = await fetchuser(session.user.name);
-      setUserPoints(user.points || 0);
-      
+      // Fetch points for THIS SPECIFIC CREATOR
+      if (currentUser?._id) {
+        const pointsResponse = await fetch(`/api/points?creatorId=${currentUser._id}`);
+        if (pointsResponse.ok) {
+          const pointsData = await pointsResponse.json();
+          setUserPoints(pointsData.points || 0);
+        }
+      }
+
       // Load redeemed items for this fan from this creator
       if (currentUser?.username) {
         const redeemedResult = await fetchRedeemedItems(currentUser.username);
@@ -81,7 +86,7 @@ const VaultSection = ({ currentUser }) => {
     }
 
     if (userPoints < item.pointCost) {
-      toast.error('Insufficient Fam Points!');
+      toast.error(`Insufficient points! You have ${userPoints} points for this creator.`);
       return;
     }
 
@@ -99,12 +104,12 @@ const VaultSection = ({ currentUser }) => {
   const showInputModal = (item) => {
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
-    
+
     const getInputPlaceholder = (item) => {
-    // Removed placeholder for promise input
-    // if (item.fileType === 'promise') {
-    //   return 'Provide any additional details or preferences for this promise...';
-    // }
+      // Removed placeholder for promise input
+      // if (item.fileType === 'promise') {
+      //   return 'Provide any additional details or preferences for this promise...';
+      // }
       return 'Enter your question or message for the creator...';
     };
 
@@ -159,7 +164,7 @@ const VaultSection = ({ currentUser }) => {
         toast.error('Please provide the required input');
         return;
       }
-      
+
       modal.remove();
       await processRedemption(item, input);
       delete window.submitFanInput;
@@ -177,22 +182,22 @@ const VaultSection = ({ currentUser }) => {
   const processRedemption = async (item, fanInput) => {
     try {
       setRedeeming(prev => ({ ...prev, [item._id]: true }));
-      
+
       const result = await redeemVaultItem(item._id, currentUser.username, fanInput);
-      
+
       if (result.success) {
         toast.success('Item redeemed successfully!');
         setUserPoints(prev => prev - item.pointCost);
         setRedeemedItems(prev => [...prev, item._id]);
-        
+
         // Update navbar points immediately
         if (updatePoints) {
           updatePoints();
         }
-        
+
         // Emit global event for points update
         emitPaymentSuccess({ pointsSpent: item.pointCost });
-        
+
         // Show appropriate modal based on file type
         if (item.fileType === 'text-reward') {
           showStatusModal(item, 'Pending');
@@ -214,7 +219,7 @@ const VaultSection = ({ currentUser }) => {
   const showStatusModal = (item, status) => {
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
-    
+
     const statusInfo = {
       'Pending': {
         icon: '⏳',
@@ -282,7 +287,7 @@ const VaultSection = ({ currentUser }) => {
   const showDownloadModal = (item, downloadUrl) => {
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
-    
+
     if (item.fileType === 'text-reward') {
       // Special modal for Q&A rewards only - removed for Promise rewards
     } else if (item.fileType === 'promise') {
@@ -316,10 +321,10 @@ const VaultSection = ({ currentUser }) => {
           <div class="space-y-3">
             <a href="${downloadUrl}" target="_blank" rel="noopener noreferrer" 
                class="block bg-primary text-background px-4 py-2 rounded-lg hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md">
-              ${item.fileType === 'image' ? 'View Image' : 
-                item.fileType === 'video' ? 'Watch Video' : 
-                item.fileType === 'pdf' ? 'View PDF' : 
-                item.fileType === 'audio' ? 'Listen Audio' : 'Download File'}
+              ${item.fileType === 'image' ? 'View Image' :
+          item.fileType === 'video' ? 'Watch Video' :
+            item.fileType === 'pdf' ? 'View PDF' :
+              item.fileType === 'audio' ? 'Listen Audio' : 'Download File'}
             </a>
             <button onclick="this.parentElement.parentElement.parentElement.remove()" 
                     class="block w-full bg-background text-text px-4 py-2 rounded-lg hover:bg-background/80 transition-all duration-200 shadow-sm">
@@ -329,7 +334,7 @@ const VaultSection = ({ currentUser }) => {
         </div>
       `;
     }
-    
+
     document.body.appendChild(modal);
   };
 
@@ -394,7 +399,7 @@ const VaultSection = ({ currentUser }) => {
           const isRedeeming = redeeming[item._id];
 
           return (
-            <div key={item._id} className="rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl border border-white/10" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)'}}>
+            <div key={item._id} className="rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl border border-white/10" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}>
               {/* Item Header */}
               <div className="p-4 border-b border-white/10">
                 <div className="flex items-center justify-between mb-2">
@@ -448,15 +453,14 @@ const VaultSection = ({ currentUser }) => {
                       // Only Q&A rewards show status
                       const status = redemptionInfo?.status || 'Pending';
                       const isPending = status === 'Pending';
-                      
+
                       return (
                         <button
                           onClick={() => showStatusModal(item, status)}
-                          className={`w-full py-2 px-4 rounded-lg transition-colors shadow-sm ${
-                            isPending
-                              ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
-                              : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                          }`}
+                          className={`w-full py-2 px-4 rounded-lg transition-colors shadow-sm ${isPending
+                            ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                            : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                            }`}
                         >
                           {isPending ? '⏳ Pending Fulfillment' : '✅ Fulfilled!'}
                         </button>
@@ -474,11 +478,10 @@ const VaultSection = ({ currentUser }) => {
                   <button
                     onClick={() => handleRedeem(item)}
                     disabled={isRedeeming}
-                    className={`w-full py-2.5 px-4 rounded-xl font-medium transition-all duration-300 shadow-md ${
-                      isRedeeming
-                        ? 'bg-primary/50 text-background cursor-not-allowed'
-                        : 'btn-gradient text-white hover:shadow-lg hover:scale-[1.02]'
-                    }`}
+                    className={`w-full py-2.5 px-4 rounded-xl font-medium transition-all duration-300 shadow-md ${isRedeeming
+                      ? 'bg-primary/50 text-background cursor-not-allowed'
+                      : 'btn-gradient text-white hover:shadow-lg hover:scale-[1.02]'
+                      }`}
                   >
                     {isRedeeming ? (
                       <span className="flex items-center justify-center">
@@ -497,7 +500,7 @@ const VaultSection = ({ currentUser }) => {
       </div>
 
       {session && vaultItems.length > 0 && (
-        <div className="mt-6 text-center p-4 rounded-2xl border border-white/10" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'}}>
+        <div className="mt-6 text-center p-4 rounded-2xl border border-white/10" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)' }}>
           <p className="text-text/60 text-sm">
             💡 <strong>Tip:</strong> Support {currentUser?.username || 'this creator'} to earn more Fam Points and unlock exclusive content!
           </p>

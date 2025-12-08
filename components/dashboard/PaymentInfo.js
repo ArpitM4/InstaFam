@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { fetchuser, updatePaymentInfo, fetchEvents } from "@/actions/useractions";
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 const PaymentInfo = () => {
   const { data: session } = useSession();

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { fetchPendingRedemptions, fulfillRedemption, submitCreatorAnswer, fetchFulfilledRedemptions, fetchExpiredRedemptions } from "@/actions/vaultActions";
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 const VaultRequests = () => {
   const [pendingRedemptions, setPendingRedemptions] = useState([]);
@@ -76,7 +76,7 @@ const VaultRequests = () => {
 
     try {
       const result = await fulfillRedemption(redemptionId);
-      
+
       if (result.success) {
         toast.success('Redemption marked as fulfilled!');
         // Move the fulfilled redemption from pending to fulfilled list
@@ -96,7 +96,7 @@ const VaultRequests = () => {
 
   const handleSubmitAnswer = async (redemptionId) => {
     const response = creatorResponses[redemptionId];
-    
+
     if (!response || !response.trim()) {
       toast.error('Please write an answer before submitting');
       return;
@@ -106,21 +106,21 @@ const VaultRequests = () => {
 
     try {
       const result = await submitCreatorAnswer(redemptionId, response.trim());
-      
+
       if (result.success) {
         toast.success('Answer submitted successfully! The redemption has been marked as fulfilled.');
-        
+
         // Update the redemption with the answer and move to fulfilled
         const answeredRedemption = pendingRedemptions.find(r => r._id === redemptionId);
         if (answeredRedemption) {
           setPendingRedemptions(prev => prev.filter(r => r._id !== redemptionId));
-          setFulfilledRedemptions(prev => [...prev, { 
-            ...answeredRedemption, 
+          setFulfilledRedemptions(prev => [...prev, {
+            ...answeredRedemption,
             creatorResponse: response.trim(),
             fulfilledAt: new Date()
           }]);
         }
-        
+
         // Clear the response from state
         setCreatorResponses(prev => {
           const newResponses = { ...prev };
@@ -159,11 +159,10 @@ const VaultRequests = () => {
             setActiveRequestsTab('pending');
             loadRedemptions();
           }}
-          className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-            activeRequestsTab === 'pending'
+          className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeRequestsTab === 'pending'
               ? 'bg-primary text-text shadow-sm'
               : 'text-text/70 hover:text-text hover:bg-text/5'
-          }`}
+            }`}
         >
           Pending Requests
           {pendingRedemptions.length > 0 && (
@@ -177,11 +176,10 @@ const VaultRequests = () => {
             setActiveRequestsTab('fulfilled');
             loadRedemptions();
           }}
-          className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-            activeRequestsTab === 'fulfilled'
+          className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeRequestsTab === 'fulfilled'
               ? 'bg-primary text-text shadow-sm'
               : 'text-text/70 hover:text-text hover:bg-text/5'
-          }`}
+            }`}
         >
           Fulfilled Requests
           {fulfilledRedemptions.length > 0 && (
@@ -195,11 +193,10 @@ const VaultRequests = () => {
             setActiveRequestsTab('expired');
             loadRedemptions();
           }}
-          className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-            activeRequestsTab === 'expired'
+          className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeRequestsTab === 'expired'
               ? 'bg-primary text-text shadow-sm'
               : 'text-text/70 hover:text-text hover:bg-text/5'
-          }`}
+            }`}
         >
           Expired Requests
           {expiredRedemptions.length > 0 && (
@@ -214,14 +211,14 @@ const VaultRequests = () => {
       {activeRequestsTab === 'pending' && (
         <section className="bg-text/5  border-text/10 rounded-lg p-6">
           <h3 className="text-xl font-semibold mb-4">
-            Pending Fulfillments 
+            Pending Fulfillments
             {pendingRedemptions.length > 0 && (
               <span className="ml-2 bg-red-500 text-white text-sm px-3 py-1 rounded-full">
                 {pendingRedemptions.length}
               </span>
             )}
           </h3>
-          
+
           {redemptionsLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin h-8 w-8 rounded-full border-2 border-primary border-t-transparent mx-auto mb-2"></div>
@@ -237,90 +234,90 @@ const VaultRequests = () => {
               {[...pendingRedemptions]
                 .sort((a, b) => new Date(a.redeemedAt) - new Date(b.redeemedAt))
                 .map((redemption) => (
-                <div key={redemption._id} className="bg-dropdown-hover rounded-lg p-4 px-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h4 className="text-lg font-semibold text-primary mb-2">
-                        {redemption.vaultItemId.title}
-                      </h4>
-                      <div className="flex items-center gap-4 text-sm text-text/60">
-                        <span className="flex items-center gap-1">
-                          👤 <strong>{redemption.fanId.username}</strong>
-                        </span>
-                        <span className="flex items-center gap-1">
-                           {new Date(redemption.redeemedAt).toLocaleDateString()}
-                        </span>
+                  <div key={redemption._id} className="bg-dropdown-hover rounded-lg p-4 px-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <h4 className="text-lg font-semibold text-primary mb-2">
+                          {redemption.vaultItemId.title}
+                        </h4>
+                        <div className="flex items-center gap-4 text-sm text-text/60">
+                          <span className="flex items-center gap-1">
+                            👤 <strong>{redemption.fanId.username}</strong>
+                          </span>
+                          <span className="flex items-center gap-1">
+                            {new Date(redemption.redeemedAt).toLocaleDateString()}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Perk Type Badge */}
-                  <div className="flex items-center gap-2 mb-4">
-                    {redemption.vaultItemId.requiresFanInput && redemption.fanInput && (
-                      <span className="bg-text/10  text-red-500 px-3 py-1 rounded-full text-xs font-medium">
-                        Answer Required *
-                      </span>
+                    {/* Perk Type Badge */}
+                    <div className="flex items-center gap-2 mb-4">
+                      {redemption.vaultItemId.requiresFanInput && redemption.fanInput && (
+                        <span className="bg-text/10  text-red-500 px-3 py-1 rounded-full text-xs font-medium">
+                          Answer Required *
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Fan Input Section - Q&A Interface */}
+                    {redemption.vaultItemId.requiresFanInput && redemption.fanInput ? (
+                      <div className="space-y-6">
+                        {/* Fan's Question */}
+                        <div className="space-y-3">
+                          <div className="bg-background/30 rounded-lg ">
+                            <p className="text-text/90 leading-relaxed">
+                              {redemption.fanInput}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Creator's Answer Interface */}
+                        <div className="space-y-3">
+                          <h5 className="text-sm font-medium text-text/70 uppercase tracking-wide">
+                            Your Answer
+                          </h5>
+                          <textarea
+                            value={creatorResponses[redemption._id] || ''}
+                            onChange={(e) => handleResponseChange(redemption._id, e.target.value)}
+                            placeholder="Write your exclusive answer to this fan's question..."
+                            className="w-full bg-white border border-text/10 rounded-lg p-4 text-black resize-none focus:border-primary/30 focus:outline-none min-h-[60px] max-h-[70px] transition-colors"
+                            maxLength={2000}
+                          />
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-text/50">
+                              {(creatorResponses[redemption._id] || '').length}/2000 characters
+                            </span>
+                            <button
+                              onClick={() => handleSubmitAnswer(redemption._id)}
+                              disabled={submittingAnswers[redemption._id] || !(creatorResponses[redemption._id] || '').trim()}
+                              className="bg-primary hover:bg-primary/90 disabled:bg-text/20 disabled:cursor-not-allowed text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                            >
+                              {submittingAnswers[redemption._id] ? (
+                                <>
+                                  <div className="animate-spin h-4 w-4 rounded-full border-2 border-white border-t-transparent"></div>
+                                  Sending...
+                                </>
+                              ) : (
+                                'Send Answer'
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      // Non-Q&A redemptions (simple fulfillment)
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() => handleFulfillRedemption(redemption._id)}
+                          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                        >
+                          Mark as Fulfilled
+                        </button>
+                      </div>
                     )}
                   </div>
-
-                  {/* Fan Input Section - Q&A Interface */}
-                  {redemption.vaultItemId.requiresFanInput && redemption.fanInput ? (
-                    <div className="space-y-6">
-                      {/* Fan's Question */}
-                      <div className="space-y-3">
-                        <div className="bg-background/30 rounded-lg ">
-                          <p className="text-text/90 leading-relaxed">
-                            {redemption.fanInput}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Creator's Answer Interface */}
-                      <div className="space-y-3">
-                        <h5 className="text-sm font-medium text-text/70 uppercase tracking-wide">
-                          Your Answer
-                        </h5>
-                        <textarea
-                          value={creatorResponses[redemption._id] || ''}
-                          onChange={(e) => handleResponseChange(redemption._id, e.target.value)}
-                          placeholder="Write your exclusive answer to this fan's question..."
-                          className="w-full bg-white border border-text/10 rounded-lg p-4 text-black resize-none focus:border-primary/30 focus:outline-none min-h-[60px] max-h-[70px] transition-colors"
-                          maxLength={2000}
-                        />
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-text/50">
-                            {(creatorResponses[redemption._id] || '').length}/2000 characters
-                          </span>
-                          <button
-                            onClick={() => handleSubmitAnswer(redemption._id)}
-                            disabled={submittingAnswers[redemption._id] || !(creatorResponses[redemption._id] || '').trim()}
-                            className="bg-primary hover:bg-primary/90 disabled:bg-text/20 disabled:cursor-not-allowed text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-                          >
-                            {submittingAnswers[redemption._id] ? (
-                              <>
-                                <div className="animate-spin h-4 w-4 rounded-full border-2 border-white border-t-transparent"></div>
-                                Sending...
-                              </>
-                            ) : (
-                              'Send Answer'
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    // Non-Q&A redemptions (simple fulfillment)
-                    <div className="flex justify-end">
-                      <button
-                        onClick={() => handleFulfillRedemption(redemption._id)}
-                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-                      >
-                        Mark as Fulfilled
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
+                ))}
             </div>
           )}
         </section>
@@ -337,7 +334,7 @@ const VaultRequests = () => {
               </span>
             )}
           </h3>
-          
+
           {redemptionsLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin h-8 w-8 rounded-full border-2 border-primary border-t-transparent mx-auto mb-2"></div>
@@ -411,14 +408,14 @@ const VaultRequests = () => {
       {activeRequestsTab === 'expired' && (
         <section className="bg-text/5 border-text/10 rounded-lg p-6">
           <h3 className="text-xl font-semibold mb-4">
-            Expired Requests 
+            Expired Requests
             {expiredRedemptions.length > 0 && (
               <span className="ml-2 bg-orange-500 text-white text-sm px-3 py-1 rounded-full">
                 {expiredRedemptions.length}
               </span>
             )}
           </h3>
-          
+
           {redemptionsLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin h-8 w-8 rounded-full border-2 border-primary border-t-transparent mx-auto mb-2"></div>

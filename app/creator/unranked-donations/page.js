@@ -5,8 +5,6 @@ import { useSession } from "next-auth/react";
 import { fetchuser } from "@/actions/useractions";
 import DashboardLayout from "@/components/DashboardLayout";
 import UnrankedDonations from "@/components/dashboard/UnrankedDonations";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 /**
  * Unranked Donations Dashboard Page
@@ -32,25 +30,11 @@ const UnrankedDonationsPage = () => {
   };
 
   return (
-    <>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ top: 72 }}
-      />
-      <DashboardLayout>
-        <UnrankedDonations />
-      </DashboardLayout>
-    </>
+    <DashboardLayout>
+      <UnrankedDonations />
+    </DashboardLayout>
   );
 };
 
 export default UnrankedDonationsPage;
+

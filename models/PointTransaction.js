@@ -3,19 +3,20 @@ const { Schema, model } = mongoose;
 
 const PointTransactionSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-  type: { 
-    type: String, 
-    enum: ['Earned', 'Spent', 'Refund', 'Expired', 'Bonus'], 
-    default: 'Earned' 
+  creatorId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true }, // Creator the points belong to
+  type: {
+    type: String,
+    enum: ['Earned', 'Spent', 'Refund', 'Expired', 'Bonus'],
+    default: 'Earned'
   },
-  amount: { 
-    type: Number, 
-    required: function() {
+  amount: {
+    type: Number,
+    required: function () {
       // Only require amount if points_earned is not set (for new transactions)
       return !this.points_earned;
     },
     validate: {
-      validator: function(v) {
+      validator: function (v) {
         // If amount is provided, it must be a valid number
         if (v !== undefined && v !== null) {
           return !isNaN(v);
@@ -33,7 +34,7 @@ const PointTransactionSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   expiresAt: {
     type: Date,
-    default: function() {
+    default: function () {
       // Set expiry for 'Earned', 'Refund', and 'Bonus' type transactions
       if (this.type === 'Earned' || this.type === 'Refund' || this.type === 'Bonus' || !this.type) {
         return new Date(Date.now() + 60 * 24 * 60 * 60 * 1000); // 60 days from now
@@ -56,12 +57,12 @@ const PointTransactionSchema = new Schema({
 });
 
 // Middleware to ensure backward compatibility and prevent NaN values
-PointTransactionSchema.pre('save', function(next) {
+PointTransactionSchema.pre('save', function (next) {
   // Validate amount is not NaN
   if (this.amount !== undefined && (isNaN(this.amount) || this.amount === null)) {
     return next(new Error('Amount cannot be NaN or null'));
   }
-  
+
   // Validate points_earned is not NaN
   if (this.points_earned !== undefined && (isNaN(this.points_earned) || this.points_earned === null)) {
     return next(new Error('Points earned cannot be NaN or null'));
@@ -75,13 +76,13 @@ PointTransactionSchema.pre('save', function(next) {
   if (this.points_earned !== undefined && !this.amount) {
     this.amount = this.points_earned;
   }
-  
+
   next();
 });
 
 // Performance indexes for faster queries
-PointTransactionSchema.index({ userId: 1, type: 1, createdAt: -1 }); // User transaction history by type
-PointTransactionSchema.index({ userId: 1, used: 1, expired: 1 }); // Available points calculation
+PointTransactionSchema.index({ userId: 1, creatorId: 1, type: 1, createdAt: -1 }); // User transaction history by creator and type
+PointTransactionSchema.index({ userId: 1, creatorId: 1, used: 1, expired: 1 }); // Available points calculation per creator
 PointTransactionSchema.index({ expiresAt: 1, expired: 1 }); // Expiry processing job
 PointTransactionSchema.index({ createdAt: -1 }); // Recent transactions
 

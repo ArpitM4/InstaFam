@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import dynamic from "next/dynamic";
 
 // Dynamically import SimpleMDE to avoid SSR issues
@@ -36,7 +36,7 @@ const UploadBlogPage = () => {
     title: "",
     content: ""
   });
-  
+
   // Check if we're in edit mode
   const editId = searchParams.get('edit');
   const isEditMode = !!editId;
@@ -124,7 +124,7 @@ Use the toolbar above for easy formatting!`,
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim() || !formData.content.trim()) {
       toast.error("Please fill in both title and content");
       return;
@@ -135,16 +135,16 @@ Use the toolbar above for easy formatting!`,
     try {
       const url = '/api/blogs';
       const method = isEditMode ? 'PUT' : 'POST';
-      const body = isEditMode 
+      const body = isEditMode
         ? {
-            id: editId,
-            title: formData.title.trim(),
-            content: formData.content.trim()
-          }
+          id: editId,
+          title: formData.title.trim(),
+          content: formData.content.trim()
+        }
         : {
-            title: formData.title.trim(),
-            content: formData.content.trim()
-          };
+          title: formData.title.trim(),
+          content: formData.content.trim()
+        };
 
       const response = await fetch(url, {
         method: method,
@@ -159,7 +159,7 @@ Use the toolbar above for easy formatting!`,
       if (data.success) {
         const successMessage = isEditMode ? "Blog post updated successfully!" : "Blog post created successfully!";
         toast.success(successMessage);
-        
+
         if (isEditMode) {
           // Redirect to the updated blog post
           router.push(`/blogs/${data.blog.slug}`);
@@ -276,7 +276,7 @@ Use the toolbar above for easy formatting!`,
                 />
               </div>
               <p className="text-sm text-text/60">
-                💡 <strong>Markdown Tips:</strong> Use **bold**, *italic*, # headings, &gt; quotes, [links](url), and `code`. 
+                💡 <strong>Markdown Tips:</strong> Use **bold**, *italic*, # headings, &gt; quotes, [links](url), and `code`.
                 Press F9 for side-by-side preview or F11 for fullscreen editing.
               </p>
             </div>
@@ -297,7 +297,7 @@ Use the toolbar above for easy formatting!`,
                   isEditMode ? "Update Blog Post" : "Publish Blog Post"
                 )}
               </button>
-              
+
               <button
                 type="button"
                 onClick={() => {

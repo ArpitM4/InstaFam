@@ -5,8 +5,6 @@ import { useSession } from "next-auth/react";
 import { fetchuser } from "@/actions/useractions";
 import DashboardLayout from "@/components/DashboardLayout";
 import GeneralSettings from "@/components/dashboard/GeneralSettings";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -28,23 +26,9 @@ export default function DashboardPage() {
   };
 
   return (
-    <>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ top: 72 }}
-      />
-      <DashboardLayout>
-        <GeneralSettings user={user} onUserUpdate={setUser} />
-      </DashboardLayout>
-    </>
+    <DashboardLayout>
+      <GeneralSettings user={user} onUserUpdate={setUser} />
+    </DashboardLayout>
   );
 }
+

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { FaPlus, FaTimes, FaTrash } from 'react-icons/fa';
 import Image from 'next/image';
 
@@ -14,7 +14,7 @@ const LinksSection = ({ currentUser }) => {
   const [showFavouriteModal, setShowFavouriteModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   // Form states for adding new items
   const [socialForm, setSocialForm] = useState({ platform: '', username: '', link: '' });
   const [favouriteForm, setFavouriteForm] = useState({ name: '', link: '', image: '' });
@@ -36,7 +36,7 @@ const LinksSection = ({ currentUser }) => {
       setLoading(true);
       const response = await fetch(`/api/links?username=${currentUser.username}`);
       const data = await response.json();
-      
+
       if (response.ok) {
         setSocials(data.socials || []);
         setFavourites(data.favourites || []);
@@ -62,7 +62,7 @@ const LinksSection = ({ currentUser }) => {
   // Add a new social link
   const handleAddSocial = async (e) => {
     e.preventDefault();
-    
+
     if (!socialForm.platform || !socialForm.username || !socialForm.link) {
       toast.error('Please fill all fields');
       return;
@@ -97,7 +97,7 @@ const LinksSection = ({ currentUser }) => {
   // Add a new favourite product
   const handleAddFavourite = async (e) => {
     e.preventDefault();
-    
+
     if (!favouriteForm.name || !favouriteForm.link) {
       toast.error('Please fill all fields');
       return;
@@ -222,7 +222,7 @@ const LinksSection = ({ currentUser }) => {
         <h2 className="text-2xl font-bold text-text mb-6 flex items-center gap-2">
           Socials
         </h2>
-        
+
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {/* Display existing social cards */}
           {socials.map((social) => {
@@ -233,8 +233,8 @@ const LinksSection = ({ currentUser }) => {
                 frontContent={
                   <div className="flex flex-col items-center justify-center h-full p-2">
                     <div className="w-12 h-12 mb-2 flex items-center justify-center relative">
-                      <Image 
-                        src={platformData.logo} 
+                      <Image
+                        src={platformData.logo}
                         alt={platformData.name}
                         fill
                         sizes="48px"
@@ -276,7 +276,7 @@ const LinksSection = ({ currentUser }) => {
           {isOwner && (
             <button
               onClick={() => setShowSocialModal(true)}
-              className="aspect-square border-2 border-dashed border-white/20 rounded-xl hover:border-primary/50 transition-all duration-300 flex flex-col items-center justify-center group" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)'}}
+              className="aspect-square border-2 border-dashed border-white/20 rounded-xl hover:border-primary/50 transition-all duration-300 flex flex-col items-center justify-center group" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)' }}
             >
               <FaPlus className="text-3xl text-text/40 group-hover:text-primary transition-colors" />
               <p className="text-text/60 text-xs mt-2 group-hover:text-primary transition-colors">Add Social</p>
@@ -291,7 +291,7 @@ const LinksSection = ({ currentUser }) => {
           <span className="text-3xl">⭐</span>
           Favourites/ Affiliates
         </h2>
-        
+
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {/* Display existing favourite cards */}
           {favourites.map((fav) => (
@@ -300,8 +300,8 @@ const LinksSection = ({ currentUser }) => {
               frontContent={
                 <div className="flex flex-col items-center justify-center h-full overflow-hidden relative">
                   {fav.image ? (
-                    <Image 
-                      src={fav.image} 
+                    <Image
+                      src={fav.image}
                       alt={fav.name}
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
@@ -346,7 +346,7 @@ const LinksSection = ({ currentUser }) => {
           {isOwner && (
             <button
               onClick={() => setShowFavouriteModal(true)}
-              className="aspect-square border-2 border-dashed border-white/20 rounded-xl hover:border-primary/50 transition-all duration-300 flex flex-col items-center justify-center group" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)'}}
+              className="aspect-square border-2 border-dashed border-white/20 rounded-xl hover:border-primary/50 transition-all duration-300 flex flex-col items-center justify-center group" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)' }}
             >
               <FaPlus className="text-3xl text-text/40 group-hover:text-primary transition-colors" />
               <p className="text-text/60 text-xs mt-2 group-hover:text-primary transition-colors">Add Favourite</p>
@@ -413,13 +413,13 @@ const LinksSection = ({ currentUser }) => {
           <div className="text-center">
             <h3 className="text-2xl font-bold text-primary mb-2">Share {currentUser.username || currentUser.name}'s Page</h3>
             <p className="text-text/60 mb-6">Copy the link below to share</p>
-            
+
             <div className="bg-dropdown-hover border border-text/10 rounded-lg p-4 mb-4">
               <p className="text-text font-mono text-sm break-all">
                 {typeof window !== 'undefined' && `${window.location.origin}/${currentUser.username}`}
               </p>
             </div>
-            
+
             <div className="flex gap-3">
               <button
                 type="button"
@@ -462,7 +462,7 @@ const LinksSection = ({ currentUser }) => {
               onChange={(e) => setFavouriteForm({ ...favouriteForm, link: e.target.value })}
               className="w-full px-4 py-2 bg-background text-text rounded-lg focus:outline-none focus:ring-2 focus:ring-primary border border-text/10"
             />
-            
+
             {/* Image Upload Section */}
             <div>
               <label className="block text-sm font-medium text-text/70 mb-2">Product Image (Optional)</label>
@@ -482,8 +482,8 @@ const LinksSection = ({ currentUser }) => {
                 )}
                 {favouriteForm.image && (
                   <div className="relative w-full h-32 rounded-lg overflow-hidden border border-text/10">
-                    <Image 
-                      src={favouriteForm.image} 
+                    <Image
+                      src={favouriteForm.image}
                       alt="Preview"
                       fill
                       sizes="100%"
@@ -537,12 +537,12 @@ const FlipCard = ({ frontContent, backContent }) => {
     >
       <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`}>
         {/* Front of the card */}
-        <div className="flip-card-front rounded-xl border border-white/10 shadow-lg transition-shadow" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(8px)'}}>
+        <div className="flip-card-front rounded-xl border border-white/10 shadow-lg transition-shadow" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(8px)' }}>
           {frontContent}
         </div>
-        
+
         {/* Back of the card */}
-        <div className="flip-card-back rounded-xl border border-primary/30 shadow-lg" style={{background: 'linear-gradient(135deg, rgba(225,29,72,0.15) 0%, rgba(99,102,241,0.15) 100%)'}}>
+        <div className="flip-card-back rounded-xl border border-primary/30 shadow-lg" style={{ background: 'linear-gradient(135deg, rgba(225,29,72,0.15) 0%, rgba(99,102,241,0.15) 100%)' }}>
           {backContent}
         </div>
       </div>
@@ -717,22 +717,22 @@ const socialPlatforms = {
 const detectPlatform = (url, platformName) => {
   // Normalize the platform name for better matching
   const normalizedName = platformName?.toLowerCase().replace(/\s+/g, '') || '';
-  
+
   // First priority: Try to match platform name with fuzzy matching
   if (normalizedName) {
     for (const [key, platform] of Object.entries(socialPlatforms)) {
       const platformNameLower = platform.name.toLowerCase().replace(/\s+/g, '');
-      
+
       // Exact match (case-insensitive, space-insensitive)
       if (normalizedName === platformNameLower || normalizedName === key) {
         return platform;
       }
-      
+
       // Contains match - handles typos and partial matches
       if (normalizedName.includes(platformNameLower) || platformNameLower.includes(normalizedName)) {
         return platform;
       }
-      
+
       // Check for common variations and typos
       // Handle "snap" for snapchat, "insta" for instagram, etc.
       if (normalizedName.length >= 4) {
@@ -742,14 +742,14 @@ const detectPlatform = (url, platformName) => {
       }
     }
   }
-  
+
   // Second priority: Try to detect from URL
   for (const [key, platform] of Object.entries(socialPlatforms)) {
     if (platform.pattern.test(url)) {
       return platform;
     }
   }
-  
+
   // Default fallback
   return {
     name: platformName || 'Link',

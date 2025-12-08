@@ -7,6 +7,11 @@ const ExpiredPointsSchema = new Schema({
     ref: 'User',
     required: true
   },
+  creatorId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   pointsExpired: {
     type: Number,
     required: true
@@ -21,4 +26,8 @@ const ExpiredPointsSchema = new Schema({
   }]
 });
 
+// Performance index
+ExpiredPointsSchema.index({ userId: 1, creatorId: 1 });
+
 export default mongoose.models.ExpiredPoints || model("ExpiredPoints", ExpiredPointsSchema);
+
