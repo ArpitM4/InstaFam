@@ -123,7 +123,7 @@ const Account = () => {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push('/login');
+      router.push('/');
     } else if (status === "authenticated" && session && !hasLoadedData.current) {
       getData();
     }

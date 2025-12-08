@@ -21,7 +21,7 @@ const DashboardLayout = ({ children }) => {
     if (status === "loading") return;
 
     if (!session) {
-      router.push("/login");
+      router.push("/");
     } else {
       loadUser();
     }
@@ -116,8 +116,8 @@ const DashboardLayout = ({ children }) => {
           <Link
             href="/creator/dashboard"
             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/creator/dashboard')
-                ? 'bg-white/10 text-white'
-                : 'text-gray-300 hover:bg-white/5 hover:text-white'
+              ? 'bg-white/10 text-white'
+              : 'text-gray-300 hover:bg-white/5 hover:text-white'
               }`}
           >
             <FaHome className="text-xl flex-shrink-0" />
@@ -128,8 +128,8 @@ const DashboardLayout = ({ children }) => {
           <Link
             href="/creator/payment"
             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/creator/payment')
-                ? 'bg-white/10 text-white'
-                : 'text-gray-300 hover:bg-white/5 hover:text-white'
+              ? 'bg-white/10 text-white'
+              : 'text-gray-300 hover:bg-white/5 hover:text-white'
               }`}
           >
             <FaMoneyBillWave className="text-xl flex-shrink-0" />
@@ -140,8 +140,8 @@ const DashboardLayout = ({ children }) => {
           <Link
             href="/creator/unranked-donations"
             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/creator/unranked-donations')
-                ? 'bg-white/10 text-white'
-                : 'text-gray-300 hover:bg-white/5 hover:text-white'
+              ? 'bg-white/10 text-white'
+              : 'text-gray-300 hover:bg-white/5 hover:text-white'
               }`}
           >
             <FaDonate className="text-xl flex-shrink-0" />
@@ -155,8 +155,8 @@ const DashboardLayout = ({ children }) => {
             <Link
               href="/creator/vault"
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/creator/vault')
-                  ? 'bg-white/10 text-white'
-                  : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                ? 'bg-white/10 text-white'
+                : 'text-gray-300 hover:bg-white/5 hover:text-white'
                 }`}
             >
               <FaLock className="text-xl flex-shrink-0" />
@@ -167,8 +167,8 @@ const DashboardLayout = ({ children }) => {
             <Link
               href="/creator/requests"
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/creator/requests')
-                  ? 'bg-white/10 text-white'
-                  : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                ? 'bg-white/10 text-white'
+                : 'text-gray-300 hover:bg-white/5 hover:text-white'
                 }`}
             >
               <FaInbox className="text-xl flex-shrink-0" />
@@ -215,8 +215,8 @@ const DashboardLayout = ({ children }) => {
           <Link
             href="/creator/dashboard"
             className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${isActive('/creator/dashboard')
-                ? 'bg-white/10 text-white'
-                : 'bg-white/5 text-gray-300 hover:text-white'
+              ? 'bg-white/10 text-white'
+              : 'bg-white/5 text-gray-300 hover:text-white'
               }`}
           >
             General
@@ -224,8 +224,8 @@ const DashboardLayout = ({ children }) => {
           <Link
             href="/creator/payment"
             className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${isActive('/creator/payment')
-                ? 'bg-white/10 text-white'
-                : 'bg-white/5 text-gray-300 hover:text-white'
+              ? 'bg-white/10 text-white'
+              : 'bg-white/5 text-gray-300 hover:text-white'
               }`}
           >
             Payout
@@ -233,8 +233,8 @@ const DashboardLayout = ({ children }) => {
           <Link
             href="/creator/unranked-donations"
             className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${isActive('/creator/unranked-donations')
-                ? 'bg-white/10 text-white'
-                : 'bg-white/5 text-gray-300 hover:text-white'
+              ? 'bg-white/10 text-white'
+              : 'bg-white/5 text-gray-300 hover:text-white'
               }`}
           >
             Unranked
@@ -244,8 +244,8 @@ const DashboardLayout = ({ children }) => {
             <Link
               href="/creator/vault"
               className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${isActive('/creator/vault')
-                  ? 'bg-white/10 text-white'
-                  : 'bg-white/5 text-gray-300 hover:text-white'
+                ? 'bg-white/10 text-white'
+                : 'bg-white/5 text-gray-300 hover:text-white'
                 }`}
             >
               Vault
@@ -253,8 +253,8 @@ const DashboardLayout = ({ children }) => {
             <Link
               href="/creator/requests"
               className={`flex-shrink-0 py-2 px-4 text-center rounded-xl font-medium transition-all duration-200 text-sm ${isActive('/creator/requests')
-                  ? 'bg-white/10 text-white'
-                  : 'bg-white/5 text-gray-300 hover:text-white'
+                ? 'bg-white/10 text-white'
+                : 'bg-white/5 text-gray-300 hover:text-white'
                 }`}
             >
               Requests

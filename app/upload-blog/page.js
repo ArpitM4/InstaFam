@@ -200,7 +200,7 @@ Use the toolbar above for easy formatting!`,
           <h1 className="text-2xl font-bold text-primary mb-4">Authentication Required</h1>
           <p className="text-text/70 mb-6">Please log in to access this page.</p>
           <button
-            onClick={() => router.push('/login')}
+            onClick={() => router.push('/')}
             className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-medium transition-colors"
           >
             Go to Login

@@ -23,7 +23,7 @@ const MyFamPointsPage = () => {
   useEffect(() => {
     if (status === "loading") return;
     if (!session) {
-      router.push("/login");
+      router.push("/");
       return;
     }
     fetchPointsData();
@@ -236,11 +236,11 @@ const MyFamPointsPage = () => {
                       >
                         <div className="flex items-center gap-3">
                           <span className={`px-2 py-1 text-xs rounded-full ${tx.type === 'Earned' ? 'bg-green-500/20 text-green-300' :
-                              tx.type === 'Spent' ? 'bg-red-500/20 text-red-300' :
-                                tx.type === 'Expired' ? 'bg-gray-500/20 text-gray-300' :
-                                  tx.type === 'Refund' ? 'bg-blue-500/20 text-blue-300' :
-                                    tx.type === 'Bonus' ? 'bg-purple-500/20 text-purple-300' :
-                                      'bg-blue-500/20 text-blue-300'
+                            tx.type === 'Spent' ? 'bg-red-500/20 text-red-300' :
+                              tx.type === 'Expired' ? 'bg-gray-500/20 text-gray-300' :
+                                tx.type === 'Refund' ? 'bg-blue-500/20 text-blue-300' :
+                                  tx.type === 'Bonus' ? 'bg-purple-500/20 text-purple-300' :
+                                    'bg-blue-500/20 text-blue-300'
                             }`}>
                             {tx.type}
                           </span>
@@ -253,8 +253,8 @@ const MyFamPointsPage = () => {
                         </div>
                         <div className="text-right">
                           <p className={`font-semibold ${tx.type === 'Earned' || tx.type === 'Refund' || tx.type === 'Bonus'
-                              ? 'text-green-400'
-                              : 'text-red-400'
+                            ? 'text-green-400'
+                            : 'text-red-400'
                             }`}>
                             {tx.type === 'Earned' || tx.type === 'Refund' || tx.type === 'Bonus' ? '+' : ''}
                             {Math.abs(tx.amount)} pts
@@ -313,10 +313,10 @@ const MyFamPointsPage = () => {
                       {/* Status Badge */}
                       {isQandA && (
                         <div className={`px-3 py-1 rounded-lg text-xs font-medium ${redemption.status === 'Fulfilled'
-                            ? 'bg-green-500/20 text-green-400'
-                            : redemption.status === 'Unfulfilled'
-                              ? 'bg-red-500/20 text-red-400'
-                              : 'bg-yellow-500/20 text-yellow-400'
+                          ? 'bg-green-500/20 text-green-400'
+                          : redemption.status === 'Unfulfilled'
+                            ? 'bg-red-500/20 text-red-400'
+                            : 'bg-yellow-500/20 text-yellow-400'
                           }`}>
                           {redemption.status === 'Fulfilled' ? 'Answered' :
                             redemption.status === 'Unfulfilled' ? 'Unfulfilled' : 'Pending'}

@@ -230,9 +230,16 @@ export const authOptions = {
             token.setupCompleted = dbUser.setupCompleted;
             token.visibility = dbUser.visibility;
             token.lastRefresh = Date.now();
+          } else {
+            // User not found in DB (e.g. fresh DB migration) - Invalidate session
+            return null;
           }
         } catch (error) {
           console.error('Error refreshing JWT token:', error);
+          // If DB error, we might want to keep the old token valid solely for temporary availability issues, 
+          // BUT since we are handling a migration, strictness is better.
+          // However, distinguishing network error vs user not found is key.
+          // For now, let's assume if findOne fails it's likely connection, but if it returns null (handled above), it's user gone.
         }
       }
 

@@ -22,7 +22,7 @@ const VaultPayouts = () => {
   useEffect(() => {
     if (status === "loading") return;
     if (!session) {
-      router.push("/login");
+      router.push("/");
       return;
     }
     fetchPayoutData();
@@ -250,8 +250,8 @@ const VaultPayouts = () => {
                       <div className="flex items-center space-x-2">
                         <p className="font-medium text-text text-sm">{redemption.fanUsername}</p>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${redemption.status === 'Fulfilled'
-                            ? 'bg-green-500/10 text-green-500'
-                            : 'bg-yellow-500/10 text-yellow-500'
+                          ? 'bg-green-500/10 text-green-500'
+                          : 'bg-yellow-500/10 text-yellow-500'
                           }`}>
                           {redemption.status}
                         </span>
