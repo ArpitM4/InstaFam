@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useUser } from "@/context/UserContext";
 import { FaHome, FaCompass, FaCoins, FaBars } from "react-icons/fa";
@@ -10,6 +10,7 @@ import NotificationBell from "./NotificationBell";
 
 export default function AppLayout({ children }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session, status } = useSession();
   const { userData, accountType } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -24,6 +25,17 @@ export default function AppLayout({ children }) {
 
   // Check if current page is a creator profile page (dynamic routes like /username)
   const isCreatorPage = !mainRoutes.some(route => pathname === route || pathname.startsWith(route + '/')) && pathname !== '/' && !isCreatorDashboardRoute;
+
+  // Enforce onboarding flow for new users
+  useEffect(() => {
+    if (status === "loading") return;
+
+    // If logged in but setup not completed, force redirect to /setup
+    // Exclude /setup from the check to avoid infinite loop
+    if (session?.user && !session.user.setupCompleted && pathname !== '/setup') {
+      router.push('/setup');
+    }
+  }, [session, status, pathname, router]);
 
   // Auto-collapse sidebar on creator pages (dynamic routes)
   useEffect(() => {
