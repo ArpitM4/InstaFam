@@ -12,6 +12,7 @@ import VaultItemCard from './vault/VaultItemCard';
 import VaultRequests from './vault/VaultRequests';
 import AddVaultItemModal from './vault/AddVaultItemModal';
 import RedeemVaultModal from './vault/RedeemVaultModal';
+import VaultSuccessModal from './vault/VaultSuccessModal';
 
 const VaultSection = ({ currentUser, initialItems, isOwner }) => {
   const { data: session } = useSession();
@@ -27,6 +28,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
   // Modals / View State
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRedeemItem, setSelectedRedeemItem] = useState(null); // Item to redeem
+  const [successData, setSuccessData] = useState(null); // { item, fanInput } for success modal
   const [viewMode, setViewMode] = useState('items'); // 'items' | 'requests'
   const [infoExpanded, setInfoExpanded] = useState(false); // Expandable info section
 
@@ -80,7 +82,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
     try {
       const result = await redeemVaultItem(item._id, currentUser.username, fanInput);
       if (result.success) {
-        toast.success("Redeemed successfully!");
+        // toast.success("Redeemed successfully!"); // Modal handles the success message now
         setUserPoints(prev => prev - item.pointCost);
         setRedeemedItems(prev => [...prev, item._id]);
         setRedemptionStatuses(prev => ({
@@ -91,7 +93,10 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
         if (updatePoints) updatePoints();
         emitPaymentSuccess({ pointsSpent: item.pointCost });
 
-        setSelectedRedeemItem(null); // Close modal
+        setSelectedRedeemItem(null); // Close redeem modal
+
+        // Show Success Modal
+        setSuccessData({ item, fanInput });
 
         // If it's a file, we could show download immediately, but user can just click 'Unlocked'
         if (item.type === 'file' || item.type === 'text') {
@@ -230,7 +235,6 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
               className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center gap-2 ${viewMode === 'requests' ? 'bg-primary text-white' : 'text-white/60 hover:text-white'}`}
             >
               Requests
-              {/* Could add badge count here if we fetched pending count */}
             </button>
           </div>
 
@@ -248,7 +252,6 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
       {/* HEADER (Public View) */}
       {!isOwner && (
         <div className="text-center mb-6">
-          <p className="text-text/60 mb-4">Exclusive digital content available for Fam Points</p>
           {session && (
             <div className="bg-gradient-primary-soft text-primary px-4 py-2 rounded-xl inline-block border border-primary/20">
               Your Fam Points: {userPoints}
@@ -313,6 +316,14 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
           userPoints={userPoints}
           onClose={() => setSelectedRedeemItem(null)}
           onRedeemSuccess={handleRedeemSuccess}
+        />
+      )}
+
+      {successData && (
+        <VaultSuccessModal
+          item={successData.item}
+          fanInput={successData.fanInput}
+          onClose={() => setSuccessData(null)}
         />
       )}
 

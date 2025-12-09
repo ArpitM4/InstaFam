@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  Search, 
-  UserCheck, 
-  Gift, 
-  BarChart3, 
+import {
+  Search,
+  UserCheck,
+  Gift,
+  BarChart3,
   Menu,
   X,
   Home,
@@ -16,40 +16,36 @@ import {
 } from 'lucide-react';
 
 const sidebarItems = [
-  { 
-    name: 'Dashboard', 
-    href: '/admin/dashboard', 
-    icon: Home 
+  {
+    name: 'Dashboard',
+    href: '/admin/dashboard',
+    icon: Home
   },
-  { 
-    name: 'Search Users', 
-    href: '/admin/dashboard/search', 
-    icon: Search 
+  {
+    name: 'Search Users',
+    href: '/admin/dashboard/search',
+    icon: Search
   },
-  { 
-    name: 'OTP Verification', 
-    href: '/admin/dashboard/verification', 
-    icon: UserCheck 
+  {
+    name: 'OTP Verification',
+    href: '/admin/dashboard/verification',
+    icon: UserCheck
   },
-  { 
-    name: 'Bonus Management', 
-    href: '/admin/dashboard/bonus', 
-    icon: Gift 
+
+  {
+    name: 'FamPoints',
+    href: '/admin/dashboard/fampoints',
+    icon: Coins
   },
-  { 
-    name: 'FamPoints', 
-    href: '/admin/dashboard/fampoints', 
-    icon: Coins 
+  {
+    name: 'Analytics',
+    href: '/admin/dashboard/analytics',
+    icon: BarChart3
   },
-  { 
-    name: 'Analytics', 
-    href: '/admin/dashboard/analytics', 
-    icon: BarChart3 
-  },
-  { 
-    name: 'Google Analytics', 
-    href: '/admin/dashboard/google-analytics', 
-    icon: TrendingUp 
+  {
+    name: 'Google Analytics',
+    href: '/admin/dashboard/google-analytics',
+    icon: TrendingUp
   },
 ];
 
@@ -61,7 +57,7 @@ function AdminDashboardLayoutInner({ children }) {
     <div className="min-h-screen bg-[var(--background)] text-[var(--text)] flex flex-row">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -70,7 +66,7 @@ function AdminDashboardLayoutInner({ children }) {
       <aside className="hidden lg:flex flex-col justify-between w-72 bg-[var(--background)] border-r border-gray-200 dark:border-gray-700 shadow-xl">
         {/* Sidebar header */}
         <div className="flex items-center justify-between h-20 px-6 border-gray-200 dark:border-gray-700">
-      
+
         </div>
         {/* Navigation */}
         <nav className="mt-8 px-4 flex-1">
@@ -82,11 +78,10 @@ function AdminDashboardLayoutInner({ children }) {
                 <li key={item.name}>
                   <Link
                     href={item.href}
-                    className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
-                      isActive
+                    className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${isActive
                         ? 'bg-[var(--primary)] text-white shadow-lg transform scale-105'
                         : 'text-[var(--text)] hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] hover:transform hover:scale-105'
-                    }`}
+                      }`}
                     onClick={() => setSidebarOpen(false)}
                   >
                     <Icon className={`mr-4 h-5 w-5 transition-transform duration-200 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[var(--primary)]'}`} />
@@ -102,7 +97,7 @@ function AdminDashboardLayoutInner({ children }) {
         </nav>
         {/* Sidebar footer pinned to bottom */}
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex flex-col gap-4">
-          <Link 
+          <Link
             href="/"
             className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-[var(--text)] hover:text-[var(--primary)] bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
           >

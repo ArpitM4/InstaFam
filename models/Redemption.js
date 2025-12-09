@@ -21,7 +21,7 @@ const redemptionSchema = new Schema({
   pointsSpent: {
     type: Number,
     required: true,
-    min: 1
+    min: 0
   },
   redeemedAt: {
     type: Date,

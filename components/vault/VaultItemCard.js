@@ -4,16 +4,36 @@ import { FaGem, FaDownload, FaHandshake, FaComment, FaLock } from 'react-icons/f
 
 const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, isRedeemed, status }) => {
 
-    const getIcon = (type, fileType) => {
-        if (type === 'promise') return <FaHandshake className="text-2xl text-purple-400" />;
-        if (type === 'qna') return <FaComment className="text-2xl text-blue-400" />;
-        if (type === 'file') {
-            if (fileType === 'image') return <span className="text-2xl">🖼️</span>;
-            if (fileType === 'video') return <span className="text-2xl">🎥</span>;
-            if (fileType === 'pdf') return <span className="text-2xl">📄</span>;
-            return <FaDownload className="text-2xl" />;
+    const type = item.type || 'file'; // Default to file but ideally should be explicit
+    const fileType = item.fileType;
+
+    const getIcon = (t, fType) => {
+        if (t === 'promise') return <FaHandshake className="text-2xl text-purple-400" />;
+        if (t === 'qna') return <FaComment className="text-2xl text-blue-400" />;
+        if (t === 'text') return <span className="text-2xl">🔐</span>; // Lock/Key for secret
+        if (t === 'file') {
+            if (fType === 'image') return <span className="text-2xl">🖼️</span>;
+            if (fType === 'video') return <span className="text-2xl">🎥</span>;
+            if (fType === 'pdf') return <span className="text-2xl">📄</span>;
+            if (fType === 'audio') return <span className="text-2xl">🎵</span>;
+            return <FaDownload className="text-2xl text-sky-400" />;
         }
-        return <FaGem className="text-2xl" />;
+        return <FaGem className="text-2xl text-pink-500" />;
+    };
+
+    const getTypeLabel = (t) => {
+        if (t === 'promise') return 'SERVICE / PROMISE';
+        if (t === 'qna') return 'Q & A';
+        if (t === 'text') return 'SECRET CODE';
+        if (t === 'file') return 'DIGITAL FILE';
+        return 'REWARD';
+    };
+
+    const getTypeColor = (t) => {
+        if (t === 'promise') return 'bg-purple-500/20 text-purple-300 border-purple-500/20';
+        if (t === 'qna') return 'bg-blue-500/20 text-blue-300 border-blue-500/20';
+        if (t === 'text') return 'bg-pink-500/20 text-pink-300 border-pink-500/20';
+        return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/20'; // File
     };
 
     const getStatusBadge = () => {
@@ -25,22 +45,39 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, isRedeemed, status }) 
     };
 
     return (
-        <div className="rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl border border-white/10 relative group"
-            style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}>
+        <div className="rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl border border-white/10 relative group bg-[#1a1a1f] hover:border-white/20">
+
+            {/* Type Badge (Top Right) */}
+            <div className={`absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-[10px] font-bold tracking-wider border-b border-l ${getTypeColor(type)}`}>
+                {getTypeLabel(type)}
+            </div>
 
             {/* Item Header */}
-            <div className="p-4 border-b border-white/10 relative">
-                <div className="flex items-center justify-between mb-2">
+            <div className="p-4 pt-8 border-b border-white/10 relative">
+                <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                        {getIcon(item.type, item.fileType)}
+                        <div className="p-2 bg-white/5 rounded-lg border border-white/5">
+                            {getIcon(type, fileType)}
+                        </div>
                         {getStatusBadge()}
                     </div>
-                    <span className="bg-primary/20 text-primary px-3 py-1 rounded-xl text-sm font-medium border border-primary/20">
-                        {item.pointCost} FP
-                    </span>
+                    {/* Points placed below or differently? Keeping typical layout */}
                 </div>
-                <h3 className="font-bold text-lg text-white mb-1 line-clamp-1">{item.title}</h3>
-                <p className="text-white/60 text-sm line-clamp-2 min-h-[40px]">{item.description}</p>
+
+                <h3 className="font-bold text-lg text-white mb-1 line-clamp-1 pr-2">{item.title}</h3>
+
+                <div className="flex items-center gap-2 mb-2">
+                    <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs font-bold border border-primary/20">
+                        💎 {item.pointCost} FP
+                    </span>
+                    {item.limit > 0 && (
+                        <span className="text-xs text-white/40">
+                            {item.limit - item.unlockCount} left
+                        </span>
+                    )}
+                </div>
+
+                <p className="text-white/60 text-sm line-clamp-2 min-h-[40px] text-sm leading-relaxed">{item.description}</p>
             </div>
 
             {/* Stats / Limits */}

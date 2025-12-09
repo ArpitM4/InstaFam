@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
 import Redemption from "@/models/Redemption";
-import Bonus from "@/models/Bonus";
+
 import VaultItem from "@/models/VaultItem";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
@@ -12,7 +12,7 @@ await connectDb();
 export async function PUT(request, { params }) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -53,29 +53,10 @@ export async function PUT(request, { params }) {
       fulfilledAt: fulfilledAt
     });
 
-    // Now add this fulfilled redemption to the bonus record
-    const currentMonth = fulfilledAt.getMonth() + 1;
-    const currentYear = fulfilledAt.getFullYear();
-    
-    // Get or create monthly bonus record
-    const bonus = await Bonus.getOrCreateMonthlyBonus(
-      creator._id,
-      creator.username,
-      currentMonth,
-      currentYear
-    );
+    // Bonus logic removed.
 
-    // Add this redemption to the bonus record
-    await bonus.addRedemption({
-      redemptionId: redemption._id,
-      fanUsername: redemption.fanId?.username || redemption.fanId?.name || 'Unknown',
-      vaultItemTitle: redemption.vaultItemId?.title || 'Unknown Item',
-      famPointsSpent: redemption.pointsSpent,
-      redeemedAt: fulfilledAt
-    });
-
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: "Redemption marked as fulfilled successfully"
     });
 

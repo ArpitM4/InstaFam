@@ -105,8 +105,8 @@ export async function POST(req) {
 
                 // Create Refund Transaction
                 await PointTransaction.create({
-                    fanId: fan._id,
-                    creatorId: user._id,
+                    userId: fan._id,
+                    creatorId: redemption.creatorId,
                     amount: redemption.pointsSpent,
                     type: 'REFUND',
                     description: `Refund for rejected vault item: ${redemption.vaultItemId.title}`

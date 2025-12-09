@@ -4,7 +4,7 @@ import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
 import VaultItem from "@/models/VaultItem";
 import Redemption from "@/models/Redemption";
-import Bonus from "@/models/Bonus";
+
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { notifyVaultRedeemed } from "@/utils/notificationHelpers";
 import { spendPoints, getAvailablePoints } from "@/utils/pointsHelpers";
@@ -41,7 +41,12 @@ export async function POST(request) {
     }
 
     // Check if fan has enough available (unexpired) points FOR THIS CREATOR
+    // Ensure IDs are strings for helper functions consistency if needed, but Mongoose usually handles ObjectIds.
+    // Logging for debugging the 400 error
+    console.log(`[Redeem] Processing for fan: ${fan._id}, creator: ${vaultItem.creatorId}, cost: ${vaultItem.pointCost}`);
+
     const availablePoints = await getAvailablePoints(fan._id, vaultItem.creatorId);
+
     if (availablePoints < vaultItem.pointCost) {
       return NextResponse.json({
         error: "Insufficient points for this creator",
@@ -61,12 +66,20 @@ export async function POST(request) {
     }
 
     // Start transaction-like operations
-    // Use FIFO point spending system with creatorId
     try {
-      await spendPoints(fan._id, vaultItem.creatorId, vaultItem.pointCost, `Vault redemption: ${vaultItem.title}`);
+      // Ensure pointCost is a valid non-negative number
+      const cost = Number(vaultItem.pointCost);
+      if (cost < 0 || isNaN(cost)) {
+        throw new Error("Invalid point cost");
+      }
+
+      if (cost > 0) {
+        await spendPoints(fan._id, vaultItem.creatorId, cost, `Vault redemption: ${vaultItem.title}`);
+      }
     } catch (pointError) {
+      console.error("[Redeem] Point transaction failed:", pointError);
       return NextResponse.json({
-        error: pointError.message,
+        error: pointError.message || "Point transaction failed",
         required: vaultItem.pointCost,
         available: availablePoints
       }, { status: 400 });
@@ -97,32 +110,7 @@ export async function POST(request) {
 
     await redemption.save();
 
-    // Update monthly bonus record for the creator ONLY if it's fulfilled
-    if (isAutoFulfilled) { // For both digital files and promises
-      const now = new Date();
-      const currentMonth = now.getMonth() + 1;
-      const currentYear = now.getFullYear();
-
-      // Get creator details
-      const creator = await User.findById(vaultItem.creatorId);
-
-      // Get or create monthly bonus record
-      const bonus = await Bonus.getOrCreateMonthlyBonus(
-        vaultItem.creatorId,
-        creator.username,
-        currentMonth,
-        currentYear
-      );
-
-      // Add this redemption to the bonus record
-      await bonus.addRedemption({
-        redemptionId: redemption._id,
-        fanUsername: fan.username || fan.name,
-        vaultItemTitle: vaultItem.title,
-        famPointsSpent: vaultItem.pointCost,
-        redeemedAt: redemption.fulfilledAt // Use fulfilledAt date
-      });
-    }
+    // Bonus logic removed.
 
     // Send notification to creator for non-digital items that require action
     if (!isDigitalFile) {

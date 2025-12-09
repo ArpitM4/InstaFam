@@ -14,7 +14,7 @@ await connectDb();
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -26,22 +26,22 @@ export async function GET(request) {
     }
 
     // Fetch all redemptions for this fan across all creators
-    const redemptions = await Redemption.find({ 
+    const redemptions = await Redemption.find({
       fanId: fan._id
     })
-    .populate('vaultItemId', 'title description perkType fileType pointCost fileUrl')
-    .populate('creatorId', 'username')
-    .sort({ redeemedAt: -1 });
+      .populate('vaultItemId', 'title description type fileType pointCost fileUrl instructions')
+      .populate('creatorId', 'username')
+      .sort({ redeemedAt: -1 });
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       redemptions
     });
 
   } catch (error) {
     console.error("Error fetching user redemptions:", error);
     return NextResponse.json(
-      { error: "Internal server error" }, 
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
