@@ -30,7 +30,8 @@ export default function GoogleOneTap() {
           setIsAuthenticating(false);
           const sessionRes = await fetch('/api/auth/session');
           const session = await sessionRes.json();
-          if (session?.user?.setupCompleted) {
+          // Skip setup if user already completed it OR has a username
+          if (session?.user?.setupCompleted || session?.user?.hasUsername) {
             router.push('/');
           } else {
             router.push('/setup');

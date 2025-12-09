@@ -34,7 +34,8 @@ export default function AppLayout({ children }) {
   useEffect(() => {
     if (status === "loading") return;
 
-    if (session?.user && !session.user.setupCompleted) {
+    // Skip setup if user completed it OR already has a username
+    if (session?.user && !session.user.setupCompleted && !session.user.hasUsername) {
       // If on setup page, let them be
       if (pathname === '/setup') return;
 

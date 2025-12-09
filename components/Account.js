@@ -217,12 +217,10 @@ const Account = ({ initialUser }) => {
                     )}
 
                     {form.profilepic ? (
-                      <Image
+                      <img
                         src={form.profilepic}
                         alt="Profile"
-                        fill
-                        sizes="64px"
-                        className="object-cover"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full bg-white/10 flex items-center justify-center">
@@ -320,40 +318,19 @@ const Account = ({ initialUser }) => {
 
               {/* Account Type */}
               <div className="p-4 border-b border-white/10">
-                <label className="block text-xs font-medium text-white/70 mb-2">Account Type</label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      // Only allow switching to User if not already a Creator
-                      if (form.accountType !== 'Creator') {
-                        setForm(prev => ({ ...prev, accountType: 'User' }));
-                      }
-                    }}
-                    disabled={form.accountType === 'Creator'}
-                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${form.accountType === 'User'
-                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
-                      : form.accountType === 'Creator'
-                        ? 'bg-white/5 text-white/30 border border-white/5 cursor-not-allowed'
-                        : 'bg-white/5 text-white/50 border border-white/10 hover:border-white/20'
-                      }`}
-                  >
-                    User
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setForm(prev => ({ ...prev, accountType: 'Creator' }))}
-                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${form.accountType === 'Creator'
-                      ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
-                      : 'bg-white/5 text-white/50 border border-white/10 hover:border-white/20'
-                      }`}
-                  >
-                    Creator
-                  </button>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-medium text-white/70">Account Type</label>
+                  <span className="text-white/40 text-xs">Display only</span>
                 </div>
-                {form.accountType === 'Creator' && (
-                  <p className="text-white/40 text-xs mt-2">Creator accounts cannot be changed back to User</p>
-                )}
+                <div className="mt-2">
+                  <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium ${form.accountType === 'Creator'
+                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                    : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                    }`}>
+                    {form.accountType || 'User'}
+                  </span>
+                </div>
+                <p className="text-white/40 text-xs mt-2">Account type is managed automatically based on your page visibility.</p>
               </div>
 
               {/* Submit Button */}

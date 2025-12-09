@@ -196,7 +196,8 @@ export const authOptions = {
             token.points = dbUser.points || 0;
             token.profilepic = dbUser.profilepic;
             token.hasUsername = !!dbUser.username;
-            token.setupCompleted = dbUser.setupCompleted;
+            // If user has a username, they have completed setup (backward compat for older users)
+            token.setupCompleted = dbUser.setupCompleted || !!dbUser.username;
             token.visibility = dbUser.visibility;
             token.lastRefresh = Date.now();
           }
@@ -227,7 +228,8 @@ export const authOptions = {
             token.points = dbUser.points || 0;
             token.profilepic = dbUser.profilepic;
             token.hasUsername = !!dbUser.username;
-            token.setupCompleted = dbUser.setupCompleted;
+            // If user has a username, they have completed setup (backward compat for older users)
+            token.setupCompleted = dbUser.setupCompleted || !!dbUser.username;
             token.visibility = dbUser.visibility;
             token.lastRefresh = Date.now();
             delete token.error;

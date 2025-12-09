@@ -47,7 +47,8 @@ export default function MarketingSplash() {
         // Check if setup is needed by fetching user data
         const sessionRes = await fetch('/api/auth/session');
         const session = await sessionRes.json();
-        if (session?.user?.setupCompleted) {
+        // Skip setup if user already completed it OR has a username
+        if (session?.user?.setupCompleted || session?.user?.hasUsername) {
           router.push('/');
         } else {
           router.push('/setup');
@@ -119,7 +120,8 @@ export default function MarketingSplash() {
   };
 
   const handleGoogleSignIn = () => {
-    signIn('google', { callbackUrl: '/setup' });
+    // Redirect to home - app/page.js will handle setup redirect if needed
+    signIn('google', { callbackUrl: '/' });
   };
 
   return (

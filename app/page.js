@@ -11,7 +11,8 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    if (session?.user && !session.user.setupCompleted) {
+    // Skip setup if user completed it OR already has a username
+    if (session?.user && !session.user.setupCompleted && !session.user.hasUsername) {
       router.push("/setup");
     }
   }, [session, router]);

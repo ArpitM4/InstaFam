@@ -32,7 +32,8 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
     // Reset view when opening
     useEffect(() => {
         if (isOpen) {
-            if (session?.user && !session.user.setupCompleted) {
+            // Skip setup if user has completed it OR already has a username
+            if (session?.user && !session.user.setupCompleted && !session.user.hasUsername) {
                 setView("SETUP");
             } else {
                 setView("AUTH");
@@ -71,7 +72,8 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                 const sessionRes = await fetch('/api/auth/session');
                 const sessionData = await sessionRes.json();
 
-                if (sessionData?.user?.setupCompleted) {
+                // Skip setup if user already completed it OR has a username
+                if (sessionData?.user?.setupCompleted || sessionData?.user?.hasUsername) {
                     onClose();
                     router.refresh();
                 } else {
