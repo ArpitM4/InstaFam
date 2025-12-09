@@ -6,6 +6,47 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
 
+export async function generateMetadata({ params }) {
+  const user = await fetchuser(params.username);
+
+  if (!user || user.visibility === 'hidden') {
+    return {
+      title: 'Profile Not Found | Sygil',
+      description: 'The requested profile could not be found.',
+    };
+  }
+
+  const title = `${user.name || user.username} | Sygil`;
+  const description = user.description || `Check out ${user.username}'s profile on Sygil. Connect, support, and get exclusive content.`;
+  const image = user.profilepic || 'https://www.sygil.app/og-image.jpg';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: `${user.username}'s profile picture`,
+        },
+      ],
+      type: 'profile',
+      username: user.username,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image],
+      creator: '@sygil_official',
+    },
+  };
+}
+
 const UsernamePage = async ({ params }) => {
   const user = await fetchuser(params.username);
   const session = await getServerSession(nextAuthConfig);

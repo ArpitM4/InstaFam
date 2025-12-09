@@ -30,7 +30,7 @@ export default function robots() {
         ],
       },
     ],
-    sitemap: 'https://www.instafam.social/sitemap.xml',
-    host: 'https://www.instafam.social',
+    sitemap: 'https://www.sygil.app/sitemap.xml',
+    host: 'https://www.sygil.app',
   };
 }

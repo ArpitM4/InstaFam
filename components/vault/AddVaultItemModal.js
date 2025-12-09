@@ -250,7 +250,7 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
                                                 ) : (
                                                     <div className="text-center">
                                                         <p className="text-white/60 font-medium">Click to Upload File</p>
-                                                        <p className="text-xs text-white/40 mt-1">Supports {formData.fileType}</p>
+                                                        <p className="text-xs text-white/40 mt-1">Supports {formData.fileType} (Max 10MB)</p>
                                                     </div>
                                                 )}
                                             </label>

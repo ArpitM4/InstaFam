@@ -4,19 +4,20 @@ import User from "@/models/User";
 
 export default async function sitemap() {
   const baseUrl = 'https://www.sygil.app';
-  
+
   try {
     // Connect to database
     await connectDB();
-    
+
     // Get all blog posts
     const blogs = await Blog.find({}).sort({ createdAt: -1 }).lean();
-    
+
     // Get all verified creators
-    const creators = await User.find({ 
-      'instagram.isVerified': true 
+    const creators = await User.find({
+      accountType: 'Creator',
+      visibility: 'public'
     }).select('username').lean();
-    
+
     // Static pages with priorities and change frequencies
     const staticPages = [
       {
@@ -80,7 +81,7 @@ export default async function sitemap() {
         priority: 0.4,
       },
     ];
-    
+
     // Blog pages
     const blogPages = blogs.map((blog) => ({
       url: `${baseUrl}/blogs/${blog.slug}`,
@@ -88,15 +89,15 @@ export default async function sitemap() {
       changeFrequency: 'weekly',
       priority: 0.7,
     }));
-    
-    // Creator profile pages
+
+    // Creator profile pages - High priority as they are the main content
     const creatorPages = creators.map((creator) => ({
       url: `${baseUrl}/${creator.username}`,
       lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.7,
+      changeFrequency: 'daily',
+      priority: 0.8,
     }));
-    
+
     return [...staticPages, ...blogPages, ...creatorPages];
   } catch (error) {
     console.error('Error generating sitemap:', error);
