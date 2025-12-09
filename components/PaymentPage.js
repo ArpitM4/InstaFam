@@ -113,6 +113,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
   const coverInputRef = useRef();
   const [isUploadingProfile, setIsUploadingProfile] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [showBannerPicker, setShowBannerPicker] = useState(false);
   // --- Hooks Initialization ---
   const { data: session } = useSession();
   const searchParams = useSearchParams();
@@ -660,13 +661,51 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
       const data = await res.json();
       const uploadedUrl = data.url || data.secure_url;
       if (data.success && uploadedUrl) {
-        setcurrentUser((prev) => ({ ...prev, coverpic: uploadedUrl }));
+        // Clear any previous Unsplash attribution since this is a custom upload
+        setcurrentUser((prev) => ({ ...prev, coverpic: uploadedUrl, bannerAttribution: null }));
+        // Also update database to clear attribution
+        fetch('/api/update-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bannerAttribution: null }),
+        });
         toast.success("Cover banner updated!");
       } else {
         toast.error(data.error || "Upload failed");
       }
     } catch (err) {
       toast.error(err?.message || "Upload error");
+    } finally {
+      setIsUploadingCover(false);
+    }
+  };
+
+  // Handle Unsplash image selection for banner
+  const handleSelectUnsplashBanner = async (imageUrl, attribution) => {
+    setIsUploadingCover(true);
+    try {
+      // Save the Unsplash URL and attribution to the user
+      const res = await fetch('/api/update-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          coverpic: imageUrl,
+          bannerAttribution: attribution
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setcurrentUser((prev) => ({
+          ...prev,
+          coverpic: imageUrl,
+          bannerAttribution: attribution
+        }));
+        toast.success("Banner updated!");
+      } else {
+        toast.error(data.error || "Update failed");
+      }
+    } catch (err) {
+      toast.error(err?.message || "Update error");
     } finally {
       setIsUploadingCover(false);
     }
@@ -958,6 +997,9 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
           fanPoints={fanPoints}
           canEarnBonus={canEarnBonus}
           onPointsUpdate={loadFanPoints}
+          showBannerPicker={showBannerPicker}
+          setShowBannerPicker={setShowBannerPicker}
+          onSelectUnsplashBanner={handleSelectUnsplashBanner}
         />
 
         {/* NEW TAB NAVIGATION UI - Replaces the old InteractionSection placement */}
@@ -1274,10 +1316,10 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
                     <label
                       key={section.id}
                       className={`relative flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group ${isComingSoon
-                          ? 'bg-white/[0.02] border border-white/5 opacity-50 cursor-not-allowed'
-                          : isSelected
-                            ? 'bg-primary/10 cursor-pointer'
-                            : 'bg-white/5 border border-white/5 cursor-pointer hover:bg-white/10'
+                        ? 'bg-white/[0.02] border border-white/5 opacity-50 cursor-not-allowed'
+                        : isSelected
+                          ? 'bg-primary/10 cursor-pointer'
+                          : 'bg-white/5 border border-white/5 cursor-pointer hover:bg-white/10'
                         }`}
                     >
                       {/* Checkbox (Hidden) */}
@@ -1292,10 +1334,10 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
 
                       {/* Custom Checkbox UI */}
                       <div className={`flex-shrink-0 w-5 h-5 rounded-md flex items-center justify-center transition-colors ${isComingSoon
-                          ? 'border border-white/10 bg-white/5'
-                          : isSelected
-                            ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                            : 'border border-white/20 group-hover:border-white/40'
+                        ? 'border border-white/10 bg-white/5'
+                        : isSelected
+                          ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                          : 'border border-white/20 group-hover:border-white/40'
                         }`}>
                         {isSelected && !isComingSoon && (
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">

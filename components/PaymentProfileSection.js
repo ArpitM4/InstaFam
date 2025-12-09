@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { FaPen, FaSpinner, FaExclamationTriangle } from "react-icons/fa";
 import FollowButton from "./FollowButton";
+import BannerPickerModal from "./BannerPickerModal";
 
 const PaymentProfileSection = ({
   username,
@@ -27,7 +28,10 @@ const PaymentProfileSection = ({
   setShowBetaPopup,
   fanPoints = 0,
   canEarnBonus = false,
-  onPointsUpdate
+  onPointsUpdate,
+  showBannerPicker,
+  setShowBannerPicker,
+  onSelectUnsplashBanner
 }) => {
   // Generate fallback profile image URL only when needed
   const profileImageUrl = currentUser?.profilepic || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(username || 'User')}&backgroundColor=6366f1`;
@@ -67,7 +71,7 @@ const PaymentProfileSection = ({
               <button
                 type="button"
                 className={`absolute bottom-2 right-2 md:bottom-4 md:right-4 z-10 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow hover:bg-black/80 transition text-xs md:text-sm font-medium flex items-center gap-1.5 ${isUploadingCover ? 'opacity-60 cursor-not-allowed' : ''}`}
-                onClick={() => !isUploadingCover && coverInputRef.current.click()}
+                onClick={() => !isUploadingCover && setShowBannerPicker(true)}
                 disabled={isUploadingCover}
               >
                 {isUploadingCover ? <FaSpinner className="animate-spin text-sm" /> : <FaPen className="text-xs" />}
@@ -83,6 +87,18 @@ const PaymentProfileSection = ({
               <FaSpinner className="animate-spin text-white text-3xl mb-2" />
               <span className="text-white text-sm font-medium">Uploading banner...</span>
             </div>
+          )}
+
+          {/* Unsplash Attribution Credit (for legal compliance) */}
+          {hasCoverImage && currentUser?.bannerAttribution?.photographer && (
+            <a
+              href={currentUser.bannerAttribution.unsplashUrl || currentUser.bannerAttribution.photographerUrl || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute bottom-2 left-2 md:bottom-4 md:left-4 z-10 bg-black/40 backdrop-blur-sm text-white/70 hover:text-white px-2 py-1 rounded text-xs transition-colors"
+            >
+              Photo by {currentUser.bannerAttribution.photographer} on Unsplash
+            </a>
           )}
         </div>
 
@@ -222,6 +238,26 @@ const PaymentProfileSection = ({
           </div>
         )}
       </div>
+
+      {/* Banner Picker Modal */}
+      {showBannerPicker && (
+        <BannerPickerModal
+          onClose={() => setShowBannerPicker(false)}
+          onUpload={(file) => {
+            setShowBannerPicker(false);
+            // Trigger the existing file input change handler
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            coverInputRef.current.files = dataTransfer.files;
+            handleCoverChange({ target: { files: dataTransfer.files } });
+          }}
+          onSelectUnsplash={(imageUrl, attribution) => {
+            setShowBannerPicker(false);
+            onSelectUnsplashBanner(imageUrl, attribution);
+          }}
+          isUploading={isUploadingCover}
+        />
+      )}
     </>
   );
 };

@@ -218,30 +218,57 @@ const PaymentInteractionSection = ({
                 />
               </div>
 
-              {/* PayPal Button - ALWAYS AVAILABLE for everyone */}
-              <div className="min-h-[55px] mt-2">
-                <div className="w-full paypal-container">
-                  <PayPalScriptProvider
-                    options={{
-                      "client-id": PAYPAL_CLIENT_ID,
-                      currency: "USD",
-                      components: "buttons",
-                      "disable-funding": "credit,card"
-                    }}
-                  >
-                    <PayPalButtons
-                      style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay" }}
-                      createOrder={createOrder}
-                      onApprove={onApprove}
-                      onError={(err) => {
-                        console.error('PayPal Button Error:', err);
-                      }}
-                      disabled={!paymentform.amount || Number(paymentform.amount) <= 0 || isPaying || !paymentform.name}
-                      className="w-full"
-                    />
-                  </PayPalScriptProvider>
-                </div>
+              {/* Razorpay Button - UI Only (Coming Soon) */}
+              <div className="mt-2">
+                <button
+                  disabled
+                  className="w-full py-3 bg-[#072654] text-white rounded-lg font-bold flex items-center justify-center gap-2 opacity-70 cursor-not-allowed"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 10H21M7 15H8M12 15H13M6 19H18C19.1046 19 20 18.1046 20 17V7C20 5.89543 19.1046 5 18 5H6C4.89543 5 4 5.89543 4 7V17C4 18.1046 4.89543 19 6 19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Pay with Razorpay
+                  <span className="ml-2 text-xs bg-white/20 px-2 py-0.5 rounded-full">Coming Soon</span>
+                </button>
+                <p className="text-xs text-center text-white/40 mt-2">
+                  UPI, Cards, NetBanking & more - launching soon!
+                </p>
               </div>
+
+              {/* PayPal Button - Only for Admin Users */}
+              {(() => {
+                const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || '').split(',').map(e => e.trim());
+                const isAdmin = session?.user?.email && adminEmails.includes(session.user.email);
+
+                if (!isAdmin) return null;
+
+                return (
+                  <div className="min-h-[55px] mt-4">
+                    <p className="text-xs text-yellow-400 mb-2 text-center">Admin Only: PayPal Testing</p>
+                    <div className="w-full paypal-container">
+                      <PayPalScriptProvider
+                        options={{
+                          "client-id": PAYPAL_CLIENT_ID,
+                          currency: "USD",
+                          components: "buttons",
+                          "disable-funding": "credit,card"
+                        }}
+                      >
+                        <PayPalButtons
+                          style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay" }}
+                          createOrder={createOrder}
+                          onApprove={onApprove}
+                          onError={(err) => {
+                            console.error('PayPal Button Error:', err);
+                          }}
+                          disabled={!paymentform.amount || Number(paymentform.amount) <= 0 || isPaying || !paymentform.name}
+                          className="w-full"
+                        />
+                      </PayPalScriptProvider>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

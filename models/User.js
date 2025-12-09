@@ -13,6 +13,12 @@ const UserSchema = new Schema({
   name: { type: String },
   profilepic: { type: String },
   coverpic: { type: String },
+  // Unsplash attribution for banner (for legal compliance)
+  bannerAttribution: {
+    photographer: { type: String },
+    photographerUrl: { type: String },
+    unsplashUrl: { type: String }
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   followers: { type: Number, default: 0 }, // Legacy count field - kept for backward compatibility
