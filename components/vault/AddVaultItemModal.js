@@ -19,9 +19,43 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
         userLimit: 1
     });
 
+    const [uploadMode, setUploadMode] = useState('upload'); // 'link' | 'upload'
+    const [uploadingFile, setUploadingFile] = useState(false);
+
     const handleTypeSelect = (type) => {
         setFormData(prev => ({ ...prev, type }));
         setStep(2);
+    };
+
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setUploadingFile(true);
+        const uploadFormData = new FormData();
+        uploadFormData.append("file", file);
+        // We don't need a specific type for vault items unless we want to categorize them in folders
+        // route.js handles undefined type by putting it in 'sygil/vault'
+
+        try {
+            const res = await fetch("/api/upload", {
+                method: "POST",
+                body: uploadFormData,
+            });
+            const data = await res.json();
+
+            if (data.success && (data.secure_url || data.url)) {
+                setFormData(prev => ({ ...prev, fileUrl: data.secure_url || data.url }));
+                toast.success("File uploaded successfully!");
+            } else {
+                toast.error(data.error || "Upload failed");
+            }
+        } catch (err) {
+            console.error("Upload error:", err);
+            toast.error("Upload failed");
+        } finally {
+            setUploadingFile(false);
+        }
     };
 
     const handleSubmit = async () => {
@@ -139,14 +173,14 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
                                     value={formData.pointCost} onChange={e => setFormData({ ...formData, pointCost: e.target.value })} />
                             </div>
                             <div>
-                                <label className="block text-sm text-white/60 mb-1">Per User Limit</label>
+                                <label className="block text-sm text-white/60 mb-1">Per User Limit (0 = Unlimited)</label>
                                 <input type="number" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
                                     min={0}
                                     placeholder="0 = Unlimited"
                                     value={formData.userLimit} onChange={e => setFormData({ ...formData, userLimit: e.target.value })} />
                             </div>
                             <div>
-                                <label className="block text-sm text-white/60 mb-1">Total Supply (Slots)</label>
+                                <label className="block text-sm text-white/60 mb-1">Total Supply (0 = Unlimited)</label>
                                 <input type="number" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
                                     min={0}
                                     placeholder="0 = Unlimited"
@@ -168,11 +202,60 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
                                         <option value="document">Document</option>
                                     </select>
                                 </div>
+
                                 <div>
-                                    <label className="block text-sm text-white/60 mb-1">File URL</label>
-                                    <input type="text" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
-                                        placeholder="https://..."
-                                        value={formData.fileUrl} onChange={e => setFormData({ ...formData, fileUrl: e.target.value })} />
+                                    <div className="flex gap-4 mb-2">
+                                        <button
+                                            className={`text-sm pb-1 border-b-2 transition-colors ${uploadMode === 'upload' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white'}`}
+                                            onClick={() => setUploadMode('upload')}
+                                        >
+                                            Upload File
+                                        </button>
+                                        <button
+                                            className={`text-sm pb-1 border-b-2 transition-colors ${uploadMode === 'link' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white'}`}
+                                            onClick={() => setUploadMode('link')}
+                                        >
+                                            External Link
+                                        </button>
+                                    </div>
+
+                                    {uploadMode === 'link' ? (
+                                        <input type="text" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                                            placeholder="https://..."
+                                            value={formData.fileUrl} onChange={e => setFormData({ ...formData, fileUrl: e.target.value })} />
+                                    ) : (
+                                        <div className="relative">
+                                            <input
+                                                type="file"
+                                                id="vault-file-upload"
+                                                className="hidden"
+                                                onChange={handleFileUpload}
+                                                disabled={uploadingFile}
+                                            />
+                                            <label
+                                                htmlFor="vault-file-upload"
+                                                className={`flex items-center justify-center w-full p-4 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-primary/50 transition-colors bg-white/5 ${uploadingFile ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            >
+                                                {uploadingFile ? (
+                                                    <span className="flex items-center gap-2 text-white/60">
+                                                        <div className="animate-spin h-4 w-4 border-2 border-white/20 border-t-white rounded-full"></div>
+                                                        Uploading...
+                                                    </span>
+                                                ) : formData.fileUrl && uploadMode === 'upload' ? (
+                                                    <div className="text-center">
+                                                        <p className="text-green-400 font-medium mb-1">File Uploaded!</p>
+                                                        <p className="text-xs text-white/40 break-all">{formData.fileUrl}</p>
+                                                        <p className="text-xs text-primary mt-2">Click to replace</p>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-center">
+                                                        <p className="text-white/60 font-medium">Click to Upload File</p>
+                                                        <p className="text-xs text-white/40 mt-1">Supports {formData.fileType}</p>
+                                                    </div>
+                                                )}
+                                            </label>
+                                        </div>
+                                    )}
                                 </div>
                             </>
                         )}
