@@ -94,9 +94,12 @@ export async function POST(request) {
     });
 
     // Create redemption record
-    const isDigitalFile = vaultItem.fileType !== 'text-reward' && vaultItem.fileType !== 'promise';
-    const isPromise = vaultItem.fileType === 'promise';
-    const isAutoFulfilled = isDigitalFile || isPromise; // Both digital files and promises are auto-fulfilled
+    // Determine item type and fulfillment status
+    const type = vaultItem.type || 'file'; // Default to file
+
+    // Files and Text (Secret Codes) are auto-fulfilled upon redemption
+    // QnA and Promise (Services) require creator action
+    const isAutoFulfilled = type === 'file' || type === 'text';
 
     const redemption = new Redemption({
       fanId: fan._id,
@@ -104,21 +107,23 @@ export async function POST(request) {
       vaultItemId: vaultItem._id,
       pointsSpent: vaultItem.pointCost,
       fanInput: fanInput ? fanInput.trim() : null,
-      status: isAutoFulfilled ? 'Fulfilled' : 'Pending', // Auto-fulfill digital files and promises
-      fulfilledAt: isAutoFulfilled ? new Date() : null // Set fulfillment date for auto-fulfilled items
+      status: isAutoFulfilled ? 'Fulfilled' : 'Pending',
+      fulfilledAt: isAutoFulfilled ? new Date() : null
     });
 
     await redemption.save();
 
     // Bonus logic removed.
 
-    // Send notification to creator for non-digital items that require action
-    if (!isDigitalFile) {
+    // Send notification to creator for items that might require attention or are significant
+    // We skip notifications for standard file downloads to reduce noise, unless desired
+    if (type !== 'file') {
       await notifyVaultRedeemed(
         vaultItem.creatorId,
         fan.name,
         vaultItem.title,
-        redemption._id
+        redemption._id,
+        type
       );
     }
 

@@ -30,6 +30,7 @@ export const createNotification = async ({
 };
 
 // Specific notification creators
+// Specific notification creators
 export const notifyCreatorAnswered = async (fanId, creatorName, vaultItemTitle, redemptionId) => {
   return await createNotification({
     recipientId: fanId,
@@ -40,13 +41,34 @@ export const notifyCreatorAnswered = async (fanId, creatorName, vaultItemTitle, 
   });
 };
 
-export const notifyVaultRedeemed = async (creatorId, fanName, vaultItemTitle, redemptionId) => {
+export const notifyRedemptionFulfilled = async (fanId, creatorName, vaultItemTitle, redemptionId) => {
+  return await createNotification({
+    recipientId: fanId,
+    type: 'redemption_fulfilled',
+    title: 'Your request has been fulfilled!',
+    message: `${creatorName} fulfilled your request for "${vaultItemTitle}"`,
+    data: { redemptionId, vaultItemTitle }
+  });
+};
+
+export const notifyVaultRedeemed = async (creatorId, fanName, vaultItemTitle, redemptionId, type = 'file') => {
+  let title = 'New vault redemption!';
+  let message = `${fanName} redeemed "${vaultItemTitle}"`;
+
+  if (type === 'qna') {
+    title = 'New Question Received!';
+    message = `${fanName} asked a question in "${vaultItemTitle}". Reply now!`;
+  } else if (type === 'promise') {
+    title = 'New Service Request!';
+    message = `${fanName} requested "${vaultItemTitle}". Check details.`;
+  }
+
   return await createNotification({
     recipientId: creatorId,
     type: 'vault_redeemed',
-    title: 'New vault redemption!',
-    message: `${fanName} redeemed "${vaultItemTitle}" and needs your attention`,
-    data: { redemptionId, vaultItemTitle, fanName }
+    title,
+    message,
+    data: { redemptionId, vaultItemTitle, fanName, type }
   });
 };
 

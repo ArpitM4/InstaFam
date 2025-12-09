@@ -6,6 +6,7 @@ import Redemption from "@/models/Redemption";
 
 import VaultItem from "@/models/VaultItem";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { notifyRedemptionFulfilled } from "@/utils/notificationHelpers";
 
 await connectDb();
 
@@ -54,6 +55,14 @@ export async function PUT(request, { params }) {
     });
 
     // Bonus logic removed.
+
+    // Notify the fan that their request has been fulfilled
+    await notifyRedemptionFulfilled(
+      redemption.fanId._id,
+      creator.name,
+      redemption.vaultItemId?.title || 'Unknown Item',
+      redemption._id
+    );
 
     return NextResponse.json({
       success: true,
