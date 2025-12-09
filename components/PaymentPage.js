@@ -1300,7 +1300,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
           href={`${typeof window !== 'undefined' ? window.location.pathname : ''}?viewAs=public`}
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 z-[9990] bg-black text-white px-6 py-3 rounded-full font-bold shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 border border-white/10 hover:shadow-primary/20"
+          className="fixed bottom-24 right-6 z-[9990] bg-black text-white px-6 py-3 rounded-full font-bold shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 border border-white/10 hover:shadow-primary/20"
           title="See how your page looks to others"
         >
           <FaEye className="text-xl" />
