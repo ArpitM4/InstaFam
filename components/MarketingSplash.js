@@ -7,7 +7,12 @@ import { signIn } from "next-auth/react";
 import { FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa';
 import Footer from "@/components/Footer";
 
-import CosmicBackground from "@/components/CosmicBackground";
+import dynamic from "next/dynamic";
+
+const CosmicBackground = dynamic(() => import("@/components/CosmicBackground"), {
+  ssr: false,
+  loading: () => <div className="fixed inset-0 bg-[#0a0a15]" />
+});
 
 export default function MarketingSplash() {
   const router = useRouter();
