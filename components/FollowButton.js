@@ -11,8 +11,8 @@ const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFoll
   const [loading, setLoading] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
 
-  // Don't show follow button if user is not logged in or is viewing their own profile
-  const shouldShowButton = session && session.user.id !== creatorId;
+  // Show follow button for guests or other users (not owner)
+  const shouldShowButton = !session || session.user.id !== creatorId;
 
   useEffect(() => {
     if (shouldShowButton && creatorId) {
@@ -23,6 +23,10 @@ const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFoll
   }, [creatorId, session?.user?.id]);
 
   const checkFollowStatus = async () => {
+    if (!session) {
+      setCheckingStatus(false);
+      return; // Skip check for guests
+    }
     try {
       console.log('Checking follow status for creator:', creatorId);
       const response = await fetch(`/api/users/${creatorId}/follow`);
@@ -42,7 +46,7 @@ const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFoll
 
   const handleFollowToggle = async () => {
     if (!session) {
-      toast.error('Please log in to follow creators');
+      window.dispatchEvent(new CustomEvent('open-auth-modal'));
       return;
     }
 

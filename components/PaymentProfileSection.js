@@ -178,77 +178,31 @@ const PaymentProfileSection = ({
           <p className="text-sm text-text/60 text-center mt-2">{currentUser?.description}</p>
         )}
 
-        {/* FamPoints Box */}
+        {/* FamPoints Display - Integrated */}
         {!isOwner && (
-          <div className="mt-4 flex justify-center w-full animate-in fade-in duration-500">
-            <div className="flex items-center gap-4 bg-white/5 border border-white/10 px-6 py-3 rounded-2xl backdrop-blur-sm">
-
-              {/* Points Display */}
-              <div className="flex flex-col items-center">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">🪙</span>
-                  <span className="text-lg font-bold text-white">
-                    {fanPoints.toLocaleString()}
-                  </span>
-                </div>
+          <div className="mt-3 flex items-center justify-center gap-6 animate-in fade-in duration-500">
+            {/* Points */}
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🪙</span>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-white leading-none">
+                  {fanPoints.toLocaleString()}
+                </span>
                 <span className="text-[10px] uppercase tracking-wide text-white/40 font-medium">FamPoints</span>
               </div>
-
-              {/* Separator */}
-              {canEarnBonus && (
-                <>
-                  <div className="w-px h-8 bg-white/10"></div>
-
-                  {/* Incentive Text */}
-                  <div className="flex flex-col">
-                    <span className="text-xs font-semibold text-white">Follow Now</span>
-                    <span className="text-[10px] text-green-400 font-medium">+10 FP Bonus</span>
-                  </div>
-                </>
-              )}
             </div>
-          </div>
-        )}
 
-        {/* Owner-only Event Controls */}
-        {isOwner && (
-          <div className="mt-4 space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
-              <input
-                type="number"
-                placeholder={isEventActive ? "Event is running" : "Duration in days"}
-                value={eventDuration}
-                onChange={(e) => !isEventActive && setEventDuration(e.target.value)}
-                className={`w-full sm:min-w-[160px] sm:flex-1 px-3 py-2 bg-background text-text rounded-lg focus:outline-none transition-all duration-200 border-0 placeholder-text/40 ${isEventActive ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={isEventActive}
-                readOnly={isEventActive}
-              />
-              <button
-                onClick={handleStartEvent}
-                disabled={isEventActive || !eventDuration}
-                className={`w-full sm:w-auto px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm ${isEventActive || !eventDuration
-                  ? 'bg-gray-500 text-gray-300 cursor-not-allowed opacity-50'
-                  : 'bg-success hover:bg-success/90 text-white hover:shadow-md'
-                  }`}
-              >
-                {isEventActive ? 'Event Active' : 'Start Event'}
-              </button>
-              <button
-                onClick={handleEndEvent}
-                disabled={!isEventActive}
-                className={`w-full sm:w-auto px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm ${!isEventActive
-                  ? 'bg-gray-500 text-gray-300 cursor-not-allowed opacity-50'
-                  : 'bg-error hover:bg-error/90 text-white hover:shadow-md'
-                  }`}
-              >
-                End Event
-              </button>
-            </div>
-            {isEventActive && (
-              <p className="text-center text-xs text-text/50">Event settings are locked while event is running</p>
+            {/* Bonus Incentive */}
+            {canEarnBonus && (
+              <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/20 px-3 py-1 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                <span className="text-[10px] font-medium text-green-400">+10 FP On Follow</span>
+              </div>
             )}
           </div>
         )}
+
+
 
         {/* Event Timer */}
         {isEventActive && timeLeft && (

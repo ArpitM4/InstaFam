@@ -159,7 +159,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
     if (validSections.includes(section)) {
       // Force 'links' tab if user is not owner and trying to access restricted sections
       // We check isActualOwner first to avoid hydration mismatch, but effect runs on client
-      if (!isOwner && section !== 'links') {
+      if (!isOwner && section !== 'links' && section !== 'vault') {
         setActiveTab('links');
       } else {
         setActiveTab(section);
@@ -988,7 +988,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
               </button>
             )}
 
-            {isOwner && visibleSections.includes('vault') && (
+            {visibleSections.includes('vault') && (
               <button
                 onClick={() => handleTabChange('vault')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'vault'
@@ -1087,7 +1087,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
         {/* Conditionally Rendered Content */}
         <div className="w-full flex flex-col items-center">
           {/* Beta Mode Warning for Creators */}
-          {isOwner && activeTab !== 'links' && (
+          {isOwner && activeTab !== 'links' && activeTab !== 'vault' && (
             <div className="w-full max-w-5xl mb-6 px-4">
               <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl p-4 flex items-center justify-center gap-3 backdrop-blur-sm">
                 <span className="text-xl">🚧</span>
@@ -1116,6 +1116,10 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
                     currentUser={currentUser}
                     setPaymentform={setPaymentform}
                     isOwner={isOwner}
+                    eventDuration={eventDuration}
+                    setEventDuration={setEventDuration}
+                    handleStartEvent={handleStartEvent}
+                    handleEndEvent={handleEndEvent}
                   />
                 </ErrorBoundary>
               ) : (

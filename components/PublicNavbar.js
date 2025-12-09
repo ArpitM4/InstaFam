@@ -1,11 +1,17 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import AuthModal from "./AuthModal";
 
 export default function PublicNavbar() {
     const [showAuthModal, setShowAuthModal] = useState(false);
+
+    useEffect(() => {
+        const handleOpenAuth = () => setShowAuthModal(true);
+        window.addEventListener('open-auth-modal', handleOpenAuth);
+        return () => window.removeEventListener('open-auth-modal', handleOpenAuth);
+    }, []);
 
     return (
         <>

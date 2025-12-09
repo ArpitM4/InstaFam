@@ -49,13 +49,16 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
         }
     };
 
+    // Unified Modal Style
+    const modalContentClass = "bg-[#1a1a1f] p-6 rounded-2xl w-full border border-white/10 max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/40 transition-colors";
+
     // --- RENDER STEPS ---
 
     // STEP 1: SELECT TYPE
     if (step === 1) {
         return (
             <div className="fixed inset-0 bg-black/80 z-[10000] flex items-center justify-center p-4">
-                <div className="bg-[#1a1a1f] p-6 rounded-2xl max-w-2xl w-full border border-white/10 max-h-[90vh] overflow-y-auto">
+                <div className={`${modalContentClass} max-w-2xl`}>
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold text-white">Create Vault Reward</h2>
                         <button onClick={onClose} className="text-white/50 hover:text-white">✕</button>
@@ -103,7 +106,7 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
     if (step === 2) {
         return (
             <div className="fixed inset-0 bg-black/80 z-[10000] flex items-center justify-center p-4">
-                <div className="bg-[#1a1a1f] p-6 rounded-2xl max-w-xl w-full border border-white/10 max-h-[90vh] overflow-y-auto">
+                <div className={`${modalContentClass} max-w-xl`}>
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-bold text-white flex items-center gap-2">
                             <span className="text-primary text-sm font-normal cursor-pointer hover:underline" onClick={() => setStep(1)}>← Change Type</span>
@@ -206,7 +209,7 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
     if (step === 3) {
         return (
             <div className="fixed inset-0 bg-black/80 z-[10000] flex items-center justify-center p-4">
-                <div className="bg-[#1a1a1f] p-6 rounded-2xl max-w-md w-full border border-yellow-500/30">
+                <div className={`${modalContentClass} max-w-md border-yellow-500/30`}>
                     <div className="text-center mb-6">
                         <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
                             ⚖️
