@@ -28,6 +28,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRedeemItem, setSelectedRedeemItem] = useState(null); // Item to redeem
   const [viewMode, setViewMode] = useState('items'); // 'items' | 'requests'
+  const [infoExpanded, setInfoExpanded] = useState(false); // Expandable info section
 
   useEffect(() => {
     if (currentUser?.username) {
@@ -107,6 +108,113 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
 
   return (
     <div className="w-full max-w-5xl mt-4 p-4">
+      {/* CREATOR INFO BUTTON */}
+      {isOwner && (
+        <div className="mb-6">
+          <button
+            onClick={() => setInfoExpanded(true)}
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20 rounded-2xl p-4 hover:border-primary/40 transition-all text-white font-bold"
+          >
+            <span className="text-lg">💡</span>
+            How to earn using Vault Items
+          </button>
+        </div>
+      )}
+
+      {/* INFO MODAL */}
+      {infoExpanded && (
+        <div className="fixed inset-0 bg-black/80 z-[10000] flex items-center justify-center p-4">
+          <div className="bg-[#1a1a1f] rounded-2xl w-full max-w-2xl border border-white/10 max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-full">
+            <div className="sticky top-0 bg-[#1a1a1f] p-6 border-b border-white/10 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-white">How to earn using Vault Items</h2>
+              <button onClick={() => setInfoExpanded(false)} className="text-white/50 hover:text-white text-xl">✕</button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div className="text-white/80 space-y-4">
+                <p>
+                  Very soon, you'll be able to publish <span className="text-primary font-medium">paid Vault items</span> that cost FamPoints.
+                  Fans will contribute to you to earn those points, and you'll finally have a clean and powerful way to monetize your real supporters.
+                </p>
+                <p>
+                  But for the next 4 weeks (during beta), the smartest thing you can do is simple:
+                  <span className="text-yellow-400 font-bold ml-1">Grow your Sygil audience first.</span>
+                </p>
+                <p className="text-white/60">
+                  Fans follow you here for one reason: They don't want to miss out on your free drops.
+                  Free items are limited, they're first-come-first-serve, and they disappear fast — so fans keep checking your Sygil page.
+                  That's how they get used to visiting your Sygil, and later that same audience becomes your biggest earning base.
+                </p>
+              </div>
+
+              <div className="border-t border-white/10 pt-6">
+                <h4 className="text-xl font-bold text-white mb-4">3 Steps to Grow Fast</h4>
+
+                <div className="space-y-4">
+                  {/* Step 1 */}
+                  <div className="bg-white/5 rounded-xl p-4 border border-white/5">
+                    <div className="flex items-start gap-3">
+                      <span className="bg-primary/20 text-primary w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0">1</span>
+                      <div>
+                        <h5 className="text-white font-bold mb-1">Create a Free Vault Item</h5>
+                        <p className="text-white/60 text-sm">
+                          Offer something small but meaningful — a message, shoutout, Q&A, or a limited digital reward.
+                          Fans claim free drops instantly because supply is limited.
+                        </p>
+                        <p className="text-green-400 text-sm mt-2 font-medium">
+                          Why it works: Free + limited = instant followers.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="bg-white/5 rounded-xl p-4 border border-white/5">
+                    <div className="flex items-start gap-3">
+                      <span className="bg-primary/20 text-primary w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0">2</span>
+                      <div>
+                        <h5 className="text-white font-bold mb-1">Tell Your Fans to Claim Before It's Gone</h5>
+                        <p className="text-white/60 text-sm">
+                          Share your Sygil link on Instagram / YouTube / Snapchat.
+                          Make it clear: "Only limited spots. First come, first served."
+                        </p>
+                        <p className="text-green-400 text-sm mt-2 font-medium">
+                          Why it works: Scarcity creates urgency.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="bg-white/5 rounded-xl p-4 border border-white/5">
+                    <div className="flex items-start gap-3">
+                      <span className="bg-primary/20 text-primary w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0">3</span>
+                      <div>
+                        <h5 className="text-white font-bold mb-1">Build a Fanbase That's Ready for Future Paid Rewards</h5>
+                        <p className="text-white/60 text-sm">
+                          Every fan who follows you gets FamPoints and becomes part of your inner circle.
+                          When paid Vault items go live, this warmed-up audience will support you immediately.
+                        </p>
+                        <p className="text-green-400 text-sm mt-2 font-medium">
+                          Why it matters: Creators who build now will earn the most later.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => { setInfoExpanded(false); setShowAddModal(true); }}
+                className="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+              >
+                <FaPlus /> Create Your First Vault Item
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* HEADER CONTROLS (Creator Only) */}
       {isOwner && (
         <div className="flex justify-between items-center mb-6 bg-white/5 p-4 rounded-2xl border border-white/10">
