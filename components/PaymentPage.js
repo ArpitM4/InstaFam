@@ -960,9 +960,9 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
       {/* Creator Onboarding Guide */}
       {showOnboarding && isOwner && (
         <CreatorOnboardingGuide
-          hasProfilePic={!!currentUser?.profilepic}
           hasCoverPic={!!currentUser?.coverpic}
           hasSocialLinks={currentUser?.socials && currentUser.socials.length > 0}
+          isPublic={currentUser?.visibility === 'public'}
           onComplete={() => {
             setShowOnboarding(false);
             setShowShareModal(true);
@@ -1214,7 +1214,12 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
           )}
 
           {activeTab === 'links' && (
-            <LinksSection currentUser={currentUser} />
+            <LinksSection
+              currentUser={currentUser}
+              onSocialsChange={(newSocials) => {
+                setcurrentUser(prev => ({ ...prev, socials: newSocials }));
+              }}
+            />
           )}
 
           {activeTab === 'merchandise' && (

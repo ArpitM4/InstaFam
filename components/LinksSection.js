@@ -7,7 +7,7 @@ import { FaPlus, FaTimes, FaTrash } from 'react-icons/fa';
 import Image from 'next/image';
 import ShareModal from "./ShareModal";
 
-const LinksSection = ({ currentUser }) => {
+const LinksSection = ({ currentUser, onSocialsChange }) => {
     const { data: session } = useSession();
     const [socials, setSocials] = useState([]);
     const [favourites, setFavourites] = useState([]);
@@ -77,6 +77,8 @@ const LinksSection = ({ currentUser }) => {
                 setSocialForm({ platform: '', username: '', link: '' });
                 setShowSocialModal(false);
                 toast.success('Social link added!');
+                // Notify parent of social change for onboarding
+                if (onSocialsChange) onSocialsChange(data.socials);
             } else {
                 toast.error(data.error || 'Failed to add social');
             }
@@ -177,6 +179,8 @@ const LinksSection = ({ currentUser }) => {
                 setSocials(data.socials);
                 setFavourites(data.favourites);
                 toast.success('Deleted successfully!');
+                // Notify parent of social change for onboarding
+                if (onSocialsChange) onSocialsChange(data.socials);
             } else {
                 toast.error(data.error || 'Failed to delete');
             }

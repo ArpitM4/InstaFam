@@ -46,8 +46,8 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, isRedeemed, status }) 
             {/* Stats / Limits */}
             <div className="px-4 py-2 border-b border-white/5 flex justify-between text-xs text-white/40">
                 <span>
-                    {item.type.toUpperCase()}
-                    {item.type === 'file' && ` • ${item.fileType?.toUpperCase()}`}
+                    {item.type?.toUpperCase() || 'REWARD'}
+                    {item.type === 'file' && ` • ${item.fileType?.toUpperCase() || 'FILE'}`}
                 </span>
                 <span>
                     {item.limit > 0 ? `${item.unlockCount} / ${item.limit} Claimed` : `${item.unlockCount} Unlocks`}
@@ -68,8 +68,8 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, isRedeemed, status }) 
                         onClick={() => onRedeem(item)}
                         disabled={isRedeemed && status !== 'Rejected'}
                         className={`w-full py-2.5 px-4 rounded-xl font-bold transition-all duration-300 shadow-md flex items-center justify-center gap-2 ${isRedeemed && status !== 'Rejected'
-                                ? 'bg-green-500/20 text-green-400 cursor-default'
-                                : 'btn-gradient text-white hover:scale-[1.02] hover:shadow-lg'
+                            ? 'bg-green-500/20 text-green-400 cursor-default'
+                            : 'btn-gradient text-white hover:scale-[1.02] hover:shadow-lg'
                             }`}
                     >
                         {isRedeemed && status !== 'Rejected' ? (

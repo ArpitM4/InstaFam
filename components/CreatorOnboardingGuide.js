@@ -5,30 +5,30 @@ import { FaCheckCircle, FaRegCircle, FaChevronUp, FaChevronDown } from "react-ic
 /**
  * CreatorOnboardingGuide - Simple floating checklist widget
  * 
- * Shows progress:
- * ✓ Profile Photo (Optional)
- * ✓ Banner (Optional)  
- * ✓ Social Link (Required)
+ * Shows progress for NEW steps:
+ * 1. Setup Banner (Required)
+ * 2. Add Social Link (Required)
+ * 3. Set Page Public (Required)
  * 
- * Auto-hides when all steps complete
+ * Auto-hides and marks complete when all steps done
+ * Never shows again once user.onboardingCompleted is true
  */
 const CreatorOnboardingGuide = ({
     onComplete,
-    hasProfilePic = false,
     hasCoverPic = false,
     hasSocialLinks = false,
+    isPublic = false,
 }) => {
     const [isExpanded, setIsExpanded] = useState(true);
 
-    // Calculate completion
+    // Define the 3 required steps
     const steps = [
-        { id: 1, title: "Add Profile Photo", isOptional: true, isComplete: hasProfilePic },
-        { id: 2, title: "Add Banner", isOptional: true, isComplete: hasCoverPic },
-        { id: 3, title: "Add Social Link", isOptional: false, isComplete: hasSocialLinks },
+        { id: 1, title: "Setup Banner", isComplete: hasCoverPic },
+        { id: 2, title: "Add a Social Link", isComplete: hasSocialLinks },
+        { id: 3, title: "Set Page to Public", isComplete: isPublic },
     ];
 
     const completedCount = steps.filter(s => s.isComplete).length;
-    const allRequiredComplete = hasSocialLinks; // Only social link is required
     const allComplete = completedCount === 3;
 
     // Auto-complete and hide when all done
@@ -116,9 +116,6 @@ const CreatorOnboardingGuide = ({
                                     }`}>
                                     {step.title}
                                 </span>
-                                {step.isOptional && (
-                                    <span className="ml-2 text-xs text-white/40">(Optional)</span>
-                                )}
                             </div>
                         </div>
                     ))}
@@ -134,7 +131,7 @@ const CreatorOnboardingGuide = ({
                 ) : (
                     <div className="px-4 pb-4">
                         <p className="text-white/40 text-xs text-center">
-                            Complete these steps to set up your page
+                            Complete all steps to launch your page
                         </p>
                     </div>
                 )}
