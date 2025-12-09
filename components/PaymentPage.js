@@ -7,7 +7,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { FaSpinner } from "react-icons/fa";
 import { FaUserCircle } from "react-icons/fa";
-import { FaPen } from "react-icons/fa";
+import { FaPen, FaEye } from "react-icons/fa";
 import "../app/globals.css"; // Assuming your global styles are here
 
 import { fetchuser, fetchpayments, updateProfile, createEvent, endEvent, fetchEvents } from "@/actions/useractions";
@@ -140,6 +140,14 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
   const [isPaying, setIsPaying] = useState(false);
   const [activeTab, setActiveTab] = useState(initialTab);
 
+  // Memoize computed values for performance
+  const isActualOwner = useMemo(() => session?.user?.name === username, [session?.user?.name, username]);
+
+  const isOwner = useMemo(() => {
+    const isPreviewMode = searchParams?.get('viewAs') === 'public';
+    return isActualOwner && !isPreviewMode;
+  }, [isActualOwner, searchParams]);
+
   // Sync activeTab with URL path
   useEffect(() => {
     const pathParts = window.location.pathname.split('/');
@@ -148,12 +156,18 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
     const validSections = ['contribute', 'vault', 'community', 'links', 'merchandise', 'subscription', 'courses', 'giveaway'];
 
     if (validSections.includes(section)) {
-      setActiveTab(section);
+      // Force 'links' tab if user is not owner and trying to access restricted sections
+      // We check isActualOwner first to avoid hydration mismatch, but effect runs on client
+      if (!isOwner && section !== 'links') {
+        setActiveTab('links');
+      } else {
+        setActiveTab(section);
+      }
     } else if (pathParts.length === 2 || section === username) {
       // Default to 'links' when on base username page
       setActiveTab('links');
     }
-  }, [searchParams, username]);
+  }, [searchParams, username, isOwner]);
 
   // Update URL when tab changes - use replaceState to avoid page reload
   const handleTabChange = (tab) => {
@@ -226,8 +240,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
 
-  // Memoize computed values for performance
-  const isOwner = useMemo(() => session?.user?.name === username, [session?.user?.name, username]);
+
 
   // --- Data Fetching and Effects ---
   const fetchActiveEvent = async (userId) => {
@@ -957,7 +970,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
               </button>
             )}
 
-            {visibleSections.includes('contribute') && (
+            {isOwner && visibleSections.includes('contribute') && (
               <button
                 onClick={() => handleTabChange('contribute')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'contribute'
@@ -969,7 +982,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
               </button>
             )}
 
-            {visibleSections.includes('vault') && (
+            {isOwner && visibleSections.includes('vault') && (
               <button
                 onClick={() => handleTabChange('vault')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'vault'
@@ -983,7 +996,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
 
 
 
-            {visibleSections.includes('community') && (
+            {isOwner && visibleSections.includes('community') && (
               <button
                 onClick={() => handleTabChange('community')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'community'
@@ -995,7 +1008,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
               </button>
             )}
 
-            {visibleSections.includes('merchandise') && (
+            {isOwner && visibleSections.includes('merchandise') && (
               <button
                 onClick={() => handleTabChange('merchandise')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'merchandise'
@@ -1007,7 +1020,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
               </button>
             )}
 
-            {visibleSections.includes('subscription') && (
+            {isOwner && visibleSections.includes('subscription') && (
               <button
                 onClick={() => handleTabChange('subscription')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'subscription'
@@ -1019,7 +1032,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
               </button>
             )}
 
-            {visibleSections.includes('courses') && (
+            {isOwner && visibleSections.includes('courses') && (
               <button
                 onClick={() => handleTabChange('courses')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'courses'
@@ -1031,7 +1044,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
               </button>
             )}
 
-            {visibleSections.includes('giveaway') && (
+            {isOwner && visibleSections.includes('giveaway') && (
               <button
                 onClick={() => handleTabChange('giveaway')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'giveaway'
@@ -1066,7 +1079,19 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
         </div>
 
         {/* Conditionally Rendered Content */}
-        <div className="w-full flex justify-center">
+        <div className="w-full flex flex-col items-center">
+          {/* Beta Mode Warning for Creators */}
+          {isOwner && activeTab !== 'links' && (
+            <div className="w-full max-w-5xl mb-6 px-4">
+              <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl p-4 flex items-center justify-center gap-3 backdrop-blur-sm">
+                <span className="text-xl">🚧</span>
+                <p className="text-yellow-200/90 text-sm font-medium text-center">
+                  <strong className="text-yellow-400">Beta Mode:</strong> This tab is currently visible only to you. Public users cannot see this section yet.
+                </p>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'contribute' && (
             <>
               {!hasError ? (
@@ -1262,13 +1287,26 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
         </div>
       )}
 
-      {/* Share Modal */}
       <ShareModal
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
         username={username}
         title="Your Page is Ready!"
       />
+
+      {/* Preview Button for Owners */}
+      {isOwner && !showOnboarding && (
+        <a
+          href={`${typeof window !== 'undefined' ? window.location.pathname : ''}?viewAs=public`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 z-[9990] bg-black text-white px-6 py-3 rounded-full font-bold shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 border border-white/10 hover:shadow-primary/20"
+          title="See how your page looks to others"
+        >
+          <FaEye className="text-xl" />
+          <span>Preview</span>
+        </a>
+      )}
     </>
   );
 };

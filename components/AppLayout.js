@@ -8,6 +8,9 @@ import { useUser } from "@/context/UserContext";
 import { FaHome, FaCompass, FaCoins, FaBars } from "react-icons/fa";
 import NotificationBell from "./NotificationBell";
 
+import PublicNavbar from "./PublicNavbar";
+import AuthModal from "./AuthModal";
+
 export default function AppLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -15,6 +18,7 @@ export default function AppLayout({ children }) {
   const { userData, accountType } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [navbarVisible, setNavbarVisible] = useState(true);
+  const [showSetupModal, setShowSetupModal] = useState(false);
   const lastScrollY = useRef(0);
 
   // Define main routes where sidebar should stay expanded
@@ -30,12 +34,21 @@ export default function AppLayout({ children }) {
   useEffect(() => {
     if (status === "loading") return;
 
-    // If logged in but setup not completed, force redirect to /setup
-    // Exclude /setup from the check to avoid infinite loop
-    if (session?.user && !session.user.setupCompleted && pathname !== '/setup') {
-      router.push('/setup');
+    if (session?.user && !session.user.setupCompleted) {
+      // If on setup page, let them be
+      if (pathname === '/setup') return;
+
+      // If on a creator page (and not a dashboard), show modal instead of redirect
+      if (isCreatorPage) {
+        setShowSetupModal(true);
+      } else {
+        // Otherwise redirect to setup page
+        router.push('/setup');
+      }
+    } else {
+      setShowSetupModal(false);
     }
-  }, [session, status, pathname, router]);
+  }, [session, status, pathname, router, isCreatorPage]);
 
   // Auto-collapse sidebar on creator pages (dynamic routes)
   useEffect(() => {
@@ -82,6 +95,17 @@ export default function AppLayout({ children }) {
   }
 
   if (!session) {
+    // For creator pages (not root), show PublicNavbar
+    if (pathname !== '/') {
+      return (
+        <div className="min-h-screen bg-background">
+          <PublicNavbar />
+          <main className="pt-16 md:pt-0">
+            {children}
+          </main>
+        </div>
+      );
+    }
     return <>{children}</>;
   }
 
@@ -92,6 +116,13 @@ export default function AppLayout({ children }) {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Setup Modal for In-Place Onboarding */}
+      <AuthModal
+        isOpen={showSetupModal}
+        onClose={() => setShowSetupModal(false)}
+        initialView="SETUP"
+      />
+
       {/* Top Navbar - Full Width */}
       <header className={`fixed top-0 left-0 right-0 z-50 bg-background border-b border-white/10 transition-transform duration-300 ${navbarVisible ? 'translate-y-0' : '-translate-y-full'
         }`}>
