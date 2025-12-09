@@ -93,11 +93,14 @@ const PaymentProfileSection = ({
             onClick={isOwner && !isUploadingProfile ? () => profileInputRef.current.click() : undefined}
             style={{ opacity: isUploadingProfile ? 0.6 : 1 }}
           >
-            <img
+            <Image
               src={profileImageUrl}
               alt="Profile"
-              className="w-full h-full object-cover rounded-full"
+              fill
+              sizes="(max-width: 768px) 128px, 160px"
+              className="object-cover rounded-full"
               style={{ filter: isUploadingProfile ? 'blur(2px)' : 'none' }}
+              priority
             />
             {isOwner && (
               <>

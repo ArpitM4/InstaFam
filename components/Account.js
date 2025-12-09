@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { FaPen } from 'react-icons/fa';
+import Image from "next/image";
 
 import { useSession, signIn, signOut } from "next-auth/react"
 import "../app/globals.css";
@@ -216,10 +217,12 @@ const Account = ({ initialUser }) => {
                     )}
 
                     {form.profilepic ? (
-                      <img
+                      <Image
                         src={form.profilepic}
                         alt="Profile"
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="64px"
+                        className="object-cover"
                       />
                     ) : (
                       <div className="w-full h-full bg-white/10 flex items-center justify-center">

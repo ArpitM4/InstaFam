@@ -158,7 +158,8 @@ export default function MarketingSplash() {
                 alt="Sygil Characters"
                 width={600}
                 height={400}
-                className="w-full h-auto"
+                sizes="(max-width: 768px) 100vw, 600px"
+                className="w-full h-full object-contain"
                 priority
               />
             </div>
@@ -213,7 +214,8 @@ export default function MarketingSplash() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text transition-colors p-2"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <FaEyeSlash /> : <FaEye />}
                     </button>

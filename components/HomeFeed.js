@@ -23,7 +23,6 @@ function CreatorCard({ creator, showFollowedBadge = false, famPoints = 0 }) {
               fill
               sizes="80px"
               className="rounded-full object-cover border-2 border-white/10"
-              unoptimized
             />
           ) : (
             <div className="w-full h-full rounded-full bg-white/10 flex items-center justify-center border-2 border-white/10">
@@ -195,7 +194,6 @@ export default function HomeFeed() {
                       fill
                       sizes="80px"
                       className="rounded-full object-cover border-2 border-primary/30"
-                      unoptimized
                     />
                   ) : (
                     <div className="w-full h-full rounded-full bg-white/10 flex items-center justify-center border-2 border-primary/30">

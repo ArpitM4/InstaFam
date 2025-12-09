@@ -1,5 +1,6 @@
 
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import "./globals.css";
 import AppLayout from "@/components/AppLayout";
 import SessionWrapper from "@/components/SessionWrapper";
@@ -127,21 +128,22 @@ export default function RootLayout({ children }) {
         <link rel="dns-prefetch" href="https://www.paypal.com" />
 
         {/* Google Identity Services */}
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
-        <script src="https://apis.google.com/js/api.js" async defer></script>
+        <Script src="https://accounts.google.com/gsi/client" strategy="lazyOnload" />
+        <Script src="https://apis.google.com/js/api.js" strategy="lazyOnload" />
 
         {/* Google Analytics */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-7JF29P11H7"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-7JF29P11H7');
-            `,
-          }}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-7JF29P11H7"
+          strategy="afterInteractive"
         />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-7JF29P11H7');
+          `}
+        </Script>
 
         {/* JSON-LD Organization Schema */}
         <script

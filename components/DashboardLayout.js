@@ -94,10 +94,12 @@ const DashboardLayout = ({ children }) => {
                   className="rounded-full object-cover border-2 border-white/10"
                 />
               ) : (
-                <img
+                <Image
                   src={`https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(session?.user?.email || 'user')}`}
                   alt="Profile"
-                  className="w-full h-full rounded-full object-cover border-2 border-white/10"
+                  fill
+                  sizes="36px"
+                  className="rounded-full object-cover border-2 border-white/10"
                 />
               )}
             </Link>

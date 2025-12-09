@@ -30,6 +30,7 @@ const Footer = ({ forceShow = false }) => {
                 src="/SygilFull.png"
                 alt="Sygil"
                 fill
+                sizes="200px"
                 className="object-contain object-left"
               />
             </div>
