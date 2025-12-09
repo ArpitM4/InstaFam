@@ -28,12 +28,29 @@ export async function POST(req) {
             fileUrl,
             instructions,
             limit,
-            userLimit
+            userLimit,
+            isFree = true  // Default to free
         } = data;
 
         // Validation
-        if (!title || !description || !pointCost || !type) {
+        if (!title || !description || !type) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+
+        // Free item validation
+        if (isFree) {
+            if (Number(pointCost) !== 0) {
+                return NextResponse.json({ error: 'Free items must have 0 cost' }, { status: 400 });
+            }
+            if (Number(limit) <= 0) {
+                return NextResponse.json({ error: 'Free items must have a limited supply (cannot be unlimited)' }, { status: 400 });
+            }
+            // userLimit is strictly 1 for free items - enforced on save
+        } else {
+            // Paid item validation
+            if (!pointCost || Number(pointCost) <= 0) {
+                return NextResponse.json({ error: 'Paid items must have a cost greater than 0' }, { status: 400 });
+            }
         }
 
         // Type-specific validation
@@ -41,8 +58,9 @@ export async function POST(req) {
             return NextResponse.json({ error: 'File URL and file type are required for file rewards' }, { status: 400 });
         }
 
-        if ((type === 'promise' || type === 'qna') && !instructions) {
-            return NextResponse.json({ error: 'Instructions are required for Promise and QnA rewards' }, { status: 400 });
+        // Only promise type requires instructions (Q&A doesn't)
+        if (type === 'promise' && !instructions) {
+            return NextResponse.json({ error: 'Instructions are required for Promise rewards' }, { status: 400 });
         }
 
         // Create the vault item
@@ -50,13 +68,14 @@ export async function POST(req) {
             creatorId: user._id,
             title,
             description,
-            pointCost: Number(pointCost),
+            pointCost: isFree ? 0 : Number(pointCost),
+            isFree: isFree,
             type,
             fileType: type === 'file' ? fileType : undefined,
             fileUrl: type === 'file' ? fileUrl : undefined,
-            instructions: (type === 'promise' || type === 'qna' || type === 'text') ? instructions : undefined, // Text might use instructions too ("Here is the secret...")? No, Text is usually the content itself.
+            instructions: type === 'promise' ? instructions : undefined,
             limit: Number(limit) || 0,
-            userLimit: Number(userLimit) || 1,
+            userLimit: isFree ? 1 : (Number(userLimit) || 1),  // Strictly 1 for free items
             isActive: true
         });
 

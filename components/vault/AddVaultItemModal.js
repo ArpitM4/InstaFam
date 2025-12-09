@@ -10,12 +10,13 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        pointCost: 100,
+        isFree: true,  // Default to free
+        pointCost: 0,  // 0 for free items
         type: 'file', // 'file', 'text', 'qna', 'promise'
         fileType: 'image', // 'image', 'video', 'pdf', 'audio', 'document'
         fileUrl: '', // For file/text (secret)
         instructions: '', // For promise/qna
-        limit: 0, // 0 = unlimited
+        limit: 10, // Default to 10 for free items (cannot be 0)
         userLimit: 1
     });
 
@@ -153,7 +154,12 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
                         <div>
                             <label className="block text-sm text-white/60 mb-1">Title</label>
                             <input type="text" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
-                                placeholder="e.g. Exclusive 4K Wallpaper Pack"
+                                placeholder={
+                                    formData.type === 'file' ? "e.g. Exclusive 4K Wallpaper Pack" :
+                                        formData.type === 'promise' ? "e.g. Meetup IRL" :
+                                            formData.type === 'qna' ? "e.g. Ask Me Anything" :
+                                                formData.type === 'text' ? "e.g. Secret Discord Invite" : "Enter title..."
+                                }
                                 value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
                         </div>
 
@@ -161,26 +167,72 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
                             <label className="block text-sm text-white/60 mb-1">Description</label>
                             <textarea className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
                                 rows={3}
-                                placeholder="Describe what the fan gets..."
+                                placeholder={
+                                    formData.type === 'file' ? "Describe the file content fans will unlock..." :
+                                        formData.type === 'promise' ? "Describe the service or experience you're offering..." :
+                                            formData.type === 'qna' ? "What kind of questions will you answer?" :
+                                                formData.type === 'text' ? "Describe what secret is revealed after purchase..." : "Describe what the fan gets..."
+                                }
                                 value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
                         </div>
+                        {/* Free/Paid Toggle */}
+                        <div className="mb-4">
+                            <label className="block text-sm text-white/60 mb-2">
+                                Pricing
+                                {formData.isFree && <span className="text-yellow-400 ml-2">(Free Item: Each user can claim once. Great for promotions!)</span>}
+                            </label>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, isFree: true, pointCost: 0, userLimit: 1, limit: formData.limit <= 0 ? 10 : formData.limit })}
+                                    className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${formData.isFree
+                                        ? 'bg-green-500/20 border-2 border-green-500 text-green-400'
+                                        : 'bg-white/5 border border-white/10 text-white/60 hover:bg-white/10'
+                                        }`}
+                                >
+                                    Free
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, isFree: false, pointCost: 10, limit: formData.limit })}
+                                    className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${!formData.isFree
+                                        ? 'bg-primary/20 border-2 border-primary text-primary'
+                                        : 'bg-white/5 border border-white/10 text-white/60 hover:bg-white/10'
+                                        }`}
+                                >
+                                    Paid
+                                </button>
+                            </div>
+                        </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        {/* Cost Input - Only for Paid */}
+                        {!formData.isFree && (
                             <div>
                                 <label className="block text-sm text-white/60 mb-1">Cost (FamPoints)</label>
                                 <input type="number" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
-                                    min={0}
+                                    min={1}
                                     value={formData.pointCost} onChange={e => setFormData({ ...formData, pointCost: e.target.value })} />
                             </div>
+                        )}
+
+                        {/* Limit Fields */}
+                        <div className={`grid ${formData.isFree ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
+                            {/* Per User Limit - Only for Paid (Free is strictly 1) */}
+                            {!formData.isFree && (
+                                <div>
+                                    <label className="block text-sm text-white/60 mb-1">Per User Limit <span className="text-white/40 ml-1">(0 = Unlimited)</span></label>
+                                    <input type="number" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                                        min={0}
+                                        placeholder="0 = Unlimited"
+                                        value={formData.userLimit} onChange={e => setFormData({ ...formData, userLimit: e.target.value })} />
+                                </div>
+                            )}
+
+                            {/* Total Supply */}
                             <div>
-                                <label className="block text-sm text-white/60 mb-1">Per User Limit (0 = Unlimited)</label>
-                                <input type="number" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
-                                    min={0}
-                                    placeholder="0 = Unlimited"
-                                    value={formData.userLimit} onChange={e => setFormData({ ...formData, userLimit: e.target.value })} />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-white/60 mb-1">Total Supply (0 = Unlimited)</label>
+                                <label className="block text-sm text-white/60 mb-1">
+                                    Total Supply {!formData.isFree && <span className="text-white/40 ml-1">(0 = Unlimited)</span>}
+                                </label>
                                 <input type="number" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
                                     min={0}
                                     placeholder="0 = Unlimited"
@@ -260,11 +312,11 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
                             </>
                         )}
 
-                        {(formData.type === 'promise' || formData.type === 'qna') && (
+                        {formData.type === 'promise' && (
                             <div>
                                 <label className="block text-sm text-white/60 mb-1">Instructions for User</label>
                                 <input type="text" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
-                                    placeholder={formData.type === 'qna' ? "e.g. Ask me anything about my setup..." : "e.g. Please provide your Instagram handle..."}
+                                    placeholder="e.g. Please provide your Instagram handle..."
                                     value={formData.instructions} onChange={e => setFormData({ ...formData, instructions: e.target.value })} />
                             </div>
                         )}
@@ -279,7 +331,21 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
                             </div>
                         )}
 
-                        <button onClick={() => setStep(3)} className="w-full py-3 mt-4 bg-primary text-white rounded-xl font-bold hover:bg-primary/90">
+                        <button
+                            onClick={() => {
+                                // Validate free items before proceeding
+                                if (formData.isFree && Number(formData.limit) <= 0) {
+                                    toast.error('Free items must have a limited supply');
+                                    return;
+                                }
+                                if (!formData.isFree && Number(formData.pointCost) <= 0) {
+                                    toast.error('Paid items must have a cost greater than 0');
+                                    return;
+                                }
+                                setStep(3);
+                            }}
+                            className="w-full py-3 mt-4 bg-primary text-white rounded-xl font-bold hover:bg-primary/90"
+                        >
                             Continue
                         </button>
                     </div>

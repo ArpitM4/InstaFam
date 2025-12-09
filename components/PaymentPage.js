@@ -1227,71 +1227,133 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
 
       {/* Customization Modal */}
       {showCustomizeModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 sm:p-6 md:p-8 max-w-md sm:max-w-lg md:max-w-2xl w-full border border-white/10 shadow-2xl my-8" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)' }}>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-text flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 text-primary" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                </svg>
-                <span className="hidden sm:inline">Customize Your Page</span>
-                <span className="sm:hidden">Customize</span>
-              </h2>
-              <button
-                onClick={() => setShowCustomizeModal(false)}
-                className="text-text/60 hover:text-text transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-[#0f0f13] rounded-2xl p-5 sm:p-6 max-w-md sm:max-w-lg md:max-w-xl w-full border border-white/10 shadow-2xl my-8 relative overflow-hidden">
+            {/* Background Glow */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
-            <p className="text-text/60 text-xs sm:text-sm mb-4">Select sections to display on your page.</p>
-
-            <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-2">
-              {/* Section checkboxes */}
-              {[
-                { id: 'contribute', name: 'Contribute', desc: 'Donations & leaderboard' },
-                { id: 'vault', name: 'Vault', desc: 'Exclusive content' },
-                { id: 'links', name: 'Links', desc: 'Social & products' },
-                { id: 'merchandise', name: 'Merchandise', desc: 'Your merch' },
-                { id: 'community', name: 'Community', desc: 'Engagement' },
-                { id: 'subscription', name: 'Subscription', desc: 'Tiers & perks' },
-                { id: 'courses', name: 'Courses', desc: 'Tutorials' },
-                { id: 'giveaway', name: 'Giveaway', desc: 'Host giveaways' }
-              ].map(section => (
-                <label
-                  key={section.id}
-                  className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-background/50 rounded-lg hover:bg-background/70 transition-colors cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={tempVisibleSections.includes(section.id)}
-                    onChange={() => handleToggleSection(section.id)}
-                    className="mt-0.5 sm:mt-1 w-4 h-4 sm:w-5 sm:h-5 rounded border-text/20 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-text text-sm sm:text-base">{section.name}</div>
-                    <div className="text-xs sm:text-sm text-text/60 truncate">{section.desc}</div>
+            <div className="relative z-10">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                    </svg>
                   </div>
-                </label>
-              ))}
-            </div>
+                  <span>Customize Your Page</span>
+                </h2>
+                <button
+                  onClick={() => setShowCustomizeModal(false)}
+                  className="text-white/40 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-full"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
 
-            <div className="flex gap-2 sm:gap-3 mt-4 sm:mt-6">
-              <button
-                onClick={() => setShowCustomizeModal(false)}
-                className="flex-1 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-background text-text rounded-lg hover:bg-background/80 transition-colors font-medium"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveCustomization}
-                className="btn-gradient flex-1 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-white rounded-lg shadow-md hover:scale-[1.04] hover:brightness-110 transition-all font-medium border-0"
-              >
-                Save
-              </button>
+              <p className="text-white/60 text-sm mb-6">Select the sections you want to display on your public profile.</p>
+
+              <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                {/* Section checkboxes */}
+                {[
+                  { id: 'contribute', name: 'Contribute', desc: 'Donations & leaderboard' },
+                  { id: 'vault', name: 'Vault', desc: 'Exclusive content' },
+                  { id: 'links', name: 'Links', desc: 'Social & products' },
+                  { id: 'merchandise', name: 'Merchandise', desc: 'Your merch' },
+                  { id: 'community', name: 'Community', desc: 'Engagement' },
+                  { id: 'subscription', name: 'Subscription', desc: 'Tiers & perks' },
+                  { id: 'courses', name: 'Courses', desc: 'Tutorials' },
+                  { id: 'giveaway', name: 'Giveaway', desc: 'Host giveaways' }
+                ].map(section => {
+                  const isComingSoon = !['contribute', 'vault', 'links'].includes(section.id);
+                  const isMandatory = section.id === 'links';
+                  const isSelected = isMandatory ? true : tempVisibleSections.includes(section.id);
+
+                  return (
+                    <label
+                      key={section.id}
+                      className={`relative flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group ${isComingSoon
+                          ? 'bg-white/[0.02] border border-white/5 opacity-50 cursor-not-allowed'
+                          : isSelected
+                            ? 'bg-primary/10 cursor-pointer'
+                            : 'bg-white/5 border border-white/5 cursor-pointer hover:bg-white/10'
+                        }`}
+                    >
+                      {/* Checkbox (Hidden) */}
+                      {!isComingSoon && !isMandatory && (
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleToggleSection(section.id)}
+                          className="hidden"
+                        />
+                      )}
+
+                      {/* Custom Checkbox UI */}
+                      <div className={`flex-shrink-0 w-5 h-5 rounded-md flex items-center justify-center transition-colors ${isComingSoon
+                          ? 'border border-white/10 bg-white/5'
+                          : isSelected
+                            ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                            : 'border border-white/20 group-hover:border-white/40'
+                        }`}>
+                        {isSelected && !isComingSoon && (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        {isComingSoon && (
+                          <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className={`font-semibold text-sm ${isSelected ? 'text-white' : 'text-white/70'}`}>
+                              {section.name}
+                            </span>
+                            {isMandatory && (
+                              <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-white/10 text-white/40">
+                                Required
+                              </span>
+                            )}
+                          </div>
+
+                          {isComingSoon && (
+                            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-white/5 text-white/30">
+                              Soon
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-white/40">{section.desc}</div>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+
+              <div className="flex gap-3 mt-8 pt-4 border-t border-white/10">
+                <button
+                  onClick={() => setShowCustomizeModal(false)}
+                  className="flex-1 px-4 py-3 text-sm font-semibold rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    // Ensure links is always included in the save
+                    if (!tempVisibleSections.includes('links')) {
+                      handleSaveCustomization([...tempVisibleSections, 'links']);
+                    } else {
+                      handleSaveCustomization();
+                    }
+                  }}
+                  className="flex-1 px-4 py-3 text-sm font-bold text-white rounded-xl bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98]"
+                >
+                  Save Changes
+                </button>
+              </div>
             </div>
           </div>
         </div>

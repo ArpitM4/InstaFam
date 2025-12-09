@@ -101,6 +101,7 @@ const PaymentProfileSection = ({
               className="object-cover rounded-full"
               style={{ filter: isUploadingProfile ? 'blur(2px)' : 'none' }}
               priority
+              unoptimized
             />
             {isOwner && (
               <>

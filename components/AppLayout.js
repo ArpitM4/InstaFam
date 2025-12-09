@@ -165,6 +165,7 @@ export default function AppLayout({ children }) {
                   className="rounded-full object-cover border-2 border-white/10"
                   priority
                   referrerPolicy="no-referrer"
+                  unoptimized
                 />
               ) : (
                 <div className="w-full h-full rounded-full bg-white/10 flex items-center justify-center border-2 border-white/10">

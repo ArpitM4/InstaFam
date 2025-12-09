@@ -242,7 +242,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
 
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="relative w-full max-w-md bg-[#0a0a0f] rounded-2xl shadow-2xl overflow-hidden border border-white/10 max-h-[90vh] overflow-y-auto">
+            <div className="relative w-full max-w-md bg-[#0a0a0f] rounded-2xl shadow-2xl overflow-hidden border border-white/10">
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-white/50 hover:text-white z-50 p-2"
@@ -268,9 +268,9 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                                     <Image
                                         src="/Illustration.png"
                                         alt="Sygil Characters"
-                                        width={200}
-                                        height={133}
-                                        className="w-48 h-auto object-contain"
+                                        width={280}
+                                        height={186}
+                                        className="w-64 h-auto object-contain"
                                     />
                                 </div>
                             </div>

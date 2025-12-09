@@ -23,7 +23,11 @@ const vaultItemSchema = new Schema({
   pointCost: {
     type: Number,
     required: true,
-    min: 1
+    min: 0  // Changed from 1 to allow free items
+  },
+  isFree: {
+    type: Boolean,
+    default: true  // Default to free to promote free items
   },
   fileUrl: {
     type: String, // Optional: only for 'file' type (image/video/pdf)
