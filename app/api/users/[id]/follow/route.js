@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { nextAuthConfig } from '../../../auth/[...nextauth]/route';
 import User from '@/models/User';
+import PointTransaction from '@/models/PointTransaction';
 import connectDB from '@/db/ConnectDb';
 import { notifyNewFollower } from '@/utils/notificationHelpers';
 
@@ -45,7 +46,7 @@ export async function POST(request, { params }) {
       if (creator.followersArray) creator.followersArray.pull(fanId);
       // Update legacy follower count
       creator.followers = Math.max(0, creator.followers - 1);
-      
+
       await Promise.all([fan.save(), creator.save()]);
 
       return NextResponse.json({
@@ -59,12 +60,34 @@ export async function POST(request, { params }) {
       // Follow: Add to both arrays (initialize if they don't exist)
       if (!fan.following) fan.following = [];
       if (!creator.followersArray) creator.followersArray = [];
-      
+
       fan.following.push(creatorId);
       creator.followersArray.push(fanId);
       // Update legacy follower count
       creator.followers = creator.followersArray.length;
-      
+
+      // Check for Follow Bonus (10 FP)
+      // Check if user has EVER received a "Follow Bonus" for this creator
+      const existingBonus = await PointTransaction.findOne({
+        userId: fanId,
+        creatorId: creatorId,
+        description: 'Follow Bonus'
+      });
+
+      let pointsEarned = 0;
+
+      if (!existingBonus) {
+        pointsEarned = 10;
+        await PointTransaction.create({
+          userId: fanId,
+          creatorId: creatorId,
+          type: 'Earned',
+          amount: 10,
+          description: 'Follow Bonus',
+          points_earned: 10 // Support legacy field just in case
+        });
+      }
+
       await Promise.all([fan.save(), creator.save()]);
 
       // Send notification to creator about new follower
@@ -78,9 +101,12 @@ export async function POST(request, { params }) {
       return NextResponse.json({
         success: true,
         action: 'followed',
-        message: `You are now following ${creator.username || creator.name}`,
+        message: pointsEarned > 0
+          ? `You followed ${creator.username || creator.name} (+${pointsEarned} FP!)`
+          : `You are now following ${creator.username || creator.name}`,
         isFollowing: true,
-        followerCount: creator.followersArray.length
+        followerCount: creator.followersArray.length,
+        pointsEarned
       });
     }
 

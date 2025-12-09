@@ -29,22 +29,26 @@ const redemptionSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['Pending', 'Fulfilled', 'Unfulfilled'],
+    enum: ['Pending', 'Fulfilled', 'Rejected', 'Cancelled'],
     default: 'Pending'
   },
-  fanInput: {
+  fanInput: { // The Fans response to instructions
     type: String,
     maxlength: 1000
   },
-  creatorResponse: {
+  creatorResponse: { // For QnA or fulfillment notes
     type: String,
-    maxlength: 2000 // Allow longer responses from creators
+    maxlength: 2000
+  },
+  rejectionReason: { // Only present if status is Rejected
+    type: String,
+    maxlength: 500
   },
   fulfilledAt: {
     type: Date
   },
   expiredAt: {
-    type: Date
+    type: Date // For auto-cancellation (60 days)
   }
 }, {
   timestamps: true

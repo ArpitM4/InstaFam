@@ -1,0 +1,245 @@
+"use client";
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+import { FaGem, FaHandshake, FaComment, FaFileAlt } from 'react-icons/fa';
+
+const AddVaultItemModal = ({ onClose, onSuccess }) => {
+    const [loading, setLoading] = useState(false);
+    const [step, setStep] = useState(1); // 1: Type Selection, 2: Details, 3: Disclaimer
+
+    const [formData, setFormData] = useState({
+        title: '',
+        description: '',
+        pointCost: 100,
+        type: 'file', // 'file', 'text', 'qna', 'promise'
+        fileType: 'image', // 'image', 'video', 'pdf', 'audio', 'document'
+        fileUrl: '', // For file/text (secret)
+        instructions: '', // For promise/qna
+        limit: 0, // 0 = unlimited
+        userLimit: 1
+    });
+
+    const handleTypeSelect = (type) => {
+        setFormData(prev => ({ ...prev, type }));
+        setStep(2);
+    };
+
+    const handleSubmit = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch('/api/vault/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                toast.success("Vault Item Created!");
+                onSuccess(data.item);
+                onClose();
+            } else {
+                toast.error(data.error || "Failed to create item");
+            }
+        } catch (err) {
+            toast.error("Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // --- RENDER STEPS ---
+
+    // STEP 1: SELECT TYPE
+    if (step === 1) {
+        return (
+            <div className="fixed inset-0 bg-black/80 z-[10000] flex items-center justify-center p-4">
+                <div className="bg-[#1a1a1f] p-6 rounded-2xl max-w-2xl w-full border border-white/10 max-h-[90vh] overflow-y-auto">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-bold text-white">Create Vault Reward</h2>
+                        <button onClick={onClose} className="text-white/50 hover:text-white">✕</button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button onClick={() => handleTypeSelect('file')} className="p-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left hover:border-primary/50 transition-all group">
+                            <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-4 text-blue-400 group-hover:scale-110 transition-transform">
+                                <FaFileAlt className="text-2xl" />
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-2">Digital File</h3>
+                            <p className="text-sm text-white/50">Sell access to Images, Videos, PDFs, or Documents. Instant unlock.</p>
+                        </button>
+
+                        <button onClick={() => handleTypeSelect('promise')} className="p-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left hover:border-primary/50 transition-all group">
+                            <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center mb-4 text-purple-400 group-hover:scale-110 transition-transform">
+                                <FaHandshake className="text-2xl" />
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-2">Promise</h3>
+                            <p className="text-sm text-white/50">Offer a service like a Shoutout, DM reply, or Meetup. Requires fan input.</p>
+                        </button>
+
+                        <button onClick={() => handleTypeSelect('qna')} className="p-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left hover:border-primary/50 transition-all group">
+                            <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center mb-4 text-orange-400 group-hover:scale-110 transition-transform">
+                                <FaComment className="text-2xl" />
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-2">Q & A</h3>
+                            <p className="text-sm text-white/50">Paid question box. Fans pay to ask, you reply directly.</p>
+                        </button>
+
+                        <button onClick={() => handleTypeSelect('text')} className="p-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left hover:border-primary/50 transition-all group">
+                            <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center mb-4 text-green-400 group-hover:scale-110 transition-transform">
+                                <FaGem className="text-2xl" />
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-2">Secret Message</h3>
+                            <p className="text-sm text-white/50">Reveal a hidden text, link, or code instantly after purchase.</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // STEP 2: FILL DETAILS
+    if (step === 2) {
+        return (
+            <div className="fixed inset-0 bg-black/80 z-[10000] flex items-center justify-center p-4">
+                <div className="bg-[#1a1a1f] p-6 rounded-2xl max-w-xl w-full border border-white/10 max-h-[90vh] overflow-y-auto">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                            <span className="text-primary text-sm font-normal cursor-pointer hover:underline" onClick={() => setStep(1)}>← Change Type</span>
+                            Details
+                        </h2>
+                        <button onClick={onClose} className="text-white/50 hover:text-white">✕</button>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm text-white/60 mb-1">Title</label>
+                            <input type="text" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                                placeholder="e.g. Exclusive 4K Wallpaper Pack"
+                                value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm text-white/60 mb-1">Description</label>
+                            <textarea className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                                rows={3}
+                                placeholder="Describe what the fan gets..."
+                                value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm text-white/60 mb-1">Cost (FamPoints)</label>
+                                <input type="number" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                                    min={0}
+                                    value={formData.pointCost} onChange={e => setFormData({ ...formData, pointCost: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-white/60 mb-1">Per User Limit</label>
+                                <input type="number" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                                    min={0}
+                                    placeholder="0 = Unlimited"
+                                    value={formData.userLimit} onChange={e => setFormData({ ...formData, userLimit: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-white/60 mb-1">Total Supply (Slots)</label>
+                                <input type="number" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                                    min={0}
+                                    placeholder="0 = Unlimited"
+                                    value={formData.limit} onChange={e => setFormData({ ...formData, limit: e.target.value })} />
+                            </div>
+                        </div>
+
+                        {/* FIELDS BASED ON TYPE */}
+                        {formData.type === 'file' && (
+                            <>
+                                <div>
+                                    <label className="block text-sm text-white/60 mb-1">File Type</label>
+                                    <select className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                                        value={formData.fileType} onChange={e => setFormData({ ...formData, fileType: e.target.value })}>
+                                        <option value="image">Image</option>
+                                        <option value="video">Video</option>
+                                        <option value="pdf">PDF</option>
+                                        <option value="audio">Audio</option>
+                                        <option value="document">Document</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm text-white/60 mb-1">File URL</label>
+                                    <input type="text" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                                        placeholder="https://..."
+                                        value={formData.fileUrl} onChange={e => setFormData({ ...formData, fileUrl: e.target.value })} />
+                                </div>
+                            </>
+                        )}
+
+                        {(formData.type === 'promise' || formData.type === 'qna') && (
+                            <div>
+                                <label className="block text-sm text-white/60 mb-1">Instructions for User</label>
+                                <input type="text" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                                    placeholder={formData.type === 'qna' ? "e.g. Ask me anything about my setup..." : "e.g. Please provide your Instagram handle..."}
+                                    value={formData.instructions} onChange={e => setFormData({ ...formData, instructions: e.target.value })} />
+                            </div>
+                        )}
+
+                        {formData.type === 'text' && (
+                            <div>
+                                <label className="block text-sm text-white/60 mb-1">Secret Message / Content</label>
+                                <textarea className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                                    rows={3}
+                                    placeholder="The secret code or link revealed after purchase..."
+                                    value={formData.fileUrl} onChange={e => setFormData({ ...formData, fileUrl: e.target.value })} />
+                            </div>
+                        )}
+
+                        <button onClick={() => setStep(3)} className="w-full py-3 mt-4 bg-primary text-white rounded-xl font-bold hover:bg-primary/90">
+                            Continue
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // STEP 3: DISCLAIMER
+    if (step === 3) {
+        return (
+            <div className="fixed inset-0 bg-black/80 z-[10000] flex items-center justify-center p-4">
+                <div className="bg-[#1a1a1f] p-6 rounded-2xl max-w-md w-full border border-yellow-500/30">
+                    <div className="text-center mb-6">
+                        <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                            ⚖️
+                        </div>
+                        <h2 className="text-xl font-bold text-white mb-2">Creator Disclaimer</h2>
+                        <p className="text-sm text-white/60">Please confirm before publishing.</p>
+                    </div>
+
+                    <div className="bg-white/5 p-4 rounded-xl text-xs text-white/70 space-y-2 mb-6 border border-white/10 h-48 overflow-y-auto">
+                        <p>By creating this reward item, you understand and agree that:</p>
+                        <ul className="list-disc pl-4 space-y-1">
+                            <li>You are fully responsible for fulfilling this reward directly with the fan.</li>
+                            <li>Sygil does not participate in, supervise, or guarantee fulfillment.</li>
+                            <li>You must handle communication and delivery independently and off-platform.</li>
+                            <li>If you do not fulfill or reject a request within 60 days, the request will be automatically cancelled and points refunded.</li>
+                            <li>Sygil has no liability for any interactions or outcomes between you and the fan.</li>
+                        </ul>
+                    </div>
+
+                    <div className="flex gap-3">
+                        <button onClick={() => setStep(2)} className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium">
+                            Back
+                        </button>
+                        <button onClick={handleSubmit} disabled={loading} className="flex-1 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 disabled:opacity-50">
+                            {loading ? 'Creating...' : 'I Agree & Publish'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return null;
+};
+
+export default AddVaultItemModal;

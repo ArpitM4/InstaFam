@@ -136,3 +136,50 @@ export async function fetchMyRedemptions() {
         return { success: false, error: 'Failed to fetch redemptions' };
     }
 }
+
+export async function getCreatorPoints(creatorId) {
+    try {
+        await connectDB();
+        const session = await getServerSession(authOptions);
+
+        if (!session?.user?.email) {
+            return { success: true, points: 0, hasFollowed: false, canEarnBonus: true }; // Guest user can potentially earn
+        }
+
+        const user = await User.findOne({ email: session.user.email });
+        if (!user) {
+            return { success: false, error: 'User not found' };
+        }
+
+        const userId = user._id;
+
+        // Fetch points for this creator using aggregation helper
+        // getPointsByCreator returns an array of { creatorId, points, ... }
+        // We filter for the specific creatorId
+        const allPoints = await getPointsByCreator(userId);
+        const creatorPointsData = allPoints.find(p => p.creatorId.toString() === creatorId);
+        const points = creatorPointsData ? creatorPointsData.points : 0;
+
+        // Check if user has EVER received a "Follow Bonus" for this creator
+        const existingBonus = await PointTransaction.findOne({
+            userId: userId,
+            creatorId: creatorId,
+            description: 'Follow Bonus'
+        });
+
+        // Check current follow status
+        // We can check user.following array
+        const isFollowing = user.following?.includes(creatorId) || false;
+
+        return {
+            success: true,
+            points,
+            hasFollowed: isFollowing,
+            canEarnBonus: !existingBonus // Can earn if never received before
+        };
+
+    } catch (error) {
+        console.error('Error fetching creator points:', error);
+        return { success: false, error: 'Failed to fetch points' };
+    }
+}

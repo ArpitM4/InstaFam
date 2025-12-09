@@ -26,35 +26,46 @@ const vaultItemSchema = new Schema({
     min: 1
   },
   fileUrl: {
-    type: String,
-    required: false // Make optional for Q&A rewards
+    type: String, // Optional: only for 'file' type (image/video/pdf)
+    required: false
   },
+  // Type of the vault item determines the flow
+  type: {
+    type: String,
+    required: true,
+    enum: ['file', 'text', 'qna', 'promise'],
+    default: 'file'
+  },
+  // Sub-type for 'file' reward (e.g., image, video, pdf)
   fileType: {
     type: String,
-    required: true,
-    enum: ['image', 'video', 'pdf', 'audio', 'document', 'text-reward', 'promise']
+    enum: ['image', 'video', 'pdf', 'audio', 'document'],
+    required: function () { return this.type === 'file'; }
   },
-  perkType: {
+  // Instructions for the Fan (e.g. "Send your IG handle") - Required for Promise/QnA
+  instructions: {
     type: String,
-    enum: ['DigitalFile', 'Recognition', 'Influence', 'AccessLink', 'Promise'],
-    required: true,
-    default: 'DigitalFile'
+    maxlength: 500
+  },
+  // Total redemption slots (0 = unlimited)
+  limit: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  // Max redemptions per specific user (0 = unlimited, default 1)
+  userLimit: {
+    type: Number,
+    default: 1,
+    min: 0
   },
   unlockCount: {
     type: Number,
     default: 0
   },
-  requiresFanInput: {
-    type: Boolean,
-    default: false
-  },
   isActive: {
     type: Boolean,
     default: true
-  },
-  expiredAt: {
-    type: Date,
-    default: null
   }
 }, {
   timestamps: true

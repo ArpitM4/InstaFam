@@ -25,6 +25,9 @@ const PaymentProfileSection = ({
   setcurrentUser,
   isEventActive,
   setShowBetaPopup,
+  fanPoints = 0,
+  canEarnBonus = false,
+  onPointsUpdate
 }) => {
   // Generate fallback profile image URL only when needed
   const profileImageUrl = currentUser?.profilepic || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(username || 'User')}&backgroundColor=6366f1`;
@@ -154,6 +157,7 @@ const PaymentProfileSection = ({
                 followers: newCount,
                 followersArray: prev.followersArray || []
               }));
+              if (onPointsUpdate) onPointsUpdate();
             }}
           />
         </div>
@@ -172,6 +176,38 @@ const PaymentProfileSection = ({
           </div>
         ) : (
           <p className="text-sm text-text/60 text-center mt-2">{currentUser?.description}</p>
+        )}
+
+        {/* FamPoints Box */}
+        {!isOwner && (
+          <div className="mt-4 flex justify-center w-full animate-in fade-in duration-500">
+            <div className="flex items-center gap-4 bg-white/5 border border-white/10 px-6 py-3 rounded-2xl backdrop-blur-sm">
+
+              {/* Points Display */}
+              <div className="flex flex-col items-center">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🪙</span>
+                  <span className="text-lg font-bold text-white">
+                    {fanPoints.toLocaleString()}
+                  </span>
+                </div>
+                <span className="text-[10px] uppercase tracking-wide text-white/40 font-medium">FamPoints</span>
+              </div>
+
+              {/* Separator */}
+              {canEarnBonus && (
+                <>
+                  <div className="w-px h-8 bg-white/10"></div>
+
+                  {/* Incentive Text */}
+                  <div className="flex flex-col">
+                    <span className="text-xs font-semibold text-white">Follow Now</span>
+                    <span className="text-[10px] text-green-400 font-medium">+10 FP Bonus</span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         )}
 
         {/* Owner-only Event Controls */}

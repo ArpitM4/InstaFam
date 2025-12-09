@@ -85,7 +85,7 @@ const ShareModal = ({ isOpen, onClose, username, title = "Share Your Sygil Page"
                         </div>
                         <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
                         <p className="text-white/60 text-sm leading-relaxed max-w-xs mx-auto">
-                            Add this link to your Instagram/YouTube bio to grow faster.
+                            Add this link to your Instagram/YouTube bio to grow faster. 🚀
                         </p>
                     </div>
 

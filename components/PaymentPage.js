@@ -11,6 +11,7 @@ import { FaPen, FaEye } from "react-icons/fa";
 import "../app/globals.css"; // Assuming your global styles are here
 
 import { fetchuser, fetchpayments, updateProfile, createEvent, endEvent, fetchEvents } from "@/actions/useractions";
+import { getCreatorPoints } from "@/actions/pointsActions";
 import { useUser } from "@/context/UserContext";
 import { emitPaymentSuccess } from "@/utils/eventBus";
 import PaymentProfileSection from "./PaymentProfileSection";
@@ -231,7 +232,8 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
   const [showBetaPopup, setShowBetaPopup] = useState(false);
   const [showFamPointsPopup, setShowFamPointsPopup] = useState(false);
   const [earnedFamPoints, setEarnedFamPoints] = useState(0);
-  const [fanPoints, setFanPoints] = useState(null); // Points for current logged-in fan for this creator
+  const [fanPoints, setFanPoints] = useState(0); // Points for current logged-in fan for this creator
+  const [canEarnBonus, setCanEarnBonus] = useState(false);
   const [visibleSections, setVisibleSections] = useState(['contribute', 'vault', 'links']);
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
   const [tempVisibleSections, setTempVisibleSections] = useState([]);
@@ -370,23 +372,24 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
   }, [session]);
 
   // Fetch fan's FamPoints for this creator
-  useEffect(() => {
-    const fetchFanPoints = async () => {
-      if (session && currentUser?._id && !isOwner) {
-        try {
-          const response = await fetch(`/api/points?creatorId=${currentUser._id}`);
-          if (response.ok) {
-            const data = await response.json();
-            setFanPoints(data.points || 0);
-          }
-        } catch (error) {
-          console.error('Error fetching fan points:', error);
-          setFanPoints(0);
+  // Fetch fan's FamPoints for this creator
+  const loadFanPoints = useCallback(async () => {
+    if (currentUser?._id && !isOwner) {
+      try {
+        const res = await getCreatorPoints(currentUser._id);
+        if (res.success) {
+          setFanPoints(res.points);
+          setCanEarnBonus(res.canEarnBonus);
         }
+      } catch (error) {
+        console.error('Error fetching fan points:', error);
       }
-    };
-    fetchFanPoints();
-  }, [session, currentUser?._id, isOwner]);
+    }
+  }, [currentUser?._id, isOwner]);
+
+  useEffect(() => {
+    loadFanPoints();
+  }, [loadFanPoints, session]); // Re-fetch on session change
 
   // Check onboarding status for page owner
   useEffect(() => {
@@ -952,6 +955,9 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
           setcurrentUser={setcurrentUser}
           isEventActive={isEventActive}
           setShowBetaPopup={setShowBetaPopup}
+          fanPoints={fanPoints}
+          canEarnBonus={canEarnBonus}
+          onPointsUpdate={loadFanPoints}
         />
 
         {/* NEW TAB NAVIGATION UI - Replaces the old InteractionSection placement */}
@@ -1153,7 +1159,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
                   <p className="text-text/60 text-sm">🔒 Login to see your FamPoints and redeem vault items</p>
                 </div>
               )}
-              <VaultSection currentUser={currentUser} initialItems={initialVaultItems} />
+              <VaultSection currentUser={currentUser} initialItems={initialVaultItems} isOwner={isOwner} />
             </div>
           )}
 
