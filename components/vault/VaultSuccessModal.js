@@ -2,15 +2,17 @@ import React from 'react';
 import { FaCheckCircle, FaDownload, FaCopy, FaExternalLinkAlt } from 'react-icons/fa';
 import { toast } from 'sonner';
 
-const VaultSuccessModal = ({ item, fanInput, creatorResponse, status, onClose }) => {
+const VaultSuccessModal = ({ item, fanInput, creatorResponse, status, rejectionReason, onClose }) => {
     if (!item) return null;
 
     const isInstant = item.type === 'file' || item.type === 'text';
+    const isRejectedOrCancelled = status === 'Rejected' || status === 'Cancelled';
 
     const getStatusBadge = () => {
         if (!status || status === 'Pending') return <span className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded inline-block mb-4">⏳ Pending</span>;
         if (status === 'Fulfilled') return <span className="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded inline-block mb-4">✅ Fulfilled</span>;
         if (status === 'Rejected') return <span className="bg-red-500/20 text-red-400 text-xs px-2 py-1 rounded inline-block mb-4">❌ Rejected</span>;
+        if (status === 'Cancelled') return <span className="bg-gray-500/20 text-gray-400 text-xs px-2 py-1 rounded inline-block mb-4">⛔ Cancelled</span>;
         return null;
     };
 
@@ -104,7 +106,14 @@ const VaultSuccessModal = ({ item, fanInput, creatorResponse, status, onClose })
                                 </div>
                             </div>
 
-                            {creatorResponse ? (
+                            {isRejectedOrCancelled && rejectionReason ? (
+                                <div>
+                                    <p className="text-red-400/80 text-xs uppercase font-bold tracking-wider mb-1">{status === 'Rejected' ? 'Rejection Reason' : 'Cancellation Reason'}</p>
+                                    <div className="bg-red-500/10 p-3 rounded-lg border border-red-500/20 text-red-100 text-sm">
+                                        {rejectionReason}
+                                    </div>
+                                </div>
+                            ) : creatorResponse ? (
                                 <div>
                                     <p className="text-emerald-400/80 text-xs uppercase font-bold tracking-wider mb-1">Creator Answer</p>
                                     <div className="bg-emerald-500/10 p-3 rounded-lg border border-emerald-500/20 text-emerald-100 text-sm">
@@ -127,7 +136,14 @@ const VaultSuccessModal = ({ item, fanInput, creatorResponse, status, onClose })
                                 </div>
                             </div>
 
-                            {creatorResponse ? (
+                            {isRejectedOrCancelled && rejectionReason ? (
+                                <div>
+                                    <p className="text-red-400/80 text-xs uppercase font-bold tracking-wider mb-1">{status === 'Rejected' ? 'Rejection Reason' : 'Cancellation Reason'}</p>
+                                    <div className="bg-red-500/10 p-3 rounded-lg border border-red-500/20 text-red-100 text-sm">
+                                        {rejectionReason}
+                                    </div>
+                                </div>
+                            ) : creatorResponse ? (
                                 <div>
                                     <p className="text-emerald-400/80 text-xs uppercase font-bold tracking-wider mb-1">Creator Note</p>
                                     <div className="bg-emerald-500/10 p-3 rounded-lg border border-emerald-500/20 text-emerald-100 text-sm">

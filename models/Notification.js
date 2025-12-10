@@ -28,7 +28,8 @@ const notificationSchema = new Schema({
       'points_expired',         // FamPoints have expired
 
       'vault_request_expiring_soon',  // Creator: pending redemption expiring soon (7 days warning)
-      'vault_request_expired'         // Creator: pending redemption expired & refunded
+      'vault_request_expired',        // Creator: pending redemption expired & refunded
+      'vault_request_refunded'        // Fan: their request expired and points were refunded
     ],
     required: true
   },

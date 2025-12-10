@@ -56,10 +56,11 @@ export async function POST(request) {
     }
 
     // Check if fan has already redeemed this item
-    // Check user limit
+    // Check user limit - only count Pending/Fulfilled (not Rejected/Cancelled)
     const userRedemptionCount = await Redemption.countDocuments({
       fanId: fan._id,
-      vaultItemId: vaultItem._id
+      vaultItemId: vaultItem._id,
+      status: { $in: ['Pending', 'Fulfilled'] }
     });
 
     const limit = (vaultItem.userLimit !== undefined && vaultItem.userLimit !== null) ? vaultItem.userLimit : 1;

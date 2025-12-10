@@ -242,6 +242,13 @@ const MyFamPointsClient = ({ pointsData, redemptions }) => {
                                                 {item.title || 'Deleted Item'}
                                             </h4>
                                             <p className="text-sm text-text/60">From @{redemption.creatorId?.username || 'unknown'}</p>
+
+                                            {/* Show rejection/cancellation reason */}
+                                            {(isRejected || isCancelled) && redemption.rejectionReason && (
+                                                <p className="text-xs text-red-400/80 mt-2 italic">
+                                                    {redemption.rejectionReason}
+                                                </p>
+                                            )}
                                         </div>
 
                                         <div className="text-right flex flex-col items-end gap-2">
@@ -279,6 +286,7 @@ const MyFamPointsClient = ({ pointsData, redemptions }) => {
                     fanInput={selectedRedemption.fanInput}
                     creatorResponse={selectedRedemption.creatorResponse}
                     status={selectedRedemption.status}
+                    rejectionReason={selectedRedemption.rejectionReason}
                     onClose={() => setSelectedRedemption(null)}
                 />
             )}

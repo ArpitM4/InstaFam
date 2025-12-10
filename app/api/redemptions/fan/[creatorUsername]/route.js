@@ -39,7 +39,7 @@ export async function GET(request, { params }) {
       fanId: fan._id,
       creatorId: creator._id
     })
-      .populate('vaultItemId', 'title description type instructions perkType fileType')
+      .populate('vaultItemId', 'title description type instructions perkType fileType pointCost')
       .sort({ createdAt: -1 });
 
     return NextResponse.json({

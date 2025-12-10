@@ -82,12 +82,11 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
             const id = r.vaultItemId._id;
             // Initialize if not exists
             if (!statusMap[id]) {
-              statusMap[id] = { status: r.status, fanInput: r.fanInput, creatorResponse: r.creatorResponse, count: 0 };
+              statusMap[id] = { status: r.status, fanInput: r.fanInput, creatorResponse: r.creatorResponse, rejectionReason: r.rejectionReason, count: 0 };
             }
-            // Increment count (count all attempts? or only valid ones? usually all non-rejected ones count towards limit?
-            // Actually, rejected ones usually refund points, so they shouldn't count towards limit.
-            // But Pending/Fulfilled count.
-            if (r.status !== 'Rejected') {
+            // Increment count: Only count Pending/Fulfilled towards user limit
+            // Rejected and Cancelled don't count (points are refunded, slot is freed)
+            if (r.status !== 'Rejected' && r.status !== 'Cancelled') {
               statusMap[id].count += 1;
             }
             // Keep status of most recent interactive one or just the latest?
@@ -159,7 +158,8 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
         item,
         fanInput: specificRedemption.fanInput,
         creatorResponse: specificRedemption.creatorResponse,
-        status: specificRedemption.status
+        status: specificRedemption.status,
+        rejectionReason: specificRedemption.rejectionReason
       });
       return;
     }
@@ -172,7 +172,8 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
         item,
         fanInput: statusData.fanInput,
         creatorResponse: statusData.creatorResponse,
-        status: statusData.status
+        status: statusData.status,
+        rejectionReason: statusData.rejectionReason
       });
     } else {
       // Fallback for file/text if no status tracked
@@ -424,6 +425,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
             fanInput={successData.fanInput}
             status={successData.status}
             creatorResponse={successData.creatorResponse}
+            rejectionReason={successData.rejectionReason}
             onClose={() => setSuccessData(null)}
           />
         )

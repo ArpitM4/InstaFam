@@ -47,6 +47,7 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
         if (status === 'Pending') return <span className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded">⏳ Pending</span>;
         if (status === 'Fulfilled') return <span className="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded">✅ Fulfilled</span>;
         if (status === 'Rejected') return <span className="bg-red-500/20 text-red-400 text-xs px-2 py-1 rounded">❌ Rejected</span>;
+        if (status === 'Cancelled') return <span className="bg-gray-500/20 text-gray-400 text-xs px-2 py-1 rounded">⛔ Cancelled</span>;
         return null;
     };
 
@@ -95,9 +96,11 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
 
                 <div className="flex items-center gap-2 mb-2">
                     <h3 className="font-bold text-lg text-white mb-1 line-clamp-1 pr-2">{item.title}</h3>
-                    <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs font-bold">
-                        🪙 {item.pointCost} FP
-                    </span>
+                    {(item.pointCost !== undefined && item.pointCost !== null) && (
+                        <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs font-bold">
+                            🪙 {item.pointCost} FP
+                        </span>
+                    )}
                 </div>
 
                 <p className="text-white/60 text-sm line-clamp-2 min-h-[40px] text-sm leading-relaxed">{item.description}</p>
@@ -111,12 +114,15 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
                         {item.type === 'file' && ` • ${item.fileType?.toUpperCase() || 'FILE'}`}
                     </span>
                     <span>
-                        {/* Only show claimed count if valid numbers exist */}
-                        {(item.unlockCount !== undefined) ? (
+                        {/* Only show claimed count if valid numbers exist and NOT redemption card */}
+                        {isRedemptionCard ? (
+                            // For redemption cards, just show the type
+                            null
+                        ) : (item.unlockCount !== undefined) ? (
                             limit > 0 ? `${item.unlockCount} / ${limit} Claimed` : `${item.unlockCount} Unlocks`
                         ) : (
                             // Fallback if unlockCount is missing
-                            limit > 0 ? `Limit: ${limit}` : "Unlimited"
+                            limit > 0 ? `Limit: ${limit}` : null
                         )}
                     </span>
                 </div>
@@ -160,13 +166,7 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
                             }`}
                     >
                         {isRedemptionCard ? (
-                            <>
-                                {(type === 'file' || type === 'text') ? (
-                                    <><FaDownload className="text-xs" /> View Reward</>
-                                ) : (
-                                    <><FaComment className="text-xs" /> View Request</>
-                                )}
-                            </>
+                            <>View Details</>
                         ) : (isSoldOut || isLimitReached) ? (
                             <>
                                 <FaLock className="text-xs" /> {getButtonText()}

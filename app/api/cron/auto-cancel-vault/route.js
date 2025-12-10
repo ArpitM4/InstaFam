@@ -45,6 +45,13 @@ export async function GET(req) {
                 redemption.rejectionReason = 'Auto-cancelled due to creator inactivity (60 days).';
                 await redemption.save();
 
+                // 2. Decrement unlockCount on the VaultItem (free up the slot)
+                if (redemption.vaultItemId?._id) {
+                    await VaultItem.findByIdAndUpdate(redemption.vaultItemId._id, {
+                        $inc: { unlockCount: -1 }
+                    });
+                }
+
                 // Track for creator notification
                 const creatorId = redemption.creatorId.toString();
                 if (!creatorExpiredCounts[creatorId]) {
@@ -53,37 +60,51 @@ export async function GET(req) {
                 creatorExpiredCounts[creatorId].count++;
                 creatorExpiredCounts[creatorId].items.push({
                     fanUsername: redemption.fanId?.username || 'Unknown',
+                    fanId: redemption.fanId?._id || redemption.fanId,
                     vaultItemTitle: redemption.vaultItemId?.title || 'Vault Item',
-                    pointsSpent: redemption.pointsSpent
+                    pointsSpent: redemption.pointsSpent,
+                    redemptionId: redemption._id
                 });
 
-                // 2. Refund Points
+                // 2. Create Refund Transaction (FamPoints are tracked via PointTransaction, not User.points)
                 const fan = await User.findById(redemption.fanId);
                 if (fan) {
-                    const creatorPointIndex = fan.points.findIndex(p => p.creatorId.toString() === redemption.creatorId.toString());
+                    // Create Transaction Record with redemptionId for tracking
+                    await PointTransaction.create({
+                        userId: fan._id,
+                        creatorId: redemption.creatorId,
+                        amount: redemption.pointsSpent,
+                        type: 'Refund',
+                        redemptionId: redemption._id,
+                        description: `Auto-refund: Request expired (60 days) - ${redemption.vaultItemId?.title || 'Vault Item'}`
+                    });
 
-                    if (creatorPointIndex > -1) {
-                        fan.points[creatorPointIndex].points += redemption.pointsSpent;
-                        await fan.save();
+                    // Get creator info for fan notification
+                    const creator = await User.findById(redemption.creatorId).select('username');
 
-                        // 3. Create Transaction Record
-                        await PointTransaction.create({
-                            userId: fan._id,
-                            creatorId: redemption.creatorId,
-                            amount: redemption.pointsSpent,
-                            type: 'Refund',
-                            description: `Auto-refund: Request expired (60 days) - ${redemption.vaultItemId?.title || 'Vault Item'}`
+                    // Send notification to fan about refund
+                    try {
+                        await createNotification({
+                            recipientId: fan._id,
+                            type: 'vault_request_refunded',
+                            title: `${redemption.pointsSpent} FamPoints refunded`,
+                            message: `Your request for "${redemption.vaultItemId?.title || 'Vault Item'}" from @${creator?.username || 'creator'} expired after 60 days. Your FamPoints have been refunded.`,
+                            data: {
+                                redemptionId: redemption._id.toString(),
+                                pointsRefunded: redemption.pointsSpent,
+                                creatorUsername: creator?.username
+                            }
                         });
-
-                        results.push({
-                            id: redemption._id,
-                            status: 'Cancelled & Refunded',
-                            fan: fan.username,
-                            amount: redemption.pointsSpent
-                        });
-                    } else {
-                        results.push({ id: redemption._id, status: 'Cancelled (Fan points record missing)', fanId: redemption.fanId });
+                    } catch (fanNotifError) {
+                        console.error(`[Auto-Cancel] Error sending refund notification to fan ${fan._id}:`, fanNotifError);
                     }
+
+                    results.push({
+                        id: redemption._id,
+                        status: 'Cancelled & Refunded',
+                        fan: fan.username,
+                        amount: redemption.pointsSpent
+                    });
                 } else {
                     results.push({ id: redemption._id, status: 'Cancelled (Fan not found)', fanId: redemption.fanId });
                 }

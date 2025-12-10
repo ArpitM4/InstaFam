@@ -123,6 +123,7 @@ export async function fetchMyRedemptions() {
             status: r.status,
             fanInput: r.fanInput,
             creatorResponse: r.creatorResponse,
+            rejectionReason: r.rejectionReason,
             answeredAt: r.answeredAt ? r.answeredAt.toISOString() : null
         }));
 

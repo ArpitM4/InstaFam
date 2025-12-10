@@ -72,6 +72,11 @@ export async function POST(req) {
             redemption.rejectionReason = rejectionReason;
             await redemption.save();
 
+            // Decrement unlockCount on the VaultItem (free up the slot)
+            await VaultItem.findByIdAndUpdate(redemption.vaultItemId._id, {
+                $inc: { unlockCount: -1 }
+            });
+
             // REFUND LOGIC
             // Create Refund Transaction to restore points
             await PointTransaction.create({
@@ -79,6 +84,7 @@ export async function POST(req) {
                 creatorId: redemption.creatorId,
                 amount: redemption.pointsSpent,
                 type: 'Refund',
+                redemptionId: redemption._id,
                 description: `Refund for rejected vault item: ${redemption.vaultItemId.title}`
             });
         } else {
