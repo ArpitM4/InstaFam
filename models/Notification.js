@@ -16,12 +16,16 @@ const notificationSchema = new Schema({
     enum: [
       'creator_answered',        // Creator answered fan's Q&A
       'vault_redeemed',         // Fan redeemed non-digital vault item
+      'redemption_fulfilled',   // Creator fulfilled a vault redemption
       'system_message',         // Admin/system message
       'payment_received',       // Payment notification
 
       'new_follower',          // Someone followed the user
       'creator_event_started',  // Creator started a new event (for followers)
-      'creator_new_vault_item'  // Creator added new vault item (for followers)
+      'creator_new_vault_item', // Creator added new vault item (for followers)
+
+      'points_expiring_soon',   // FamPoints expiring within 7 days
+      'points_expired'          // FamPoints have expired
     ],
     required: true
   },
