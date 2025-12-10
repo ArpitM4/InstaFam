@@ -1,4 +1,5 @@
 "use server";
+import { revalidatePath } from "next/cache";
 
 import Payment from "@/models/Payment";
 import connectDb from "@/db/ConnectDb";
@@ -117,6 +118,11 @@ export const updateProfile = async (data, oldusername) => {
     delete ndata.username;
   }
   await User.updateOne({ email: ndata.email }, ndata);
+
+  revalidatePath('/account');
+  if (ndata.username) {
+    revalidatePath(`/${ndata.username}`);
+  }
 
   // Return only success status, don't return the full user object
   // to avoid circular reference issues in Next.js serialization

@@ -78,6 +78,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
           setMyRedemptions(redemptionsRes.redemptions || []);
           const statusMap = {};
           redemptionsRes.redemptions.forEach(r => {
+            if (!r.vaultItemId) return;
             const id = r.vaultItemId._id;
             // Initialize if not exists
             if (!statusMap[id]) {
@@ -329,7 +330,6 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
                       }}
                       onEdit={(itm) => {
                         setEditItem(itm);
-                        setShowAddModal(true);
                       }}
                       onView={handleView}
                     />
@@ -355,6 +355,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
                           onView={handleView}
                           // Disable redundant redeem action
                           onRedeem={() => { }}
+                          isRedemptionCard={true}
                         />
                       ) : null
                     ))}

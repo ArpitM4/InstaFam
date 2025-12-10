@@ -2,7 +2,7 @@
 import React from 'react';
 import { FaGem, FaDownload, FaHandshake, FaComment, FaLock } from 'react-icons/fa';
 
-const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, status, userRedemptionCount = 0 }) => {
+const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, status, userRedemptionCount = 0, isRedemptionCard = false }) => {
 
     const type = item.type || 'file'; // Default to file but ideally should be explicit
     const fileType = item.fileType;
@@ -51,45 +51,11 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
     const reachedTotalLimit = item.limit > 0 && item.unlockCount >= item.limit;
     const reachedUserLimit = item.userLimit > 0 && userRedemptionCount >= item.userLimit;
 
-    // For single-use items (File/Text), simple 'isRedeemed' check is often enough, but tracking userLimit is safer.
-    // If it's multi-use (QnA), we rely on reachedUserLimit.
-
-    // Determine button state
-    // Disabled if: owner OR reached total limit OR reached user limit
-    // (Note: Owner button is separate)
-
     const isSoldOut = reachedTotalLimit;
-    const isUnlocked = isRedeemed && (type === 'file' || type === 'text'); // Only show 'Unlocked' for static content
     const isLimitReached = reachedUserLimit;
 
-    // Effective disable condition for Fan:
-    // Disabled if Sold Out OR Limit Reached (unless it's an unlocked static item which we want to view)
-    // Wait, if I've already unlocked it, I should be able to VIEW it regardless of limits.
-    // So 'isActionDisabled' mainly applies to NEW redemptions.
-
-    // View Mode: If redeemed.
-    const canView = isRedeemed;
-
-    // Unlock Mode: If NOT redeemed (or multi-use allowed and limit not reached).
-    // Actually, simple rule: If isRedeemed, show VIEW button.
-    // Except for multi-use? The requirement "My Redemptions" implies listing individual redemptions.
-    // In the main vault list:
-    // If QnA/Promise: You can redeem AGAIN if userLimit not reached. 
-    // If you have redeemed it once, should it show "View"? Or "Unlock Another"?
-    // The card represents the ITEM.
-    // If I have pending requests, maybe show "View Status"?
-    // For simplicity: If user has ANY redemption of this item, provide a way to see it? 
-    // But typically QnA is "Ask Another".
-    // Let's stick to the User Request: "In the Promise and QnA , Simple show the status of their Request. on clicking upon the button show them their inpupt and the creator's response."
-
-    // So if isRedeemed is true (meaning user has interacted), we prioritize "View Status".
-    // BUT what if they want to ask ANOTHER QnA? 
-    // Maybe we need two buttons? Or just stick to "View" if they have an active interaction?
-    // Let's assume for now: If redeemed, show View. If they want another, they usually can't unless we added "Buy Again" logic explicitly.
-    // Current logic: `isRedeemed` is passed as true if `redeemedItems.includes(item._id)`.
-    // `redeemedItems` is list of IDs user has redeemed.
-
-    const showViewButton = isRedeemed;
+    // View Mode is FORCED if isRedemptionCard is true.
+    // Otherwise it's Store Mode (Unlock).
 
     const getButtonText = () => {
         if (isSoldOut) return "Sold Out";
@@ -127,14 +93,31 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
             </div>
 
             {/* Stats / Limits */}
-            <div className="px-4 py-2 border-b border-white/5 flex justify-between text-xs text-white/40">
-                <span>
-                    {item.type?.toUpperCase() || 'REWARD'}
-                    {item.type === 'file' && ` • ${item.fileType?.toUpperCase() || 'FILE'}`}
-                </span>
-                <span>
-                    {item.limit > 0 ? `${item.unlockCount} / ${item.limit} Claimed` : `${item.unlockCount} Unlocks`}
-                </span>
+            <div className="px-4 py-2 border-b border-white/5 flex flex-col gap-1 text-xs text-white/40">
+                <div className="flex justify-between">
+                    <span>
+                        {item.type?.toUpperCase() || 'REWARD'}
+                        {item.type === 'file' && ` • ${item.fileType?.toUpperCase() || 'FILE'}`}
+                    </span>
+                    <span>
+                        {/* Only show claimed count if valid numbers exist */}
+                        {(item.unlockCount !== undefined) ? (
+                            item.limit > 0 ? `${item.unlockCount} / ${item.limit} Claimed` : `${item.unlockCount} Unlocks`
+                        ) : (
+                            // Fallback if unlockCount is missing
+                            item.limit > 0 ? `Limit: ${item.limit}` : "Unlimited"
+                        )}
+                    </span>
+                </div>
+                {/* User Limit - Only show if NOT a redemption card (Store Mode) */}
+                {!isRedemptionCard && item.userLimit > 0 && (
+                    <div className="flex justify-between text-[11px] font-medium mt-1 bg-white/5 p-1.5 rounded-lg border border-white/5">
+                        <span className="text-white/60">Max {item.userLimit} per user</span>
+                        <span className={`${reachedUserLimit ? 'text-red-400' : 'text-primary'}`}>
+                            You: {userRedemptionCount} / {item.userLimit}
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Action Footer */}
@@ -149,21 +132,21 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
                 ) : (
                     <button
                         onClick={() => {
-                            if (showViewButton) {
+                            if (isRedemptionCard) {
                                 if (onView) onView(item);
                             } else {
                                 onRedeem(item);
                             }
                         }}
-                        disabled={!showViewButton && (isSoldOut || isLimitReached)}
-                        className={`w-full py-2.5 px-4 rounded-xl font-bold transition-all duration-300 shadow-md flex items-center justify-center gap-2 ${showViewButton
-                            ? 'bg-transparent border border-white/20 text-white hover:bg-white/5' // Simplified View Button
+                        disabled={!isRedemptionCard && (isSoldOut || isLimitReached)}
+                        className={`w-full py-2.5 px-4 rounded-xl font-bold transition-all duration-300 shadow-md flex items-center justify-center gap-2 ${isRedemptionCard
+                            ? 'bg-transparent border border-white/20 text-white hover:bg-white/5' // View Mode
                             : (isSoldOut || isLimitReached)
-                                ? 'bg-white/5 text-white/40 cursor-not-allowed border border-white/5'
-                                : 'btn-gradient text-white hover:scale-[1.02] hover:shadow-lg'
+                                ? 'bg-white/5 text-white/40 cursor-not-allowed border border-white/5' // Disabled Store Mode
+                                : 'btn-gradient text-white hover:scale-[1.02] hover:shadow-lg' // Active Store Mode
                             }`}
                     >
-                        {showViewButton ? (
+                        {isRedemptionCard ? (
                             <>
                                 {(type === 'file' || type === 'text') ? (
                                     <><FaDownload className="text-xs" /> View Reward</>
