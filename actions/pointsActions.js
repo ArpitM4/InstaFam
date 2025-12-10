@@ -100,7 +100,7 @@ export async function fetchMyRedemptions() {
         })
             .populate('vaultItemId', 'title description type instructions pointCost fileUrl')
             .populate('creatorId', 'username')
-            .sort({ redeemedAt: -1 })
+            .sort({ createdAt: -1 })
             .lean();
 
         const serializedRedemptions = redemptions.map(r => ({
@@ -119,7 +119,7 @@ export async function fetchMyRedemptions() {
                 pointCost: r.vaultItemId.pointCost,
                 fileUrl: r.vaultItemId.fileUrl
             } : null,
-            redeemedAt: r.redeemedAt.toISOString(),
+            redeemedAt: r.createdAt.toISOString(),
             status: r.status,
             fanInput: r.fanInput,
             creatorResponse: r.creatorResponse,

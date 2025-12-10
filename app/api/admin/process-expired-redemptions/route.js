@@ -15,7 +15,7 @@ export async function POST() {
     // Find all pending redemptions older than 30 days
     const expiredRedemptions = await Redemption.find({
       status: 'Pending',
-      redeemedAt: { $lt: thirtyDaysAgo }
+      createdAt: { $lt: thirtyDaysAgo }
     }).populate('fanId', 'username famPoints').populate('vaultItemId', 'title');
 
     const processedResults = [];
@@ -30,7 +30,7 @@ export async function POST() {
         // Refund FamPoints to the fan with proper expiry
         const fan = redemption.fanId;
         const refundAmount = Number(redemption.pointsSpent) || 0;
-        
+
         // Update user's total points
         await User.findByIdAndUpdate(
           fan._id,
@@ -41,7 +41,7 @@ export async function POST() {
         // Create refund point transaction with expiry (60 days from refund date)
         const refundExpiryDate = new Date();
         refundExpiryDate.setDate(refundExpiryDate.getDate() + 60);
-        
+
         await PointTransaction.create({
           userId: fan._id,
           type: 'Refund',

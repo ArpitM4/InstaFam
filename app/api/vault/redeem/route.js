@@ -137,7 +137,7 @@ export async function POST(request) {
       pointsRemaining: Math.max(0, (fan.points || 0) - vaultItem.pointCost),
       redemption: {
         id: redemption._id,
-        redeemedAt: redemption.redeemedAt
+        redeemedAt: redemption.createdAt
       }
     });
 

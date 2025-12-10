@@ -160,8 +160,8 @@ const VaultRequests = () => {
             loadRedemptions();
           }}
           className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeRequestsTab === 'pending'
-              ? 'bg-primary text-text shadow-sm'
-              : 'text-text/70 hover:text-text hover:bg-text/5'
+            ? 'bg-primary text-text shadow-sm'
+            : 'text-text/70 hover:text-text hover:bg-text/5'
             }`}
         >
           Pending Requests
@@ -177,8 +177,8 @@ const VaultRequests = () => {
             loadRedemptions();
           }}
           className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeRequestsTab === 'fulfilled'
-              ? 'bg-primary text-text shadow-sm'
-              : 'text-text/70 hover:text-text hover:bg-text/5'
+            ? 'bg-primary text-text shadow-sm'
+            : 'text-text/70 hover:text-text hover:bg-text/5'
             }`}
         >
           Fulfilled Requests
@@ -194,8 +194,8 @@ const VaultRequests = () => {
             loadRedemptions();
           }}
           className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeRequestsTab === 'expired'
-              ? 'bg-primary text-text shadow-sm'
-              : 'text-text/70 hover:text-text hover:bg-text/5'
+            ? 'bg-primary text-text shadow-sm'
+            : 'text-text/70 hover:text-text hover:bg-text/5'
             }`}
         >
           Expired Requests
@@ -232,7 +232,7 @@ const VaultRequests = () => {
           ) : (
             <div className="space-y-4">
               {[...pendingRedemptions]
-                .sort((a, b) => new Date(a.redeemedAt) - new Date(b.redeemedAt))
+                .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
                 .map((redemption) => (
                   <div key={redemption._id} className="bg-dropdown-hover rounded-lg p-4 px-6">
                     <div className="flex items-start justify-between mb-4">
@@ -245,7 +245,7 @@ const VaultRequests = () => {
                             👤 <strong>{redemption.fanId.username}</strong>
                           </span>
                           <span className="flex items-center gap-1">
-                            {new Date(redemption.redeemedAt).toLocaleDateString()}
+                            {new Date(redemption.createdAt).toLocaleDateString()}
                           </span>
                         </div>
                       </div>
@@ -359,7 +359,7 @@ const VaultRequests = () => {
                           👤 <strong>{redemption.fanId.username}</strong>
                         </span>
                         <span className="flex items-center gap-1">
-                          {new Date(redemption.redeemedAt).toLocaleDateString()}
+                          {new Date(redemption.createdAt).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
@@ -440,7 +440,7 @@ const VaultRequests = () => {
                           👤 <strong>{redemption.fanId.username}</strong>
                         </span>
                         <span className="flex items-center gap-1">
-                          📅 Requested: {new Date(redemption.redeemedAt).toLocaleDateString()}
+                          📅 Requested: {new Date(redemption.createdAt).toLocaleDateString()}
                         </span>
                         <span className="flex items-center gap-1 text-orange-600">
                           ⏰ Expired: {new Date(redemption.expiredAt).toLocaleDateString()}

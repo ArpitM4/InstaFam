@@ -133,7 +133,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
           status: isAutoFulfilled ? 'Fulfilled' : 'Pending',
           fanInput: fanInput,
           creatorResponse: isAutoFulfilled ? item.fileUrl : null, // Store secret/file link immediately
-          redeemedAt: result.redemption.redeemedAt
+          createdAt: result.redemption.redeemedAt
         };
         setMyRedemptions(prev => [newRedemption, ...prev]);
 

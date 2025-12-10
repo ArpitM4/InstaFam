@@ -23,10 +23,6 @@ const redemptionSchema = new Schema({
     required: true,
     min: 0
   },
-  redeemedAt: {
-    type: Date,
-    default: Date.now
-  },
   status: {
     type: String,
     enum: ['Pending', 'Fulfilled', 'Rejected', 'Cancelled'],

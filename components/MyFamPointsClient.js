@@ -236,7 +236,7 @@ const MyFamPointsClient = ({ pointsData, redemptions }) => {
                                                     }`}>
                                                     {item.type === 'text' ? 'SECRET MESSAGE' : item.type === 'promise' ? 'SERVICE / PROMISE' : item.type === 'qna' ? 'Q & A' : 'DIGITAL FILE'}
                                                 </span>
-                                                <span className="text-text/40 text-xs">• {formatDate(redemption.redeemedAt)}</span>
+                                                <span className="text-text/40 text-xs">• {formatDate(redemption.createdAt || redemption.redeemedAt)}</span>
                                             </div>
                                             <h4 className="text-lg font-bold text-white mb-1">
                                                 {item.title || 'Deleted Item'}

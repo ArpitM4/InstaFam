@@ -25,7 +25,10 @@ const notificationSchema = new Schema({
       'creator_new_vault_item', // Creator added new vault item (for followers)
 
       'points_expiring_soon',   // FamPoints expiring within 7 days
-      'points_expired'          // FamPoints have expired
+      'points_expired',         // FamPoints have expired
+
+      'vault_request_expiring_soon',  // Creator: pending redemption expiring soon (7 days warning)
+      'vault_request_expired'         // Creator: pending redemption expired & refunded
     ],
     required: true
   },

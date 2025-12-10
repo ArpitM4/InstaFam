@@ -14,7 +14,7 @@ await connectDb();
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -31,16 +31,16 @@ export async function GET(request) {
     }
 
     // Fetch pending redemptions with populated data
-    const pendingRedemptions = await Redemption.find({ 
+    const pendingRedemptions = await Redemption.find({
       creatorId: creator._id,
       status: 'Pending'
     })
-    .populate('fanId', 'username name')
-    .populate('vaultItemId', 'title description perkType requiresFanInput')
-    .sort({ redeemedAt: -1 });
+      .populate('fanId', 'username name')
+      .populate('vaultItemId', 'title description perkType requiresFanInput')
+      .sort({ createdAt: -1 });
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       redemptions: pendingRedemptions
     });
 

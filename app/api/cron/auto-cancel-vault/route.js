@@ -4,6 +4,7 @@ import Redemption from '@/models/Redemption';
 import User from '@/models/User';
 import PointTransaction from '@/models/PointTransaction';
 import VaultItem from '@/models/VaultItem'; // Ensure model is loaded
+import { createNotification } from '@/utils/notificationHelpers';
 
 // Force dynamic since we want fresh time check on every hit
 export const dynamic = 'force-dynamic';
@@ -29,11 +30,12 @@ export async function GET(req) {
         const expiredRedemptions = await Redemption.find({
             status: 'Pending',
             createdAt: { $lt: cutoffDate }
-        }).populate('vaultItemId');
+        }).populate('vaultItemId').populate('fanId', 'username');
 
         console.log(`[Auto-Cancel] Found ${expiredRedemptions.length} expired pending requests.`);
 
         const results = [];
+        const creatorExpiredCounts = {}; // Track expired counts per creator
 
         for (const redemption of expiredRedemptions) {
             try {
@@ -42,6 +44,18 @@ export async function GET(req) {
                 redemption.expiredAt = new Date(); // Track when it effectively expired/cancelled
                 redemption.rejectionReason = 'Auto-cancelled due to creator inactivity (60 days).';
                 await redemption.save();
+
+                // Track for creator notification
+                const creatorId = redemption.creatorId.toString();
+                if (!creatorExpiredCounts[creatorId]) {
+                    creatorExpiredCounts[creatorId] = { count: 0, items: [] };
+                }
+                creatorExpiredCounts[creatorId].count++;
+                creatorExpiredCounts[creatorId].items.push({
+                    fanUsername: redemption.fanId?.username || 'Unknown',
+                    vaultItemTitle: redemption.vaultItemId?.title || 'Vault Item',
+                    pointsSpent: redemption.pointsSpent
+                });
 
                 // 2. Refund Points
                 const fan = await User.findById(redemption.fanId);
@@ -54,10 +68,10 @@ export async function GET(req) {
 
                         // 3. Create Transaction Record
                         await PointTransaction.create({
-                            fanId: fan._id,
+                            userId: fan._id,
                             creatorId: redemption.creatorId,
                             amount: redemption.pointsSpent,
-                            type: 'REFUND',
+                            type: 'Refund',
                             description: `Auto-refund: Request expired (60 days) - ${redemption.vaultItemId?.title || 'Vault Item'}`
                         });
 
@@ -80,6 +94,24 @@ export async function GET(req) {
             }
         }
 
+        // Send notifications to creators about expired requests
+        for (const [creatorId, data] of Object.entries(creatorExpiredCounts)) {
+            try {
+                const totalPoints = data.items.reduce((sum, item) => sum + item.pointsSpent, 0);
+                await createNotification({
+                    recipientId: creatorId,
+                    type: 'vault_request_expired',
+                    title: `${data.count} vault request${data.count > 1 ? 's' : ''} expired`,
+                    message: data.count === 1
+                        ? `${data.items[0].fanUsername}'s request for "${data.items[0].vaultItemTitle}" expired after 60 days. ${data.items[0].pointsSpent} FamPoints refunded.`
+                        : `${data.count} vault requests expired after 60 days. ${totalPoints} total FamPoints refunded to fans.`,
+                    data: { expiredCount: data.count, totalPointsRefunded: totalPoints }
+                });
+            } catch (notifError) {
+                console.error(`[Auto-Cancel] Error sending notification to creator ${creatorId}:`, notifError);
+            }
+        }
+
         return NextResponse.json({
             success: true,
             processed: results.length,
@@ -92,3 +124,4 @@ export async function GET(req) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+

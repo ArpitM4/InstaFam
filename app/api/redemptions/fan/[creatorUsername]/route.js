@@ -40,7 +40,7 @@ export async function GET(request, { params }) {
       creatorId: creator._id
     })
       .populate('vaultItemId', 'title description type instructions perkType fileType')
-      .sort({ redeemedAt: -1 });
+      .sort({ createdAt: -1 });
 
     return NextResponse.json({
       success: true,

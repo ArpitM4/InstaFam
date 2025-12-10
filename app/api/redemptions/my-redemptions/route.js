@@ -31,7 +31,7 @@ export async function GET(request) {
     })
       .populate('vaultItemId', 'title description type fileType pointCost fileUrl instructions')
       .populate('creatorId', 'username')
-      .sort({ redeemedAt: -1 });
+      .sort({ createdAt: -1 });
 
     return NextResponse.json({
       success: true,
