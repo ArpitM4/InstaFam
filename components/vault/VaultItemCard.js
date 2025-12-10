@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { FaGem, FaDownload, FaHandshake, FaComment, FaLock } from 'react-icons/fa';
+import { FaGem, FaDownload, FaHandshake, FaComment, FaLock, FaImage, FaVideo, FaFilePdf, FaMusic, FaKey } from 'react-icons/fa';
 
 const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, status, userRedemptionCount = 0, isRedemptionCard = false }) => {
 
@@ -10,12 +10,12 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
     const getIcon = (t, fType) => {
         if (t === 'promise') return <FaHandshake className="text-2xl text-purple-400" />;
         if (t === 'qna') return <FaComment className="text-2xl text-blue-400" />;
-        if (t === 'text') return <span className="text-2xl">🔐</span>; // Lock/Key for secret
+        if (t === 'text') return <FaKey className="text-2xl text-pink-400" />;
         if (t === 'file') {
-            if (fType === 'image') return <span className="text-2xl">🖼️</span>;
-            if (fType === 'video') return <span className="text-2xl">🎥</span>;
-            if (fType === 'pdf') return <span className="text-2xl">📄</span>;
-            if (fType === 'audio') return <span className="text-2xl">🎵</span>;
+            if (fType === 'image') return <FaImage className="text-2xl text-emerald-400" />;
+            if (fType === 'video') return <FaVideo className="text-2xl text-red-400" />;
+            if (fType === 'pdf') return <FaFilePdf className="text-2xl text-orange-400" />;
+            if (fType === 'audio') return <FaMusic className="text-2xl text-cyan-400" />;
             return <FaDownload className="text-2xl text-sky-400" />;
         }
         return <FaGem className="text-2xl text-pink-500" />;

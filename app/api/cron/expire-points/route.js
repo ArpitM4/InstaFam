@@ -10,8 +10,8 @@ const verifyCronSecret = (request) => {
     const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
 
-    // If no secret is set, allow in development
-    if (!cronSecret && process.env.NODE_ENV === 'development') {
+    // If no secret is configured, allow access (local dev / no protection setup)
+    if (!cronSecret) {
         return true;
     }
 
