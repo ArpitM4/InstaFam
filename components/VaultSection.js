@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { fetchCreatorVaultItems, redeemVaultItem, fetchRedeemedItems, fetchFanRedemptions } from '@/actions/vaultActions';
 import { useUser } from '@/context/UserContext';
 import { emitPaymentSuccess } from '@/utils/eventBus';
-import { FaGem, FaPlus, FaList } from 'react-icons/fa';
+import { FaGem, FaPlus, FaList, FaShoppingBag } from 'react-icons/fa';
 
 // Components
 import VaultItemCard from './vault/VaultItemCard';
@@ -22,6 +22,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) =>
   // State
   const [vaultItems, setVaultItems] = useState(initialItems || []);
   const [loading, setLoading] = useState(!initialItems);
+  const [redemptionsLoading, setRedemptionsLoading] = useState(true);
   const [userPoints, setUserPoints] = useState(0);
   const [redeemedItems, setRedeemedItems] = useState([]);
   const [redemptionStatuses, setRedemptionStatuses] = useState({});
@@ -62,43 +63,56 @@ const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) =>
 
   const loadFanData = async () => {
     try {
-      if (currentUser?._id) {
-        const res = await fetch(`/api/points?creatorId=${currentUser._id}`);
-        if (res.ok) {
-          const data = await res.json();
-          setUserPoints(data.points || 0);
-        }
-      }
-      if (currentUser?.username) {
-        const redeemedRes = await fetchRedeemedItems(currentUser.username);
-        if (redeemedRes.success) setRedeemedItems(redeemedRes.redeemedItems || []);
+      setRedemptionsLoading(true);
 
-        const redemptionsRes = await fetchFanRedemptions(currentUser.username);
-        if (redemptionsRes.success) {
-          setMyRedemptions(redemptionsRes.redemptions || []);
-          const statusMap = {};
-          redemptionsRes.redemptions.forEach(r => {
-            if (!r.vaultItemId) return;
-            const id = r.vaultItemId._id;
-            // Initialize if not exists
-            if (!statusMap[id]) {
-              statusMap[id] = { status: r.status, fanInput: r.fanInput, creatorResponse: r.creatorResponse, rejectionReason: r.rejectionReason, count: 0 };
-            }
-            // Increment count: Only count Pending/Fulfilled towards user limit
-            // Rejected and Cancelled don't count (points are refunded, slot is freed)
-            if (r.status !== 'Rejected' && r.status !== 'Cancelled') {
-              statusMap[id].count += 1;
-            }
-            // Keep status of most recent interactive one or just the latest?
-            // If we have mixed statuses, simpler to just take the "latest" one from the sort order (desc)
-            // But if we want to show specific status, it might be tricky for multi-redemption.
-            // For now, let's trust the sort order gives us the latest interaction.
-          });
-          setRedemptionStatuses(statusMap);
-        }
+      // Run all API calls in parallel for faster loading
+      const promises = [];
+
+      if (currentUser?._id) {
+        promises.push(
+          fetch(`/api/points?creatorId=${currentUser._id}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+              if (data) setUserPoints(data.points || 0);
+            })
+        );
       }
+
+      if (currentUser?.username) {
+        promises.push(
+          fetchRedeemedItems(currentUser.username)
+            .then(redeemedRes => {
+              if (redeemedRes.success) setRedeemedItems(redeemedRes.redeemedItems || []);
+            })
+        );
+
+        promises.push(
+          fetchFanRedemptions(currentUser.username)
+            .then(redemptionsRes => {
+              if (redemptionsRes.success) {
+                setMyRedemptions(redemptionsRes.redemptions || []);
+                const statusMap = {};
+                redemptionsRes.redemptions.forEach(r => {
+                  if (!r.vaultItemId) return;
+                  const id = r.vaultItemId._id;
+                  if (!statusMap[id]) {
+                    statusMap[id] = { status: r.status, fanInput: r.fanInput, creatorResponse: r.creatorResponse, rejectionReason: r.rejectionReason, count: 0 };
+                  }
+                  if (r.status !== 'Rejected' && r.status !== 'Cancelled') {
+                    statusMap[id].count += 1;
+                  }
+                });
+                setRedemptionStatuses(statusMap);
+              }
+            })
+        );
+      }
+
+      await Promise.all(promises);
     } catch (error) {
       console.error('Error loading fan data:', error);
+    } finally {
+      setRedemptionsLoading(false);
     }
   };
 
@@ -323,7 +337,28 @@ const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) =>
       ) : (
         <>
           {loading ? (
-            <div className="text-center p-8"><div className="animate-spin h-8 w-8 mx-auto border-2 border-primary border-t-transparent rounded-full" /></div>
+            // Skeleton Loading Cards
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="bg-[#1a1a1f] rounded-2xl border border-white/10 overflow-hidden animate-pulse">
+                  <div className="p-4 pt-8 border-b border-white/10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-white/10 rounded-lg" />
+                      <div className="h-5 bg-white/10 rounded w-20" />
+                    </div>
+                    <div className="h-6 bg-white/10 rounded w-3/4 mb-2" />
+                    <div className="h-4 bg-white/5 rounded w-full mb-1" />
+                    <div className="h-4 bg-white/5 rounded w-2/3" />
+                  </div>
+                  <div className="px-4 py-2 border-b border-white/5">
+                    <div className="h-3 bg-white/5 rounded w-1/2" />
+                  </div>
+                  <div className="p-4">
+                    <div className="h-10 bg-white/10 rounded-xl w-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
             <>
               {vaultItems.length === 0 ? (
@@ -343,12 +378,16 @@ const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) =>
                     <VaultItemCard
                       key={item._id}
                       item={item}
+                      userPoints={userPoints}
                       isOwner={isOwner}
                       isRedeemed={redeemedItems.includes(item._id)}
                       userRedemptionCount={redemptionStatuses[item._id]?.count || 0}
                       status={redemptionStatuses[item._id]?.status}
                       onRedeem={(itm) => {
-                        if (!session) { toast.error("Please login first"); return; }
+                        if (!session) {
+                          window.dispatchEvent(new CustomEvent('open-auth-modal'));
+                          return;
+                        }
                         if (userPoints < itm.pointCost) { toast.error(`Need ${itm.pointCost - userPoints} more points`); return; }
                         setSelectedRedeemItem(itm);
                       }}
@@ -362,28 +401,54 @@ const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) =>
               )}
 
               {/* MY REDEMPTIONS SECTION */}
-              {!isOwner && myRedemptions.length > 0 && (
+              {!isOwner && (
                 <div className="mt-12 border-t border-white/10 pt-8">
                   <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                    <span className="text-primary">🎒</span> My Redemptions
+                    <FaShoppingBag className="text-primary" /> My Redemptions
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {myRedemptions.map(r => (
-                      r.vaultItemId ? (
-                        <VaultItemCard
-                          key={r._id}
-                          item={r.vaultItemId}
-                          isOwner={false}
-                          isRedeemed={true}
-                          status={r.status}
-                          onView={() => handleView(r.vaultItemId, r)}
-                          // Disable redundant redeem action
-                          onRedeem={() => { }}
-                          isRedemptionCard={true}
-                        />
-                      ) : null
-                    ))}
-                  </div>
+
+                  {redemptionsLoading ? (
+                    // Skeleton Loading for Redemptions
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {[1, 2].map(i => (
+                        <div key={i} className="bg-[#1a1a1f] rounded-2xl border border-white/10 overflow-hidden animate-pulse">
+                          <div className="p-4 pt-8 border-b border-white/10">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="w-10 h-10 bg-white/10 rounded-lg" />
+                              <div className="h-5 bg-green-500/20 rounded w-16" />
+                            </div>
+                            <div className="h-6 bg-white/10 rounded w-3/4 mb-2" />
+                            <div className="h-4 bg-white/5 rounded w-full" />
+                          </div>
+                          <div className="px-4 py-2 border-b border-white/5">
+                            <div className="h-3 bg-white/5 rounded w-1/3" />
+                          </div>
+                          <div className="p-4">
+                            <div className="h-10 bg-white/10 rounded-xl w-full" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : myRedemptions.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {myRedemptions.map(r => (
+                        r.vaultItemId ? (
+                          <VaultItemCard
+                            key={r._id}
+                            item={r.vaultItemId}
+                            isOwner={false}
+                            isRedeemed={true}
+                            status={r.status}
+                            onView={() => handleView(r.vaultItemId, r)}
+                            onRedeem={() => { }}
+                            isRedemptionCard={true}
+                          />
+                        ) : null
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-white/40 text-center py-6">No redemptions yet. Unlock a reward above!</p>
+                  )}
                 </div>
               )}
             </>

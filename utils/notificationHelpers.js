@@ -131,20 +131,25 @@ export const notifyFollowersNewEvent = async (creatorId, creatorName, followers)
   return notifications;
 };
 
-export const notifyFollowersNewVaultItem = async (creatorId, creatorName, vaultItemTitle, vaultItemId, followers) => {
+export const notifyFollowersNewVaultItem = async (creatorId, creatorName, vaultItemTitle, vaultItemId, followers, isFree = false) => {
   if (!followers || followers.length === 0) return [];
 
   const notifications = [];
+  const notificationType = isFree ? 'creator_free_vault_item' : 'creator_new_vault_item';
+  const title = isFree ? 'Free reward available!' : 'New vault item available!';
+  const message = isFree
+    ? `${creatorName} added a FREE item to their vault: "${vaultItemTitle}" - Grab it before it's gone!`
+    : `${creatorName} added a new item to their vault: "${vaultItemTitle}"`;
 
   for (const followerId of followers) {
     try {
       const notification = await createNotification({
         recipientId: followerId,
         senderId: creatorId,
-        type: 'creator_new_vault_item',
-        title: 'New vault item available!',
-        message: `${creatorName} added a new item to their vault: "${vaultItemTitle}"`,
-        data: { creatorId, creatorName, vaultItemTitle, vaultItemId }
+        type: notificationType,
+        title,
+        message,
+        data: { creatorId, creatorName, vaultItemTitle, vaultItemId, isFree }
       });
       if (notification) notifications.push(notification);
     } catch (error) {
@@ -153,4 +158,25 @@ export const notifyFollowersNewVaultItem = async (creatorId, creatorName, vaultI
   }
 
   return notifications;
+};
+
+// Request response notifications (for fans)
+export const notifyRedemptionRejected = async (fanId, creatorName, vaultItemTitle, rejectionReason, redemptionId) => {
+  return await createNotification({
+    recipientId: fanId,
+    type: 'redemption_rejected',
+    title: 'Request Rejected',
+    message: `${creatorName} couldn't fulfill your request for "${vaultItemTitle}". Reason: ${rejectionReason}. Your points have been refunded.`,
+    data: { redemptionId, vaultItemTitle, rejectionReason }
+  });
+};
+
+export const notifyRedemptionCancelled = async (fanId, creatorName, vaultItemTitle, redemptionId) => {
+  return await createNotification({
+    recipientId: fanId,
+    type: 'redemption_cancelled',
+    title: 'Request Expired',
+    message: `Your request for "${vaultItemTitle}" was automatically cancelled due to inactivity. Your points have been refunded.`,
+    data: { redemptionId, vaultItemTitle }
+  });
 };

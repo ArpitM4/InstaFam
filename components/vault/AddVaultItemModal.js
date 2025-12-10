@@ -382,7 +382,7 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
                         <p className="text-sm text-white/60">Please confirm before publishing.</p>
                     </div>
 
-                    <div className="bg-white/5 p-4 rounded-xl text-xs text-white/70 space-y-2 mb-6 border border-white/10 h-48 overflow-y-auto">
+                    <div className="bg-white/5 p-4 rounded-xl text-xs text-white/70 space-y-2 mb-6 border border-white/10 h-48 overflow-y-auto custom-scrollbar">
                         <p>By creating this reward item, you understand and agree that:</p>
                         <ul className="list-disc pl-4 space-y-1">
                             <li>You are fully responsible for fulfilling this reward directly with the fan.</li>

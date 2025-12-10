@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { FaCheck, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
 
 const VaultRequests = ({ creatorUsername }) => {
     const [requests, setRequests] = useState([]);
@@ -87,8 +88,8 @@ const VaultRequests = ({ creatorUsername }) => {
                             <div className="flex items-center gap-2 mb-1">
                                 {/* Type Badge */}
                                 <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${req.vaultItemId?.type === 'qna' ? 'bg-blue-500/20 text-blue-300 border-blue-500/20' :
-                                        req.vaultItemId?.type === 'promise' ? 'bg-purple-500/20 text-purple-300 border-purple-500/20' :
-                                            'bg-white/10 text-white/60 border-white/10'
+                                    req.vaultItemId?.type === 'promise' ? 'bg-purple-500/20 text-purple-300 border-purple-500/20' :
+                                        'bg-white/10 text-white/60 border-white/10'
                                     }`}>
                                     {req.vaultItemId?.type === 'qna' ? 'Q & A' : req.vaultItemId?.type === 'promise' ? 'Promise' : req.vaultItemId?.type || 'Reward'}
                                 </span>
@@ -131,15 +132,15 @@ const VaultRequests = ({ creatorUsername }) => {
                         <div className="flex gap-2 mt-3">
                             <button
                                 onClick={() => { setSelectedRequest(req); setActionType('fulfill'); }}
-                                className="flex-1 bg-green-600/20 hover:bg-green-600/30 text-green-400 py-2 rounded-lg text-sm font-medium transition-colors"
+                                className="flex-1 bg-green-600/20 hover:bg-green-600/30 text-green-400 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1.5"
                             >
-                                ✅ Fulfill
+                                <FaCheck className="text-xs" /> Fulfill
                             </button>
                             <button
                                 onClick={() => { setSelectedRequest(req); setActionType('reject'); }}
-                                className="flex-1 bg-red-600/20 hover:bg-red-600/30 text-red-400 py-2 rounded-lg text-sm font-medium transition-colors"
+                                className="flex-1 bg-red-600/20 hover:bg-red-600/30 text-red-400 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1.5"
                             >
-                                ❌ Reject
+                                <FaTimes className="text-xs" /> Reject
                             </button>
                         </div>
                     )}
@@ -182,8 +183,8 @@ const VaultRequests = ({ creatorUsername }) => {
                         {actionType === 'reject' && (
                             <div className="mb-4">
                                 <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-lg mb-3">
-                                    <p className="text-red-400 text-xs">
-                                        ⚠️ Warning: Rejecting will automatically refund {selectedRequest.vaultItemId?.pointCost} points to the fan.
+                                    <p className="text-red-400 text-xs flex items-center gap-1.5">
+                                        <FaExclamationTriangle className="text-[10px]" /> Warning: Rejecting will automatically refund {selectedRequest.vaultItemId?.pointCost} points to the fan.
                                     </p>
                                 </div>
                                 <label className="block text-sm text-white/60 mb-2">Rejection Reason (Required):</label>

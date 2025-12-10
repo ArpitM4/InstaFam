@@ -6,6 +6,7 @@ import Redemption from '@/models/Redemption';
 import VaultItem from '@/models/VaultItem';
 import PointTransaction from '@/models/PointTransaction';
 import connectDB from '@/db/ConnectDb';
+import { notifyRedemptionFulfilled, notifyRedemptionRejected } from '@/utils/notificationHelpers';
 
 export async function GET(req) {
     try {
@@ -63,7 +64,14 @@ export async function POST(req) {
             if (response) redemption.creatorResponse = response;
             await redemption.save();
 
-            // Notify Fan? (Future enhancement)
+            // Notify Fan about fulfillment
+            const creatorName = user.name || user.username;
+            notifyRedemptionFulfilled(
+                redemption.fanId,
+                creatorName,
+                redemption.vaultItemId.title,
+                redemption._id
+            ).catch(err => console.error('Error notifying fan:', err));
 
         } else if (action === 'reject') {
             if (!rejectionReason) return NextResponse.json({ error: 'Rejection reason required' }, { status: 400 });
@@ -87,6 +95,16 @@ export async function POST(req) {
                 redemptionId: redemption._id,
                 description: `Refund for rejected vault item: ${redemption.vaultItemId.title}`
             });
+
+            // Notify Fan about rejection
+            const creatorName = user.name || user.username;
+            notifyRedemptionRejected(
+                redemption.fanId,
+                creatorName,
+                redemption.vaultItemId.title,
+                rejectionReason,
+                redemption._id
+            ).catch(err => console.error('Error notifying fan:', err));
         } else {
             return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
         }

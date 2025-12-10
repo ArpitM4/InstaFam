@@ -4,6 +4,7 @@ import { authOptions } from '../../auth/[...nextauth]/route';
 import User from '@/models/User';
 import VaultItem from '@/models/VaultItem';
 import connectDB from '@/db/ConnectDb';
+import { notifyFollowersNewVaultItem } from '@/utils/notificationHelpers';
 
 export async function POST(req) {
     try {
@@ -78,6 +79,19 @@ export async function POST(req) {
             userLimit: isFree ? 1 : (Number(userLimit) || 1),  // Strictly 1 for free items
             isActive: true
         });
+
+        // Notify followers about the new vault item
+        if (user.followersArray && user.followersArray.length > 0) {
+            const creatorName = user.name || user.username;
+            notifyFollowersNewVaultItem(
+                user._id,
+                creatorName,
+                title,
+                newItem._id,
+                user.followersArray,
+                isFree
+            ).catch(err => console.error('Error notifying followers:', err));
+        }
 
         return NextResponse.json({ success: true, item: newItem });
     } catch (error) {

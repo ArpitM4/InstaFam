@@ -1,8 +1,8 @@
 "use client";
 import React from 'react';
-import { FaGem, FaDownload, FaHandshake, FaComment, FaLock, FaImage, FaVideo, FaFilePdf, FaMusic, FaKey } from 'react-icons/fa';
+import { FaGem, FaDownload, FaHandshake, FaComment, FaLock, FaUnlock, FaImage, FaVideo, FaFilePdf, FaMusic, FaKey, FaClock, FaCheck, FaTimes, FaBan } from 'react-icons/fa';
 
-const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, status, userRedemptionCount = 0, isRedemptionCard = false }) => {
+const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, status, userRedemptionCount = 0, isRedemptionCard = false, userPoints = 0 }) => {
 
     const type = item.type || 'file'; // Default to file but ideally should be explicit
     const fileType = item.fileType;
@@ -44,10 +44,10 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
         if (type === 'file' || type === 'text') return null;
 
         if (!status) return null;
-        if (status === 'Pending') return <span className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded">⏳ Pending</span>;
-        if (status === 'Fulfilled') return <span className="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded">✅ Fulfilled</span>;
-        if (status === 'Rejected') return <span className="bg-red-500/20 text-red-400 text-xs px-2 py-1 rounded">❌ Rejected</span>;
-        if (status === 'Cancelled') return <span className="bg-gray-500/20 text-gray-400 text-xs px-2 py-1 rounded">⛔ Cancelled</span>;
+        if (status === 'Pending') return <span className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded flex items-center gap-1"><FaClock className="text-[10px]" /> Pending</span>;
+        if (status === 'Fulfilled') return <span className="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded flex items-center gap-1"><FaCheck className="text-[10px]" /> Fulfilled</span>;
+        if (status === 'Rejected') return <span className="bg-red-500/20 text-red-400 text-xs px-2 py-1 rounded flex items-center gap-1"><FaTimes className="text-[10px]" /> Rejected</span>;
+        if (status === 'Cancelled') return <span className="bg-gray-500/20 text-gray-400 text-xs px-2 py-1 rounded flex items-center gap-1"><FaBan className="text-[10px]" /> Cancelled</span>;
         return null;
     };
 
@@ -148,35 +148,77 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
                     >
                         Edit / Manage Item
                     </button>
-                ) : (
+                ) : isRedemptionCard ? (
                     <button
-                        onClick={() => {
-                            if (isRedemptionCard) {
-                                if (onView) onView(item);
-                            } else {
-                                onRedeem(item);
-                            }
-                        }}
-                        disabled={!isRedemptionCard && (isSoldOut || isLimitReached)}
-                        className={`w-full py-2.5 px-4 rounded-xl font-bold transition-all duration-300 shadow-md flex items-center justify-center gap-2 ${isRedemptionCard
-                            ? 'bg-transparent border border-white/20 text-white hover:bg-white/5' // View Mode
-                            : (isSoldOut || isLimitReached)
-                                ? 'bg-white/5 text-white/40 cursor-not-allowed border border-white/5' // Disabled Store Mode
-                                : 'btn-gradient text-white hover:scale-[1.02] hover:shadow-lg' // Active Store Mode
-                            }`}
+                        onClick={() => onView && onView(item)}
+                        className="w-full py-2.5 px-4 rounded-xl font-bold transition-all duration-300 shadow-md flex items-center justify-center gap-2 bg-transparent border border-white/20 text-white hover:bg-white/5"
                     >
-                        {isRedemptionCard ? (
-                            <>View Details</>
-                        ) : (isSoldOut || isLimitReached) ? (
-                            <>
-                                <FaLock className="text-xs" /> {getButtonText()}
-                            </>
-                        ) : (
-                            <>
-                                Unlock Reward
-                            </>
-                        )}
+                        View Details
                     </button>
+                ) : (isSoldOut || isLimitReached) ? (
+                    <button
+                        disabled
+                        className="w-full py-2.5 px-4 rounded-xl font-bold flex items-center justify-center gap-2 bg-white/5 text-white/40 cursor-not-allowed border border-white/5"
+                    >
+                        <FaLock className="text-xs" /> {getButtonText()}
+                    </button>
+                ) : (
+                    // LIQUID FILL BUTTON
+                    (() => {
+                        const cost = item.pointCost || 0;
+                        const progress = cost === 0 ? 100 : Math.min(((userPoints || 0) / cost) * 100, 100);
+                        const canAfford = cost === 0 || (userPoints || 0) >= cost;
+                        const almostThere = !canAfford && progress > 70;
+                        const remaining = cost - (userPoints || 0);
+
+                        return (
+                            <button
+                                onClick={() => onRedeem(item)}
+                                disabled={!canAfford}
+                                className={`w-full h-12 rounded-xl relative overflow-hidden group transition-all duration-300 
+                                    ${canAfford
+                                        ? 'shadow-lg hover:shadow-primary/20 cursor-pointer'
+                                        : almostThere
+                                            ? 'shadow-[0_0_15px_rgba(255,47,114,0.3)] animate-pulse cursor-not-allowed'
+                                            : 'bg-white/5 cursor-not-allowed'
+                                    }`}
+                            >
+                                {/* Background Empty State */}
+                                <div className="absolute inset-0 bg-[#0f0f13]" />
+
+                                {/* Liquid Fill Layer (Horizontal) */}
+                                <div
+                                    className={`absolute top-0 left-0 h-full transition-all duration-700 ease-out flex items-center justify-end
+                                        ${canAfford
+                                            ? 'bg-gradient-to-r from-[#FF2F72] via-[#FF4B86] to-[#FF6A2F]'
+                                            : 'bg-gradient-to-r from-[#FF2F72]/30 via-[#FF4B86]/30 to-[#FF6A2F]/30'
+                                        }
+                                    `}
+                                    style={{ width: `${progress}%` }}
+                                >
+                                    {/* Wave Edge (Vertical right line) */}
+                                    <div className={`h-full w-[2px] ${canAfford ? 'bg-white/40' : 'bg-primary/40 shadow-[0_0_10px_rgba(255,47,114,0.4)]'}`} />
+                                </div>
+
+                                {/* Content Layer (Text & Icons) */}
+                                <div className="absolute inset-0 flex items-center justify-center z-10 gap-2">
+                                    {canAfford ? (
+                                        <>
+                                            <FaUnlock className="text-white text-sm drop-shadow-md" />
+                                            <span className="font-bold text-white drop-shadow-md">Unlock Reward</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FaLock className={`text-sm ${almostThere ? 'text-primary-light' : 'text-white/40'}`} />
+                                            <span className={`font-bold text-sm ${almostThere ? 'text-primary-light' : 'text-white/40'}`}>
+                                                {remaining > 0 ? `Need ${remaining} More 🪙` : 'Unlock'}
+                                            </span>
+                                        </>
+                                    )}
+                                </div>
+                            </button>
+                        );
+                    })()
                 )}
             </div>
         </div>

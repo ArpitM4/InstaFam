@@ -1000,6 +1000,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
           showBannerPicker={showBannerPicker}
           setShowBannerPicker={setShowBannerPicker}
           onSelectUnsplashBanner={handleSelectUnsplashBanner}
+          isLoggedIn={!!session}
         />
 
         {/* NEW TAB NAVIGATION UI - Replaces the old InteractionSection placement */}
@@ -1201,8 +1202,11 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
               )}
               {/* Prompt to login for guests */}
               {!session && (
-                <div className="mb-6 p-4 bg-white/5 border border-text/10 rounded-xl text-center">
-                  <p className="text-text/60 text-sm">🔒 Login to see your FamPoints and redeem vault items</p>
+                <div className="mb-6 p-1 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-full text-center max-w-sm mx-auto cursor-pointer hover:scale-105 transition-transform" onClick={() => window.dispatchEvent(new CustomEvent('open-auth-modal'))}>
+                  <div className="flex items-center justify-center gap-2 py-2 px-4">
+                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                    <p className="text-green-400 text-sm font-bold tracking-wide">Get +10 FP On Follow</p>
+                  </div>
                 </div>
               )}
               <VaultSection currentUser={currentUser} initialItems={initialVaultItems} isOwner={isOwner} onPointsUpdate={loadFanPoints} />

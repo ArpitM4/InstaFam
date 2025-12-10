@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { fetchNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/actions/notificationActions';
-import { FaCommentDots, FaGift, FaBullhorn, FaMoneyBillWave, FaUserPlus, FaCalendarAlt, FaLockOpen, FaBell } from 'react-icons/fa';
+import { FaCommentDots, FaGift, FaBullhorn, FaMoneyBillWave, FaUserPlus, FaCalendarAlt, FaLockOpen, FaBell, FaCheckCircle, FaTimesCircle, FaClock, FaHourglassHalf, FaUndo } from 'react-icons/fa';
 
 const NotificationBell = () => {
   const { data: session } = useSession();
@@ -123,6 +123,14 @@ const NotificationBell = () => {
         return <FaCommentDots className="text-blue-400" />;
       case 'vault_redeemed':
         return <FaGift className="text-pink-400" />;
+      case 'redemption_fulfilled':
+        return <FaCheckCircle className="text-green-400" />;
+      case 'redemption_rejected':
+        return <FaTimesCircle className="text-red-400" />;
+      case 'redemption_cancelled':
+      case 'vault_request_expired':
+      case 'vault_request_refunded':
+        return <FaUndo className="text-orange-400" />;
       case 'system_message':
         return <FaBullhorn className="text-yellow-400" />;
       case 'payment_received':
@@ -133,6 +141,14 @@ const NotificationBell = () => {
         return <FaCalendarAlt className="text-orange-400" />;
       case 'creator_new_vault_item':
         return <FaLockOpen className="text-cyan-400" />;
+      case 'creator_free_vault_item':
+        return <FaGift className="text-primary" />;
+      case 'points_expiring_soon':
+        return <FaHourglassHalf className="text-amber-400" />;
+      case 'points_expired':
+        return <FaClock className="text-red-400" />;
+      case 'vault_request_expiring_soon':
+        return <FaClock className="text-amber-400" />;
       default:
         return <FaBell className="text-gray-400" />;
     }

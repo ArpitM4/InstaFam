@@ -31,7 +31,8 @@ const PaymentProfileSection = ({
   onPointsUpdate,
   showBannerPicker,
   setShowBannerPicker,
-  onSelectUnsplashBanner
+  onSelectUnsplashBanner,
+  isLoggedIn = false
 }) => {
   // Generate fallback profile image URL only when needed
   const profileImageUrl = currentUser?.profilepic || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(username || 'User')}&backgroundColor=6366f1`;
@@ -208,7 +209,7 @@ const PaymentProfileSection = ({
         )}
 
         {/* FamPoints Display - Integrated */}
-        {!isOwner && (
+        {!isOwner && isLoggedIn && (
           <div className="mt-3 flex items-center justify-center gap-6 animate-in fade-in duration-500">
             {/* Points */}
             <div className="flex items-center gap-2">

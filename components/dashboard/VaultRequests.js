@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { fetchPendingRedemptions, fulfillRedemption, submitCreatorAnswer, fetchFulfilledRedemptions, fetchExpiredRedemptions } from "@/actions/vaultActions";
 import { toast } from 'sonner';
+import { FaCheckCircle, FaUser, FaExclamationTriangle } from 'react-icons/fa';
 
 const VaultRequests = () => {
   const [pendingRedemptions, setPendingRedemptions] = useState([]);
@@ -226,7 +227,7 @@ const VaultRequests = () => {
             </div>
           ) : pendingRedemptions.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-4xl mb-2">✅</div>
+              <FaCheckCircle className="text-4xl mb-2 text-green-400 mx-auto" />
               <p className="text-text/60">No pending requests! All your fans' redemptions are up to date.</p>
             </div>
           ) : (
@@ -242,7 +243,7 @@ const VaultRequests = () => {
                         </h4>
                         <div className="flex items-center gap-4 text-sm text-text/60">
                           <span className="flex items-center gap-1">
-                            👤 <strong>{redemption.fanId.username}</strong>
+                            <FaUser className="text-xs" /> <strong>{redemption.fanId.username}</strong>
                           </span>
                           <span className="flex items-center gap-1">
                             {new Date(redemption.createdAt).toLocaleDateString()}
@@ -356,7 +357,7 @@ const VaultRequests = () => {
                       </h4>
                       <div className="flex items-center gap-4 text-sm text-text/60">
                         <span className="flex items-center gap-1">
-                          👤 <strong>{redemption.fanId.username}</strong>
+                          <FaUser className="text-xs" /> <strong>{redemption.fanId.username}</strong>
                         </span>
                         <span className="flex items-center gap-1">
                           {new Date(redemption.createdAt).toLocaleDateString()}
@@ -437,7 +438,7 @@ const VaultRequests = () => {
                       </h4>
                       <div className="flex items-center gap-4 text-sm text-text/60">
                         <span className="flex items-center gap-1">
-                          👤 <strong>{redemption.fanId.username}</strong>
+                          <FaUser className="text-xs" /> <strong>{redemption.fanId.username}</strong>
                         </span>
                         <span className="flex items-center gap-1">
                           📅 Requested: {new Date(redemption.createdAt).toLocaleDateString()}
@@ -475,7 +476,7 @@ const VaultRequests = () => {
 
                   <div className="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-200">
                     <p className="text-sm text-orange-800">
-                      <strong>⚠️ Request expired:</strong> This request was not fulfilled within 30 days and the fan has been automatically refunded their FamPoints.
+                      <strong><FaExclamationTriangle className="inline text-xs mr-1" /> Request expired:</strong> This request was not fulfilled within 30 days and the fan has been automatically refunded their FamPoints.
                     </p>
                   </div>
                 </div>
