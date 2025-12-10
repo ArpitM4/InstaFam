@@ -47,13 +47,12 @@ export async function PUT(req, { params }) {
             const oldUserLim = item.userLimit;
             const newUserLim = Number(updates.userLimit);
 
-            // Same logic for per-user limit?
-            // "limits could only be increase not decreased"
+            // "limits could only be increase not decreased" (availability)
             if (oldUserLim === 0 && newUserLim !== 0) {
-                return NextResponse.json({ error: 'Cannot decrease per-user limit' }, { status: 400 });
+                return NextResponse.json({ error: 'Cannot decrease per-user limit (currently Unlimited)' }, { status: 400 });
             }
             if (oldUserLim > 0 && newUserLim !== 0 && newUserLim < oldUserLim) {
-                return NextResponse.json({ error: 'Cannot decrease per-user limit' }, { status: 400 });
+                return NextResponse.json({ error: 'Cannot decrease per-user limit. You can only add more slots.' }, { status: 400 });
             }
         }
 

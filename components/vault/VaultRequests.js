@@ -85,9 +85,18 @@ const VaultRequests = ({ creatorUsername }) => {
                     <div className="flex justify-between items-start mb-3">
                         <div>
                             <div className="flex items-center gap-2 mb-1">
+                                {/* Type Badge */}
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${req.vaultItemId?.type === 'qna' ? 'bg-blue-500/20 text-blue-300 border-blue-500/20' :
+                                        req.vaultItemId?.type === 'promise' ? 'bg-purple-500/20 text-purple-300 border-purple-500/20' :
+                                            'bg-white/10 text-white/60 border-white/10'
+                                    }`}>
+                                    {req.vaultItemId?.type === 'qna' ? 'Q & A' : req.vaultItemId?.type === 'promise' ? 'Promise' : req.vaultItemId?.type || 'Reward'}
+                                </span>
+
+                                {/* Status Badge */}
                                 <span className={`px-2 py-0.5 rounded text-xs font-bold ${req.status === 'Pending' ? 'bg-yellow-500/20 text-yellow-400' :
-                                        req.status === 'Fulfilled' ? 'bg-green-500/20 text-green-400' :
-                                            'bg-red-500/20 text-red-400'
+                                    req.status === 'Fulfilled' ? 'bg-green-500/20 text-green-400' :
+                                        'bg-red-500/20 text-red-400'
                                     }`}>
                                     {req.status.toUpperCase()}
                                 </span>
@@ -105,9 +114,17 @@ const VaultRequests = ({ creatorUsername }) => {
 
                     {/* Fan Input Display */}
                     <div className="bg-black/40 p-3 rounded-lg text-sm text-white/80 mb-3 border-l-2 border-primary">
-                        <p className="text-xs text-white/40 mb-1">USER INPUT:</p>
+                        <p className="text-xs text-white/40 mb-1 uppercase font-bold">User Input</p>
                         "{req.fanInput || "No input provided"}"
                     </div>
+
+                    {/* Creator Response Display (If fulfilled) */}
+                    {req.creatorResponse && (
+                        <div className="bg-green-500/5 p-3 rounded-lg text-sm text-white/80 mb-3 border-l-2 border-green-500/40">
+                            <p className="text-xs text-green-400 mb-1 uppercase font-bold">Your Response</p>
+                            "{req.creatorResponse}"
+                        </div>
+                    )}
 
                     {/* Actions (Only actions for Pending) */}
                     {req.status === 'Pending' && (
@@ -137,18 +154,30 @@ const VaultRequests = ({ creatorUsername }) => {
                             {actionType === 'fulfill' ? 'Fulfill Request' : 'Reject Request'}
                         </h3>
 
-                        {actionType === 'fulfill' && (
-                            <div className="mb-4">
-                                <label className="block text-sm text-white/60 mb-2">Your Response (Optional):</label>
-                                <textarea
-                                    value={responseText}
-                                    onChange={(e) => setResponseText(e.target.value)}
-                                    className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
-                                    rows={3}
-                                    placeholder="Send a message back to the fan..."
-                                />
-                            </div>
-                        )}
+                        {/* Show Fan Input Context in Modal */}
+                        <div className="bg-white/5 p-3 rounded-lg mb-4 text-sm">
+                            <p className="text-xs text-white/40 mb-1 uppercase font-bold">Request from {selectedRequest.fanId?.name}</p>
+                            <p className="text-white/80 italic">"{selectedRequest.fanInput || 'No message'}"</p>
+                        </div>
+
+                        {actionType === 'fulfill' && (() => {
+                            const isQnA = selectedRequest.vaultItemId?.type === 'qna';
+                            return (
+                                <div className="mb-4">
+                                    <label className="block text-sm text-white/60 mb-2">
+                                        {isQnA ? "Your Answer (Required)" : "Your Response / Note (Optional)"}
+                                    </label>
+                                    <textarea
+                                        value={responseText}
+                                        onChange={(e) => setResponseText(e.target.value)}
+                                        className={`w-full bg-black/50 border rounded-lg p-3 text-white focus:outline-none ${isQnA && !responseText.trim() ? 'border-red-500/50 focus:border-red-500' : 'border-white/10 focus:border-primary'}`}
+                                        rows={3}
+                                        placeholder={isQnA ? "Type your answer here..." : "Send a message back to the fan..."}
+                                    />
+                                    {isQnA && <p className="text-xs text-white/30 mt-1">This answer will be visible to the fan.</p>}
+                                </div>
+                            );
+                        })()}
 
                         {actionType === 'reject' && (
                             <div className="mb-4">
@@ -177,9 +206,13 @@ const VaultRequests = ({ creatorUsername }) => {
                             </button>
                             <button
                                 onClick={handleAction}
-                                disabled={processingId === selectedRequest._id || (actionType === 'reject' && !rejectReason)}
+                                disabled={
+                                    processingId === selectedRequest._id ||
+                                    (actionType === 'reject' && !rejectReason) ||
+                                    (actionType === 'fulfill' && selectedRequest.vaultItemId?.type === 'qna' && !responseText.trim())
+                                }
                                 className={`flex-1 py-2 rounded-lg text-white font-medium ${actionType === 'fulfill' ? 'bg-green-600 hover:bg-green-500' : 'bg-red-600 hover:bg-red-500'
-                                    } disabled:opacity-50`}
+                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
                                 {processingId === selectedRequest._id ? 'Processing...' : 'Confirm'}
                             </button>

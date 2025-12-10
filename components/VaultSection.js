@@ -108,8 +108,15 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
     try {
       const result = await redeemVaultItem(item._id, currentUser.username, fanInput);
       if (result.success) {
-        setUserPoints(prev => prev - item.pointCost);
+        // Use authoritative remaining points from API if available, else optimistic
+        if (typeof result.pointsRemaining === 'number') {
+          setUserPoints(result.pointsRemaining);
+        } else {
+          setUserPoints(prev => prev - item.pointCost);
+        }
+
         setRedeemedItems(prev => [...prev, item._id]);
+        // Optimistically update Store Cards status
         setRedemptionStatuses(prev => {
           const current = prev[item._id] || { count: 0 };
           return {
@@ -118,13 +125,25 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
           };
         });
 
+        // Optimistically update My Redemptions List (Instant UI)
+        const isAutoFulfilled = item.type === 'file' || item.type === 'text';
+        const newRedemption = {
+          _id: result.redemption.id,
+          vaultItemId: item,
+          status: isAutoFulfilled ? 'Fulfilled' : 'Pending',
+          fanInput: fanInput,
+          creatorResponse: isAutoFulfilled ? item.fileUrl : null, // Store secret/file link immediately
+          redeemedAt: result.redemption.redeemedAt
+        };
+        setMyRedemptions(prev => [newRedemption, ...prev]);
+
         if (updatePoints) updatePoints();
         emitPaymentSuccess({ pointsSpent: item.pointCost });
         setSelectedRedeemItem(null);
         setSuccessData({ item, fanInput });
-        if (item.type === 'file' || item.type === 'text') {
-          loadFanData();
-        }
+
+        // Background refresh to ensure consistency (optional but good)
+        loadFanData();
       } else {
         toast.error(result.error || "Redemption failed");
       }

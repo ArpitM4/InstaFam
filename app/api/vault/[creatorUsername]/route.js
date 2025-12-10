@@ -5,12 +5,15 @@ import User from "@/models/User";
 import VaultItem from "@/models/VaultItem";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 await connectDb();
 
 export async function GET(request, { params }) {
   try {
     const { creatorUsername } = params;
-    
+
     if (!creatorUsername) {
       return NextResponse.json({ error: "Creator username is required" }, { status: 400 });
     }
@@ -22,13 +25,13 @@ export async function GET(request, { params }) {
     }
 
     // Fetch creator's public vault items
-    const vaultItems = await VaultItem.find({ 
+    const vaultItems = await VaultItem.find({
       creatorId: creator._id,
-      isActive: true 
-    }).sort({ createdAt: -1 });
+      isActive: true
+    }).sort({ createdAt: -1 }).lean();
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       items: vaultItems,
       creator: {
         username: creator.username,

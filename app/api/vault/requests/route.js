@@ -73,45 +73,14 @@ export async function POST(req) {
             await redemption.save();
 
             // REFUND LOGIC
-            // 1. Credit points back to Fan
-            // 2. Create Refund Transaction
-
-            // Find existing transaction to reverse? Or just create new one?
-            // Let's create a new transaction record for refund
-
-            // Update user points (Fan)
-            // Need to find the specific "points balance" for this creator-fan pair?
-            // Current system: User schema has `famPoints`. Is it global or per creator?
-            // User.js: `points: [{ creatorId: ..., points: ... }]` ?
-            // Or is it a separate collection?
-            // Let's check `models/User.js` or `PointTransaction.js` usage.
-            // Based on `VaultSection.js`, it calls `fetchFanData`.
-
-            // I'll assume `PointTransaction` handles the ledger, and I need to update the aggregated balance.
-            // Actually, let's look at `actions/pointsActions.js` or similar to see how points are managed.
-            // For now, I will mark it as Rejected. The refund logic likely needs to interact with the Points system carefully.
-            // I will add a TODO or try to implement if I see the pattern.
-
-            // Pattern from VaultSection: `setUserPoints(prev => prev - cost)`.
-            // Server side:
-            const fan = await User.findById(redemption.fanId);
-            if (fan) {
-                // Logic to find point balance for THIS creator
-                const creatorPointIndex = fan.points.findIndex(p => p.creatorId.toString() === user._id.toString());
-                if (creatorPointIndex > -1) {
-                    fan.points[creatorPointIndex].points += redemption.pointsSpent;
-                    await fan.save();
-                }
-
-                // Create Refund Transaction
-                await PointTransaction.create({
-                    userId: fan._id,
-                    creatorId: redemption.creatorId,
-                    amount: redemption.pointsSpent,
-                    type: 'Refund',
-                    description: `Refund for rejected vault item: ${redemption.vaultItemId.title}`
-                });
-            }
+            // Create Refund Transaction to restore points
+            await PointTransaction.create({
+                userId: redemption.fanId,
+                creatorId: redemption.creatorId,
+                amount: redemption.pointsSpent,
+                type: 'Refund',
+                description: `Refund for rejected vault item: ${redemption.vaultItemId.title}`
+            });
         } else {
             return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
         }

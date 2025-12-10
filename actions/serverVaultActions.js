@@ -27,6 +27,7 @@ export const fetchCreatorVaultItemsServer = async (username) => {
             title: item.title,
             description: item.description,
             pointCost: item.pointCost,
+            isFree: item.isFree,
             fileUrl: item.fileUrl,
             fileType: item.fileType,
             fileName: item.fileName,
@@ -37,6 +38,7 @@ export const fetchCreatorVaultItemsServer = async (username) => {
             type: item.type,
             instructions: item.instructions,
             limit: item.limit,
+            userLimit: item.userLimit,
             createdAt: item.createdAt?.toISOString(),
             updatedAt: item.updatedAt?.toISOString()
         }));

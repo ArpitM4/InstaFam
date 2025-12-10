@@ -11,14 +11,14 @@ const EditVaultItemModal = ({ item, onClose, onSuccess, onDelete }) => {
     const [formData, setFormData] = useState({
         title: item.title || '',
         description: item.description || '',
-        isFree: item.isFree,
-        pointCost: item.pointCost || 0,
+        isFree: item.isFree ?? false,
+        pointCost: item.pointCost ?? 0,
         type: item.type, // Read only
         fileType: item.fileType || 'image',
         fileUrl: item.fileUrl || '',
         instructions: item.instructions || '',
-        limit: item.limit || 0,
-        userLimit: item.userLimit || 0
+        limit: item.limit ?? 0,
+        userLimit: item.userLimit ?? 1
     });
 
     const [uploadMode, setUploadMode] = useState(item.fileUrl && !item.fileUrl.startsWith('http') ? 'upload' : 'link');
@@ -161,6 +161,9 @@ const EditVaultItemModal = ({ item, onClose, onSuccess, onDelete }) => {
                     </div>
 
                     {/* Limit Fields */}
+                    <p className="text-[11px] text-yellow-500/80 mb-2 flex items-center gap-1 bg-yellow-500/10 p-2 rounded-lg border border-yellow-500/20">
+                        ⚠️ Note: You can only increase availability (e.g. 10 → 20, or 10 → 0/Unlimited). Decreasing is not allowed.
+                    </p>
                     <div className={`grid ${formData.isFree ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
                         {!formData.isFree && (
                             <div>
@@ -189,7 +192,7 @@ const EditVaultItemModal = ({ item, onClose, onSuccess, onDelete }) => {
                                 placeholder="0 = Unlimited"
                                 value={formData.limit} onChange={e => setFormData({ ...formData, limit: e.target.value })}
                             />
-                            <p className="text-[10px] text-yellow-500/60 mt-1">Note: You can only increase availability (e.g. 10 → 20, or 10 → 0/Unlimited). Decreasing is not allowed.</p>
+
                         </div>
                     </div>
 

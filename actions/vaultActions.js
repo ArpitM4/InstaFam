@@ -8,7 +8,7 @@ export const addVaultItem = async (vaultItem) => {
       },
       body: JSON.stringify(vaultItem),
     });
-    
+
     const result = await response.json();
     return result;
   } catch (error) {
@@ -19,7 +19,7 @@ export const addVaultItem = async (vaultItem) => {
 
 export const fetchMyVaultItems = async () => {
   try {
-    const response = await fetch('/api/vault/add');
+    const response = await fetch('/api/vault/add', { cache: 'no-store' });
     const result = await response.json();
     return result;
   } catch (error) {
@@ -30,7 +30,7 @@ export const fetchMyVaultItems = async () => {
 
 export const fetchCreatorVaultItems = async (creatorUsername) => {
   try {
-    const response = await fetch(`/api/vault/${creatorUsername}`);
+    const response = await fetch(`/api/vault/${creatorUsername}`, { cache: 'no-store' });
     const result = await response.json();
     return result;
   } catch (error) {
@@ -48,7 +48,7 @@ export const redeemVaultItem = async (itemId, creatorUsername, fanInput = null) 
       },
       body: JSON.stringify({ itemId, creatorUsername, fanInput }),
     });
-    
+
     const result = await response.json();
     return result;
   } catch (error) {
@@ -62,7 +62,7 @@ export const deleteVaultItem = async (itemId) => {
     const response = await fetch(`/api/vault/delete/${itemId}`, {
       method: 'DELETE',
     });
-    
+
     const result = await response.json();
     return result;
   } catch (error) {
@@ -98,7 +98,7 @@ export const fulfillRedemption = async (redemptionId) => {
     const response = await fetch(`/api/redemptions/${redemptionId}/fulfill`, {
       method: 'PUT',
     });
-    
+
     const result = await response.json();
     return result;
   } catch (error) {
@@ -149,7 +149,7 @@ export const submitCreatorAnswer = async (redemptionId, creatorResponse) => {
       },
       body: JSON.stringify({ creatorResponse }),
     });
-    
+
     const result = await response.json();
     return result;
   } catch (error) {

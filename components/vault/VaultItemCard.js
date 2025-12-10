@@ -52,9 +52,12 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
 
     // Limit Logic
     const limit = Number(item.limit) || 0;
-    const userLimit = (item.userLimit === undefined || item.userLimit === null) ? 1 : Number(item.userLimit);
+    // Explicitly handle 0 as a valid limit (Unlimited)
+    // If userLimit is explicitly 0 or '0', treat as 0. 
+    // Otherwise if falsy/missing, default to 1.
+    const userLimit = (item.userLimit === 0 || item.userLimit === '0') ? 0 : (Number(item.userLimit) || 1);
 
-    // console.log("VaultItem:", { title: item.title, userLimit, raw: item.userLimit, isRedemptionCard });
+    // console.log("VaultItem:", { title: item.title, userLimit, raw: item.userLimit });
 
     const reachedTotalLimit = limit > 0 && (item.unlockCount || 0) >= limit;
     const reachedUserLimit = userLimit > 0 && userRedemptionCount >= userLimit;
@@ -119,11 +122,13 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
                 </div>
                 {/* User Limit - Only show if NOT a redemption card (Store Mode) */}
                 {!isRedemptionCard && userLimit > 0 && (
-                    <div className="flex justify-between text-[11px] font-medium mt-1 bg-white/5 p-1.5 rounded-lg border border-white/5">
-                        <span className="text-white/60">Max {item.userLimit} per user</span>
-                        <span className={`${reachedUserLimit ? 'text-red-400' : 'text-primary'}`}>
-                            You: {userRedemptionCount} / {item.userLimit}
-                        </span>
+                    <div className="flex justify-between items-center text-[11px] font-medium mt-1 bg-white/5 p-1.5 rounded-lg border border-white/5">
+                        <span className="text-white/60">Max {userLimit} per user</span>
+                        {!isOwner && (
+                            <span className={`${reachedUserLimit ? 'text-red-400' : 'text-primary'}`}>
+                                You: {userRedemptionCount} / {userLimit}
+                            </span>
+                        )}
                     </div>
                 )}
             </div>

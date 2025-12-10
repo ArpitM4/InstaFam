@@ -56,13 +56,15 @@ export async function POST(request) {
     }
 
     // Check if fan has already redeemed this item
-    const existingRedemption = await Redemption.findOne({
+    // Check user limit
+    const userRedemptionCount = await Redemption.countDocuments({
       fanId: fan._id,
       vaultItemId: vaultItem._id
     });
 
-    if (existingRedemption) {
-      return NextResponse.json({ error: "Item already redeemed" }, { status: 400 });
+    const limit = (vaultItem.userLimit !== undefined && vaultItem.userLimit !== null) ? vaultItem.userLimit : 1;
+    if (limit > 0 && userRedemptionCount >= limit) {
+      return NextResponse.json({ error: `You have reached the limit of ${limit} redemptions for this item` }, { status: 400 });
     }
 
     // Start transaction-like operations
