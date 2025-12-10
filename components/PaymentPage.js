@@ -1205,7 +1205,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
                   <p className="text-text/60 text-sm">🔒 Login to see your FamPoints and redeem vault items</p>
                 </div>
               )}
-              <VaultSection currentUser={currentUser} initialItems={initialVaultItems} isOwner={isOwner} />
+              <VaultSection currentUser={currentUser} initialItems={initialVaultItems} isOwner={isOwner} onPointsUpdate={loadFanPoints} />
             </div>
           )}
 

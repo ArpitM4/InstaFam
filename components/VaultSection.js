@@ -15,7 +15,7 @@ import EditVaultItemModal from './vault/EditVaultItemModal';
 import RedeemVaultModal from './vault/RedeemVaultModal';
 import VaultSuccessModal from './vault/VaultSuccessModal';
 
-const VaultSection = ({ currentUser, initialItems, isOwner }) => {
+const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) => {
   const { data: session } = useSession();
   const { updatePoints } = useUser();
 
@@ -112,6 +112,11 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
           setUserPoints(result.pointsRemaining);
         } else {
           setUserPoints(prev => prev - item.pointCost);
+        }
+
+        // Notify parent to refresh FamPoints in header
+        if (onPointsUpdate) {
+          onPointsUpdate();
         }
 
         setRedeemedItems(prev => [...prev, item._id]);
@@ -310,16 +315,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
         </div>
       )}
 
-      {/* HEADER (Public View) */}
-      {!isOwner && (
-        <div className="text-center mb-6">
-          {session && (
-            <div className="bg-gradient-primary-soft text-primary px-4 py-2 rounded-xl inline-block border border-primary/20">
-              Your Fam Points: {userPoints}
-            </div>
-          )}
-        </div>
-      )}
+      {/* FamPoints Balance is already shown in the header - removed duplicate box */}
 
       {/* CONTENT AREA */}
       {viewMode === 'requests' && isOwner ? (
