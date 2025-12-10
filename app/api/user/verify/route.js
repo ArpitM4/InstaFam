@@ -34,7 +34,7 @@ export async function POST(request) {
 
         const followerCount = user.followersArray?.length || user.followers || 0;
 
-        if (followerCount < 3) {
+        if (followerCount < 100) {
             return NextResponse.json({ error: 'Not enough followers' }, { status: 400 });
         }
 

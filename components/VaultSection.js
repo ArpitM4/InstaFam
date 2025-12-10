@@ -133,12 +133,20 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
     }
   };
 
-  const handleView = (item) => {
-    // Find cached redemption status to show proper details (e.g. QnA answer)
-    const statusData = redemptionStatuses[item._id];
+  const handleView = (item, specificRedemption) => {
+    // If specific redemption passed (from My Redemptions), use that directly
+    if (specificRedemption) {
+      setSuccessData({
+        item,
+        fanInput: specificRedemption.fanInput,
+        creatorResponse: specificRedemption.creatorResponse,
+        status: specificRedemption.status
+      });
+      return;
+    }
 
-    // For My Redemptions, we might have passed the redemption object directly or just the item?
-    // VaultItemCard calls onView(item). So we use state lookup.
+    // Fallback: Find cached redemption status from generic map
+    const statusData = redemptionStatuses[item._id];
 
     if (statusData) {
       setSuccessData({
@@ -148,7 +156,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
         status: statusData.status
       });
     } else {
-      // Fallback for file/text if no status tracked (though they should be)
+      // Fallback for file/text if no status tracked
       setSuccessData({ item, fanInput: null });
     }
   };
@@ -352,7 +360,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
                           isOwner={false}
                           isRedeemed={true}
                           status={r.status}
-                          onView={handleView}
+                          onView={() => handleView(r.vaultItemId, r)}
                           // Disable redundant redeem action
                           onRedeem={() => { }}
                           isRedemptionCard={true}
@@ -395,6 +403,8 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
           <VaultSuccessModal
             item={successData.item}
             fanInput={successData.fanInput}
+            status={successData.status}
+            creatorResponse={successData.creatorResponse}
             onClose={() => setSuccessData(null)}
           />
         )

@@ -312,12 +312,12 @@ const Account = ({ initialUser }) => {
               <div>
                 <div className="flex justify-between items-center text-xs text-white/70 mb-2">
                   <span>Progress</span>
-                  <span>{Math.min(form.followersCount, 3)} / 3 Followers</span>
+                  <span>{Math.min(form.followersCount, 100)} / 100 Followers</span>
                 </div>
                 <div className="w-full bg-white/10 rounded-full h-2.5 mb-4 overflow-hidden">
                   <div
                     className="bg-gradient-to-r from-[#00E5D4] to-[#1d4ed8] h-2.5 rounded-full transition-all duration-500 ease-out relative"
-                    style={{ width: `${Math.min((form.followersCount / 3) * 100, 100)}%` }}
+                    style={{ width: `${Math.min((form.followersCount / 100) * 100, 100)}%` }}
                   >
                     {/* Shimmer effect */}
                     <div className="absolute inset-0 bg-white/30 skew-x-12 animate-[shimmer_2s_infinite] w-full transform -translate-x-full"></div>
@@ -326,19 +326,19 @@ const Account = ({ initialUser }) => {
 
                 <button
                   onClick={handleRedeemBadge}
-                  disabled={form.followersCount < 3}
-                  className={`w-full py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${form.followersCount >= 3
+                  disabled={form.followersCount < 100}
+                  className={`w-full py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${form.followersCount >= 100
                     ? 'bg-gradient-to-r from-[#00E5D4] to-[#1d4ed8] text-black shadow-lg shadow-cyan-500/20 hover:scale-[1.02]'
                     : 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
                     }`}
                 >
-                  {form.followersCount >= 3 ? (
+                  {form.followersCount >= 100 ? (
                     <>
                       Redeem Badge Now 🌟
                     </>
                   ) : (
                     <>
-                      Needs {3 - form.followersCount} more followers
+                      Needs {100 - form.followersCount} more followers
                     </>
                   )}
                 </button>

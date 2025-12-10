@@ -37,6 +37,9 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
     };
 
     const getStatusBadge = () => {
+        // Only show status badge on Redemption Cards (History), not Store Cards (Unlock)
+        if (!isRedemptionCard) return null;
+
         // Instant items (file/text) don't need status badges as they are instant
         if (type === 'file' || type === 'text') return null;
 
@@ -48,8 +51,13 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
     };
 
     // Limit Logic
-    const reachedTotalLimit = item.limit > 0 && item.unlockCount >= item.limit;
-    const reachedUserLimit = item.userLimit > 0 && userRedemptionCount >= item.userLimit;
+    const limit = Number(item.limit) || 0;
+    const userLimit = (item.userLimit === undefined || item.userLimit === null) ? 1 : Number(item.userLimit);
+
+    // console.log("VaultItem:", { title: item.title, userLimit, raw: item.userLimit, isRedemptionCard });
+
+    const reachedTotalLimit = limit > 0 && (item.unlockCount || 0) >= limit;
+    const reachedUserLimit = userLimit > 0 && userRedemptionCount >= userLimit;
 
     const isSoldOut = reachedTotalLimit;
     const isLimitReached = reachedUserLimit;
@@ -102,15 +110,15 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
                     <span>
                         {/* Only show claimed count if valid numbers exist */}
                         {(item.unlockCount !== undefined) ? (
-                            item.limit > 0 ? `${item.unlockCount} / ${item.limit} Claimed` : `${item.unlockCount} Unlocks`
+                            limit > 0 ? `${item.unlockCount} / ${limit} Claimed` : `${item.unlockCount} Unlocks`
                         ) : (
                             // Fallback if unlockCount is missing
-                            item.limit > 0 ? `Limit: ${item.limit}` : "Unlimited"
+                            limit > 0 ? `Limit: ${limit}` : "Unlimited"
                         )}
                     </span>
                 </div>
                 {/* User Limit - Only show if NOT a redemption card (Store Mode) */}
-                {!isRedemptionCard && item.userLimit > 0 && (
+                {!isRedemptionCard && userLimit > 0 && (
                     <div className="flex justify-between text-[11px] font-medium mt-1 bg-white/5 p-1.5 rounded-lg border border-white/5">
                         <span className="text-white/60">Max {item.userLimit} per user</span>
                         <span className={`${reachedUserLimit ? 'text-red-400' : 'text-primary'}`}>

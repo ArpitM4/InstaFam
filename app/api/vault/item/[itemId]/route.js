@@ -100,8 +100,8 @@ export async function DELETE(req, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
-        // Hard Delete
-        await VaultItem.findByIdAndDelete(itemId);
+        // Soft Delete (Mark inactive)
+        await VaultItem.findByIdAndUpdate(itemId, { isActive: false });
 
         return NextResponse.json({ success: true });
 
