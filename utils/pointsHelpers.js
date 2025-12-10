@@ -402,11 +402,14 @@ export async function sendExpiryWarnings(daysAhead = 7) {
 
     for (const item of expiringTransactions) {
       try {
+        // Calculate actual days remaining from earliest expiry
+        const daysRemaining = Math.ceil((new Date(item.earliestExpiry) - now) / (1000 * 60 * 60 * 24));
+
         await createNotification({
           recipientId: item._id.userId,
           type: 'points_expiring_soon',
           title: `${item.totalExpiring} FamPoints expiring soon!`,
-          message: `${item.totalExpiring} of your FamPoints for ${item.creator.username} will expire in ${daysAhead} days. Use them in their Vault!`
+          message: `${item.totalExpiring} of your FamPoints for ${item.creator.username} will expire in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}. Use them in their Vault!`
         });
       } catch (notifError) {
         console.error('Error sending expiry warning:', notifError);
