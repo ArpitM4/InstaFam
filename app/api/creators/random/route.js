@@ -25,7 +25,8 @@ export async function GET(req) {
                     name: 1,
                     description: 1,
                     followers: 1,
-                    followersArray: 1
+                    followersArray: 1,
+                    isVerified: 1
                 }
             }
         ]);

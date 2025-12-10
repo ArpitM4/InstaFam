@@ -98,7 +98,7 @@ export async function fetchMyRedemptions() {
         const redemptions = await Redemption.find({
             fanId: user._id
         })
-            .populate('vaultItemId', 'title description perkType fileType pointCost fileUrl')
+            .populate('vaultItemId', 'title description type instructions pointCost fileUrl')
             .populate('creatorId', 'username')
             .sort({ redeemedAt: -1 })
             .lean();
@@ -114,8 +114,8 @@ export async function fetchMyRedemptions() {
                 _id: r.vaultItemId._id.toString(),
                 title: r.vaultItemId.title,
                 description: r.vaultItemId.description,
-                perkType: r.vaultItemId.perkType,
-                fileType: r.vaultItemId.fileType,
+                type: r.vaultItemId.type,
+                instructions: r.vaultItemId.instructions,
                 pointCost: r.vaultItemId.pointCost,
                 fileUrl: r.vaultItemId.fileUrl
             } : null,

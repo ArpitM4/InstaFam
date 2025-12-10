@@ -26,6 +26,18 @@ export async function POST(req) {
         // Toggle visibility
         const newVisibility = user.visibility === "hidden" ? "public" : "hidden";
 
+        // Validation for Public Visibility
+        if (newVisibility === "public") {
+            const hasCoverPic = !!user.coverpic;
+            const hasSocials = user.socials && user.socials.length > 0;
+
+            if (!hasCoverPic || !hasSocials) {
+                return NextResponse.json({
+                    error: "Setup incomplete. Please add a banner and at least one social link."
+                }, { status: 400 });
+            }
+        }
+
         // If setting to public, also update account type to Creator if not already
         const updateData = { visibility: newVisibility };
 

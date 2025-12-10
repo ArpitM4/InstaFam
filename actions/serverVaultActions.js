@@ -34,6 +34,9 @@ export const fetchCreatorVaultItemsServer = async (username) => {
             unlockCount: item.unlockCount,
             isActive: item.isActive,
             requiresFanInput: item.requiresFanInput,
+            type: item.type,
+            instructions: item.instructions,
+            limit: item.limit,
             createdAt: item.createdAt?.toISOString(),
             updatedAt: item.updatedAt?.toISOString()
         }));

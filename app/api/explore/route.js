@@ -11,7 +11,7 @@ export async function GET(req) {
   const creators = await User.aggregate([
     { $match: { visibility: "public" } },
     { $sample: { size: 20 } },
-    { $project: { username: 1, _id: 1, profilepic: 1 } }
+    { $project: { username: 1, _id: 1, profilepic: 1, name: 1, isVerified: 1 } }
   ]);
 
   // Add cache headers - cache for 5 minutes, stale-while-revalidate for 10 minutes

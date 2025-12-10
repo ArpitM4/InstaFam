@@ -253,7 +253,18 @@ const LinksSection = ({ currentUser, onSocialsChange }) => {
                                 key={social._id}
                                 link={social.link}
                                 frontContent={
-                                    <div className="flex flex-col items-center justify-center h-full p-2">
+                                    <div className="flex flex-col items-center justify-center h-full p-2 relative">
+                                        {isOwner && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDelete(social._id, 'social');
+                                                }}
+                                                className="absolute top-2 right-2 text-white/30 hover:text-red-500 z-20 sm:hidden transition-colors"
+                                            >
+                                                <FaTimes size={12} />
+                                            </button>
+                                        )}
                                         <div className="w-12 h-12 mb-2 flex items-center justify-center relative">
                                             <Image
                                                 src={platformData.logo}
@@ -322,6 +333,17 @@ const LinksSection = ({ currentUser, onSocialsChange }) => {
                             link={fav.link}
                             frontContent={
                                 <div className="flex flex-col items-center justify-center h-full overflow-hidden relative">
+                                    {isOwner && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(fav._id, 'favourite');
+                                            }}
+                                            className="absolute top-2 right-2 bg-black/40 rounded-full p-1 text-white/50 hover:text-red-500 z-20 sm:hidden transition-colors"
+                                        >
+                                            <FaTimes size={12} />
+                                        </button>
+                                    )}
                                     {fav.image ? (
                                         <Image
                                             src={fav.image}

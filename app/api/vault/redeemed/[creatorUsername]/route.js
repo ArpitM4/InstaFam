@@ -8,7 +8,7 @@ import User from "@/models/User";
 export async function GET(request, { params }) {
   try {
     await ConnectDb();
-    
+
     const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
@@ -34,7 +34,9 @@ export async function GET(request, { params }) {
       creatorId: creator._id
     }).populate('vaultItemId');
 
-    const redeemedItemIds = redemptions.map(r => r.vaultItemId._id.toString());
+    const redeemedItemIds = redemptions
+      .filter(r => r.vaultItemId)
+      .map(r => r.vaultItemId._id.toString());
 
     return NextResponse.json({
       success: true,

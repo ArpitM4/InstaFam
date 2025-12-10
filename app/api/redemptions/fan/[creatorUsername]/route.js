@@ -11,7 +11,7 @@ await connectDb();
 export async function GET(request, { params }) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -35,15 +35,15 @@ export async function GET(request, { params }) {
     }
 
     // Fetch fan's redemptions from this creator
-    const redemptions = await Redemption.find({ 
+    const redemptions = await Redemption.find({
       fanId: fan._id,
       creatorId: creator._id
     })
-    .populate('vaultItemId', 'title description perkType fileType')
-    .sort({ redeemedAt: -1 });
+      .populate('vaultItemId', 'title description type instructions perkType fileType')
+      .sort({ redeemedAt: -1 });
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       redemptions
     });
 

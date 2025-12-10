@@ -11,6 +11,7 @@ import { FaGem, FaPlus, FaList } from 'react-icons/fa';
 import VaultItemCard from './vault/VaultItemCard';
 import VaultRequests from './vault/VaultRequests';
 import AddVaultItemModal from './vault/AddVaultItemModal';
+import EditVaultItemModal from './vault/EditVaultItemModal';
 import RedeemVaultModal from './vault/RedeemVaultModal';
 import VaultSuccessModal from './vault/VaultSuccessModal';
 
@@ -24,13 +25,21 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
   const [userPoints, setUserPoints] = useState(0);
   const [redeemedItems, setRedeemedItems] = useState([]);
   const [redemptionStatuses, setRedemptionStatuses] = useState({});
+  const [myRedemptions, setMyRedemptions] = useState([]);
 
   // Modals / View State
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRedeemItem, setSelectedRedeemItem] = useState(null); // Item to redeem
+  const [editItem, setEditItem] = useState(null); // Item to edit
   const [successData, setSuccessData] = useState(null); // { item, fanInput } for success modal
   const [viewMode, setViewMode] = useState('items'); // 'items' | 'requests'
   const [infoExpanded, setInfoExpanded] = useState(false); // Expandable info section
+
+  // ... (useEffect and load functions unchanged)
+
+  // ... (handleRedeemSuccess unchanged)
+
+
 
   useEffect(() => {
     if (currentUser?.username) {
@@ -66,9 +75,24 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
 
         const redemptionsRes = await fetchFanRedemptions(currentUser.username);
         if (redemptionsRes.success) {
+          setMyRedemptions(redemptionsRes.redemptions || []);
           const statusMap = {};
           redemptionsRes.redemptions.forEach(r => {
-            statusMap[r.vaultItemId._id] = { status: r.status, fanInput: r.fanInput, creatorResponse: r.creatorResponse };
+            const id = r.vaultItemId._id;
+            // Initialize if not exists
+            if (!statusMap[id]) {
+              statusMap[id] = { status: r.status, fanInput: r.fanInput, creatorResponse: r.creatorResponse, count: 0 };
+            }
+            // Increment count (count all attempts? or only valid ones? usually all non-rejected ones count towards limit?
+            // Actually, rejected ones usually refund points, so they shouldn't count towards limit.
+            // But Pending/Fulfilled count.
+            if (r.status !== 'Rejected') {
+              statusMap[id].count += 1;
+            }
+            // Keep status of most recent interactive one or just the latest?
+            // If we have mixed statuses, simpler to just take the "latest" one from the sort order (desc)
+            // But if we want to show specific status, it might be tricky for multi-redemption.
+            // For now, let's trust the sort order gives us the latest interaction.
           });
           setRedemptionStatuses(statusMap);
         }
@@ -78,29 +102,26 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
     }
   };
 
+  // ... (handleRedeemSuccess updates)
   const handleRedeemSuccess = async (item, fanInput) => {
     try {
       const result = await redeemVaultItem(item._id, currentUser.username, fanInput);
       if (result.success) {
-        // toast.success("Redeemed successfully!"); // Modal handles the success message now
         setUserPoints(prev => prev - item.pointCost);
         setRedeemedItems(prev => [...prev, item._id]);
-        setRedemptionStatuses(prev => ({
-          ...prev,
-          [item._id]: { status: 'Pending', fanInput } // Optimistic update
-        }));
+        setRedemptionStatuses(prev => {
+          const current = prev[item._id] || { count: 0 };
+          return {
+            ...prev,
+            [item._id]: { status: 'Pending', fanInput, count: current.count + 1 }
+          };
+        });
 
         if (updatePoints) updatePoints();
         emitPaymentSuccess({ pointsSpent: item.pointCost });
-
-        setSelectedRedeemItem(null); // Close redeem modal
-
-        // Show Success Modal
+        setSelectedRedeemItem(null);
         setSuccessData({ item, fanInput });
-
-        // If it's a file, we could show download immediately, but user can just click 'Unlocked'
         if (item.type === 'file' || item.type === 'text') {
-          // Reload fan data to ensure we get true status/urls if any
           loadFanData();
         }
       } else {
@@ -108,6 +129,26 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
       }
     } catch (err) {
       toast.error("Something went wrong");
+    }
+  };
+
+  const handleView = (item) => {
+    // Find cached redemption status to show proper details (e.g. QnA answer)
+    const statusData = redemptionStatuses[item._id];
+
+    // For My Redemptions, we might have passed the redemption object directly or just the item?
+    // VaultItemCard calls onView(item). So we use state lookup.
+
+    if (statusData) {
+      setSuccessData({
+        item,
+        fanInput: statusData.fanInput,
+        creatorResponse: statusData.creatorResponse,
+        status: statusData.status
+      });
+    } else {
+      // Fallback for file/text if no status tracked (though they should be)
+      setSuccessData({ item, fanInput: null });
     }
   };
 
@@ -166,9 +207,6 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
                           Offer something small but meaningful — a message, shoutout, Q&A, or a limited digital reward.
                           Fans claim free drops instantly because supply is limited.
                         </p>
-                        <p className="text-green-400 text-sm mt-2 font-medium">
-                          Why it works: Free + limited = instant followers.
-                        </p>
                       </div>
                     </div>
                   </div>
@@ -183,9 +221,6 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
                           Share your Sygil link on Instagram / YouTube / Snapchat.
                           Make it clear: "Only limited spots. First come, first served."
                         </p>
-                        <p className="text-green-400 text-sm mt-2 font-medium">
-                          Why it works: Scarcity creates urgency.
-                        </p>
                       </div>
                     </div>
                   </div>
@@ -199,9 +234,6 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
                         <p className="text-white/60 text-sm">
                           Every fan who follows you gets FamPoints and becomes part of your inner circle.
                           When paid Vault items go live, this warmed-up audience will support you immediately.
-                        </p>
-                        <p className="text-green-400 text-sm mt-2 font-medium">
-                          Why it matters: Creators who build now will earn the most later.
                         </p>
                       </div>
                     </div>
@@ -267,67 +299,122 @@ const VaultSection = ({ currentUser, initialItems, isOwner }) => {
         <>
           {loading ? (
             <div className="text-center p-8"><div className="animate-spin h-8 w-8 mx-auto border-2 border-primary border-t-transparent rounded-full" /></div>
-          ) : vaultItems.length === 0 ? (
-            <div className="text-center p-12 bg-white/5 rounded-3xl border border-white/10">
-              <FaGem className="text-5xl text-white/20 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">Vault Empty</h3>
-              <p className="text-white/50">{isOwner ? "Add your first reward item!" : "This creator hasn't added any rewards yet."}</p>
-              {isOwner && (
-                <button onClick={() => setShowAddModal(true)} className="mt-6 px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90">
-                  Create Reward
-                </button>
-              )}
-            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {vaultItems.map(item => (
-                <VaultItemCard
-                  key={item._id}
-                  item={item}
-                  isOwner={isOwner}
-                  isRedeemed={redeemedItems.includes(item._id)}
-                  status={redemptionStatuses[item._id]?.status}
-                  onRedeem={(itm) => {
-                    if (!session) { toast.error("Please login first"); return; }
-                    if (userPoints < itm.pointCost) { toast.error(`Need ${itm.pointCost - userPoints} more points`); return; }
-                    setSelectedRedeemItem(itm);
-                  }}
-                  onEdit={() => toast.info("Editing coming soon!")}
-                />
-              ))}
-            </div>
+            <>
+              {vaultItems.length === 0 ? (
+                <div className="text-center p-12 bg-white/5 rounded-3xl border border-white/10">
+                  <FaGem className="text-5xl text-white/20 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-white mb-2">Vault Empty</h3>
+                  <p className="text-white/50">{isOwner ? "Add your first reward item!" : "This creator hasn't added any rewards yet."}</p>
+                  {isOwner && (
+                    <button onClick={() => setShowAddModal(true)} className="mt-6 px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90">
+                      Create Reward
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {vaultItems.map(item => (
+                    <VaultItemCard
+                      key={item._id}
+                      item={item}
+                      isOwner={isOwner}
+                      isRedeemed={redeemedItems.includes(item._id)}
+                      userRedemptionCount={redemptionStatuses[item._id]?.count || 0}
+                      status={redemptionStatuses[item._id]?.status}
+                      onRedeem={(itm) => {
+                        if (!session) { toast.error("Please login first"); return; }
+                        if (userPoints < itm.pointCost) { toast.error(`Need ${itm.pointCost - userPoints} more points`); return; }
+                        setSelectedRedeemItem(itm);
+                      }}
+                      onEdit={(itm) => {
+                        setEditItem(itm);
+                        setShowAddModal(true);
+                      }}
+                      onView={handleView}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* MY REDEMPTIONS SECTION */}
+              {!isOwner && myRedemptions.length > 0 && (
+                <div className="mt-12 border-t border-white/10 pt-8">
+                  <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <span className="text-primary">🎒</span> My Redemptions
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {myRedemptions.map(r => (
+                      r.vaultItemId ? (
+                        <VaultItemCard
+                          key={r._id}
+                          item={r.vaultItemId}
+                          isOwner={false}
+                          isRedeemed={true}
+                          status={r.status}
+                          onView={handleView}
+                          // Disable redundant redeem action
+                          onRedeem={() => { }}
+                        />
+                      ) : null
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </>
       )}
 
       {/* MODALS */}
-      {showAddModal && (
-        <AddVaultItemModal
-          onClose={() => setShowAddModal(false)}
-          onSuccess={(newItem) => {
-            setVaultItems(prev => [newItem, ...prev]);
-          }}
-        />
-      )}
+      {
+        showAddModal && (
+          <AddVaultItemModal
+            onClose={() => setShowAddModal(false)}
+            onSuccess={(newItem) => {
+              setVaultItems(prev => [newItem, ...prev]);
+            }}
+          />
+        )
+      }
 
-      {selectedRedeemItem && (
-        <RedeemVaultModal
-          item={selectedRedeemItem}
-          userPoints={userPoints}
-          onClose={() => setSelectedRedeemItem(null)}
-          onRedeemSuccess={handleRedeemSuccess}
-        />
-      )}
+      {
+        selectedRedeemItem && (
+          <RedeemVaultModal
+            item={selectedRedeemItem}
+            userPoints={userPoints}
+            onClose={() => setSelectedRedeemItem(null)}
+            onRedeemSuccess={handleRedeemSuccess}
+          />
+        )
+      }
 
-      {successData && (
-        <VaultSuccessModal
-          item={successData.item}
-          fanInput={successData.fanInput}
-          onClose={() => setSuccessData(null)}
-        />
-      )}
+      {
+        successData && (
+          <VaultSuccessModal
+            item={successData.item}
+            fanInput={successData.fanInput}
+            onClose={() => setSuccessData(null)}
+          />
+        )
+      }
 
-    </div>
+      {
+        editItem && (
+          <EditVaultItemModal
+            item={editItem}
+            onClose={() => setEditItem(null)}
+            onSuccess={(updatedItem) => {
+              setVaultItems(prev => prev.map(i => i._id === updatedItem._id ? updatedItem : i));
+            }}
+            onDelete={(deletedId) => {
+              setVaultItems(prev => prev.filter(i => i._id !== deletedId));
+            }}
+          />
+        )
+      }
+
+    </div >
   );
 };
 

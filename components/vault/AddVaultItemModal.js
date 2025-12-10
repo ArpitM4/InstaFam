@@ -24,7 +24,13 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
     const [uploadingFile, setUploadingFile] = useState(false);
 
     const handleTypeSelect = (type) => {
-        setFormData(prev => ({ ...prev, type }));
+        // Enforce userLimit = 1 for Digital File and One Way Message (Text)
+        const isRestrictedType = type === 'file' || type === 'text';
+        setFormData(prev => ({
+            ...prev,
+            type,
+            userLimit: isRestrictedType ? 1 : prev.userLimit
+        }));
         setStep(2);
     };
 
@@ -221,10 +227,19 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
                             {!formData.isFree && (
                                 <div>
                                     <label className="block text-sm text-white/60 mb-1">Per User Limit <span className="text-white/40 ml-1">(0 = Unlimited)</span></label>
-                                    <input type="number" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                                    <input
+                                        type="number"
+                                        className={`w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary ${formData.type === 'file' || formData.type === 'text' ? 'opacity-50 cursor-not-allowed' : ''
+                                            }`}
                                         min={0}
                                         placeholder="0 = Unlimited"
-                                        value={formData.userLimit} onChange={e => setFormData({ ...formData, userLimit: e.target.value })} />
+                                        value={formData.type === 'file' || formData.type === 'text' ? 1 : formData.userLimit}
+                                        onChange={e => setFormData({ ...formData, userLimit: e.target.value })}
+                                        disabled={formData.type === 'file' || formData.type === 'text'}
+                                    />
+                                    {(formData.type === 'file' || formData.type === 'text') && (
+                                        <p className="text-[10px] text-white/40 mt-1">Fixed to 1 per user for this type</p>
+                                    )}
                                 </div>
                             )}
 

@@ -4,10 +4,22 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "sonner";
 import { emitAccountTypeChange } from "@/utils/eventBus";
 
-export default function VisibilityToggle({ isVisible, onToggle, onShareModal }) {
+export default function VisibilityToggle({ isVisible, onToggle, onShareModal, hasCoverPic, hasSocialLinks }) {
     const [loading, setLoading] = useState(false);
 
     const handleToggle = async () => {
+        // Frontend validation before API call
+        if (isVisible !== "public") {
+            if (!hasCoverPic) {
+                toast.error("Please set a banner image first!");
+                return;
+            }
+            if (!hasSocialLinks) {
+                toast.error("Please add at least one social link!");
+                return;
+            }
+        }
+
         setLoading(true);
         try {
             const res = await fetch("/api/toggle-visibility", {

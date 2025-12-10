@@ -1111,6 +1111,8 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
                   isVisible={currentUser.visibility || "hidden"}
                   onToggle={(newVisibility) => setcurrentUser(prev => ({ ...prev, visibility: newVisibility }))}
                   onShareModal={() => setShowShareModal(true)}
+                  hasCoverPic={!!currentUser.coverpic}
+                  hasSocialLinks={currentUser.socials && currentUser.socials.length > 0}
                 />
                 <button
                   onClick={handleOpenCustomize}

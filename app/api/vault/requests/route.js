@@ -108,7 +108,7 @@ export async function POST(req) {
                     userId: fan._id,
                     creatorId: redemption.creatorId,
                     amount: redemption.pointsSpent,
-                    type: 'REFUND',
+                    type: 'Refund',
                     description: `Refund for rejected vault item: ${redemption.vaultItemId.title}`
                 });
             }

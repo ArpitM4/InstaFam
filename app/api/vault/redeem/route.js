@@ -108,6 +108,7 @@ export async function POST(request) {
       pointsSpent: vaultItem.pointCost,
       fanInput: fanInput ? fanInput.trim() : null,
       status: isAutoFulfilled ? 'Fulfilled' : 'Pending',
+      creatorResponse: isAutoFulfilled ? vaultItem.fileUrl : null, // Store secret/file link immediately
       fulfilledAt: isAutoFulfilled ? new Date() : null
     });
 

@@ -63,6 +63,7 @@ const UserSchema = new Schema({
   points: { type: Number, default: 0 },
   vaultEarningsBalance: { type: Number, default: 0 },
   isReal: { type: Boolean, default: true },
+  isVerified: { type: Boolean, default: false },
 
   // Social Media Links - Array of social media profiles
   socials: [{

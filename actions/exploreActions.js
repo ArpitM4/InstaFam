@@ -11,7 +11,7 @@ export const getExploreCreators = async () => {
         const creators = await User.aggregate([
             { $match: { visibility: "public" } },
             { $sample: { size: 20 } },
-            { $project: { username: 1, name: 1, bio: 1, tagline: 1, profilepic: 1, _id: 1 } }
+            { $project: { username: 1, _id: 1, profilepic: 1, name: 1, accountType: 1, bio: 1, isVerified: 1 } }
         ]);
 
         // Serialize ObjectIds
@@ -35,7 +35,7 @@ export const searchCreators = async (query) => {
         const users = await User.find({
             username: { $regex: query, $options: "i" },
             visibility: "public",
-        }).select("username name profilepic _id").lean();
+        }).select("username name profilepic _id isVerified").lean();
 
         return users.map(user => ({
             ...user,

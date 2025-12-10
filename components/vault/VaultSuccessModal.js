@@ -2,8 +2,17 @@ import React from 'react';
 import { FaCheckCircle, FaDownload, FaCopy, FaExternalLinkAlt } from 'react-icons/fa';
 import { toast } from 'sonner';
 
-const VaultSuccessModal = ({ item, fanInput, onClose }) => {
+const VaultSuccessModal = ({ item, fanInput, creatorResponse, status, onClose }) => {
     if (!item) return null;
+
+    const isInstant = item.type === 'file' || item.type === 'text';
+
+    const getStatusBadge = () => {
+        if (!status || status === 'Pending') return <span className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded inline-block mb-4">⏳ Pending</span>;
+        if (status === 'Fulfilled') return <span className="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded inline-block mb-4">✅ Fulfilled</span>;
+        if (status === 'Rejected') return <span className="bg-red-500/20 text-red-400 text-xs px-2 py-1 rounded inline-block mb-4">❌ Rejected</span>;
+        return null;
+    };
 
     const handleCopy = () => {
         if (item.fileUrl) {
@@ -30,14 +39,15 @@ const VaultSuccessModal = ({ item, fanInput, onClose }) => {
                     ✕
                 </button>
 
-                <div className="w-16 h-16 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-6">
-                    <FaCheckCircle />
+                <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-purple-500/20 text-primary rounded-full flex items-center justify-center text-3xl mx-auto mb-6 border border-white/5">
+                    {isInstant ? <FaCheckCircle className="text-green-400" /> : <FaCheckCircle />}
                 </div>
 
-                <h3 className="text-2xl font-bold text-white mb-2">Unlocked!</h3>
-                <p className="text-white/60 mb-6">
-                    You have successfully redeemed <span className="text-white font-medium">"{item.title}"</span>.
+                <h3 className="text-2xl font-bold text-white mb-2">{isInstant ? "Unlocked!" : "Request Details"}</h3>
+                <p className="text-white/60 mb-4">
+                    {item.title}
                 </p>
+                {!isInstant && getStatusBadge()}
 
                 {/* TYPE SPECIFIC CONTENT */}
                 <div className="bg-black/40 rounded-xl p-4 border border-white/5 mb-6 text-left">
@@ -86,29 +96,47 @@ const VaultSuccessModal = ({ item, fanInput, onClose }) => {
 
                     {/* QnA TYPE */}
                     {item.type === 'qna' && (
-                        <div>
-                            <p className="text-white/80 text-sm mb-2">Your question has been sent!</p>
-                            <div className="bg-white/5 p-3 rounded-lg border border-white/10 italic text-white/60 text-sm">
-                                "{fanInput}"
+                        <div className="space-y-4">
+                            <div>
+                                <p className="text-white/60 text-xs uppercase font-bold tracking-wider mb-1">Your Question</p>
+                                <div className="bg-white/5 p-3 rounded-lg border border-white/10 text-white/90 text-sm">
+                                    "{fanInput}"
+                                </div>
                             </div>
-                            <p className="text-xs text-white/40 mt-3 text-center">
-                                Check "My FamPoints" to see the creator's answer.
-                            </p>
+
+                            {creatorResponse ? (
+                                <div>
+                                    <p className="text-emerald-400/80 text-xs uppercase font-bold tracking-wider mb-1">Creator Answer</p>
+                                    <div className="bg-emerald-500/10 p-3 rounded-lg border border-emerald-500/20 text-emerald-100 text-sm">
+                                        "{creatorResponse}"
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-xs text-white/40 text-center italic">Waiting for creator response...</p>
+                            )}
                         </div>
                     )}
 
                     {/* PROMISE TYPE */}
                     {item.type === 'promise' && (
-                        <div>
-                            <p className="text-white/80 text-sm mb-2">Request sent to the Creator!</p>
-                            {fanInput && (
-                                <div className="bg-white/5 p-3 rounded-lg border border-white/10 italic text-white/60 text-sm mb-2">
-                                    Note: "{fanInput}"
+                        <div className="space-y-4">
+                            <div>
+                                <p className="text-white/60 text-xs uppercase font-bold tracking-wider mb-1">Your Request Info</p>
+                                <div className="bg-white/5 p-3 rounded-lg border border-white/10 text-white/90 text-sm">
+                                    "{fanInput}"
                                 </div>
+                            </div>
+
+                            {creatorResponse ? (
+                                <div>
+                                    <p className="text-emerald-400/80 text-xs uppercase font-bold tracking-wider mb-1">Creator Note</p>
+                                    <div className="bg-emerald-500/10 p-3 rounded-lg border border-emerald-500/20 text-emerald-100 text-sm">
+                                        {creatorResponse}
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-xs text-white/40 text-center italic">Waiting for update from creator...</p>
                             )}
-                            <p className="text-xs text-white/40 mt-1 text-center">
-                                You can track the status in "My FamPoints".
-                            </p>
                         </div>
                     )}
                 </div>

@@ -10,6 +10,7 @@ import { fetchuser, updateProfile } from '@/actions/useractions'
 import { useUser } from '@/context/UserContext'
 import { emitProfileUpdate, emitAccountTypeChange } from '@/utils/eventBus'
 import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
 
 const Account = ({ initialUser }) => {
   const { data: session, update, status } = useSession();
@@ -23,6 +24,8 @@ const Account = ({ initialUser }) => {
     profilepic: initialUser?.profilepic || "",
     coverpic: initialUser?.coverpic || "",
     accountType: initialUser?.accountType || "User",
+    isVerified: initialUser?.isVerified || false,
+    followersCount: initialUser?.followersArray?.length || initialUser?.followers || 0
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -75,7 +78,8 @@ const Account = ({ initialUser }) => {
       profilepic: u?.profilepic || "",
       coverpic: u?.coverpic || "",
       accountType: u?.accountType || "User",
-
+      isVerified: u?.isVerified || false,
+      followersCount: u?.followersArray?.length || u?.followers || 0
     });
     setLoading(false);
     hasLoadedData.current = true;
@@ -165,6 +169,31 @@ const Account = ({ initialUser }) => {
     }
   };
 
+  const handleRedeemBadge = async () => {
+    try {
+      const res = await fetch('/api/user/verify', { method: 'POST' });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setForm(prev => ({ ...prev, isVerified: true }));
+        toast.success("Congratulations! You are now verified!");
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#00E5D4', '#FF2F72', '#FFD700']
+        });
+        // Force refresh context
+        if (refreshUserData) refreshUserData(true);
+      } else {
+        toast.error(data.error || "Failed to redeem badge");
+      }
+    } catch (error) {
+      console.error("Verification error:", error);
+      toast.error("Something went wrong");
+    }
+  };
+
   // Simple minimal loading screen
   if (status === "loading" || loading) {
     return (
@@ -239,7 +268,14 @@ const Account = ({ initialUser }) => {
               </div>
 
               <div className="flex-1 min-w-0">
-                <h2 className="text-base font-medium text-white truncate">{form.name || 'Your Name'}</h2>
+                <h2 className="text-base font-medium text-white truncate flex items-center gap-1.5">
+                  {form.name || 'Your Name'}
+                  {form.isVerified && (
+                    <span className="text-blue-400 text-sm" title="Verified Creator">
+                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
+                    </span>
+                  )}
+                </h2>
                 <p className="text-sm text-white/50">@{form.username || 'username'}</p>
               </div>
               <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${form.accountType === 'Creator'
@@ -250,6 +286,68 @@ const Account = ({ initialUser }) => {
               </span>
             </div>
           </div>
+
+          {/* Verified Badge Section - Only for Creators and NOT verified */}
+          {form.accountType === 'Creator' && !form.isVerified && (
+            <div className="bg-gradient-to-br from-[#00E5D4]/10 to-[#1d4ed8]/10 border border-white/10 rounded-xl p-5 mb-4 relative overflow-hidden group">
+              {/* Background Glow Effect */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#00E5D4]/10 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+              <div className="flex items-center justify-between mb-4 relative z-10">
+                <div>
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    Get Verified Badge
+                    <span className="text-blue-400 text-xl">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
+                    </span>
+                  </h3>
+                  <p className="text-sm text-white/60">Adds credibility to your profile</p>
+                </div>
+                <div className="text-right">
+                  <span className="block text-xs text-white/40 line-through">₹ 5,000</span>
+                  <span className="block text-xl font-bold text-[#00E5D4]">FREE</span>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center text-xs text-white/70 mb-2">
+                  <span>Progress</span>
+                  <span>{Math.min(form.followersCount, 3)} / 3 Followers</span>
+                </div>
+                <div className="w-full bg-white/10 rounded-full h-2.5 mb-4 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-[#00E5D4] to-[#1d4ed8] h-2.5 rounded-full transition-all duration-500 ease-out relative"
+                    style={{ width: `${Math.min((form.followersCount / 3) * 100, 100)}%` }}
+                  >
+                    {/* Shimmer effect */}
+                    <div className="absolute inset-0 bg-white/30 skew-x-12 animate-[shimmer_2s_infinite] w-full transform -translate-x-full"></div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleRedeemBadge}
+                  disabled={form.followersCount < 3}
+                  className={`w-full py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${form.followersCount >= 3
+                    ? 'bg-gradient-to-r from-[#00E5D4] to-[#1d4ed8] text-black shadow-lg shadow-cyan-500/20 hover:scale-[1.02]'
+                    : 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
+                    }`}
+                >
+                  {form.followersCount >= 3 ? (
+                    <>
+                      Redeem Badge Now 🌟
+                    </>
+                  ) : (
+                    <>
+                      Needs {3 - form.followersCount} more followers
+                    </>
+                  )}
+                </button>
+                <p className="text-[10px] text-white/30 text-center mt-2">
+                  Limited time offer for early creators
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Form Card */}
           <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
@@ -369,6 +467,8 @@ const Account = ({ initialUser }) => {
               </a>
             </div>
           )}
+
+
 
           {/* Logout Button */}
           <button

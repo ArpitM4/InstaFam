@@ -153,7 +153,16 @@ const PaymentProfileSection = ({
 
       {/* Profile Info Box */}
       <div className="relative mt-6 w-full max-w-md mx-auto p-5 rounded-2xl shadow-lg border border-white/10" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}>
-        <h1 className="text-xl font-semibold text-gradient-primary text-center mb-3">@{username}</h1>
+
+        <h1 className="text-xl font-bold text-white text-center mb-0.5 flex items-center justify-center gap-2">
+          {currentUser?.name || "User"}
+          {currentUser?.isVerified && (
+            <span className="text-blue-400" title="Verified Creator">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
+            </span>
+          )}
+        </h1>
+        <p className="text-sm text-center text-text/60 mb-3">@{username}</p>
 
         {/* Follower Count for Creator's Own Page */}
         {isOwner && (

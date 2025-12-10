@@ -72,30 +72,12 @@ export async function POST(req) {
             isFree: isFree,
             type,
             fileType: type === 'file' ? fileType : undefined,
-            fileUrl: type === 'file' ? fileUrl : undefined,
+            fileUrl: (type === 'file' || type === 'text') ? fileUrl : undefined,
             instructions: type === 'promise' ? instructions : undefined,
             limit: Number(limit) || 0,
             userLimit: isFree ? 1 : (Number(userLimit) || 1),  // Strictly 1 for free items
             isActive: true
         });
-
-        // If type is 'text', we might store the 'secret' in instructions or separate field?
-        // Requirement said: "Text (Secret Message)". Usually that means the description IS the secret or a separate field.
-        // But implementation plan didn't add a specific 'content' field for text.
-        // Let's assume 'instructions' holds the secret message for 'text' type for now, or use 'description' as public teaser and need a field for the secret.
-        // Actually, 'description' is public. 'fileUrl' is hidden until unlock. 
-        // For TEXT type, we should store the secret in 'fileUrl' or a new field.
-        // Let's use 'fileUrl' to store the secret text for 'text' type for simplicity and consistency with 'file'.
-
-        if (type === 'text') {
-            // If it's a text reward, we expect the 'secret content' to be passed.
-            // Let's assume the frontend passes it in 'fileUrl' (as "content") or a specific field.
-            // I will adhere to using `fileUrl` to store the secret text content to avoid schema bloat.
-            if (data.secretContent) {
-                newItem.fileUrl = data.secretContent;
-                await newItem.save();
-            }
-        }
 
         return NextResponse.json({ success: true, item: newItem });
     } catch (error) {
