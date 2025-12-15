@@ -66,18 +66,34 @@ const UserSchema = new Schema({
   isVerified: { type: Boolean, default: false },
 
   // Social Media Links - Array of social media profiles
+  // Links (Socials & Others)
   socials: [{
-    platform: { type: String, required: true }, // e.g., "Instagram", "Twitter", "YouTube"
-    username: { type: String, required: true }, // e.g., "@username"
-    link: { type: String, required: true }, // Full URL to the profile
+    type: { type: String, enum: ['social', 'other'], default: 'social' },
+    platform: { type: String }, // Used for social media platform identifier
+    title: { type: String }, // Used for 'other' links title
+    username: { type: String }, // Optional for social, hidden for other
+    description: { type: String }, // Optional description for 'other'
+    link: { type: String, required: true },
+    icon: { type: String }, // Icon identifier for 'other'
+    color: { type: String }, // Card background color
     createdAt: { type: Date, default: Date.now }
   }],
 
-  // Favourite Products/Affiliates - Array of affiliated products
+  // Favourite Products/Affiliates
   favourites: [{
-    name: { type: String, required: true }, // Product/Affiliate name
-    link: { type: String, required: true }, // Affiliate/Product link
+    name: { type: String, required: true },
+    description: { type: String }, // Optional description
+    link: { type: String, required: true },
     image: { type: String }, // Product image URL
+    price: { type: Number }, // Optional price
+    currency: { type: String, default: 'INR' },
+    couponCode: { type: String }, // Optional coupon code
+    imagePosition: {
+      scale: { type: Number, default: 1 },
+      x: { type: Number, default: 50 }, // % position
+      y: { type: Number, default: 50 }  // % position
+    },
+    color: { type: String }, // Card background color
     createdAt: { type: Date, default: Date.now }
   }],
 

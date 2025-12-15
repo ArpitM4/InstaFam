@@ -4,6 +4,23 @@ import { FaPen, FaSpinner, FaExclamationTriangle } from "react-icons/fa";
 import FollowButton from "./FollowButton";
 import BannerPickerModal from "./BannerPickerModal";
 
+// Helper to upgrade Unsplash image quality URL
+const getOptimizedBannerUrl = (url) => {
+  if (!url) return '';
+  if (url.includes('images.unsplash.com')) {
+    try {
+      const urlObj = new URL(url);
+      urlObj.searchParams.set('w', '2560');
+      urlObj.searchParams.set('q', '85');
+      urlObj.searchParams.set('auto', 'format');
+      return urlObj.toString();
+    } catch (e) {
+      return url;
+    }
+  }
+  return url;
+};
+
 const PaymentProfileSection = ({
   username,
   currentUser,
@@ -49,7 +66,7 @@ const PaymentProfileSection = ({
         >
           {hasCoverImage && (
             <Image
-              src={currentUser.coverpic}
+              src={getOptimizedBannerUrl(currentUser.coverpic)}
               alt="Banner"
               fill
               sizes="100vw"
@@ -92,14 +109,26 @@ const PaymentProfileSection = ({
 
           {/* Unsplash Attribution Credit (for legal compliance) */}
           {hasCoverImage && currentUser?.bannerAttribution?.photographer && (
-            <a
-              href={currentUser.bannerAttribution.unsplashUrl || currentUser.bannerAttribution.photographerUrl || '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="absolute bottom-2 left-2 md:bottom-4 md:left-4 z-10 bg-black/40 backdrop-blur-sm text-white/70 hover:text-white px-2 py-1 rounded text-xs transition-colors"
-            >
-              Photo by {currentUser.bannerAttribution.photographer} on Unsplash
-            </a>
+            <div className="absolute bottom-1 left-1 md:bottom-3 md:left-3 z-10 bg-black/50 backdrop-blur-sm text-white/60 px-1.5 py-0.5 rounded text-[9px] md:text-[10px]">
+              Photo by{' '}
+              <a
+                href={currentUser.bannerAttribution.photographerUrl || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white underline transition-colors"
+              >
+                {currentUser.bannerAttribution.photographer}
+              </a>
+              {' '}on{' '}
+              <a
+                href={currentUser.bannerAttribution.unsplashUrl || 'https://unsplash.com?utm_source=sygil&utm_medium=referral'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white underline transition-colors"
+              >
+                Unsplash
+              </a>
+            </div>
           )}
         </div>
 

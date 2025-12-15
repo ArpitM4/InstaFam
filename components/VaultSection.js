@@ -338,9 +338,9 @@ const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) =>
         <>
           {loading ? (
             // Skeleton Loading Cards
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto md:overflow-visible pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide">
               {[1, 2, 3].map(i => (
-                <div key={i} className="bg-[#1a1a1f] rounded-2xl border border-white/10 overflow-hidden animate-pulse">
+                <div key={i} className="bg-[#1a1a1f] rounded-2xl border border-white/10 overflow-hidden animate-pulse min-w-[280px] md:min-w-0 snap-center flex-shrink-0 md:flex-shrink">
                   <div className="p-4 pt-8 border-b border-white/10">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 bg-white/10 rounded-lg" />
@@ -373,7 +373,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) =>
                   )}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto md:overflow-visible pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide">
                   {vaultItems.map(item => (
                     <VaultItemCard
                       key={item._id}
@@ -409,9 +409,9 @@ const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) =>
 
                   {redemptionsLoading ? (
                     // Skeleton Loading for Redemptions
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto md:overflow-visible pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide">
                       {[1, 2].map(i => (
-                        <div key={i} className="bg-[#1a1a1f] rounded-2xl border border-white/10 overflow-hidden animate-pulse">
+                        <div key={i} className="bg-[#1a1a1f] rounded-2xl border border-white/10 overflow-hidden animate-pulse min-w-[280px] md:min-w-0 snap-center flex-shrink-0 md:flex-shrink">
                           <div className="p-4 pt-8 border-b border-white/10">
                             <div className="flex items-center gap-3 mb-3">
                               <div className="w-10 h-10 bg-white/10 rounded-lg" />
@@ -430,7 +430,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) =>
                       ))}
                     </div>
                   ) : myRedemptions.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto md:overflow-visible pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide">
                       {myRedemptions.map(r => (
                         r.vaultItemId ? (
                           <VaultItemCard

@@ -59,13 +59,32 @@ const BannerPickerModal = ({ onClose, onUpload, onSelectUnsplash, isUploading })
         setSelectedImage(image);
     };
 
-    const handleConfirmSelection = () => {
+    const handleConfirmSelection = async () => {
         if (selectedImage) {
-            // Use the regular size URL for the banner
-            onSelectUnsplash(selectedImage.urls.regular, {
+            // Trigger download endpoint as per Unsplash API guidelines
+            // This must be called when user chooses to use the image
+            try {
+                await fetch(selectedImage.links.download_location, {
+                    headers: {
+                        Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to trigger Unsplash download:', error);
+            }
+
+            // Use the raw URL with custom parameters for high quality banner
+            const highQualityUrl = `${selectedImage.urls.raw}&w=2560&q=85&auto=format&fit=crop`;
+
+            // UTM parameters as required by Unsplash API guidelines
+            const utmParams = '?utm_source=sygil&utm_medium=referral';
+
+            onSelectUnsplash(highQualityUrl, {
                 photographer: selectedImage.user.name,
-                photographerUrl: selectedImage.user.links.html,
-                unsplashUrl: selectedImage.links.html
+                // Link to photographer's profile (not the photo) with UTM params
+                photographerUrl: `${selectedImage.user.links.html}${utmParams}`,
+                // Link to Unsplash with UTM params
+                unsplashUrl: `https://unsplash.com${utmParams}`
             });
         }
     };
@@ -93,8 +112,8 @@ const BannerPickerModal = ({ onClose, onUpload, onSelectUnsplash, isUploading })
                     <button
                         onClick={() => setActiveTab('upload')}
                         className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${activeTab === 'upload'
-                                ? 'text-primary border-b-2 border-primary bg-primary/5'
-                                : 'text-white/60 hover:text-white'
+                            ? 'text-primary border-b-2 border-primary bg-primary/5'
+                            : 'text-white/60 hover:text-white'
                             }`}
                     >
                         <FaUpload className="inline mr-2" />
@@ -103,8 +122,8 @@ const BannerPickerModal = ({ onClose, onUpload, onSelectUnsplash, isUploading })
                     <button
                         onClick={() => setActiveTab('unsplash')}
                         className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${activeTab === 'unsplash'
-                                ? 'text-primary border-b-2 border-primary bg-primary/5'
-                                : 'text-white/60 hover:text-white'
+                            ? 'text-primary border-b-2 border-primary bg-primary/5'
+                            : 'text-white/60 hover:text-white'
                             }`}
                     >
                         <svg className="inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
@@ -198,8 +217,8 @@ const BannerPickerModal = ({ onClose, onUpload, onSelectUnsplash, isUploading })
                                                     key={image.id}
                                                     onClick={() => handleSelectImage(image)}
                                                     className={`relative aspect-video rounded-lg overflow-hidden cursor-pointer group transition-all ${selectedImage?.id === image.id
-                                                            ? 'ring-2 ring-primary ring-offset-2 ring-offset-[#1a1a1f]'
-                                                            : 'hover:opacity-90'
+                                                        ? 'ring-2 ring-primary ring-offset-2 ring-offset-[#1a1a1f]'
+                                                        : 'hover:opacity-90'
                                                         }`}
                                                 >
                                                     <Image
