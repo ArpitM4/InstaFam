@@ -5,14 +5,28 @@ import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 import {
     FaPlus, FaTimes, FaTrash, FaShoppingBag, FaLink, FaGlobe, FaPen, FaChevronDown,
-    FaInstagram, FaTwitter, FaYoutube, FaTiktok, FaFacebook, FaLinkedin,
+    FaInstagram, FaYoutube, FaTiktok, FaFacebook, FaLinkedin,
     FaSnapchat, FaDiscord, FaTwitch, FaReddit, FaPinterest, FaSpotify,
     FaGithub, FaBriefcase, FaEnvelope, FaLaptop, FaMobile, FaMusic,
     FaGamepad, FaCamera, FaHeart, FaStar, FaFire, FaCode, FaCoffee,
-    FaPlane, FaCar, FaHome, FaBolt, FaCrown, FaGem, FaCircle, FaCopy
+    FaPlane, FaCar, FaHome, FaBolt, FaCrown, FaGem, FaCircle, FaCopy,
+    FaGripVertical,
+    // New icons for Other Links
+    FaAddressCard, FaBlog, FaNewspaper, FaVideo, FaPodcast,
+    FaStore, FaShoppingCart, FaTags, FaGift, FaTicketAlt, FaCreditCard, FaCoins, FaHandHoldingUsd,
+    FaGraduationCap, FaBook, FaFileAlt, FaChalkboardTeacher,
+    FaUsers, FaComments, FaPhone, FaCalendar,
+    FaDownload, FaFileDownload, FaExternalLinkAlt, FaShareAlt
 } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 import Image from 'next/image';
 import ShareModal from "./ShareModal";
+
+// @dnd-kit imports for drag and drop reordering
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
 
 // --- Helpers ---
 
@@ -59,7 +73,7 @@ const parseColor = (colorStr) => {
 // Social Platforms Config
 const socialPlatforms = {
     instagram: { name: 'Instagram', icon: <FaInstagram />, color: '#E4405F' },
-    twitter: { name: 'Twitter/X', icon: <FaTwitter />, color: '#000000' },
+    twitter: { name: 'X (Twitter)', icon: <FaXTwitter />, color: '#000000' },
     youtube: { name: 'YouTube', icon: <FaYoutube />, color: '#FF0000' },
     tiktok: { name: 'TikTok', icon: <FaTiktok />, color: '#000000' },
     facebook: { name: 'Facebook', icon: <FaFacebook />, color: '#1877F2' },
@@ -74,28 +88,46 @@ const socialPlatforms = {
 };
 
 const iconMap = {
-    // Communication & Social
-    'link': <FaLink />, 'globe': <FaGlobe />, 'envelope': <FaEnvelope />,
-    'mobile': <FaMobile />, 'laptop': <FaLaptop />,
+    // Core / Generic
+    'globe': <FaGlobe />, 'link': <FaLink />, 'home': <FaHome />,
+    'briefcase': <FaBriefcase />, 'address-card': <FaAddressCard />,
 
-    // Media & Ent
-    'camera': <FaCamera />, 'music': <FaMusic />, 'gamepad': <FaGamepad />,
-    'coffee': <FaCoffee />, 'code': <FaCode />,
+    // Content & Creation
+    'blog': <FaBlog />, 'newspaper': <FaNewspaper />, 'video': <FaVideo />,
+    'podcast': <FaPodcast />, 'camera': <FaCamera />, 'music': <FaMusic />,
 
-    // Lifestyle & Travel
-    'plane': <FaPlane />, 'car': <FaCar />, 'home': <FaHome />,
-    'briefcase': <FaBriefcase />, 'gem': <FaGem />,
+    // Monetization / Business
+    'store': <FaStore />, 'cart': <FaShoppingCart />, 'tags': <FaTags />,
+    'gift': <FaGift />, 'ticket': <FaTicketAlt />, 'credit-card': <FaCreditCard />,
+    'coins': <FaCoins />, 'donate': <FaHandHoldingUsd />,
 
-    // Symbols
-    'heart': <FaHeart />, 'star': <FaStar />, 'fire': <FaFire />,
-    'bolt': <FaBolt />, 'crown': <FaCrown />, 'circle': <FaCircle />
+    // Learning / Professional
+    'graduation': <FaGraduationCap />, 'book': <FaBook />,
+    'file': <FaFileAlt />, 'teacher': <FaChalkboardTeacher />,
+
+    // Community / Communication
+    'users': <FaUsers />, 'comments': <FaComments />, 'envelope': <FaEnvelope />,
+    'phone': <FaPhone />, 'calendar': <FaCalendar />,
+
+    // Download / External
+    'download': <FaDownload />, 'file-download': <FaFileDownload />,
+    'external': <FaExternalLinkAlt />, 'share': <FaShareAlt />,
+
+    // Creator-style / Highlight
+    'star': <FaStar />, 'fire': <FaFire />, 'bolt': <FaBolt />,
+    'heart': <FaHeart />, 'crown': <FaCrown />, 'gem': <FaGem />,
+
+    // Extra - Tech & Lifestyle
+    'code': <FaCode />, 'laptop': <FaLaptop />, 'mobile': <FaMobile />,
+    'gamepad': <FaGamepad />, 'coffee': <FaCoffee />, 'plane': <FaPlane />, 'car': <FaCar />
 };
 
 // Vibrant Colors (Not shaded)
 const vibrantColors = [
     '#1a1a1a', // Black
     '#FFFFFF', // White
-    '#FF3B30', // Red
+    '#e20b00ff', // Red
+    '#ff6600ff', // Orange
     '#FF9500', // Orange
     '#FFCC00', // Yellow
     '#34C759', // Green
@@ -103,8 +135,8 @@ const vibrantColors = [
     '#32ADE6', // Blue
     '#1a73e8', // Light Blue
     '#0400ffff', // Dark Blue
+    '#4800ffff', // Purple
     '#AF52DE', // Purple
-    '#ff0000ff', // Red
     '#FF0090', // Hot Pink (New)
     '#A2845E', // Brown
     '#8E8E93',  // Gray
@@ -166,23 +198,23 @@ const CustomSelect = ({ value, options, onChange, placeholder = "Select" }) => {
 };
 
 const ColorControl = ({ hex, opacity, onHexChange, onOpacityChange }) => (
-    <div className="space-y-4">
-        <label className="text-xs text-white/60 mb-2 block">Card Background & Opacity</label>
-        <div className="flex gap-2 flex-wrap">
+    <div className="space-y-2">
+        <label className="text-xs text-white/60 block">Card Background & Opacity</label>
+        <div className="flex gap-1.5 flex-wrap">
             {vibrantColors.map(color => (
                 <button
                     key={color}
                     type="button"
                     onClick={() => onHexChange(color)}
-                    className={`w-8 h-8 rounded-full border-2 transition-all duration-200 relative flex items-center justify-center ${hex === color ? 'border-primary scale-110' : 'border-white/10 hover:border-white/30'}`}
+                    className={`w-6 h-6 rounded-full border-2 transition-all duration-200 relative flex items-center justify-center ${hex === color ? 'border-primary scale-110' : 'border-white/10 hover:border-white/30'}`}
                     style={{ backgroundColor: color }}
                 >
-                    {hex === color && <div className={`w-2 h-2 rounded-full ${color === '#FFFFFF' ? 'bg-black' : 'bg-white'}`} />}
+                    {hex === color && <div className={`w-1.5 h-1.5 rounded-full ${color === '#FFFFFF' ? 'bg-black' : 'bg-white'}`} />}
                 </button>
             ))}
         </div>
         <div>
-            <div className="flex justify-between text-xs text-white/60 mb-2">
+            <div className="flex justify-between text-xs text-white/60 mb-1">
                 <span>Opacity</span>
                 <span>{opacity}%</span>
             </div>
@@ -192,11 +224,11 @@ const ColorControl = ({ hex, opacity, onHexChange, onOpacityChange }) => (
                 max="100"
                 value={opacity}
                 onChange={(e) => onOpacityChange(parseInt(e.target.value))}
-                className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"
+                className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"
             />
             {/* Preview Strip */}
             <div
-                className="w-full h-8 rounded-lg mt-3 border border-white/10 flex items-center justify-center text-xs text-white"
+                className="w-full h-6 rounded-lg mt-2 border border-white/10 flex items-center justify-center text-[10px] text-white"
                 style={{ backgroundColor: hexToRgba(hex, opacity / 100) }}
             >
                 Card Preview
@@ -206,16 +238,16 @@ const ColorControl = ({ hex, opacity, onHexChange, onOpacityChange }) => (
 );
 
 const IconPicker = ({ selected, onSelect }) => (
-    <div className="grid grid-cols-6 gap-2 max-h-48 overflow-y-auto p-2 bg-white/5 rounded-xl border border-white/5 custom-scrollbar">
+    <div className="grid grid-cols-8 gap-1.5 p-2 bg-white/5 rounded-xl border border-white/5 max-h-32 overflow-y-auto custom-scrollbar">
         {Object.entries(iconMap).map(([name, icon]) => (
             <button
                 key={name}
                 type="button"
                 onClick={() => onSelect(name)}
-                className={`aspect-square flex items-center justify-center rounded-lg border transition-all hover:scale-105 ${selected === name ? 'bg-primary border-primary text-black' : 'bg-transparent border-transparent text-white/50 hover:bg-white/10 hover:text-white'}`}
+                className={`aspect-square flex items-center justify-center rounded-md border transition-all hover:scale-105 ${selected === name ? 'bg-primary border-primary text-black' : 'bg-transparent border-transparent text-white/50 hover:bg-white/10 hover:text-white'}`}
                 title={name}
             >
-                <span className="text-lg">{icon}</span>
+                <span className="text-base">{icon}</span>
             </button>
         ))}
     </div>
@@ -280,7 +312,7 @@ const ProductCard = ({ data, isOwner, onEdit, onDelete }) => {
             style={{ backgroundColor: bgColor }}
         >
             {/* Image Section - Matches Modal Preview (aspect-[3/4]) */}
-            <div className="relative w-full aspect-[3/4] overflow-hidden bg-black/5">
+            <div className="relative w-full aspect-[3/4] overflow-hidden rounded-t-3xl">
                 {data.image ? (
                     <div
                         className="w-full h-full transition-transform duration-500 group-hover:scale-105"
@@ -341,6 +373,178 @@ const ProductCard = ({ data, isOwner, onEdit, onDelete }) => {
                             <FaCopy className="text-white/60 opacity-50 group-hover/coupon:opacity-100 transition-opacity" size={12} />
                         </div>
                     )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Sortable Wrappers for Drag & Drop ---
+
+const SortableLinkCard = ({ id, data, isOwner, onEdit, onDelete }) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        zIndex: isDragging ? 10 : 1,
+    };
+
+    const isSocial = data.type === 'social';
+    const platform = isSocial ? socialPlatforms[data.platform?.toLowerCase()] || {} : {};
+    const icon = isSocial ? platform.icon : (iconMap[data.icon] || <FaLink />);
+    const bgColor = data.color || '#1a1a1a';
+
+    const handleClick = (e) => {
+        if (isOwner) {
+            e.preventDefault();
+            onEdit(data);
+        } else {
+            window.open(data.link, '_blank');
+        }
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} className="relative group">
+            {/* Drag Handle - Visible only to owner */}
+            {isOwner && (
+                <button
+                    {...attributes}
+                    {...listeners}
+                    className="absolute left-1 top-1/2 -translate-y-1/2 z-30 p-1.5 bg-black/60 hover:bg-black/80 rounded-lg text-white/50 hover:text-white cursor-grab active:cursor-grabbing transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <FaGripVertical size={12} />
+                </button>
+            )}
+
+            <div
+                onClick={handleClick}
+                className={`relative p-5 rounded-2xl border border-white/5 transition-all duration-300 hover:scale-[1.02] cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-3 aspect-[1.2/1] shadow-lg hover:shadow-primary/5 ${isOwner ? 'pl-8' : ''}`}
+                style={{ backgroundColor: bgColor }}
+            >
+                {isOwner && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onDelete(data._id, 'social'); }}
+                        className="absolute top-2 right-2 p-2 text-white/20 hover:text-red-500 transition-colors z-20"
+                    >
+                        <FaTrash size={12} />
+                    </button>
+                )}
+
+                <div className="text-4xl text-white drop-shadow-lg">
+                    {icon}
+                </div>
+
+                <div className="text-center w-full px-2">
+                    <h3 className="font-bold text-white text-base truncate drop-shadow-md">
+                        {isSocial ? platform.name || data.platform : data.title}
+                    </h3>
+                    {((isSocial && data.username) || (!isSocial && data.description)) && (
+                        <p className="text-white/60 text-xs truncate mt-1">
+                            {isSocial ? data.username : data.description}
+                        </p>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const SortableProductCard = ({ id, data, isOwner, onEdit, onDelete }) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        zIndex: isDragging ? 10 : 1,
+    };
+
+    const pos = data.imagePosition || { scale: 1, x: 50, y: 50 };
+    const bgColor = data.color || '#1a1a1a';
+
+    return (
+        <div ref={setNodeRef} style={style} className="relative group">
+            {/* Drag Handle - Visible only to owner */}
+            {isOwner && (
+                <button
+                    {...attributes}
+                    {...listeners}
+                    className="absolute left-1 top-4 z-30 p-1.5 bg-black/60 hover:bg-black/80 rounded-lg text-white/40 hover:text-white cursor-grab active:cursor-grabbing transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <FaGripVertical size={12} />
+                </button>
+            )}
+
+            <div
+                onClick={() => isOwner ? onEdit(data) : window.open(data.link, '_blank')}
+                className={`relative rounded-3xl overflow-hidden border border-white/10 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer flex flex-col h-full`}
+                style={{ backgroundColor: bgColor }}
+            >
+                {/* Image Section */}
+                <div className="relative w-full aspect-[3/4] overflow-hidden rounded-t-3xl">
+                    {data.image ? (
+                        <div
+                            className="w-full h-full transition-transform duration-500 group-hover:scale-105"
+                            style={{
+                                backgroundImage: `url(${optimizeCloudinaryImage(data.image, 500)})`,
+                                backgroundSize: `${pos.scale * 100}%`,
+                                backgroundPosition: `${pos.x}% ${pos.y}%`,
+                                backgroundRepeat: 'no-repeat'
+                            }}
+                        />
+                    ) : (<div className="w-full h-full flex items-center justify-center text-4xl">🎁</div>)}
+
+                    {isOwner && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onDelete(data._id, 'favourite'); }}
+                            className="absolute top-3 right-3 bg-black/60 p-2 rounded-full text-white/70 hover:text-red-500 hover:bg-black transition-all z-20 backdrop-blur-sm"
+                        >
+                            <FaTrash size={12} />
+                        </button>
+                    )}
+                </div>
+
+                {/* Content Section */}
+                <div className="px-3 pb-3 pt-2 flex flex-col flex-1">
+                    <div className="flex-1 mb-1">
+                        <div className="flex justify-between items-start gap-2 mb-1">
+                            <h3 className="font-bold text-white text-base leading-tight line-clamp-2" title={data.name}>
+                                {data.name}
+                            </h3>
+                            {data.price && (
+                                <div className="shrink-0 flex items-center gap-1 text-white font-bold text-base">
+                                    <span className="text-[10px] text-white/60 uppercase tracking-wider translate-y-[1px]">{data.currency || 'INR'}</span>
+                                    <span>{data.price}</span>
+                                </div>
+                            )}
+                        </div>
+                        {data.description && (
+                            <p className="text-white/60 text-[10px] leading-relaxed line-clamp-3">{data.description}</p>
+                        )}
+                    </div>
+
+                    <div className="mt-auto space-y-2">
+                        {data.couponCode && (
+                            <div
+                                className="bg-black/20 border border-dashed border-white/20 rounded-lg px-2 py-1.5 flex items-center justify-between group/coupon hover:bg-black/30 transition-colors"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigator.clipboard.writeText(data.couponCode);
+                                    toast.success('Coupon copied!');
+                                }}
+                            >
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] text-white/60 uppercase tracking-wider font-bold">Discount Code</span>
+                                    <span className="text-xs font-mono font-bold text-white tracking-wide">{data.couponCode}</span>
+                                </div>
+                                <FaCopy className="text-white/60 opacity-50 group-hover/coupon:opacity-100 transition-opacity" size={12} />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
@@ -571,6 +775,56 @@ const LinksSection = ({ currentUser, onSocialsChange }) => {
         finally { setUploadingImage(false); }
     };
 
+    // --- Drag & Drop Reordering ---
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    );
+
+    const handleReorder = async (type, orderedIds) => {
+        try {
+            const res = await fetch('/api/links', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type, orderedIds })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                toast.error(data.error || 'Failed to save order');
+                // Refetch to restore original order
+                fetchLinks();
+            }
+        } catch (err) {
+            toast.error('Failed to save order');
+            fetchLinks();
+        }
+    };
+
+    const handleLinksDragEnd = (event) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+
+        const oldIndex = socials.findIndex(item => item._id === active.id);
+        const newIndex = socials.findIndex(item => item._id === over.id);
+
+        const newSocials = arrayMove(socials, oldIndex, newIndex);
+        setSocials(newSocials);
+        handleReorder('social', newSocials.map(item => item._id));
+    };
+
+    const handleProductsDragEnd = (event) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+
+        const oldIndex = favourites.findIndex(item => item._id === active.id);
+        const newIndex = favourites.findIndex(item => item._id === over.id);
+
+        const newFavourites = arrayMove(favourites, oldIndex, newIndex);
+        setFavourites(newFavourites);
+        handleReorder('favourite', newFavourites.map(item => item._id));
+    };
+
 
     if (loading) return <div className="p-8 text-center text-white/50 animate-pulse">Loading Links...</div>;
 
@@ -595,27 +849,43 @@ const LinksSection = ({ currentUser, onSocialsChange }) => {
                     <h2 className="text-2xl font-bold text-text flex items-center gap-2">Links</h2>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {socials.map(item => (
-                        <LinkCard
-                            key={item._id}
-                            data={item}
-                            isOwner={isOwner}
-                            onEdit={openEditLink}
-                            onDelete={handleDelete}
-                        />
-                    ))}
-
-                    {isOwner && (
-                        <button
-                            onClick={openAddLink}
-                            className="aspect-[1.2/1] rounded-2xl border-2 border-dashed border-white/10 hover:border-primary/50 bg-white/5 hover:bg-white/10 flex flex-col items-center justify-center gap-2 text-white/40 hover:text-primary transition-all group outline-none"
-                        >
-                            <FaPlus className="text-2xl" />
-                            <span className="text-sm font-medium">Add Link</span>
-                        </button>
-                    )}
-                </div>
+                {isOwner ? (
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleLinksDragEnd}>
+                        <SortableContext items={socials.map(item => item._id)} strategy={rectSortingStrategy}>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                {socials.map(item => (
+                                    <SortableLinkCard
+                                        key={item._id}
+                                        id={item._id}
+                                        data={item}
+                                        isOwner={isOwner}
+                                        onEdit={openEditLink}
+                                        onDelete={handleDelete}
+                                    />
+                                ))}
+                                <button
+                                    onClick={openAddLink}
+                                    className="aspect-[1.2/1] rounded-2xl border-2 border-dashed border-white/10 hover:border-primary/50 bg-white/5 hover:bg-white/10 flex flex-col items-center justify-center gap-2 text-white/40 hover:text-primary transition-all group outline-none"
+                                >
+                                    <FaPlus className="text-2xl" />
+                                    <span className="text-sm font-medium">Add Link</span>
+                                </button>
+                            </div>
+                        </SortableContext>
+                    </DndContext>
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {socials.map(item => (
+                            <LinkCard
+                                key={item._id}
+                                data={item}
+                                isOwner={isOwner}
+                                onEdit={openEditLink}
+                                onDelete={handleDelete}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* --- Products Section --- */}
@@ -624,145 +894,164 @@ const LinksSection = ({ currentUser, onSocialsChange }) => {
                     My Favourite Products
                 </h2>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {favourites.map(item => (
-                        <ProductCard
-                            key={item._id}
-                            data={item}
-                            isOwner={isOwner}
-                            onEdit={openEditProduct}
-                            onDelete={handleDelete}
-                        />
-                    ))}
-                    {isOwner && (
-                        <button
-                            onClick={openAddProduct}
-                            className="aspect-[4/5] rounded-2xl border-2 border-dashed border-white/10 hover:border-primary/50 bg-white/5 hover:bg-white/10 flex flex-col items-center justify-center gap-2 text-white/40 hover:text-primary transition-all group outline-none"
-                        >
-                            <FaPlus className="text-3xl" />
-                            <span className="text-sm font-medium">Add Product</span>
-                        </button>
-                    )}
-                </div>
+                {isOwner ? (
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleProductsDragEnd}>
+                        <SortableContext items={favourites.map(item => item._id)} strategy={rectSortingStrategy}>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                {favourites.map(item => (
+                                    <SortableProductCard
+                                        key={item._id}
+                                        id={item._id}
+                                        data={item}
+                                        isOwner={isOwner}
+                                        onEdit={openEditProduct}
+                                        onDelete={handleDelete}
+                                    />
+                                ))}
+                                <button
+                                    onClick={openAddProduct}
+                                    className="aspect-[4/5] rounded-2xl border-2 border-dashed border-white/10 hover:border-primary/50 bg-white/5 hover:bg-white/10 flex flex-col items-center justify-center gap-2 text-white/40 hover:text-primary transition-all group outline-none"
+                                >
+                                    <FaPlus className="text-3xl" />
+                                    <span className="text-sm font-medium">Add Product</span>
+                                </button>
+                            </div>
+                        </SortableContext>
+                    </DndContext>
+                ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {favourites.map(item => (
+                            <ProductCard
+                                key={item._id}
+                                data={item}
+                                isOwner={isOwner}
+                                onEdit={openEditProduct}
+                                onDelete={handleDelete}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
 
 
             {/* --- Link Modal --- */}
             {showLinkModal && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-                    <div className="bg-[#0f0f0f] w-full max-w-lg rounded-2xl border border-white/10 shadow-2xl p-6 relative animate-in fade-in slide-in-from-bottom-4">
-                        <button onClick={() => setShowLinkModal(false)} className="absolute top-4 right-4 text-white/50 hover:text-white"><FaTimes /></button>
+                    <div className="bg-[#0f0f0f] w-full max-w-md rounded-2xl border border-white/10 shadow-2xl relative animate-in fade-in slide-in-from-bottom-4 max-h-[90vh] flex flex-col">
+                        <div className="p-4 pb-3 shrink-0 flex items-center justify-between border-b border-white/5">
+                            <h3 className="text-lg font-bold text-white">
+                                {linkForm.mode === 'add' ? 'Add New Link' : 'Edit Link'}
+                            </h3>
+                            <button onClick={() => setShowLinkModal(false)} className="text-white/50 hover:text-white p-1"><FaTimes /></button>
+                        </div>
 
-                        <h3 className="text-xl font-bold text-white mb-6">
-                            {linkForm.mode === 'add' ? 'Add New Link' : 'Edit Link'}
-                        </h3>
-
-                        {/* Tabs - Only show in Add Mode */}
-                        {linkForm.mode === 'add' && (
-                            <div className="flex gap-4 border-b border-white/10 mb-6">
-                                <button
-                                    onClick={() => setLinkForm({ ...linkForm, tab: 'social' })}
-                                    className={`pb-2 px-1 text-sm font-medium transition-colors relative ${linkForm.tab === 'social' ? 'text-primary' : 'text-white/50 hover:text-white'}`}
-                                >
-                                    Social Media
-                                    {linkForm.tab === 'social' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full" />}
-                                </button>
-                                <button
-                                    onClick={() => setLinkForm({ ...linkForm, tab: 'other' })}
-                                    className={`pb-2 px-1 text-sm font-medium transition-colors relative ${linkForm.tab === 'other' ? 'text-primary' : 'text-white/50 hover:text-white'}`}
-                                >
-                                    Other Links
-                                    {linkForm.tab === 'other' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full" />}
-                                </button>
-                            </div>
-                        )}
-
-                        <form onSubmit={handleSaveLink} className="space-y-4">
-                            {linkForm.tab === 'social' ? (
-                                <>
-                                    <div>
-                                        <label className="text-xs text-white/60 mb-1 block">Platform</label>
-                                        <CustomSelect
-                                            value={linkForm.platform}
-                                            onChange={val => setLinkForm({ ...linkForm, platform: val })}
-                                            options={Object.keys(socialPlatforms).map(key => ({
-                                                value: key,
-                                                label: socialPlatforms[key].name,
-                                                icon: socialPlatforms[key].icon
-                                            }))}
-                                            placeholder="Select Platform"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs text-white/60 mb-1 block">Username (Optional)</label>
-                                        <input
-                                            type="text"
-                                            placeholder="@username"
-                                            value={linkForm.username}
-                                            onChange={e => setLinkForm({ ...linkForm, username: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:outline-none"
-                                        />
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <div>
-                                        <label className="text-xs text-white/60 mb-1 block">Title</label>
-                                        <input
-                                            type="text"
-                                            placeholder="e.g. My Portfolio"
-                                            value={linkForm.title}
-                                            onChange={e => setLinkForm({ ...linkForm, title: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:outline-none"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs text-white/60 mb-1 block">Description (Optional)</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Short description"
-                                            value={linkForm.description}
-                                            onChange={e => setLinkForm({ ...linkForm, description: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:outline-none"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs text-white/60 mb-1 block">Icon</label>
-                                        <IconPicker
-                                            selected={linkForm.icon}
-                                            onSelect={icon => setLinkForm({ ...linkForm, icon })}
-                                        />
-                                    </div>
-                                </>
+                        <div className="p-4 overflow-y-auto custom-scrollbar flex-1">
+                            {linkForm.mode === 'add' && (
+                                <div className="flex gap-4 border-b border-white/10 mb-6">
+                                    <button
+                                        onClick={() => setLinkForm({ ...linkForm, tab: 'social' })}
+                                        className={`pb-2 px-1 text-sm font-medium transition-colors relative ${linkForm.tab === 'social' ? 'text-primary' : 'text-white/50 hover:text-white'}`}
+                                    >
+                                        Social Media
+                                        {linkForm.tab === 'social' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full" />}
+                                    </button>
+                                    <button
+                                        onClick={() => setLinkForm({ ...linkForm, tab: 'other' })}
+                                        className={`pb-2 px-1 text-sm font-medium transition-colors relative ${linkForm.tab === 'other' ? 'text-primary' : 'text-white/50 hover:text-white'}`}
+                                    >
+                                        Other Links
+                                        {linkForm.tab === 'other' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full" />}
+                                    </button>
+                                </div>
                             )}
 
-                            <div>
-                                <label className="text-xs text-white/60 mb-1 block">Link URL</label>
-                                <input
-                                    type="url"
-                                    placeholder="https://..."
-                                    value={linkForm.url}
-                                    onChange={e => setLinkForm({ ...linkForm, url: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:outline-none"
-                                    required
-                                />
-                            </div>
+                            <form onSubmit={handleSaveLink} className="space-y-3">
+                                {linkForm.tab === 'social' ? (
+                                    <>
+                                        <div>
+                                            <label className="text-xs text-white/60 mb-1 block">Platform</label>
+                                            <CustomSelect
+                                                value={linkForm.platform}
+                                                onChange={val => setLinkForm({ ...linkForm, platform: val })}
+                                                options={Object.keys(socialPlatforms).map(key => ({
+                                                    value: key,
+                                                    label: socialPlatforms[key].name,
+                                                    icon: socialPlatforms[key].icon
+                                                }))}
+                                                placeholder="Select Platform"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-white/60 mb-1 block">Username (Optional)</label>
+                                            <input
+                                                type="text"
+                                                placeholder="@username"
+                                                value={linkForm.username}
+                                                onChange={e => setLinkForm({ ...linkForm, username: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div>
+                                            <label className="text-xs text-white/60 mb-1 block">Title</label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. My Portfolio"
+                                                value={linkForm.title}
+                                                onChange={e => setLinkForm({ ...linkForm, title: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-primary focus:outline-none"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-white/60 mb-1 block">Description (Optional)</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Short description"
+                                                value={linkForm.description}
+                                                onChange={e => setLinkForm({ ...linkForm, description: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-white/60 mb-1 block">Icon</label>
+                                            <IconPicker
+                                                selected={linkForm.icon}
+                                                onSelect={icon => setLinkForm({ ...linkForm, icon })}
+                                            />
+                                        </div>
+                                    </>
+                                )}
 
-                            <div>
-                                <label className="text-xs text-white/60 mb-1 block">Card Color</label>
-                                <ColorControl
-                                    hex={linkForm.colorHex}
-                                    opacity={linkForm.opacity}
-                                    onHexChange={hex => setLinkForm({ ...linkForm, colorHex: hex })}
-                                    onOpacityChange={op => setLinkForm({ ...linkForm, opacity: op })}
-                                />
-                            </div>
+                                <div>
+                                    <label className="text-xs text-white/60 mb-1 block">Link URL</label>
+                                    <input
+                                        type="url"
+                                        placeholder="https://..."
+                                        value={linkForm.url}
+                                        onChange={e => setLinkForm({ ...linkForm, url: e.target.value })}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-primary focus:outline-none"
+                                        required
+                                    />
+                                </div>
 
-                            <button type="submit" className="w-full btn-gradient py-3 rounded-xl font-bold text-white mt-4">
-                                {linkForm.mode === 'add' ? 'Create Link' : 'Save Changes'}
-                            </button>
-                        </form>
+                                <div>
+                                    <label className="text-xs text-white/60 mb-1 block">Card Color</label>
+                                    <ColorControl
+                                        hex={linkForm.colorHex}
+                                        opacity={linkForm.opacity}
+                                        onHexChange={hex => setLinkForm({ ...linkForm, colorHex: hex })}
+                                        onOpacityChange={op => setLinkForm({ ...linkForm, opacity: op })}
+                                    />
+                                </div>
+
+                                <button type="submit" className="w-full btn-gradient py-2.5 rounded-xl font-semibold text-white text-sm">
+                                    {linkForm.mode === 'add' ? 'Create Link' : 'Save Changes'}
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}

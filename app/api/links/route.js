@@ -283,3 +283,68 @@ export async function DELETE(req) {
     return NextResponse.json({ error: "Failed to delete link" }, { status: 500 });
   }
 }
+
+// PATCH - Reorder socials or favourites
+export async function PATCH(req) {
+  try {
+    await connectDB();
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { type, orderedIds } = body;
+
+    if (!type || !["social", "favourite"].includes(type)) {
+      return NextResponse.json({ error: "Invalid type" }, { status: 400 });
+    }
+
+    if (!orderedIds || !Array.isArray(orderedIds)) {
+      return NextResponse.json({ error: "orderedIds must be an array" }, { status: 400 });
+    }
+
+    const user = await User.findOne({ username: session.user.name });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Reorder the appropriate array
+    if (type === "social") {
+      // Create a map for quick lookup
+      const itemMap = new Map(user.socials.map(item => [item._id.toString(), item]));
+
+      // Reorder based on orderedIds
+      const reordered = orderedIds
+        .map(id => itemMap.get(id))
+        .filter(item => item !== undefined);
+
+      // Keep any items that weren't in orderedIds at the end (safety)
+      const remainingItems = user.socials.filter(item => !orderedIds.includes(item._id.toString()));
+
+      user.socials = [...reordered, ...remainingItems];
+    } else if (type === "favourite") {
+      const itemMap = new Map(user.favourites.map(item => [item._id.toString(), item]));
+
+      const reordered = orderedIds
+        .map(id => itemMap.get(id))
+        .filter(item => item !== undefined);
+
+      const remainingItems = user.favourites.filter(item => !orderedIds.includes(item._id.toString()));
+
+      user.favourites = [...reordered, ...remainingItems];
+    }
+
+    await user.save();
+
+    return NextResponse.json({
+      success: true,
+      socials: serializeList(user.socials),
+      favourites: serializeList(user.favourites)
+    });
+  } catch (error) {
+    console.error("Error reordering:", error);
+    return NextResponse.json({ error: "Failed to reorder" }, { status: 500 });
+  }
+}
