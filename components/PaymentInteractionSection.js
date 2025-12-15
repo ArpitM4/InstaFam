@@ -57,46 +57,53 @@ const PaymentInteractionSection = ({
   return (
     <>
       <div className="w-full max-w-5xl mt-8 flex flex-col items-center px-2">
-        {/* Owner-only Event Controls - Shifted from Header */}
-        {isOwner && (
-          <div className="w-full mb-6 p-5 rounded-2xl border border-white/10 shadow-lg" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}>
-            <h3 className="text-lg font-semibold text-text mb-4">Manage Event (Leaderboard) </h3>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
-              <input
-                type="number"
-                placeholder={isEventActive ? "Event is running" : "Duration in days"}
-                value={eventDuration}
-                onChange={(e) => !isEventActive && setEventDuration(e.target.value)}
-                className={`w-full sm:min-w-[160px] sm:flex-1 px-4 py-3 bg-background text-text rounded-xl focus:outline-none transition-all duration-200 border border-white/5 placeholder-text/40 ${isEventActive ? 'opacity-50 cursor-not-allowed' : 'focus:border-primary/50'}`}
-                disabled={isEventActive}
-                readOnly={isEventActive}
-              />
-              <button
-                onClick={handleStartEvent}
-                disabled={isEventActive || !eventDuration}
-                className={`w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 shadow-lg ${isEventActive || !eventDuration
-                  ? 'bg-gray-500/20 text-gray-400 cursor-not-allowed'
-                  : 'bg-green-500 hover:bg-green-600 text-white hover:scale-[1.02]'
-                  }`}
-              >
-                {isEventActive ? 'Event Active' : 'Start'}
-              </button>
-              <button
-                onClick={handleEndEvent}
-                disabled={!isEventActive}
-                className={`w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 shadow-lg ${!isEventActive
-                  ? 'bg-gray-500/20 text-gray-400 cursor-not-allowed'
-                  : 'bg-red-500 hover:bg-red-600 text-white hover:scale-[1.02]'
-                  }`}
-              >
-                End
-              </button>
+        {/* Owner-only Event Controls - Shifted from Header - ADMIN ONLY */}
+        {(() => {
+          const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || '').split(',').map(e => e.trim());
+          const isAdmin = session?.user?.email && adminEmails.includes(session.user.email);
+
+          if (!isOwner || !isAdmin) return null;
+
+          return (
+            <div className="w-full mb-6 p-5 rounded-2xl border border-white/10 shadow-lg" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}>
+              <h3 className="text-lg font-semibold text-text mb-4">Manage Event (Leaderboard) </h3>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+                <input
+                  type="number"
+                  placeholder={isEventActive ? "Event is running" : "Duration in days"}
+                  value={eventDuration}
+                  onChange={(e) => !isEventActive && setEventDuration(e.target.value)}
+                  className={`w-full sm:min-w-[160px] sm:flex-1 px-4 py-3 bg-background text-text rounded-xl focus:outline-none transition-all duration-200 border border-white/5 placeholder-text/40 ${isEventActive ? 'opacity-50 cursor-not-allowed' : 'focus:border-primary/50'}`}
+                  disabled={isEventActive}
+                  readOnly={isEventActive}
+                />
+                <button
+                  onClick={handleStartEvent}
+                  disabled={isEventActive || !eventDuration}
+                  className={`w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 shadow-lg ${isEventActive || !eventDuration
+                    ? 'bg-gray-500/20 text-gray-400 cursor-not-allowed'
+                    : 'bg-green-500 hover:bg-green-600 text-white hover:scale-[1.02]'
+                    }`}
+                >
+                  {isEventActive ? 'Event Active' : 'Start'}
+                </button>
+                <button
+                  onClick={handleEndEvent}
+                  disabled={!isEventActive}
+                  className={`w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 shadow-lg ${!isEventActive
+                    ? 'bg-gray-500/20 text-gray-400 cursor-not-allowed'
+                    : 'bg-red-500 hover:bg-red-600 text-white hover:scale-[1.02]'
+                    }`}
+                >
+                  End
+                </button>
+              </div>
+              {isEventActive && (
+                <p className="mt-3 text-center sm:text-left text-xs text-text/50">⚠️ Event settings are locked while event is running</p>
+              )}
             </div>
-            {isEventActive && (
-              <p className="mt-3 text-center sm:text-left text-xs text-text/50">⚠️ Event settings are locked while event is running</p>
-            )}
-          </div>
-        )}
+          );
+        })()}
 
         <div className="w-full flex flex-col md:flex-row gap-6">
           {/* Leaderboard - ONLY show when event is active - Visible to ALL users */}

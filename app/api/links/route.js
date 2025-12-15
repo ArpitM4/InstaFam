@@ -16,8 +16,8 @@ export async function GET(req) {
       return NextResponse.json({ error: "Username required" }, { status: 400 });
     }
 
-    // Find user and return their socials and favourites (no auth check for GET)
-    const user = await User.findOne({ username }).select("socials favourites").lean();
+    // Find user and return their socials, favourites, and linksViewMode (no auth check for GET)
+    const user = await User.findOne({ username }).select("socials favourites linksViewMode").lean();
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -38,7 +38,8 @@ export async function GET(req) {
 
     const response = NextResponse.json({
       socials: serializedSocials,
-      favourites: serializedFavourites
+      favourites: serializedFavourites,
+      linksViewMode: user.linksViewMode || 'card'
     });
 
     // Cache for 2 minutes - links don't change frequently
@@ -283,8 +284,7 @@ export async function DELETE(req) {
     return NextResponse.json({ error: "Failed to delete link" }, { status: 500 });
   }
 }
-
-// PATCH - Reorder socials or favourites
+// PATCH - Reorder socials/favourites OR update linksViewMode
 export async function PATCH(req) {
   try {
     await connectDB();
@@ -295,19 +295,30 @@ export async function PATCH(req) {
     }
 
     const body = await req.json();
-    const { type, orderedIds } = body;
+    const { type, orderedIds, viewMode } = body;
 
+    const user = await User.findOne({ username: session.user.name });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Handle view mode update
+    if (type === "viewMode") {
+      if (!viewMode || !["card", "list"].includes(viewMode)) {
+        return NextResponse.json({ error: "Invalid viewMode" }, { status: 400 });
+      }
+      user.linksViewMode = viewMode;
+      await user.save();
+      return NextResponse.json({ success: true, linksViewMode: user.linksViewMode });
+    }
+
+    // Handle reordering
     if (!type || !["social", "favourite"].includes(type)) {
       return NextResponse.json({ error: "Invalid type" }, { status: 400 });
     }
 
     if (!orderedIds || !Array.isArray(orderedIds)) {
       return NextResponse.json({ error: "orderedIds must be an array" }, { status: 400 });
-    }
-
-    const user = await User.findOne({ username: session.user.name });
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Reorder the appropriate array
@@ -344,7 +355,7 @@ export async function PATCH(req) {
       favourites: serializeList(user.favourites)
     });
   } catch (error) {
-    console.error("Error reordering:", error);
-    return NextResponse.json({ error: "Failed to reorder" }, { status: 500 });
+    console.error("Error in PATCH:", error);
+    return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }
 }

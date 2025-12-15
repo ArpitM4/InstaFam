@@ -102,6 +102,13 @@ const UserSchema = new Schema({
     type: [String],
     default: ['contribute', 'vault', 'links'],
     enum: ['contribute', 'vault', 'links', 'merchandise', 'community', 'subscription', 'courses', 'giveaway']
+  },
+
+  // Links display mode preference - card (grid) or list (Linktree-style)
+  linksViewMode: {
+    type: String,
+    enum: ['card', 'list'],
+    default: 'card'
   }
 });
 

@@ -10,7 +10,7 @@ import {
     FaGithub, FaBriefcase, FaEnvelope, FaLaptop, FaMobile, FaMusic,
     FaGamepad, FaCamera, FaHeart, FaStar, FaFire, FaCode, FaCoffee,
     FaPlane, FaCar, FaHome, FaBolt, FaCrown, FaGem, FaCircle, FaCopy,
-    FaGripVertical,
+    FaGripVertical, FaTh, FaList,
     // New icons for Other Links
     FaAddressCard, FaBlog, FaNewspaper, FaVideo, FaPodcast,
     FaStore, FaShoppingCart, FaTags, FaGift, FaTicketAlt, FaCreditCard, FaCoins, FaHandHoldingUsd,
@@ -24,7 +24,7 @@ import ShareModal from "./ShareModal";
 
 // @dnd-kit imports for drag and drop reordering
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, rectSortingStrategy, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 
@@ -301,6 +301,58 @@ const LinkCard = ({ data, isOwner, onEdit, onDelete }) => {
     );
 };
 
+// List-style Link Card (Linktree-style)
+const ListLinkCard = ({ data, isOwner, onEdit, onDelete }) => {
+    const isSocial = data.type === 'social';
+    const platform = isSocial ? socialPlatforms[data.platform?.toLowerCase()] || {} : {};
+    const icon = isSocial ? platform.icon : (iconMap[data.icon] || <FaLink />);
+    const bgColor = data.color || '#1a1a1a';
+
+    const handleClick = (e) => {
+        if (isOwner) {
+            e.preventDefault();
+            onEdit(data);
+        } else {
+            window.open(data.link, '_blank');
+        }
+    };
+
+    return (
+        <div
+            onClick={handleClick}
+            className="relative group w-full rounded-xl border border-white/10 transition-all duration-300 hover:scale-[1.01] hover:shadow-lg cursor-pointer overflow-hidden px-4 py-3"
+            style={{ backgroundColor: bgColor }}
+        >
+            {/* Icon - Left positioned */}
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-white">
+                {icon}
+            </div>
+
+            {/* Content - Centered */}
+            <div className="text-center px-10">
+                <h3 className="font-semibold text-white text-sm">
+                    {isSocial ? platform.name || data.platform : data.title}
+                </h3>
+                {((isSocial && data.username) || (!isSocial && data.description)) && (
+                    <p className="text-white/60 text-xs mt-0.5">
+                        {isSocial ? data.username : data.description}
+                    </p>
+                )}
+            </div>
+
+            {/* Delete Button (owner only) */}
+            {isOwner && (
+                <button
+                    onClick={(e) => { e.stopPropagation(); onDelete(data._id, 'social'); }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-white/20 hover:text-red-500 transition-colors z-20 opacity-0 group-hover:opacity-100"
+                >
+                    <FaTrash size={12} />
+                </button>
+            )}
+        </div>
+    );
+};
+
 const ProductCard = ({ data, isOwner, onEdit, onDelete }) => {
     const pos = data.imagePosition || { scale: 1, x: 50, y: 50 };
     const bgColor = data.color || '#1a1a1a';
@@ -452,6 +504,81 @@ const SortableLinkCard = ({ id, data, isOwner, onEdit, onDelete }) => {
     );
 };
 
+// Sortable List Link Card (for drag-and-drop in list view)
+const SortableListLinkCard = ({ id, data, isOwner, onEdit, onDelete }) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        zIndex: isDragging ? 10 : 1,
+    };
+
+    const isSocial = data.type === 'social';
+    const platform = isSocial ? socialPlatforms[data.platform?.toLowerCase()] || {} : {};
+    const icon = isSocial ? platform.icon : (iconMap[data.icon] || <FaLink />);
+    const bgColor = data.color || '#1a1a1a';
+
+    const handleClick = (e) => {
+        if (isOwner) {
+            e.preventDefault();
+            onEdit(data);
+        } else {
+            window.open(data.link, '_blank');
+        }
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} className="relative group">
+            <div
+                onClick={handleClick}
+                className="relative w-full rounded-xl border border-white/10 transition-all duration-300 hover:shadow-lg cursor-pointer overflow-hidden px-4 py-3"
+                style={{ backgroundColor: bgColor }}
+            >
+                {/* Drag Handle - Left side */}
+                {isOwner && (
+                    <button
+                        {...attributes}
+                        {...listeners}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 p-1.5 text-white/30 hover:text-white cursor-grab active:cursor-grabbing transition-all"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <FaGripVertical size={12} />
+                    </button>
+                )}
+
+                {/* Icon - Left positioned (after drag handle) */}
+                <div className={`absolute top-1/2 -translate-y-1/2 text-xl text-white ${isOwner ? 'left-10' : 'left-4'}`}>
+                    {icon}
+                </div>
+
+                {/* Content - Centered */}
+                <div className="text-center px-14">
+                    <h3 className="font-semibold text-white text-sm">
+                        {isSocial ? platform.name || data.platform : data.title}
+                    </h3>
+                    {((isSocial && data.username) || (!isSocial && data.description)) && (
+                        <p className="text-white/60 text-xs mt-0.5">
+                            {isSocial ? data.username : data.description}
+                        </p>
+                    )}
+                </div>
+
+                {/* Delete Button - Right side */}
+                {isOwner && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onDelete(data._id, 'social'); }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-white/20 hover:text-red-500 transition-colors z-20 opacity-0 group-hover:opacity-100"
+                    >
+                        <FaTrash size={12} />
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+};
+
 const SortableProductCard = ({ id, data, isOwner, onEdit, onDelete }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
@@ -558,6 +685,7 @@ const LinksSection = ({ currentUser, onSocialsChange }) => {
     const { data: session } = useSession();
     const [socials, setSocials] = useState([]);
     const [favourites, setFavourites] = useState([]);
+    const [linksViewMode, setLinksViewMode] = useState('card'); // 'card' or 'list'
 
     const [showLinkModal, setShowLinkModal] = useState(false);
     const [showProductModal, setShowProductModal] = useState(false);
@@ -595,11 +723,25 @@ const LinksSection = ({ currentUser, onSocialsChange }) => {
             if (response.ok) {
                 setSocials(data.socials || []);
                 setFavourites(data.favourites || []);
+                setLinksViewMode(data.linksViewMode || 'card');
             }
         } catch (error) {
             console.error('Error fetching links:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const toggleViewMode = async (mode) => {
+        setLinksViewMode(mode);
+        try {
+            await fetch('/api/links', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'viewMode', viewMode: mode })
+            });
+        } catch (error) {
+            console.error('Error saving view mode:', error);
         }
     };
 
@@ -830,61 +972,126 @@ const LinksSection = ({ currentUser, onSocialsChange }) => {
 
     return (
         <div className="w-full max-w-5xl mt-8 px-4 pb-20">
-            {/* Share Button Owner Only - Minimalistic */}
+            {/* ShareModal - rendered outside of button flow */}
             {isOwner && (
-                <div className="flex justify-end">
-                    <button
-                        onClick={() => setShowShareModal(true)}
-                        className="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white text-sm rounded-lg border border-white/20 hover:border-white/50 bg-transparent transition-all outline-none"
-                    >
-                        <FaLink size={12} /> Share
-                    </button>
-                    <ShareModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} username={currentUser.username} title="Share Sygil" />
-                </div>
+                <ShareModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} username={currentUser.username} title="Share Sygil" />
             )}
 
             {/* --- Links Section --- */}
             <div className="mb-12">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold text-text flex items-center gap-2">Links</h2>
-                </div>
 
-                {isOwner ? (
-                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleLinksDragEnd}>
-                        <SortableContext items={socials.map(item => item._id)} strategy={rectSortingStrategy}>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                {socials.map(item => (
-                                    <SortableLinkCard
-                                        key={item._id}
-                                        id={item._id}
-                                        data={item}
-                                        isOwner={isOwner}
-                                        onEdit={openEditLink}
-                                        onDelete={handleDelete}
-                                    />
-                                ))}
+                    {/* Share Button + View Mode Toggle - Owner Only */}
+                    {isOwner && (
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setShowShareModal(true)}
+                                className="flex items-center gap-2 px-3 py-1.5 text-white/70 hover:text-white text-sm rounded-lg border border-white/20 hover:border-white/50 bg-transparent transition-all outline-none"
+                            >
+                                <FaLink size={12} /> Share
+                            </button>
+
+                            <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
                                 <button
-                                    onClick={openAddLink}
-                                    className="aspect-[1.2/1] rounded-2xl border-2 border-dashed border-white/10 hover:border-primary/50 bg-white/5 hover:bg-white/10 flex flex-col items-center justify-center gap-2 text-white/40 hover:text-primary transition-all group outline-none"
+                                    onClick={() => toggleViewMode('card')}
+                                    className={`p-2 rounded-md transition-all ${linksViewMode === 'card' ? 'bg-primary text-black' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
+                                    title="Card View"
                                 >
-                                    <FaPlus className="text-2xl" />
-                                    <span className="text-sm font-medium">Add Link</span>
+                                    <FaTh size={14} />
+                                </button>
+                                <button
+                                    onClick={() => toggleViewMode('list')}
+                                    className={`p-2 rounded-md transition-all ${linksViewMode === 'list' ? 'bg-primary text-black' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
+                                    title="List View"
+                                >
+                                    <FaList size={14} />
                                 </button>
                             </div>
-                        </SortableContext>
-                    </DndContext>
-                ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {socials.map(item => (
-                            <LinkCard
-                                key={item._id}
-                                data={item}
-                                isOwner={isOwner}
-                                onEdit={openEditLink}
-                                onDelete={handleDelete}
-                            />
-                        ))}
-                    </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Card View */}
+                {linksViewMode === 'card' && (
+                    isOwner ? (
+                        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleLinksDragEnd}>
+                            <SortableContext items={socials.map(item => item._id)} strategy={rectSortingStrategy}>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    {socials.map(item => (
+                                        <SortableLinkCard
+                                            key={item._id}
+                                            id={item._id}
+                                            data={item}
+                                            isOwner={isOwner}
+                                            onEdit={openEditLink}
+                                            onDelete={handleDelete}
+                                        />
+                                    ))}
+                                    <button
+                                        onClick={openAddLink}
+                                        className="aspect-[1.2/1] rounded-2xl border-2 border-dashed border-white/10 hover:border-primary/50 bg-white/5 hover:bg-white/10 flex flex-col items-center justify-center gap-2 text-white/40 hover:text-primary transition-all group outline-none"
+                                    >
+                                        <FaPlus className="text-2xl" />
+                                        <span className="text-sm font-medium">Add Link</span>
+                                    </button>
+                                </div>
+                            </SortableContext>
+                        </DndContext>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {socials.map(item => (
+                                <LinkCard
+                                    key={item._id}
+                                    data={item}
+                                    isOwner={isOwner}
+                                    onEdit={openEditLink}
+                                    onDelete={handleDelete}
+                                />
+                            ))}
+                        </div>
+                    )
+                )}
+
+                {/* List View */}
+                {linksViewMode === 'list' && (
+                    isOwner ? (
+                        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleLinksDragEnd}>
+                            <SortableContext items={socials.map(item => item._id)} strategy={verticalListSortingStrategy}>
+                                <div className="flex flex-col gap-3">
+                                    {socials.map(item => (
+                                        <SortableListLinkCard
+                                            key={item._id}
+                                            id={item._id}
+                                            data={item}
+                                            isOwner={isOwner}
+                                            onEdit={openEditLink}
+                                            onDelete={handleDelete}
+                                        />
+                                    ))}
+                                    <button
+                                        onClick={openAddLink}
+                                        className="w-full rounded-xl border-2 border-dashed border-white/10 hover:border-primary/50 bg-white/5 hover:bg-white/10 flex items-center justify-center gap-2 py-4 text-white/40 hover:text-primary transition-all outline-none"
+                                    >
+                                        <FaPlus size={14} />
+                                        <span className="text-sm font-medium">Add Link</span>
+                                    </button>
+                                </div>
+                            </SortableContext>
+                        </DndContext>
+                    ) : (
+                        <div className="flex flex-col gap-3">
+                            {socials.map(item => (
+                                <ListLinkCard
+                                    key={item._id}
+                                    data={item}
+                                    isOwner={isOwner}
+                                    onEdit={openEditLink}
+                                    onDelete={handleDelete}
+                                />
+                            ))}
+                        </div>
+                    )
                 )}
             </div>
 

@@ -1264,14 +1264,21 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
           )}
         </div>
 
-        {activeTab === 'contribute' && (
-          <div className="mt-6 text-center p-4 bg-white/5 backdrop-blur-md rounded-lg shadow border border-white/10" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)' }}>
+        {/* Multiple donations info - ADMIN ONLY */}
+        {activeTab === 'contribute' && (() => {
+          const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || '').split(',').map(e => e.trim());
+          const isAdmin = session?.user?.email && adminEmails.includes(session.user.email);
 
+          if (!isAdmin) return null;
 
-            <p className="text-success text-sm font-medium">
-              💡 Multiple donations stack up! Keep contributing to climb higher on the leaderboard.
-            </p>
-          </div>)}
+          return (
+            <div className="mt-6 text-center p-4 bg-white/5 backdrop-blur-md rounded-lg shadow border border-white/10" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)' }}>
+              <p className="text-success text-sm font-medium">
+                💡 Multiple donations stack up! Keep contributing to climb higher on the leaderboard.
+              </p>
+            </div>
+          );
+        })()}
 
 
       </div>
