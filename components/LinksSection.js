@@ -464,10 +464,11 @@ const SortableLinkCard = ({ id, data, isOwner, onEdit, onDelete }) => {
                 <button
                     {...attributes}
                     {...listeners}
-                    className="absolute left-1 top-1/2 -translate-y-1/2 z-30 p-1.5 bg-black/60 hover:bg-black/80 rounded-lg text-white/50 hover:text-white cursor-grab active:cursor-grabbing transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm"
+                    style={{ touchAction: 'none' }}
+                    className="absolute left-1 top-1/2 -translate-y-1/2 z-30 p-2.5 bg-black/60 hover:bg-black/80 rounded-lg text-white/50 hover:text-white cursor-grab active:cursor-grabbing transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 backdrop-blur-sm"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <FaGripVertical size={12} />
+                    <FaGripVertical size={14} />
                 </button>
             )}
 
@@ -541,10 +542,11 @@ const SortableListLinkCard = ({ id, data, isOwner, onEdit, onDelete }) => {
                     <button
                         {...attributes}
                         {...listeners}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 p-1.5 text-white/30 hover:text-white cursor-grab active:cursor-grabbing transition-all"
+                        style={{ touchAction: 'none' }}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 text-white/40 hover:text-white cursor-grab active:cursor-grabbing transition-all"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <FaGripVertical size={12} />
+                        <FaGripVertical size={14} />
                     </button>
                 )}
 
@@ -599,10 +601,11 @@ const SortableProductCard = ({ id, data, isOwner, onEdit, onDelete }) => {
                 <button
                     {...attributes}
                     {...listeners}
-                    className="absolute left-1 top-4 z-30 p-1.5 bg-black/60 hover:bg-black/80 rounded-lg text-white/40 hover:text-white cursor-grab active:cursor-grabbing transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm"
+                    style={{ touchAction: 'none' }}
+                    className="absolute left-1 top-4 z-30 p-2.5 bg-black/60 hover:bg-black/80 rounded-lg text-white/40 hover:text-white cursor-grab active:cursor-grabbing transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 backdrop-blur-sm"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <FaGripVertical size={12} />
+                    <FaGripVertical size={14} />
                 </button>
             )}
 
