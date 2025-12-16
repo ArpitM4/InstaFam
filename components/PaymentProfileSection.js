@@ -49,7 +49,8 @@ const PaymentProfileSection = ({
   showBannerPicker,
   setShowBannerPicker,
   onSelectUnsplashBanner,
-  isLoggedIn = false
+  isLoggedIn = false,
+  isPreviewMode = false
 }) => {
   // Generate fallback profile image URL only when needed
   const profileImageUrl = currentUser?.profilepic || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(username || 'User')}&backgroundColor=6366f1`;
@@ -221,6 +222,7 @@ const PaymentProfileSection = ({
             creatorName={username}
             initialFollowerCount={currentUser?.followersArray?.length || currentUser?.followers || 0}
             showFollowerCount={false}
+            isPreviewMode={isPreviewMode}
             onFollowChange={(isFollowing, newCount) => {
               setcurrentUser(prev => ({
                 ...prev,

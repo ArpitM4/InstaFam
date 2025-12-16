@@ -2,7 +2,7 @@
 import React from 'react';
 import { FaGem, FaDownload, FaHandshake, FaComment, FaLock, FaUnlock, FaImage, FaVideo, FaFilePdf, FaMusic, FaKey, FaClock, FaCheck, FaTimes, FaBan } from 'react-icons/fa';
 
-const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, status, userRedemptionCount = 0, isRedemptionCard = false, userPoints = 0 }) => {
+const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, status, userRedemptionCount = 0, isRedemptionCard = false, userPoints = 0, isPreviewMode = false }) => {
 
     const type = item.type || 'file'; // Default to file but ideally should be explicit
     const fileType = item.fileType;
@@ -40,8 +40,10 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
         // Only show status badge on Redemption Cards (History), not Store Cards (Unlock)
         if (!isRedemptionCard) return null;
 
-        // Instant items (file/text) don't need status badges as they are instant
-        if (type === 'file' || type === 'text') return null;
+        // Instant items (file/text) are auto-fulfilled on redemption - always show Fulfilled
+        if (type === 'file' || type === 'text') {
+            return <span className="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded flex items-center gap-1"><FaCheck className="text-[10px]" /> Fulfilled</span>;
+        }
 
         if (!status) return null;
         if (status === 'Pending') return <span className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded flex items-center gap-1"><FaClock className="text-[10px]" /> Pending</span>;
@@ -84,15 +86,13 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
             </div>
 
             {/* Item Header */}
-            <div className="p-4 pt-8 border-b border-white/10 relative">
-                <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-white/5 rounded-lg border border-white/5">
-                            {getIcon(type, fileType)}
-                        </div>
+            <div className="p-4 pt-8  border-white/10 relative">
+                {/* Status Badge for redemption cards only */}
+                {getStatusBadge() && (
+                    <div className="mb-3">
                         {getStatusBadge()}
                     </div>
-                </div>
+                )}
 
                 <div className="flex items-center gap-2 mb-2">
                     <h3 className="font-bold text-lg text-white mb-1 line-clamp-1 pr-2">{item.title}</h3>
@@ -106,41 +106,37 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
                 <p className="text-white/60 text-sm line-clamp-2 min-h-[40px] text-sm leading-relaxed">{item.description}</p>
             </div>
 
-            {/* Stats / Limits */}
-            <div className="px-4 py-2 border-b border-white/5 flex flex-col gap-1 text-xs text-white/40">
-                <div className="flex justify-between">
-                    <span>
-                        {item.type?.toUpperCase() || 'REWARD'}
-                        {item.type === 'file' && ` • ${item.fileType?.toUpperCase() || 'FILE'}`}
-                    </span>
-                    <span>
-                        {/* Only show claimed count if valid numbers exist and NOT redemption card */}
-                        {isRedemptionCard ? (
-                            // For redemption cards, just show the type
-                            null
-                        ) : (item.unlockCount !== undefined) ? (
-                            limit > 0 ? `${item.unlockCount} / ${limit} Claimed` : `${item.unlockCount} Unlocks`
-                        ) : (
-                            // Fallback if unlockCount is missing
-                            limit > 0 ? `Limit: ${limit}` : null
-                        )}
-                    </span>
-                </div>
-                {/* User Limit - Only show if NOT a redemption card (Store Mode) */}
-                {!isRedemptionCard && userLimit > 0 && (
-                    <div className="flex justify-between items-center text-[11px] font-medium mt-1 bg-white/5 p-1.5 rounded-lg border border-white/5">
-                        <span className="text-white/60">Max {userLimit} per user</span>
-                        {!isOwner && (
+            {/* Stats / Limits - Fan View: Show "X Left" and "You: x/y" on same line */}
+            {!isRedemptionCard && (
+                <div className="px-4 py-2 border-b border-white/5">
+                    <div className="flex justify-between items-center text-[11px] font-medium bg-white/5 p-2 rounded-lg border border-white/5">
+                        {/* Left side: Supply remaining */}
+                        <span className={`${isSoldOut ? 'text-red-400 font-bold' : 'text-white/60'}`}>
+                            {(() => {
+                                // Calculate remaining supply
+                                const unlockCount = item.unlockCount || 0;
+                                if (limit > 0) {
+                                    const remaining = limit - unlockCount;
+                                    if (remaining <= 0) return 'SOLD OUT';
+                                    return `${remaining} Left`;
+                                }
+                                // Unlimited supply
+                                return `${unlockCount} Unlocks`;
+                            })()}
+                        </span>
+
+                        {/* Right side: User limit (only for fans, not owners) */}
+                        {!isOwner && userLimit > 0 && (
                             <span className={`${reachedUserLimit ? 'text-red-400' : 'text-primary'}`}>
                                 You: {userRedemptionCount} / {userLimit}
                             </span>
                         )}
                     </div>
-                )}
-            </div>
+                </div>
+            )}
 
-            {/* Action Footer */}
-            <div className="p-4">
+            {/* Action Footer - Less padding for redemption cards since they don't have stats section */}
+            <div className={isRedemptionCard ? "p-3" : "p-4"}>
                 {isOwner ? (
                     <button
                         onClick={() => onEdit && onEdit(item)}
@@ -190,7 +186,7 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
                                 <div
                                     className={`absolute top-0 left-0 h-full transition-all duration-700 ease-out flex items-center justify-end
                                         ${canAfford
-                                            ? 'bg-gradient-to-r from-[#FF2F72] via-[#FF4B86] to-[#FF6A2F]'
+                                            ? 'bg-gradient-to-r from-[#FF2F72]/80 via-[#FF4B86]/80 to-[#FF6A2F]/80'
                                             : 'bg-gradient-to-r from-[#FF2F72]/30 via-[#FF4B86]/30 to-[#FF6A2F]/30'
                                         }
                                     `}

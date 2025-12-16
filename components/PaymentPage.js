@@ -21,6 +21,7 @@ import CreatorOnboardingGuide from "./CreatorOnboardingGuide";
 
 import PaymentInteractionSection from "./PaymentInteractionSection";
 import ShareModal from "./ShareModal";
+import PreviewBanner from "./PreviewBanner";
 
 const VaultSection = dynamic(() => import("./VaultSection"), {
   loading: () => <div className="w-full max-w-5xl mt-8 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>
@@ -145,10 +146,12 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
   // Memoize computed values for performance
   const isActualOwner = useMemo(() => session?.user?.name === username, [session?.user?.name, username]);
 
+  // Check if in preview mode
+  const isPreviewMode = useMemo(() => searchParams?.get('viewAs') === 'public', [searchParams]);
+
   const isOwner = useMemo(() => {
-    const isPreviewMode = searchParams?.get('viewAs') === 'public';
     return isActualOwner && !isPreviewMode;
-  }, [isActualOwner, searchParams]);
+  }, [isActualOwner, isPreviewMode]);
 
   // Sync activeTab with URL path
   useEffect(() => {
@@ -177,8 +180,10 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
     setActiveTab(tab);
 
     // Update URL in browser without navigation (no page reload)
-    const newUrl = tab === 'links' ? `/${username}` : `/${username}/${tab}`;
-    window.history.replaceState(null, '', newUrl);
+    // Preserve ?viewAs=public query param if in preview mode
+    const basePath = tab === 'links' ? `/${username}` : `/${username}/${tab}`;
+    const queryParam = isPreviewMode ? '?viewAs=public' : '';
+    window.history.replaceState(null, '', basePath + queryParam);
   };
 
   const handleOpenCustomize = () => {
@@ -1000,7 +1005,8 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
           showBannerPicker={showBannerPicker}
           setShowBannerPicker={setShowBannerPicker}
           onSelectUnsplashBanner={handleSelectUnsplashBanner}
-          isLoggedIn={!!session}
+          isLoggedIn={!!session && !isPreviewMode}
+          isPreviewMode={isPreviewMode}
         />
 
         {/* NEW TAB NAVIGATION UI - Replaces the old InteractionSection placement */}
@@ -1187,8 +1193,8 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
 
           {activeTab === 'vault' && (
             <div className="w-full max-w-5xl">
-              {/* FamPoints Balance Box for fans (not owners) */}
-              {session && !isOwner && fanPoints !== null && (
+              {/* FamPoints Balance Box for fans (not owners, not in preview mode) */}
+              {session && !isOwner && !isPreviewMode && fanPoints !== null && (
                 <div className="mb-6 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-3xl">🪙</span>
@@ -1200,16 +1206,22 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
                   <p className="text-xs text-text/50">Use these points to redeem vault items</p>
                 </div>
               )}
-              {/* Prompt to login for guests */}
-              {!session && (
-                <div className="mb-6 p-1 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-full text-center max-w-sm mx-auto cursor-pointer hover:scale-105 transition-transform" onClick={() => window.dispatchEvent(new CustomEvent('open-auth-modal'))}>
+              {/* Prompt to login for guests OR preview mode */}
+              {(!session || isPreviewMode) && (
+                <div className="mb-6 p-1 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-full text-center max-w-sm mx-auto cursor-pointer hover:scale-105 transition-transform" onClick={() => {
+                  if (isPreviewMode) {
+                    toast.info("Disabled in preview mode");
+                  } else {
+                    window.dispatchEvent(new CustomEvent('open-auth-modal'));
+                  }
+                }}>
                   <div className="flex items-center justify-center gap-2 py-2 px-4">
                     <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
                     <p className="text-green-400 text-sm font-bold tracking-wide">Get +10 FP On Follow</p>
                   </div>
                 </div>
               )}
-              <VaultSection currentUser={currentUser} initialItems={initialVaultItems} isOwner={isOwner} onPointsUpdate={loadFanPoints} />
+              <VaultSection currentUser={currentUser} initialItems={initialVaultItems} isOwner={isOwner} isPreviewMode={isPreviewMode} onPointsUpdate={loadFanPoints} />
             </div>
           )}
 
@@ -1220,6 +1232,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
           {activeTab === 'links' && (
             <LinksSection
               currentUser={currentUser}
+              isOwner={isOwner}
               onSocialsChange={(newSocials) => {
                 setcurrentUser(prev => ({ ...prev, socials: newSocials }));
               }}
@@ -1423,17 +1436,20 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
       />
 
       {/* Preview Button for Owners */}
-      {isOwner && !showOnboarding && (
-        <a
-          href={`${typeof window !== 'undefined' ? window.location.pathname : ''}?viewAs=public`}
-          target="_blank"
-          rel="noopener noreferrer"
+      {isActualOwner && !isPreviewMode && !showOnboarding && (
+        <button
+          onClick={() => router.push(`/${username}?viewAs=public`)}
           className="fixed bottom-24 right-6 z-[9990] bg-black text-white px-6 py-3 rounded-full font-bold shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 border border-white/10 hover:shadow-primary/20"
           title="See how your page looks to others"
         >
           <FaEye className="text-xl" />
           <span>Preview</span>
-        </a>
+        </button>
+      )}
+
+      {/* Preview Mode Banner */}
+      {isPreviewMode && isActualOwner && (
+        <PreviewBanner username={username} />
       )}
     </>
   );

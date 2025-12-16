@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { fetchCreatorVaultItems, redeemVaultItem, fetchRedeemedItems, fetchFanRedemptions } from '@/actions/vaultActions';
 import { useUser } from '@/context/UserContext';
 import { emitPaymentSuccess } from '@/utils/eventBus';
-import { FaGem, FaPlus, FaList, FaShoppingBag } from 'react-icons/fa';
+import { FaGem, FaPlus, FaList, FaShoppingBag, FaGift } from 'react-icons/fa';
 
 // Components
 import VaultItemCard from './vault/VaultItemCard';
@@ -15,9 +15,12 @@ import EditVaultItemModal from './vault/EditVaultItemModal';
 import RedeemVaultModal from './vault/RedeemVaultModal';
 import VaultSuccessModal from './vault/VaultSuccessModal';
 
-const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) => {
+const VaultSection = ({ currentUser, initialItems, isOwner, isPreviewMode = false, onPointsUpdate }) => {
   const { data: session } = useSession();
   const { updatePoints } = useUser();
+
+  // In preview mode, simulate logged-out state
+  const effectiveSession = isPreviewMode ? null : session;
 
   // State
   const [vaultItems, setVaultItems] = useState(initialItems || []);
@@ -45,9 +48,9 @@ const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) =>
   useEffect(() => {
     if (currentUser?.username) {
       if (!initialItems) loadVaultItems();
-      if (session?.user?.name) loadFanData();
+      if (effectiveSession?.user?.name) loadFanData();
     }
-  }, [currentUser, session]);
+  }, [currentUser, effectiveSession]);
 
   const loadVaultItems = async () => {
     try {
@@ -227,19 +230,31 @@ const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) =>
             <div className="p-6 space-y-6">
               <div className="text-white/80 space-y-4">
                 <p>
-                  Very soon, you'll be able to publish <span className="text-primary font-medium">paid Vault items</span> that cost FamPoints.
-                  Fans will contribute to you to earn those points, and you'll finally have a clean and powerful way to monetize your real supporters.
+                  Very soon, you’ll be able to earn using{" "}
+                  <span className="text-primary font-medium">Vault items</span> that cost FamPoints.
+                  <br />
+                  Even right now, fans earn <span className="text-primary font-medium">10 FamPoints</span> when they follow you on Sygil.
+                  This means you can already add free or low-cost Vault items (0–10 FP) for your audience.
                 </p>
+
                 <p>
-                  But for the next 4 weeks (during beta), the smartest thing you can do is simple:
-                  <span className="text-yellow-400 font-bold ml-1">Grow your Sygil audience first.</span>
+                  Fans earn points by Contributing in the contribution tab.
+                  Later, those same points become the easiest way for them to support you and unlock your paid Vault items — without clutter or friction.
                 </p>
+
+                <p>
+                  For the next <span className="text-yellow-400 font-bold">4 weeks (beta)</span>, the smartest move is simple:
+                  <span className="text-yellow-400 font-bold ml-1">focus on growing your Sygil audience.</span>
+                </p>
+
                 <p className="text-white/60">
-                  Fans follow you here for one reason: They don't want to miss out on your free drops.
-                  Free items are limited, they're first-come-first-serve, and they disappear fast — so fans keep checking your Sygil page.
-                  That's how they get used to visiting your Sygil, and later that same audience becomes your biggest earning base.
+                  Fans follow you here because they don’t want to miss your free drops.
+                  Free Vault items are limited, first-come-first-serve, and disappear fast —
+                  so fans keep coming back to your Sygil page.
+                  Over time, this becomes your most engaged and high-trust audience.
                 </p>
               </div>
+
 
               <div className="border-t border-white/10 pt-6">
                 <h4 className="text-xl font-bold text-white mb-4">3 Steps to Grow Fast</h4>
@@ -383,8 +398,13 @@ const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) =>
                       isRedeemed={redeemedItems.includes(item._id)}
                       userRedemptionCount={redemptionStatuses[item._id]?.count || 0}
                       status={redemptionStatuses[item._id]?.status}
+                      isPreviewMode={isPreviewMode}
                       onRedeem={(itm) => {
-                        if (!session) {
+                        if (isPreviewMode) {
+                          toast.info("Disabled in preview mode");
+                          return;
+                        }
+                        if (!effectiveSession) {
                           window.dispatchEvent(new CustomEvent('open-auth-modal'));
                           return;
                         }
@@ -400,11 +420,11 @@ const VaultSection = ({ currentUser, initialItems, isOwner, onPointsUpdate }) =>
                 </div>
               )}
 
-              {/* MY REDEMPTIONS SECTION */}
-              {!isOwner && (
+              {/* MY REDEMPTIONS SECTION - Only show for logged-in users who are not the owner (hidden in preview mode) */}
+              {!isOwner && effectiveSession && (
                 <div className="mt-12 border-t border-white/10 pt-8">
                   <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                    <FaShoppingBag className="text-primary" /> My Redemptions
+                    <FaGift className="text-primary" /> My Redemptions
                   </h3>
 
                   {redemptionsLoading ? (

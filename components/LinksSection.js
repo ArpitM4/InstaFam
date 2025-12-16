@@ -23,7 +23,7 @@ import Image from 'next/image';
 import ShareModal from "./ShareModal";
 
 // @dnd-kit imports for drag and drop reordering
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, rectSortingStrategy, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -681,7 +681,7 @@ const SortableProductCard = ({ id, data, isOwner, onEdit, onDelete }) => {
 
 // --- Main LinksSection ---
 
-const LinksSection = ({ currentUser, onSocialsChange }) => {
+const LinksSection = ({ currentUser, isOwner: isOwnerProp, onSocialsChange }) => {
     const { data: session } = useSession();
     const [socials, setSocials] = useState([]);
     const [favourites, setFavourites] = useState([]);
@@ -709,7 +709,8 @@ const LinksSection = ({ currentUser, onSocialsChange }) => {
 
     const [uploadingImage, setUploadingImage] = useState(false);
 
-    const isOwner = session?.user?.name === currentUser?.username;
+    // Use prop if provided, otherwise fall back to session check (for backward compatibility)
+    const isOwner = isOwnerProp !== undefined ? isOwnerProp : session?.user?.name === currentUser?.username;
 
     useEffect(() => {
         if (currentUser?.username) fetchLinks();
@@ -921,6 +922,7 @@ const LinksSection = ({ currentUser, onSocialsChange }) => {
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+        useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } }),
         useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
     );
 

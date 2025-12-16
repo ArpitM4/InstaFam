@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 import PointsRewardPopup from './PointsRewardPopup';
 
-const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFollowChange, showFollowerCount = false }) => {
+const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFollowChange, showFollowerCount = false, isPreviewMode = false }) => {
   const { data: session } = useSession();
   const [isFollowing, setIsFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(initialFollowerCount);
@@ -17,8 +17,8 @@ const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFoll
   const [showRewardPopup, setShowRewardPopup] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
 
-  // Show follow button for guests or other users (not owner)
-  const shouldShowButton = !session || session.user.id !== creatorId;
+  // Show follow button for guests, other users (not owner), OR in preview mode
+  const shouldShowButton = isPreviewMode || !session || session.user.id !== creatorId;
 
   useEffect(() => {
     if (shouldShowButton && creatorId) {
@@ -51,6 +51,12 @@ const FollowButton = ({ creatorId, creatorName, initialFollowerCount = 0, onFoll
   };
 
   const handleFollowToggle = async () => {
+    // In preview mode, show toast and don't do anything
+    if (isPreviewMode) {
+      toast.info("Disabled in preview mode");
+      return;
+    }
+
     if (!session) {
       window.dispatchEvent(new CustomEvent('open-auth-modal'));
       return;

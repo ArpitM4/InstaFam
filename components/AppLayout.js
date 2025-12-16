@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useUser } from "@/context/UserContext";
 import { FaHome, FaCompass, FaCoins, FaBars } from "react-icons/fa";
@@ -29,6 +29,10 @@ export default function AppLayout({ children }) {
 
   // Check if current page is a creator profile page (dynamic routes like /username)
   const isCreatorPage = !mainRoutes.some(route => pathname === route || pathname.startsWith(route + '/')) && pathname !== '/' && !isCreatorDashboardRoute;
+
+  // Check if in preview mode (creator viewing their own page as visitor)
+  const searchParams = useSearchParams();
+  const isPreviewMode = searchParams?.get('viewAs') === 'public';
 
   // Enforce onboarding flow for new users
   useEffect(() => {
@@ -93,6 +97,18 @@ export default function AppLayout({ children }) {
   // For non-authenticated users, just render children (login/signup pages, etc.)
   if (status === "loading") {
     return <>{children}</>;
+  }
+
+  // In preview mode, render PublicNavbar to match visitor experience (with extra top padding for banner)
+  if (isPreviewMode && isCreatorPage) {
+    return (
+      <div className="min-h-screen bg-background">
+        <PublicNavbar isPreviewMode={true} />
+        <main className="pt-24 md:pt-12">
+          {children}
+        </main>
+      </div>
+    );
   }
 
   if (!session) {
