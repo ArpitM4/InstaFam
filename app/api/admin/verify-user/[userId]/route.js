@@ -12,7 +12,7 @@ async function isAdminUser(email) {
 export async function POST(request, { params }) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email || !(await isAdminUser(session.user.email))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -30,7 +30,7 @@ export async function POST(request, { params }) {
     user.instagram.isVerified = true;
     user.instagram.otp = null; // Clear OTP after verification
     user.updatedAt = new Date();
-    
+
     await user.save();
 
     return NextResponse.json({ message: 'User verified successfully' });

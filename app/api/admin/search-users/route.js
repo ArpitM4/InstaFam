@@ -12,7 +12,7 @@ async function isAdminUser(email) {
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email || !(await isAdminUser(session.user.email))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -36,7 +36,7 @@ export async function GET(request) {
     } else if (query) {
       // Search users by query
       const searchRegex = new RegExp(query, 'i');
-      
+
       users = await User.find({
         $or: [
           { username: searchRegex },
@@ -44,9 +44,9 @@ export async function GET(request) {
           { name: searchRegex }
         ]
       })
-      .select('-password -emailVerificationOTP -passwordResetOTP')
-      .limit(limit)
-      .sort({ createdAt: -1 });
+        .select('-password -emailVerificationOTP -passwordResetOTP')
+        .limit(limit)
+        .sort({ createdAt: -1 });
     } else {
       // Default: return latest 50 users
       users = await User.find({})

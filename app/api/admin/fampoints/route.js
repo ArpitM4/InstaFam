@@ -14,7 +14,7 @@ async function isAdminUser(email) {
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email || !(await isAdminUser(session.user.email))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -51,8 +51,8 @@ export async function GET(request) {
     ] = await Promise.all([
       // Total points generated (earned + bonus + refunds) - handle both amount and points_earned fields
       PointTransaction.aggregate([
-        { 
-          $match: { 
+        {
+          $match: {
             $or: [
               { type: 'Earned' },
               { type: 'Bonus' },
@@ -60,40 +60,40 @@ export async function GET(request) {
               { type: { $exists: false } }, // Old records without type
               { type: null }
             ],
-            ...dateFilter 
-          } 
+            ...dateFilter
+          }
         },
-        { 
-          $group: { 
-            _id: null, 
-            total: { 
+        {
+          $group: {
+            _id: null,
+            total: {
               $sum: {
                 $ifNull: ['$amount', { $ifNull: ['$points_earned', 0] }]
               }
-            } 
-          } 
+            }
+          }
         }
       ]),
 
       // Total points redeemed (spent) - count all spent transaction amounts
       PointTransaction.aggregate([
-        { 
-          $match: { 
+        {
+          $match: {
             type: 'Spent',
-            ...dateFilter 
-          } 
+            ...dateFilter
+          }
         },
-        { 
-          $group: { 
-            _id: null, 
-            total: { 
-              $sum: { 
+        {
+          $group: {
+            _id: null,
+            total: {
+              $sum: {
                 $abs: {
                   $ifNull: ['$amount', { $ifNull: ['$points_earned', 0] }]
                 }
-              } 
-            } 
-          } 
+              }
+            }
+          }
         }
       ]),
 
@@ -105,8 +105,8 @@ export async function GET(request) {
 
       // Active points (not expired, not used) - including bonus and refunds
       PointTransaction.aggregate([
-        { 
-          $match: { 
+        {
+          $match: {
             $or: [
               { type: 'Earned' },
               { type: 'Bonus' },
@@ -127,17 +127,17 @@ export async function GET(request) {
               { expiresAt: { $exists: false } } // Old records without expiry
             ],
             ...dateFilter
-          } 
+          }
         },
-        { 
-          $group: { 
-            _id: null, 
-            total: { 
+        {
+          $group: {
+            _id: null,
+            total: {
               $sum: {
                 $ifNull: ['$amount', { $ifNull: ['$points_earned', 0] }]
               }
-            } 
-          } 
+            }
+          }
         }
       ]),
 
@@ -195,15 +195,15 @@ export async function GET(request) {
             }
           }
         },
-        { 
-          $group: { 
-            _id: null, 
-            total: { 
+        {
+          $group: {
+            _id: null,
+            total: {
               $sum: {
                 $ifNull: ['$amount', { $ifNull: ['$points_earned', 0] }]
               }
-            } 
-          } 
+            }
+          }
         }
       ]),
 
@@ -231,15 +231,15 @@ export async function GET(request) {
             }
           }
         },
-        { 
-          $group: { 
-            _id: null, 
-            total: { 
+        {
+          $group: {
+            _id: null,
+            total: {
               $sum: {
                 $ifNull: ['$amount', { $ifNull: ['$points_earned', 0] }]
               }
-            } 
-          } 
+            }
+          }
         }
       ]),
 
@@ -254,17 +254,17 @@ export async function GET(request) {
             }
           }
         },
-        { 
-          $group: { 
-            _id: null, 
-            total: { 
-              $sum: { 
+        {
+          $group: {
+            _id: null,
+            total: {
+              $sum: {
                 $abs: {
                   $ifNull: ['$amount', 0]
                 }
-              } 
-            } 
-          } 
+              }
+            }
+          }
         }
       ])
     ]);
@@ -305,7 +305,7 @@ export async function GET(request) {
 
   } catch (error) {
     console.error('FamPoints admin API error:', error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: 'Internal server error',
       details: error.message
     }, { status: 500 });

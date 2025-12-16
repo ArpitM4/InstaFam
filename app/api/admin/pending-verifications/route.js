@@ -12,7 +12,7 @@ async function isAdminUser(email) {
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email || !(await isAdminUser(session.user.email))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -24,8 +24,8 @@ export async function GET(request) {
       'instagram.otp': { $exists: true, $ne: null },
       'instagram.isVerified': { $ne: true }
     })
-    .select('-password -emailVerificationOTP -passwordResetOTP')
-    .sort({ 'instagram.otpGeneratedAt': 1 }); // Oldest first
+      .select('-password -emailVerificationOTP -passwordResetOTP')
+      .sort({ 'instagram.otpGeneratedAt': 1 }); // Oldest first
 
     return NextResponse.json({ users });
   } catch (error) {

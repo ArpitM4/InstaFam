@@ -11,7 +11,7 @@ async function isAdminUser(email) {
 
 export default async function AdminDashboard() {
   const session = await getServerSession(authOptions);
-  
+
   if (!session?.user?.email || !(await isAdminUser(session.user.email))) {
     redirect('/');
   }

@@ -16,16 +16,16 @@ export async function GET(req) {
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
+
     const isAdmin = await isAdminUser(session.user.email);
     if (!isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-    
+
     // Get date range parameter
     const { searchParams } = new URL(req.url);
     const dateRange = searchParams.get('dateRange') || '7days';
-    
+
     const propertyId = process.env.GOOGLE_ANALYTICS_PROPERTY_ID;
     if (!propertyId) {
       return NextResponse.json({ error: 'Missing Google Analytics Property ID' }, { status: 500 });
@@ -35,7 +35,7 @@ export async function GET(req) {
       keyFilename: keyFilePath,
       timeout: 30000,
     });
-      
+
     // Helper function to format duration
     const formatDuration = (seconds) => {
       const minutes = Math.floor(seconds / 60);
@@ -180,17 +180,17 @@ export async function GET(req) {
 
 function generateMockAnalyticsData(dateRange) {
   // Adjust mock data based on date range
-  const multiplier = dateRange === '24hours' ? 1 : 
-                    dateRange === '7days' ? 7 : 
-                    dateRange === '30days' ? 30 : 90;
-  
+  const multiplier = dateRange === '24hours' ? 1 :
+    dateRange === '7days' ? 7 :
+      dateRange === '30days' ? 30 : 90;
+
   // Generate consistent but random-looking data
   const baseUsers = 42;
   const users = Math.floor(baseUsers * multiplier * (0.9 + Math.random() * 0.2));
   const sessions = Math.floor(users * (1.3 + Math.random() * 0.4));
   const pageviews = Math.floor(sessions * (3.2 + Math.random() * 0.6));
   const newUsers = Math.floor(users * (0.35 + Math.random() * 0.1));
-  
+
   // Calculate trends (showing growth)
   const usersTrend = Math.floor(Math.random() * 12) + 3;
   const sessionsTrend = Math.floor(Math.random() * 15) + 1;
@@ -198,7 +198,7 @@ function generateMockAnalyticsData(dateRange) {
   const durationTrend = Math.floor(Math.random() * 8) - 2;
   const bounceTrend = -1 * (Math.floor(Math.random() * 6) + 1); // Negative is good for bounce rate
   const newUsersTrend = Math.floor(Math.random() * 14) + 6;
-  
+
   // Top pages data with realistic distribution
   const totalViews = pageviews;
   const homeViews = Math.floor(totalViews * (0.32 + Math.random() * 0.05));
@@ -206,19 +206,19 @@ function generateMockAnalyticsData(dateRange) {
   const vaultViews = Math.floor(totalViews * (0.15 + Math.random() * 0.02));
   const storeViews = Math.floor(totalViews * (0.09 + Math.random() * 0.02));
   const pointsViews = Math.floor(totalViews * (0.06 + Math.random() * 0.01));
-  
+
   // Device breakdown (desktop-heavy for admin sites)
   const desktop = 65 + Math.floor(Math.random() * 10);
   const mobile = 100 - desktop - (5 + Math.floor(Math.random() * 5));
   const tablet = 100 - desktop - mobile;
-  
+
   return {
     // Note indicating mock data
     mockData: true,
-    
+
     // Live users count
     realtimeUsers: Math.floor(Math.random() * (multiplier > 30 ? 25 : 12)) + 3,
-    
+
     // Overview stats with trends
     overview: {
       users: users,
@@ -234,43 +234,43 @@ function generateMockAnalyticsData(dateRange) {
       newUsers: newUsers,
       newUsersTrend: newUsersTrend
     },
-    
+
     // Top pages with realistic percentages
     topPages: [
-      { 
-        page: '/', 
-        views: homeViews, 
-        percentage: `${Math.round((homeViews / totalViews) * 100)}%` 
+      {
+        page: '/',
+        views: homeViews,
+        percentage: `${Math.round((homeViews / totalViews) * 100)}%`
       },
-      { 
-        page: '/blogs', 
-        views: blogViews, 
-        percentage: `${Math.round((blogViews / totalViews) * 100)}%` 
+      {
+        page: '/blogs',
+        views: blogViews,
+        percentage: `${Math.round((blogViews / totalViews) * 100)}%`
       },
-      { 
-        page: '/vault', 
-        views: vaultViews, 
-        percentage: `${Math.round((vaultViews / totalViews) * 100)}%` 
+      {
+        page: '/vault',
+        views: vaultViews,
+        percentage: `${Math.round((vaultViews / totalViews) * 100)}%`
       },
-      { 
-        page: '/fam-store', 
-        views: storeViews, 
-        percentage: `${Math.round((storeViews / totalViews) * 100)}%` 
+      {
+        page: '/fam-store',
+        views: storeViews,
+        percentage: `${Math.round((storeViews / totalViews) * 100)}%`
       },
-      { 
-        page: '/my-fam-points', 
-        views: pointsViews, 
-        percentage: `${Math.round((pointsViews / totalViews) * 100)}%` 
+      {
+        page: '/my-fam-points',
+        views: pointsViews,
+        percentage: `${Math.round((pointsViews / totalViews) * 100)}%`
       }
     ],
-    
+
     // Device breakdown
     deviceBreakdown: {
       desktop: desktop,
       mobile: mobile,
       tablet: tablet
     },
-    
+
     // Geographic data
     topCountries: [
       { country: 'India', users: Math.floor(users * 0.45) },

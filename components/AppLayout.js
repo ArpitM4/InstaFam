@@ -1,8 +1,8 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useUser } from "@/context/UserContext";
 import { FaHome, FaCompass, FaCoins, FaBars } from "react-icons/fa";
@@ -10,6 +10,7 @@ import NotificationBell from "./NotificationBell";
 
 import PublicNavbar from "./PublicNavbar";
 import AuthModal from "./AuthModal";
+import PreviewModeDetector from "./PreviewModeDetector";
 
 export default function AppLayout({ children }) {
   const pathname = usePathname();
@@ -31,8 +32,11 @@ export default function AppLayout({ children }) {
   const isCreatorPage = !mainRoutes.some(route => pathname === route || pathname.startsWith(route + '/')) && pathname !== '/' && !isCreatorDashboardRoute;
 
   // Check if in preview mode (creator viewing their own page as visitor)
-  const searchParams = useSearchParams();
-  const isPreviewMode = searchParams?.get('viewAs') === 'public';
+  // Using state + callback pattern with Suspense-wrapped child component to allow static generation
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const handlePreviewModeChange = useCallback((previewMode) => {
+    setIsPreviewMode(previewMode);
+  }, []);
 
   // Enforce onboarding flow for new users
   useEffect(() => {
@@ -133,6 +137,12 @@ export default function AppLayout({ children }) {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Suspense-wrapped component for detecting preview mode from URL params */}
+      {/* This pattern allows the rest of the app to be statically generated */}
+      <Suspense fallback={null}>
+        <PreviewModeDetector onPreviewModeChange={handlePreviewModeChange} />
+      </Suspense>
+
       {/* Setup Modal for In-Place Onboarding */}
       <AuthModal
         isOpen={showSetupModal}

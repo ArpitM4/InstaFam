@@ -1,0 +1,548 @@
+
+> sygil@0.1.0 build
+> next build
+
+  ??? Next.js 14.2.31
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ ??? Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+MongoDB Connected: instafam-shard-00-01.g93qq.mongodb.net
+MongoDB Connected: instafam-shard-00-00.g93qq.mongodb.net
+MongoDB Connected: instafam-shard-00-01.g93qq.mongodb.net
+MongoDB Connected: instafam-shard-00-00.g93qq.mongodb.net
+MongoDB Connected: instafam-shard-00-01.g93qq.mongodb.net
+MongoDB Connected: instafam-shard-00-02.g93qq.mongodb.net
+MongoDB Connected: instafam-shard-00-01.g93qq.mongodb.net
+MongoDB Connected: instafam-shard-00-02.g93qq.mongodb.net
+MongoDB Connected: instafam-shard-00-00.g93qq.mongodb.net
+MongoDB Connected: instafam-shard-00-01.g93qq.mongodb.net
+MongoDB Connected: instafam-shard-00-02.g93qq.mongodb.net
+   Generating static pages (0/61) ...
+Check username error: B [Error]: Dynamic server usage: Route /api/check-username couldn't be rendered statically because it used `request.url`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at V (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:21778)
+    at Object.get (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:29465)
+    at p (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\app\api\check-username\route.js:1:835)
+    at C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\server\lib\trace\tracer.js:122:103 {
+  description: "Route /api/check-username couldn't be rendered statically because it used `request.url`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+FamPoints admin API error: n [Error]: Dynamic server usage: Route /api/admin/fampoints couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\8948.js:1:37220)
+    at d (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\5080.js:37:119777)
+    at a (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\5080.js:37:20306)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\app\api\admin\fampoints\route.js:1:2411)
+    at C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/admin/fampoints couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Fetch analytics error: n [Error]: Dynamic server usage: Route /api/admin/analytics couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\8948.js:1:37220)
+    at d (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\5080.js:37:119777)
+    at a (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\5080.js:37:20306)
+    at g (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\app\api\admin\analytics\route.js:1:2422)
+    at C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/admin/analytics couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (15/61) 
+Error fetching followed creators: n [Error]: Dynamic server usage: Route /api/user/following couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\8948.js:1:37220)
+    at d (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\5080.js:37:119777)
+    at a (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\5080.js:37:20306)
+    at d (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\app\api\user\following\route.js:1:2250)
+    at C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/user/following couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Search users error: n [Error]: Dynamic server usage: Route /api/admin/search-users couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\8948.js:1:37220)
+    at d (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\5080.js:37:119777)
+    at a (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\5080.js:37:20306)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\app\api\admin\search-users\route.js:1:2406)
+    at C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/admin/search-users couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Fetch pending verifications error: n [Error]: Dynamic server usage: Route /api/admin/pending-verifications couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\8948.js:1:37220)
+    at d (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\5080.js:37:119777)
+    at a (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\5080.js:37:20306)
+    at l (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\app\api\admin\pending-verifications\route.js:1:2400)
+    at C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/admin/pending-verifications couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/404". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/_not-found". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+   Generating static pages (30/61) 
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/admin/dashboard/analytics". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/admin/dashboard/analytics". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/about". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/about". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/creator/dashboard". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/creator/dashboard". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/creator". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/creator". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/creator/payment". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/creator/payment". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/admin/dashboard". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/admin/dashboard". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/admin/dashboard/search". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/admin/dashboard/search". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/creator/requests". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/creator/requests". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/auth/verify-request". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/auth/verify-request". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/contact". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/contact". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/admin/dashboard/google-analytics". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/admin/dashboard/google-analytics". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/admin/dashboard/verification". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/admin/dashboard/verification". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/creator/vault". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/creator/vault". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/creator/unranked-donations". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/creator/unranked-donations". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+   Generating static pages (45/61) 
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/faqs". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/faqs". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/explore". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/explore". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/privacypolicy". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/privacypolicy". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/forgot-password". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/forgot-password". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/setup". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/setup". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/unverified". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/unverified". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/creators". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/creators". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/admin/dashboard/fampoints". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/admin/dashboard/fampoints". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/terms". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/terms". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/blogs". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/blogs". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/upload-blog". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+ ??? Generating static pages (61/61)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/upload-blog". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/my-fam-points". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/my-fam-points". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+ ??? useSearchParams() should be wrapped in a suspense boundary at page "/account". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:32011)
+    at c (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\1684.js:1:42994)
+    at f (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\.next\server\chunks\7358.js:1:14708)
+    at nj (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nD (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:66681)
+    at nN (C:\Users\Arpit\Desktop\Coding\Web Dev\Next JS\InstaFam\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64854)
+System.Management.Automation.RemoteException
+Error occurred prerendering page "/account". Read more: https://nextjs.org/docs/messages/prerender-error
+System.Management.Automation.RemoteException
+System.Management.Automation.RemoteException
+> Export encountered errors on following paths:
+	/_not-found/page: /_not-found
+	/about/page: /about
+	/account/page: /account
+	/admin/dashboard/analytics/page: /admin/dashboard/analytics
+	/admin/dashboard/fampoints/page: /admin/dashboard/fampoints
+	/admin/dashboard/google-analytics/page: /admin/dashboard/google-analytics
+	/admin/dashboard/page: /admin/dashboard
+	/admin/dashboard/search/page: /admin/dashboard/search
+	/admin/dashboard/verification/page: /admin/dashboard/verification
+	/auth/verify-request/page: /auth/verify-request
+	/blogs/page: /blogs
+	/contact/page: /contact
+	/creator/dashboard/page: /creator/dashboard
+	/creator/page: /creator
+	/creator/payment/page: /creator/payment
+	/creator/requests/page: /creator/requests
+	/creator/unranked-donations/page: /creator/unranked-donations
+	/creator/vault/page: /creator/vault
+	/creators/page: /creators
+	/explore/page: /explore
+	/faqs/page: /faqs
+	/forgot-password/page: /forgot-password
+	/my-fam-points/page: /my-fam-points
+	/page: /
+	/privacypolicy/page: /privacypolicy
+	/setup/page: /setup
+	/terms/page: /terms
+	/unverified/page: /unverified
+	/upload-blog/page: /upload-blog

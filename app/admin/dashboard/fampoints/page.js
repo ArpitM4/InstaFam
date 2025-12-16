@@ -17,7 +17,7 @@ export default function FamPointsPage() {
             View comprehensive FamPoints statistics, trends, and manage the points system.
           </p>
         </div>
-        
+
         <Suspense fallback={
           <div className="bg-[var(--background)] border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-6">
             <div className="animate-pulse">

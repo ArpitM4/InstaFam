@@ -12,7 +12,7 @@ async function isAdminUser(email) {
 export async function PUT(request, { params }) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email || !(await isAdminUser(session.user.email))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -34,13 +34,13 @@ export async function PUT(request, { params }) {
     if (updateData.accountType !== undefined) user.accountType = updateData.accountType;
     if (updateData.points !== undefined) user.points = updateData.points;
     if (updateData.vaultEarningsBalance !== undefined) user.vaultEarningsBalance = updateData.vaultEarningsBalance;
-    
+
     // Update Instagram verification
     if (updateData.instagramVerified !== undefined) {
       if (!user.instagram) user.instagram = {};
       user.instagram.isVerified = updateData.instagramVerified;
     }
-    
+
     // Update payment info
     if (updateData.paymentPhone !== undefined || updateData.paymentUpi !== undefined) {
       if (!user.paymentInfo) user.paymentInfo = {};
