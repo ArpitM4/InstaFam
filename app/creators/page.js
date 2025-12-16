@@ -16,6 +16,54 @@ import {
   FaTimes, FaCheck, FaShoppingBag, FaCreditCard, FaComments,
   FaStore, FaPaintBrush
 } from "react-icons/fa";
+import { motion, useScroll, useTransform, useInView, useSpring, useMotionValue, animate } from "framer-motion";
+import { useEffect, useRef } from "react";
+
+// Animation Variants
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const slideInLeft = {
+  hidden: { x: -50, opacity: 0 },
+  visible: { x: 0, opacity: 1, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const slideInRight = {
+  hidden: { x: 50, opacity: 0 },
+  visible: { x: 0, opacity: 1, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+// CountUp Component
+const CountUp = ({ to, prefix = "", suffix = "", duration = 2 }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    if (isInView) {
+      const controls = animate(0, to, {
+        duration: duration,
+        ease: "easeOut",
+        onUpdate: (value) => setDisplayValue(Math.floor(value))
+      });
+      return () => controls.stop();
+    }
+  }, [isInView, to, duration]);
+
+  return <span ref={ref}>{prefix}{displayValue.toLocaleString()}{suffix}</span>;
+};
 
 export default function CreatorsPage() {
   const router = useRouter();
@@ -81,22 +129,28 @@ export default function CreatorsPage() {
           <div className="max-w-7xl mx-auto z-10 w-full grid lg:grid-cols-2 gap-8 items-center overflow-hidden">
 
             {/* Text Content */}
-            <div className="text-center md:text-left order-2 lg:order-1">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-[var(--primary)]/30 mb-6 animate-pulse-slow">
+            <motion.div
+              className="text-center md:text-left order-2 lg:order-1"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+            >
+              <motion.div variants={fadeIn} className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-[var(--primary)]/30 mb-6 animate-pulse-slow">
                 <FaCrown className="text-[var(--star-gold)]" />
                 <span className="text-sm font-semibold tracking-wider uppercase text-[var(--star-gold)]">Trusted by Top Creators</span>
-              </div>
+              </motion.div>
 
-              <h1 className="text-[1.85rem] sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 sm:mb-8 leading-[1.1]">
+              <motion.h1 variants={fadeIn} className="text-[1.85rem] sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 sm:mb-8 leading-[1.1]">
                 Earn From Anything You Do
                 <span className="gradient-text block mt-1 pb-2 text-[1.85rem] sm:text-4xl md:text-5xl lg:text-6xl font-black">-Literally Anything.</span>
-              </h1>
-              <p className="text-sm sm:text-base md:text-lg text-[var(--text-muted)] mb-6 max-w-xl mx-auto md:mx-0 leading-relaxed">
+              </motion.h1>
+              <motion.p variants={fadeIn} className="text-sm sm:text-base md:text-lg text-[var(--text-muted)] mb-6 max-w-xl mx-auto md:mx-0 leading-relaxed">
                 Monetize your attention — your way. <span className="text-white font-medium">Sygil is the creator platform built for the new era</span> — where fans earn rewards, unlock perks, and support you directly.
-              </p>
+              </motion.p>
 
               {/* Username / CTA area */}
-              <div className="max-w-md">
+              <motion.div variants={fadeIn} className="max-w-md">
                 {session ? (
                   <Link href={userData?.accountType === 'Creator' || userData?.accountType === 'VCreator' ? `/${session.user.name}` : '/setup'}>
                     <button className="w-auto px-8 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold rounded-full transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:scale-[1.02] text-sm border border-white/10">
@@ -136,29 +190,46 @@ export default function CreatorsPage() {
                   {!session && isAvailable === true && <span className="text-green-500 flex items-center gap-1"><FaCheck /> Username available!</span>}
                   {!session && isAvailable === false && <span className="text-red-500 flex items-center gap-1"><FaTimes /> Username taken.</span>}
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Hero Image - 3D Character */}
-            <div className="flex-1 lg:order-2 relative flex justify-center w-full max-w-full overflow-hidden">
+            <motion.div
+              className="flex-1 lg:order-2 relative flex justify-center w-full max-w-full overflow-hidden"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+            >
               <div className="relative w-full max-w-[280px] h-[350px] sm:max-w-[400px] sm:h-[500px] md:max-w-[500px] md:h-[600px] animate-float">
                 <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-transparent to-transparent z-10">
                 </div> {/* Magic Man Visual */}
                 <Image src="/magicman.png" alt="The Sygil Magician" fill unoptimized className="object-contain drop-shadow-[0_0_50px_rgba(139,92,246,0.3)]" />
                 {/* Floating Stats Cards for visual flair */}
-                <div className="absolute top-20 -left-10 p-3 glass-card rounded-lg border border-white/10 animate-bounce delay-700 hidden md:block">
+                <motion.div
+                  className="absolute top-20 -left-10 p-3 glass-card rounded-lg border border-white/10 hidden md:block"
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
                   <div className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">New Superfan</div>
                   <div className="flex items-center gap-2 mt-1">
                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500"></div>
                     <span className="font-bold text-sm">+500 FP</span> </div>
-                </div>
+                </motion.div>
 
-                <div className="absolute top-20 -right-4 p-3 glass-card rounded-lg border border-white/10 hidden md:flex flex-col items-start bg-[#111]/80 backdrop-blur-md animate-bounce">
+                <motion.div
+                  className="absolute top-20 -right-4 p-3 glass-card rounded-lg border border-white/10 hidden md:flex flex-col items-start bg-[#111]/80 backdrop-blur-md"
+                  initial={{ x: 20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.7 }}
+                >
                   <div className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Monthly Revenue</div>
-                  <div className="text-lg font-black text-green-400 mt-1">+$4,250</div>
-                </div>
+                  <div className="text-lg font-black text-green-400 mt-1">
+                    +<CountUp to={4250} prefix="$" suffix="" duration={2.5} />
+                  </div>
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
 
           </div>
         </section>
@@ -180,7 +251,13 @@ export default function CreatorsPage() {
             </div>
 
             {/* Scrollable Container on Mobile, Grid on Desktop */}
-            <div className="flex overflow-x-auto pb-6 gap-4 snap-x snap-mandatory md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible md:pb-0 px-4 md:px-0 -mx-4 md:mx-0 scrollbar-hide">
+            <motion.div
+              className="flex overflow-x-auto pb-6 gap-4 snap-x snap-mandatory md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible md:pb-0 px-4 md:px-0 -mx-4 md:mx-0 scrollbar-hide"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={staggerContainer}
+            >
               {[
                 {
                   title: "YOU'RE OFFERING THEM LESS",
@@ -207,7 +284,7 @@ export default function CreatorsPage() {
                   image: "/Img4.png"
                 },
               ].map((card, i) => (
-                <div key={i} className={`relative min-w-[85vw] md:min-w-0 md:w-auto snap-center rounded-[2rem] p-6 h-[520px] flex flex-col group overflow-hidden border border-black/60 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:brightness-110 ${card.bgClass}`}>
+                <motion.div variants={fadeIn} key={i} className={`relative min-w-[85vw] md:min-w-0 md:w-auto snap-center rounded-[2rem] p-6 h-[520px] flex flex-col group overflow-hidden border border-black/60 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:brightness-110 ${card.bgClass}`}>
 
                   {/* Title */}
                   <h3 className="text-2xl font-black uppercase leading-[0.9] tracking- mb-6 relative z-10 w-3/4 text-white">
@@ -236,9 +313,9 @@ export default function CreatorsPage() {
                     </div> */}
                   </div>
 
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </section>
 
@@ -253,7 +330,13 @@ export default function CreatorsPage() {
                   The Solution
                 </span>
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4 leading-tight">Turn Your Followers Into <span className="">Super Fans</span>.</h2>
-                <div className="space-y-6 mt-8">
+                <motion.div
+                  className="space-y-6 mt-8"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-100px" }}
+                  variants={staggerContainer}
+                >
                   {[
                     { title: "Set Up Your Sygil Page", desc: "Create your page in minutes — your new home for earnings, perks, and fan engagement." },
                     { title: "Choose How You Want to Earn", desc: "Enable contributions, add Vault items (perks fans can unlock with points) or any other tools from merchandise to subscriptions." },
@@ -261,7 +344,7 @@ export default function CreatorsPage() {
                     { title: "Fans Engage & Earn Points", desc: "Every tip, view, share, or interaction gives fans FamPoints — keeping them coming back." },
                     { title: "You Get Instant Payouts", desc: "No more juggling 5 tools. Sygil handles everything in one place, and your money arrives instantly." }
                   ].map((step, i) => (
-                    <div key={i} className="flex gap-4 group">
+                    <motion.div variants={slideInLeft} key={i} className="flex gap-4 group">
                       <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm border border-white/20 transition-colors ${i === 0
                         ? "bg-rose-500 text-black"
                         : "bg-white/10 group-hover:bg-rose-500 group-hover:text-black"
@@ -277,13 +360,19 @@ export default function CreatorsPage() {
                         </h3>
                         <p className="text-[var(--text-muted)] text-base leading-relaxed">{step.desc}</p>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               </div>
 
               {/* Right: Phone Image */}
-              <div className="relative h-[550px] w-full flex items-center justify-center">
+              <motion.div
+                className="relative h-[550px] w-full flex items-center justify-center"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={slideInRight}
+              >
                 <div className="relative z-10 w-64 md:w-80 h-[550px]">
                   <Image
                     src="/Phone.png"
@@ -295,19 +384,19 @@ export default function CreatorsPage() {
                 </div>
 
                 {/* Floating Cards */}
-                <div className="absolute top-20 -right-4 p-3 rounded-xl border border-white/10 bg-[#111]/90 backdrop-blur-md shadow-xl hidden md:flex flex-col items-start" style={{ animationDelay: '0.8s' }}>
+                <div className="absolute top-20 -right-4 p-3 rounded-xl border border-white/10 bg-[#111]/90 backdrop-blur-md shadow-xl hidden md:flex flex-col items-start animate-bounce" style={{ animationDelay: '0.8s' }}>
                   <FaCreditCard className="w-5 h-5 mb-2 text-green-400" />
                   <div className="text-xs font-bold text-white">Instant Payouts</div>
                 </div>
-                <div className="absolute bottom-28 -left-4 p-3 rounded-xl border border-white/10 bg-[#111]/90 backdrop-blur-md shadow-xl hidden md:flex flex-col items-start">
+                <div className="absolute bottom-28 -left-4 p-3 rounded-xl border border-white/10 bg-[#111]/90 backdrop-blur-md shadow-xl hidden md:flex flex-col items-start animate-bounce" style={{ animationDelay: '1.2s' }}>
                   <FaComments className="w-5 h-5 mb-2 text-blue-400" />
                   <div className="text-xs font-bold text-white">Fan Chat</div>
                 </div>
-                <div className="absolute top-1/2 -right-16 p-3 rounded-xl border border-white/10 bg-[#111]/90 backdrop-blur-md shadow-xl hidden md:flex items-center gap-2">
+                <div className="absolute top-1/2 -right-16 p-3 rounded-xl border border-white/10 bg-[#111]/90 backdrop-blur-md shadow-xl hidden md:flex items-center gap-2 animate-pulse" style={{ animationDelay: '2s' }}>
                   <FaLink className="w-4 h-4 text-purple-400" />
                   <div className="text-xs font-bold text-white">sygil.app/emma_explore</div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </section>
@@ -325,7 +414,13 @@ export default function CreatorsPage() {
             <div className="flex overflow-x-auto pb-6 gap-4 snap-x snap-mandatory md:grid md:grid-cols-3 md:gap-5 md:auto-rows-[minmax(180px,auto)] md:overflow-visible md:pb-0 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
 
               {/* 1. Beautiful Identity (Hero Card) - Spans 2 cols, 2 rows */}
-              <div className="min-w-[85vw] md:min-w-0 snap-center md:col-span-2 md:row-span-2 rounded-3xl p-8 relative overflow-hidden group border border-purple-500/20 hover:border-purple-500/40 transition-all duration-500 bg-gradient-to-b from-[#111] to-[#050505] hover:shadow-[0_0_30px_rgba(139,92,246,0.1)]">
+              <motion.div
+                className="min-w-[85vw] md:min-w-0 snap-center md:col-span-2 md:row-span-2 rounded-3xl p-8 relative overflow-hidden group border border-purple-500/20 hover:border-purple-500/40 transition-all duration-500 bg-gradient-to-b from-[#111] to-[#050505] hover:shadow-[0_0_30px_rgba(139,92,246,0.1)]"
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
                 <div className="relative z-10 flex flex-col h-full justify-between">
                   <div>
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 text-blue-400 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
@@ -347,10 +442,16 @@ export default function CreatorsPage() {
                 <div className="absolute -bottom-6 -right-6 w-40 h-40 md:w-64 md:h-64 opacity-40 md:opacity-80 z-0 pointer-events-none group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
                   <Image src="/smallcat.png" alt="Sygil Cat" fill className="object-contain" unoptimized />
                 </div>
-              </div>
+              </motion.div>
 
               {/* 2. Gamified Contributions */}
-              <div className="min-w-[85vw] md:min-w-0 snap-center rounded-3xl p-6 border border-white/10 hover:border-blue-500/30 group transition-all duration-300 bg-gradient-to-b from-[#111] to-[#050505] flex flex-col justify-between hover:shadow-[0_0_30px_rgba(59,130,246,0.1)]">
+              <motion.div
+                className="min-w-[85vw] md:min-w-0 snap-center rounded-3xl p-6 border border-white/10 hover:border-blue-500/30 group transition-all duration-300 bg-gradient-to-b from-[#111] to-[#050505] flex flex-col justify-between hover:shadow-[0_0_30px_rgba(59,130,246,0.1)]"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1, duration: 0.5 }}
+              >
                 <div>
                   <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4 text-2xl text-blue-400 group-hover:scale-110 transition-transform duration-300">
                     <FaGem />
@@ -358,10 +459,16 @@ export default function CreatorsPage() {
                   <h3 className="text-xl font-bold mb-2">Gamified Support</h3>
                   <p className="text-[var(--text-muted)] text-sm leading-relaxed">Support becomes a game. Leaderboards, XP, and badges for top fans.</p>
                 </div>
-              </div>
+              </motion.div>
 
               {/* 3. Redeemable Perks */}
-              <div className="min-w-[85vw] md:min-w-0 snap-center rounded-3xl p-6 border border-white/10 hover:border-pink-500/30 group transition-all duration-300 bg-gradient-to-b from-[#111] to-[#050505] flex flex-col justify-between hover:shadow-[0_0_30px_rgba(236,72,153,0.1)]">
+              <motion.div
+                className="min-w-[85vw] md:min-w-0 snap-center rounded-3xl p-6 border border-white/10 hover:border-pink-500/30 group transition-all duration-300 bg-gradient-to-b from-[#111] to-[#050505] flex flex-col justify-between hover:shadow-[0_0_30px_rgba(236,72,153,0.1)]"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+              >
                 <div>
                   <div className="w-12 h-12 rounded-xl bg-pink-500/10 flex items-center justify-center mb-4 text-2xl text-pink-400 group-hover:scale-110 transition-transform duration-300">
                     <FaGift />
@@ -369,7 +476,7 @@ export default function CreatorsPage() {
                   <h3 className="text-xl font-bold mb-2">Redeemable Perks</h3>
                   <p className="text-[var(--text-muted)] text-sm leading-relaxed">Fans redeem points for real value: show outs, files, or exclusive access.</p>
                 </div>
-              </div>
+              </motion.div>
 
               {/* 4, 5, 6 - Coming Soon Row */}
               {[
@@ -377,7 +484,14 @@ export default function CreatorsPage() {
                 { icon: FaCrown, color: 'text-yellow-500', bg: 'bg-yellow-500/10', title: 'Subscriptions', desc: 'Recurring revenue.' },
                 { icon: FaShoppingBag, color: 'text-pink-500', bg: 'bg-pink-500/10', title: 'Merch Store', desc: 'Sell direct.' },
               ].map((item, i) => (
-                <div key={i} className="min-w-[85vw] md:min-w-0 snap-center rounded-3xl p-6 border border-dashed border-white/10 hover:border-white/20 flex flex-col opacity-70 hover:opacity-100 transition-all hover:-translate-y-1 bg-[#080808]">
+                <motion.div
+                  key={i}
+                  className="min-w-[85vw] md:min-w-0 snap-center rounded-3xl p-6 border border-dashed border-white/10 hover:border-white/20 flex flex-col opacity-70 hover:opacity-100 transition-all hover:-translate-y-1 bg-[#080808]"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 + (i * 0.1), duration: 0.5 }}
+                >
                   <div className="flex justify-between items-start mb-4">
                     <div className={`p-3 rounded-full ${item.bg} ${item.color} text-xl grayscale group-hover:grayscale-0 transition-all`}>
                       <item.icon />
@@ -390,7 +504,7 @@ export default function CreatorsPage() {
                     <h4 className="text-xl font-bold mb-1">{item.title}</h4>
                     <p className="text-sm text-[var(--text-muted)]">{item.desc}</p>
                   </div>
-                </div>
+                </motion.div>
               ))}
 
             </div>
@@ -459,7 +573,13 @@ export default function CreatorsPage() {
             <div className="flex overflow-x-auto pb-6 gap-6 snap-x snap-mandatory lg:grid lg:grid-cols-2 lg:overflow-visible lg:pb-0 scrollbar-hide -mx-4 px-4 lg:mx-0 lg:px-0 items-stretch">
 
               {/* 2. The Old Way (Left Column) */}
-              <div className="min-w-[85vw] lg:min-w-0 snap-center rounded-2xl p-6 bg-[#111] border border-red-500/20 relative overflow-hidden flex flex-col">
+              <motion.div
+                className="min-w-[85vw] lg:min-w-0 snap-center rounded-2xl p-6 bg-[#111] border border-red-500/20 relative overflow-hidden flex flex-col"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={slideInLeft}
+              >
                 <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
                   <FaTimes className="text-8xl text-red-500" />
                 </div>
@@ -489,15 +609,23 @@ export default function CreatorsPage() {
                   <div className="flex justify-between items-end">
                     <span className="text-gray-400 font-medium text-sm">Total Monthly Cost</span>
                     <div className="text-right leading-none">
-                      <span className="text-2xl font-black text-white">$371</span>
+                      <span className="text-2xl font-black text-white">
+                        <CountUp to={371} prefix="$" suffix="" />
+                      </span>
                       <span className="text-xs text-gray-500 block mt-1">/month + transaction fees</span>
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* 3. The Sygil Way (Right Column) */}
-              <div className="min-w-[85vw] lg:min-w-0 snap-center rounded-2xl p-6 bg-gradient-to-b from-[#111] to-[#050505] border border-purple-500/20 relative overflow-hidden flex flex-col shadow-[0_0_30px_rgba(236,72,153,0.1)]">
+              <motion.div
+                className="min-w-[85vw] lg:min-w-0 snap-center rounded-2xl p-6 bg-gradient-to-b from-[#111] to-[#050505] border border-purple-500/20 relative overflow-hidden flex flex-col shadow-[0_0_30px_rgba(236,72,153,0.1)]"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={slideInRight}
+              >
                 {/* Ribbon */}
                 <div className="absolute top-5 right-5">
                   <span className="bg-yellow-500 text-black text-[10px] font-black uppercase py-1 px-2 rounded-full">
@@ -540,7 +668,10 @@ export default function CreatorsPage() {
                     <div>
                       <div className="text-xs text-primary font-medium uppercase tracking-wide mb-1">Your Savings</div>
                       <div className="text-xl font-bold text-white">
-                        $371<span className="text">/mo</span> <span className="mx-2 text-white/20">|</span> $4,452<span className="text-pin">/yr</span>
+                        <CountUp to={371} prefix="$" suffix="" />
+                        <span className="text">/mo</span> <span className="mx-2 text-white/20">|</span>
+                        <CountUp to={4452} prefix="$" suffix="" />
+                        <span className="text-pin">/yr</span>
                       </div>
                     </div>
                     <div className="text-xs text-yellow-200 max-w-[180px] leading-tight">
@@ -548,7 +679,7 @@ export default function CreatorsPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
             </div>
 
