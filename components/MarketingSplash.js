@@ -152,10 +152,10 @@ export default function MarketingSplash() {
 
             {/* Tagline */}
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-text mb-2">
-              Connect. Create. Ascend.
+              Be more than just a follower.
             </h2>
             <p className="text-text-muted text-sm sm:text-base mb-8">
-              The Ultimate Fan & Creator Nexus.
+              Unlock exclusive drops from your favourite creators.
             </p>
 
             {/* Illustration */}

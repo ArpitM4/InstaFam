@@ -261,10 +261,10 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                                     Ask More From Your Favourite Creators !
                                 </h1>
                                 <h2 className="text-lg font-semibold text-white mb-1">
-                                    Connect. Create. Ascend.
+                                    Be more than just a follower.
                                 </h2>
                                 <p className="text-white/50 text-xs mb-4">
-                                    The Ultimate Fan & Creator Nexus.
+                                    Unlock exclusive drops from your favourite creators.
                                 </p>
                                 <div className="flex justify-center mb-6">
                                     <Image
