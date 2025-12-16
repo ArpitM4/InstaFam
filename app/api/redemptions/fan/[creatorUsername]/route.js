@@ -22,30 +22,38 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: "Creator username is required" }, { status: 400 });
     }
 
-    // Find the fan by email
-    const fan = await User.findOne({ email: session.user.email });
+    // OPTIMIZATION: Run both User lookups in parallel using Promise.all
+    const [fan, creator] = await Promise.all([
+      User.findOne({ email: session.user.email }).select('_id').lean(),
+      User.findOne({ username: creatorUsername }).select('_id').lean()
+    ]);
+
     if (!fan) {
       return NextResponse.json({ error: "Fan not found" }, { status: 404 });
     }
 
-    // Find the creator
-    const creator = await User.findOne({ username: creatorUsername });
     if (!creator) {
       return NextResponse.json({ error: "Creator not found" }, { status: 404 });
     }
 
-    // Fetch fan's redemptions from this creator
+    // OPTIMIZATION: Use lean() for faster query, limit fields populated
     const redemptions = await Redemption.find({
       fanId: fan._id,
       creatorId: creator._id
     })
       .populate('vaultItemId', 'title description type instructions perkType fileType pointCost')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       redemptions
     });
+
+    // OPTIMIZATION: Add caching headers (30 sec cache, 60 sec stale-while-revalidate)
+    response.headers.set('Cache-Control', 'private, s-maxage=30, stale-while-revalidate=60');
+
+    return response;
 
   } catch (error) {
     console.error("Error fetching fan redemptions:", error);

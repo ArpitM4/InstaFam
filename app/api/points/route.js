@@ -18,7 +18,8 @@ export async function GET(req) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await User.findOne({ email: session.user.email });
+    // OPTIMIZATION: Use lean() for faster query
+    const user = await User.findOne({ email: session.user.email }).select('_id').lean();
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -42,7 +43,8 @@ export async function GET(req) {
       })
         .populate('creatorId', 'username name profilepic')
         .sort({ createdAt: -1 })
-        .limit(20);
+        .limit(20)
+        .lean();
 
       // Get expiring points for this creator
       const expiringPoints = await PointTransaction.find({
@@ -55,11 +57,11 @@ export async function GET(req) {
           $gt: now,
           $lte: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
         }
-      }).sort({ expiresAt: 1 });
+      }).sort({ expiresAt: 1 }).lean();
 
       const totalExpiring = expiringPoints.reduce((sum, tx) => sum + (tx.amount || tx.points_earned || 0), 0);
 
-      return NextResponse.json({
+      const response = NextResponse.json({
         success: true,
         points: availablePoints,
         transactions: transactions.map(tx => ({
@@ -78,6 +80,11 @@ export async function GET(req) {
           nextExpiry: expiringPoints.length > 0 ? expiringPoints[0].expiresAt : null
         }
       });
+
+      // OPTIMIZATION: Add short-term caching (30 sec)
+      response.headers.set('Cache-Control', 'private, s-maxage=30, stale-while-revalidate=60');
+
+      return response;
     }
 
     // Otherwise, return points grouped by all creators
