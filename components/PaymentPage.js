@@ -21,7 +21,9 @@ import CreatorOnboardingGuide from "./CreatorOnboardingGuide";
 
 import PaymentInteractionSection from "./PaymentInteractionSection";
 import ShareModal from "./ShareModal";
+
 import PreviewBanner from "./PreviewBanner";
+import ImageCropperModal from "./ImageCropperModal";
 
 const VaultSection = dynamic(() => import("./VaultSection"), {
   loading: () => <div className="w-full max-w-5xl mt-8 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>
@@ -624,10 +626,27 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
   };
 
   // --- Image Upload Handlers ---
-  const handleProfileChange = async (e) => {
+  const [showCropper, setShowCropper] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleProfileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setSelectedImage(reader.result);
+      setShowCropper(true);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = null; // Reset input
+  };
+
+  const handleCropComplete = async (croppedBlob) => {
+    setShowCropper(false);
     setIsUploadingProfile(true);
+
+    const file = new File([croppedBlob], "profile_pic.jpg", { type: "image/jpeg" });
     const formData = new FormData();
     formData.append("file", file);
     formData.append("type", "profilepic");
@@ -648,6 +667,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
       toast.error(err?.message || "Upload error");
     } finally {
       setIsUploadingProfile(false);
+      setSelectedImage(null);
     }
   };
 
@@ -1434,6 +1454,17 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
         username={username}
         title="Your Page is Ready!"
       />
+
+      {showCropper && selectedImage && (
+        <ImageCropperModal
+          imageSrc={selectedImage}
+          onCancel={() => {
+            setShowCropper(false);
+            setSelectedImage(null);
+          }}
+          onCropComplete={handleCropComplete}
+        />
+      )}
 
       {/* Preview Button for Owners */}
       {isActualOwner && !isPreviewMode && !showOnboarding && (

@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { FaUser, FaMagic, FaCheck, FaTimes, FaPen } from "react-icons/fa";
 import { emitProfileUpdate } from "@/utils/eventBus";
+import ImageCropperModal from "@/components/ImageCropperModal";
 
 export default function SetupPage() {
     const router = useRouter();
@@ -53,11 +54,27 @@ export default function SetupPage() {
         return () => clearTimeout(timeoutId);
     }, [username]);
 
-    const handleImageUpload = async (e) => {
+    const [showCropper, setShowCropper] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
+
+    const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
+        const reader = new FileReader();
+        reader.onload = () => {
+            setSelectedImage(reader.result);
+            setShowCropper(true);
+        };
+        reader.readAsDataURL(file);
+        e.target.value = null; // Reset input
+    };
+
+    const handleCropComplete = async (croppedBlob) => {
+        setShowCropper(false);
         setIsUploading(true);
+
+        const file = new File([croppedBlob], "profile_pic.jpg", { type: "image/jpeg" });
         const formData = new FormData();
         formData.append("file", file);
         formData.append("type", "profilepic");
@@ -79,6 +96,7 @@ export default function SetupPage() {
             setError("Upload failed");
         } finally {
             setIsUploading(false);
+            setSelectedImage(null);
         }
     };
 
@@ -314,6 +332,19 @@ export default function SetupPage() {
                     </button>
                 </form>
             </div>
-        </div>
+
+            {
+                showCropper && selectedImage && (
+                    <ImageCropperModal
+                        imageSrc={selectedImage}
+                        onCancel={() => {
+                            setShowCropper(false);
+                            setSelectedImage(null);
+                        }}
+                        onCropComplete={handleCropComplete}
+                    />
+                )
+            }
+        </div >
     );
 }

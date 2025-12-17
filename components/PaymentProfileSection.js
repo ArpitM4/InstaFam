@@ -238,16 +238,29 @@ const PaymentProfileSection = ({
         {isOwner ? (
           <div className="relative">
             <textarea
-              className="w-full mt-1 bg-background text-text text-sm text-center rounded-lg p-2 pb-6 resize-none focus:outline-none transition-all duration-200 border-0 placeholder-text/40"
+              className="w-full mt-1 bg-background text-text text-sm text-center rounded-lg p-2 pb-6 resize-none focus:outline-none transition-all duration-200 border-0 placeholder-text/40 custom-scrollbar"
               value={currentUser?.description || ""}
-              onChange={(e) => setcurrentUser({ ...currentUser, description: e.target.value })}
+              onChange={(e) => {
+                if (e.target.value.length <= 150) {
+                  setcurrentUser({ ...currentUser, description: e.target.value });
+                }
+              }}
               onBlur={handleSaveDescription}
-              placeholder="Add a description..."
+              placeholder="Add a description... (Max 150 chars)"
+              maxLength={150}
+              rows={3}
             />
-            <FaPen className="absolute bottom-2 right-2 text-text/40 text-xs pointer-events-none" />
+            <div className="absolute bottom-2 right-2 flex items-center gap-2 pointer-events-none">
+              <span className={`text-[10px] ${currentUser?.description?.length >= 150 ? 'text-red-500' : 'text-text/40'}`}>
+                {currentUser?.description?.length || 0}/150
+              </span>
+              <FaPen className="text-text/40 text-xs" />
+            </div>
           </div>
         ) : (
-          <p className="text-sm text-text/60 text-center mt-2">{currentUser?.description}</p>
+          <p className="text-sm text-text/60 text-center mt-2 break-words max-w-full overflow-hidden text-ellipsis line-clamp-3">
+            {currentUser?.description}
+          </p>
         )}
 
         {/* FamPoints Display - Integrated */}

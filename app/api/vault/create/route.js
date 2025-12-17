@@ -34,7 +34,7 @@ export async function POST(req) {
         } = data;
 
         // Validation
-        if (!title || !description || !type) {
+        if (!title || !type) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 

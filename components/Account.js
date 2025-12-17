@@ -11,6 +11,7 @@ import { useUser } from '@/context/UserContext'
 import { emitProfileUpdate, emitAccountTypeChange } from '@/utils/eventBus'
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
+import ImageCropperModal from './ImageCropperModal';
 
 const Account = ({ initialUser }) => {
   const { data: session, update, status } = useSession();
@@ -29,12 +30,28 @@ const Account = ({ initialUser }) => {
   });
 
   const [isUploading, setIsUploading] = useState(false);
+  const [showCropper, setShowCropper] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    const reader = new FileReader();
+    reader.onload = () => {
+      setSelectedImage(reader.result);
+      setShowCropper(true);
+    };
+    reader.readAsDataURL(file);
+    // Reset input so same file can be selected again
+    e.target.value = null;
+  };
+
+  const handleCropComplete = async (croppedBlob) => {
+    setShowCropper(false);
     setIsUploading(true);
+
+    const file = new File([croppedBlob], "profile_pic.jpg", { type: "image/jpeg" });
     const formData = new FormData();
     formData.append("file", file);
     formData.append("type", "profilepic");
@@ -57,6 +74,7 @@ const Account = ({ initialUser }) => {
       toast.error("Upload failed");
     } finally {
       setIsUploading(false);
+      setSelectedImage(null);
     }
   };
 
@@ -482,6 +500,17 @@ const Account = ({ initialUser }) => {
           </button>
         </div>
       </div>
+
+      {showCropper && selectedImage && (
+        <ImageCropperModal
+          imageSrc={selectedImage}
+          onCancel={() => {
+            setShowCropper(false);
+            setSelectedImage(null);
+          }}
+          onCropComplete={handleCropComplete}
+        />
+      )}
     </>
   );
 };

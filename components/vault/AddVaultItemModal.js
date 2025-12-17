@@ -170,7 +170,7 @@ const AddVaultItemModal = ({ onClose, onSuccess }) => {
                         </div>
 
                         <div>
-                            <label className="block text-sm text-white/60 mb-1">Description</label>
+                            <label className="block text-sm text-white/60 mb-1">Description <span className="text-white/40 ml-1">(Optional)</span></label>
                             <textarea className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
                                 rows={3}
                                 placeholder={

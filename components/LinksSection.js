@@ -21,6 +21,7 @@ import {
 import { FaXTwitter } from 'react-icons/fa6';
 import Image from 'next/image';
 import ShareModal from "./ShareModal";
+import ImageCropperModal from "./ImageCropperModal";
 
 // @dnd-kit imports for drag and drop reordering
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -136,7 +137,7 @@ const vibrantColors = [
     '#1a73e8', // Light Blue
     '#0400ffff', // Dark Blue
     '#4800ffff', // Purple
-    '#AF52DE', // Purple
+    '#c552ffff', // Purple
     '#FF0090', // Hot Pink (New)
     '#A2845E', // Brown
     '#8E8E93',  // Gray
@@ -712,6 +713,55 @@ const LinksSection = ({ currentUser, isOwner: isOwnerProp, onSocialsChange }) =>
 
     const [uploadingImage, setUploadingImage] = useState(false);
 
+    // --- Image Cropper State ---
+    const [showCropper, setShowCropper] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            setSelectedImage(reader.result);
+            setShowCropper(true);
+        };
+        reader.readAsDataURL(file);
+        e.target.value = null; // Reset input
+    };
+
+    const handleCropComplete = async (croppedBlob) => {
+        setShowCropper(false);
+        setUploadingImage(true);
+
+        const file = new File([croppedBlob], "product_image.jpg", { type: "image/jpeg" });
+        const formData = new FormData();
+        formData.append("file", file);
+        // Products don't have a specific folder type yet, defaults to 'sygil/uploads' or similar
+        // keeping it generic or using 'product' if API supports it
+
+        try {
+            const res = await fetch("/api/upload", {
+                method: "POST",
+                body: formData,
+            });
+            const data = await res.json();
+            const uploadedUrl = data.url || data.secure_url;
+
+            if (data.success && uploadedUrl) {
+                setProductForm(prev => ({ ...prev, image: uploadedUrl }));
+                toast.success("Image uploaded!");
+            } else {
+                toast.error(data.error || "Upload failed");
+            }
+        } catch (err) {
+            toast.error("Upload failed");
+        } finally {
+            setUploadingImage(false);
+            setSelectedImage(null);
+        }
+    };
+
     // Use prop if provided, otherwise fall back to session check (for backward compatibility)
     const isOwner = isOwnerProp !== undefined ? isOwnerProp : session?.user?.name === currentUser?.username;
 
@@ -901,25 +951,7 @@ const LinksSection = ({ currentUser, isOwner: isOwnerProp, onSocialsChange }) =>
         } catch (err) { toast.error('Delete failed'); }
     };
 
-    const handleImageUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (file.size > 5 * 1024 * 1024) return toast.error('Max 5MB');
-        setUploadingImage(true);
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('type', 'favourite');
 
-        try {
-            const res = await fetch('/api/upload', { method: 'POST', body: formData });
-            const data = await res.json();
-            if (data.success) {
-                setProductForm(prev => ({ ...prev, image: data.secure_url }));
-                toast.success('Image Uploaded');
-            } else toast.error('Upload failed');
-        } catch (err) { toast.error('Error uploading'); }
-        finally { setUploadingImage(false); }
-    };
 
     // --- Drag & Drop Reordering ---
 
@@ -1518,6 +1550,18 @@ const LinksSection = ({ currentUser, isOwner: isOwnerProp, onSocialsChange }) =>
                         </div>
                     </div>
                 </div>
+            )}
+            {/* ... Product Image Cropper ... */}
+            {showCropper && selectedImage && (
+                <ImageCropperModal
+                    imageSrc={selectedImage}
+                    onCancel={() => {
+                        setShowCropper(false);
+                        setSelectedImage(null);
+                    }}
+                    onCropComplete={handleCropComplete}
+                    aspect={3 / 4} // Product Card Ratio
+                />
             )}
         </div>
     );
