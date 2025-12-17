@@ -80,7 +80,7 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
     const [isExpanded, setIsExpanded] = React.useState(false);
 
     return (
-        <div className="rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl border border-white/10 relative group bg-[#1a1a1f] hover:border-white/20 min-w-[280px] md:min-w-0 snap-center flex-shrink-0 md:flex-shrink">
+        <div className="rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl border border-white/10 relative group bg-[#1a1a1f] hover:border-white/20 min-w-[280px] md:min-w-0 snap-center flex-shrink-0 md:flex-shrink h-full flex flex-col">
 
             {/* Type Badge (Top Right) */}
             <div className={`absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-[10px] font-bold tracking-wider border-b border-l ${getTypeColor(type)}`}>
@@ -88,7 +88,7 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
             </div>
 
             {/* Item Header */}
-            <div className="p-4 pt-8  border-white/10 relative">
+            <div className="p-4 pt-8 border-white/10 relative flex-grow">
                 {/* Status Badge for redemption cards only */}
                 {getStatusBadge() && (
                     <div className="mb-3">

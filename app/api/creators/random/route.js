@@ -31,12 +31,12 @@ export async function GET(req) {
             }
         ]);
 
-        // Add cache headers - cache for 5 minutes
+        // Disable caching for real-time updates
         return new Response(JSON.stringify({ success: true, creators }), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',
-                'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+                'Cache-Control': 'no-store, max-age=0',
             },
         });
     } catch (error) {

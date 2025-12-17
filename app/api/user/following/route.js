@@ -4,6 +4,8 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import connectDb from '@/db/ConnectDb';
 import User from '@/models/User';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -19,7 +21,10 @@ export async function GET() {
       .populate({
         path: 'following',
         select: 'username name profilepic accountType description isVerified',
-        match: { accountType: { $in: ['Creator', 'VCreator'] } }
+        match: {
+          accountType: { $in: ['Creator', 'VCreator'] },
+          visibility: 'public'
+        }
       })
       .lean();
 

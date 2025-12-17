@@ -127,7 +127,7 @@ export default function HomeFeed() {
       }
 
       try {
-        const res = await fetch('/api/user/following');
+        const res = await fetch('/api/user/following', { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           setFollowedCreators(data.creators || []);
@@ -149,7 +149,7 @@ export default function HomeFeed() {
 
       setTopCreatorsLoading(true);
       try {
-        const res = await fetch('/api/creators/random');
+        const res = await fetch('/api/creators/random', { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           setTopCreators(data.creators || []);
