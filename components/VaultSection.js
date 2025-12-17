@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
-import { fetchCreatorVaultItems, redeemVaultItem, fetchRedeemedItems, fetchFanRedemptions } from '@/actions/vaultActions';
+import { fetchCreatorVaultItems, redeemVaultItem, fetchRedeemedItems, fetchFanRedemptions, fetchPendingRedemptions } from '@/actions/vaultActions';
 import { useUser } from '@/context/UserContext';
 import { emitPaymentSuccess } from '@/utils/eventBus';
 import { FaGem, FaPlus, FaList, FaShoppingBag, FaGift } from 'react-icons/fa';
@@ -38,6 +38,7 @@ const VaultSection = ({ currentUser, initialItems, isOwner, isPreviewMode = fals
   const [successData, setSuccessData] = useState(null); // { item, fanInput } for success modal
   const [viewMode, setViewMode] = useState('items'); // 'items' | 'requests'
   const [infoExpanded, setInfoExpanded] = useState(false); // Expandable info section
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
 
   // ... (useEffect and load functions unchanged)
 
@@ -49,8 +50,9 @@ const VaultSection = ({ currentUser, initialItems, isOwner, isPreviewMode = fals
     if (currentUser?.username) {
       if (!initialItems) loadVaultItems();
       if (effectiveSession?.user?.name) loadFanData();
+      if (isOwner) loadPendingRequests();
     }
-  }, [currentUser, effectiveSession]);
+  }, [currentUser, effectiveSession, isOwner]);
 
   const loadVaultItems = async () => {
     try {
@@ -61,6 +63,17 @@ const VaultSection = ({ currentUser, initialItems, isOwner, isPreviewMode = fals
       console.error('Error loading vault items:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadPendingRequests = async () => {
+    try {
+      const result = await fetchPendingRedemptions();
+      if (result.success && result.redemptions) {
+        setPendingRequestsCount(result.redemptions.length);
+      }
+    } catch (error) {
+      console.error('Error loading pending requests:', error);
     }
   };
 
@@ -330,6 +343,11 @@ const VaultSection = ({ currentUser, initialItems, isOwner, isPreviewMode = fals
               className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center gap-2 ${viewMode === 'requests' ? 'bg-primary text-white' : 'text-white/60 hover:text-white'}`}
             >
               Requests
+              {pendingRequestsCount > 0 && (
+                <span className="bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full ml-1">
+                  {pendingRequestsCount}
+                </span>
+              )}
             </button>
           </div>
 

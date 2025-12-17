@@ -25,10 +25,10 @@ export async function GET(request) {
       return NextResponse.json({ error: "Creator not found" }, { status: 404 });
     }
 
-    // Check if creator is verified
-    if (!creator.instagram?.isVerified) {
-      return NextResponse.json({ error: "Only verified creators can access redemption requests" }, { status: 403 });
-    }
+    // Check if creator is verified - REMOVED LEGACY CHECK
+    // if (!creator.instagram?.isVerified) {
+    //   return NextResponse.json({ error: "Only verified creators can access redemption requests" }, { status: 403 });
+    // }
 
     // Fetch pending redemptions with populated data
     const pendingRedemptions = await Redemption.find({
