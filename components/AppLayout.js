@@ -26,7 +26,7 @@ export default function AppLayout({ children }) {
   const mainRoutes = ['/', '/explore', '/my-fam-points', '/account', '/search'];
 
   // Check if current page is a creator dashboard route (has its own layout)
-  const isCreatorDashboardRoute = pathname.startsWith('/creator');
+  const isCreatorDashboardRoute = pathname === '/creator' || pathname.startsWith('/creator/');
 
   // Check if current page is a creator profile page (dynamic routes like /username)
   const isCreatorPage = !mainRoutes.some(route => pathname === route || pathname.startsWith(route + '/')) && pathname !== '/' && !isCreatorDashboardRoute;
