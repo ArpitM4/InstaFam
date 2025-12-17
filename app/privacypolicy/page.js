@@ -84,7 +84,7 @@ export default function PrivacyPolicy() {
         <div className="mt-12">
           <h2 className="text-xl font-semibold text-secondary mb-3">5. Data Retention</h2>
           <p className="text-text/80">
-            We retain data as long as your account is active or required by law. Users may request data deletion by emailing <a href="mailto:privacy@sygil.app" className="underline text-secondary">privacy@sygil.app</a>.
+            We retain data as long as your account is active or required by law. Users may request data deletion by emailing <a href="mailto:contact@sygil.app" className="underline text-secondary">contact@sygil.app</a>.
           </p>
         </div>
 
@@ -106,7 +106,7 @@ export default function PrivacyPolicy() {
             <li>Opt out of promotional communications.</li>
           </ul>
           <p className="text-text/80 mt-4">
-            Requests can be made to <a href="mailto:privacy@sygil.app" className="underline text-secondary">privacy@sygil.app</a>.
+            Requests can be made to <a href="mailto:contact@sygil.app" className="underline text-secondary">contact@sygil.app</a>.
           </p>
         </div>
 
@@ -133,7 +133,7 @@ export default function PrivacyPolicy() {
             If you have questions about privacy, contact:
           </p>
           <ul className="list-none text-text/90 space-y-1 pl-4">
-            <li>Email: <a href="mailto:privacy@sygil.app" className="underline text-secondary">privacy@sygil.app</a></li>
+            <li>Email: <a href="mailto:contact@sygil.app" className="underline text-secondary">contact@sygil.app</a></li>
             <li>Location: New Delhi, India</li>
           </ul>
         </div>

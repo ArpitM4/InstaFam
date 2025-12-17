@@ -111,6 +111,22 @@ export default function CreatorsPage() {
     }
   };
 
+  // Sticky Scroll Logic for Cost Comparison (Mobile Only)
+  const costContainerRef = useRef(null);
+  const { scrollYProgress: costScrollY } = useScroll({
+    target: costContainerRef,
+    offset: ["start start", "end end"]
+  });
+  const costX = useTransform(costScrollY, [0.1, 0.9], ["0%", "-50%"]);
+
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+    return () => window.removeEventListener('resize', checkDesktop);
+  }, []);
+
   return (
     <>
       <SEO
@@ -122,7 +138,7 @@ export default function CreatorsPage() {
       <CreatorNavbar />
 
 
-      <div className="relative min-h-screen text-white overflow-x-hidden bg-[#0a0a0a]">
+      <div className="relative min-h-screen text-white bg-[#0a0a0a]">
 
         {/* ==================== SECTION 1: HERO ==================== */}
         <section className="min-h-screen flex flex-col items-center justify-center text-center px-4 relative pt-20 border-b border-white/5 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-[#0a0a0a] to-[#0a0a0a] overflow-hidden">
@@ -556,143 +572,148 @@ export default function CreatorsPage() {
 
         {/* Section 6 */}
         {/* ==================== SECTION 6: COST COMPARISON ==================== */}
-        <section className="py-16 px-4 bg-[#0a0a0a] relative border-b border-white/5">
-          <div className="max-w-5xl mx-auto relative z-10">
+        <div ref={costContainerRef} className="relative lg:h-auto h-[300vh] mt-[-50vh] pt-[50vh]">
+          <section className="sticky top-0 h-screen lg:h-auto lg:static flex flex-col justify-center py-16 px-4 bg-[#0a0a0a] border-b border-white/5 overflow-hidden">
+            <div className="max-w-5xl mx-auto relative z-10 w-full">
 
-            {/* 1. Main Headline & Subheading */}
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4 leading-tight">
-                The True Cost of <br className="hidden md:block" />
-                <span className="text-red-500">a Creator Stack.</span>
-              </h2>
-              <p className="text-[var(--text-muted)] text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-                Every Tool You Add Takes More of Your Earnings.<br /> Sygil Gives You Simplicity — For Free.
-              </p>
-            </div>
+              {/* 1. Main Headline & Subheading */}
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4 leading-tight">
+                  The True Cost of <br className="hidden md:block" />
+                  <span className="text-red-500">a Creator Stack.</span>
+                </h2>
+                <p className="text-[var(--text-muted)] text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                  Every Tool You Add Takes More of Your Earnings.<br /> Sygil Gives You Simplicity — For Free.
+                </p>
+              </div>
 
-            <div className="flex overflow-x-auto pb-6 gap-6 snap-x snap-mandatory lg:grid lg:grid-cols-2 lg:overflow-visible lg:pb-0 scrollbar-hide -mx-4 px-4 lg:mx-0 lg:px-0 items-stretch">
-
-              {/* 2. The Old Way (Left Column) */}
               <motion.div
-                className="min-w-[85vw] lg:min-w-0 snap-center rounded-2xl p-6 bg-[#111] border border-red-500/20 relative overflow-hidden flex flex-col"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={slideInLeft}
+                style={{ x: isDesktop ? 0 : costX }}
+                className="flex gap-6 lg:grid lg:grid-cols-2 lg:gap-8 items-stretch w-max lg:w-full px-4 lg:px-0"
               >
-                <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-                  <FaTimes className="text-8xl text-red-500" />
-                </div>
 
-                <h3 className="text-xl font-bold mb-1 text-white">The Typical Stack</h3>
-                <p className="text-red-400 text-xs font-bold uppercase tracking-wider mb-6">Expensive & Fragmented</p>
-
-                <div className="space-y-3 flex-1">
-                  {[
-                    { name: "Website Builder", price: "$50", period: "/month" },
-                    { name: "Link In Bio", price: "$10", period: "/month" },
-                    { name: "Courses", price: "$189", period: "/month" },
-                    { name: "Analytics", price: "$44", period: "/month" },
-                    { name: "Subscription Tool", price: "$29", period: "/month" },
-                    { name: "Merch Storefront", price: "$29", period: "/month" },
-                    { name: "Website Hosting", price: "$20", period: "/month" },
-                    { name: "Platform Fees", price: "+30%  ", period: "fees" },
-                  ].map((item, i) => (
-                    <div key={i} className="flex justify-between items-center py-2 border-b border-white/5 last:border-0 hover:bg-white/5 px-2 rounded-lg transition-colors">
-                      <span className="text-gray-400 font-medium text-sm">{item.name}</span>
-                      <span className="font-bold text-white text-sm">{item.price}<span className="text-[10px] text-gray-500 font-normal">{item.period}</span></span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-white/10">
-                  <div className="flex justify-between items-end">
-                    <span className="text-gray-400 font-medium text-sm">Total Monthly Cost</span>
-                    <div className="text-right leading-none">
-                      <span className="text-2xl font-black text-white">
-                        <CountUp to={371} prefix="$" suffix="" />
-                      </span>
-                      <span className="text-xs text-gray-500 block mt-1">/month + transaction fees</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* 3. The Sygil Way (Right Column) */}
-              <motion.div
-                className="min-w-[85vw] lg:min-w-0 snap-center rounded-2xl p-6 bg-gradient-to-b from-[#111] to-[#050505] border border-purple-500/20 relative overflow-hidden flex flex-col shadow-[0_0_30px_rgba(236,72,153,0.1)]"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={slideInRight}
-              >
-                {/* Ribbon */}
-                <div className="absolute top-5 right-5">
-                  <span className="bg-yellow-500 text-black text-[10px] font-black uppercase py-1 px-2 rounded-full">
-                    Best Value
-                  </span>
-                </div>
-
-                <h3 className="text-xl font-bold mb-1 text-white">The Sygil Ecosystem</h3>
-                <p className="text-[var(--primary)] text-xs font-bold uppercase tracking-wider mb-6">Unified & Free</p>
-
-                <div className="space-y-6 flex-1">
-                  <div className="text-center py-6">
-                    <div className="text-base text-gray-300 mb-1">What you pay monthly:</div>
-                    <div className="text-6xl md:text-7xl font-black text-white tracking-tighter mb-3">
-                      $0
-                    </div>
-                    <p className="text-pink font-medium text-sm">No hidden monthly fees.</p>
+                {/* 2. The Old Way (Left Column) */}
+                <motion.div
+                  className="w-[85vw] lg:w-auto rounded-2xl p-6 bg-[#111] border border-red-500/20 relative overflow-hidden flex flex-col"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={slideInLeft}
+                >
+                  <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                    <FaTimes className="text-8xl text-red-500" />
                   </div>
 
-                  <div className="space-y-2 bg-black/20 p-5 rounded-xl border border-white/5">
+                  <h3 className="text-xl font-bold mb-1 text-white">The Typical Stack</h3>
+                  <p className="text-red-400 text-xs font-bold uppercase tracking-wider mb-6">Expensive & Fragmented</p>
+
+                  <div className="space-y-3 flex-1">
                     {[
-                      "All-in-one Identity & Bio",
-                      "Built-in Gamified Rewards",
-                      "Perks & Shop System",
-                      "Unified Fan Database",
-                      "Keep 95% of Contributions"
-                    ].map((feat, i) => (
-                      <div key={i} className="flex items-center gap-3">
-                        <div className="w-4 h-4 rounded-full bg-green-500/20 flex items-center justify-center">
-                          <FaCheck className="text-green-500 text-[10px]" />
-                        </div>
-                        <span className="text-white font-medium text-sm">{feat}</span>
+                      { name: "Website Builder", price: "$50", period: "/month" },
+                      { name: "Link In Bio", price: "$10", period: "/month" },
+                      { name: "Courses", price: "$189", period: "/month" },
+                      { name: "Analytics", price: "$44", period: "/month" },
+                      { name: "Subscription Tool", price: "$29", period: "/month" },
+                      { name: "Merch Storefront", price: "$29", period: "/month" },
+                      { name: "Website Hosting", price: "$20", period: "/month" },
+                      { name: "Platform Fees", price: "+30%  ", period: "fees" },
+                    ].map((item, i) => (
+                      <div key={i} className="flex justify-between items-center py-2 border-b border-white/5 last:border-0 hover:bg-white/5 px-2 rounded-lg transition-colors">
+                        <span className="text-gray-400 font-medium text-sm">{item.name}</span>
+                        <span className="font-bold text-white text-sm">{item.price}<span className="text-[10px] text-gray-500 font-normal">{item.period}</span></span>
                       </div>
                     ))}
                   </div>
-                </div>
 
-                <div className="mt-6 pt-4 border-t border-pink-500/30 bg-pink-500/10 -mx-6 -mb-6 px-6 py-4">
-                  <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-                    <div>
-                      <div className="text-xs text-primary font-medium uppercase tracking-wide mb-1">Your Savings</div>
-                      <div className="text-xl font-bold text-white">
-                        <CountUp to={371} prefix="$" suffix="" />
-                        <span className="text">/mo</span> <span className="mx-2 text-white/20">|</span>
-                        <CountUp to={4452} prefix="$" suffix="" />
-                        <span className="text-pin">/yr</span>
+                  <div className="mt-6 pt-4 border-t border-white/10">
+                    <div className="flex justify-between items-end">
+                      <span className="text-gray-400 font-medium text-sm">Total Monthly Cost</span>
+                      <div className="text-right leading-none">
+                        <span className="text-2xl font-black text-white">
+                          <CountUp to={371} prefix="$" suffix="" />
+                        </span>
+                        <span className="text-xs text-gray-500 block mt-1">/month + transaction fees</span>
                       </div>
                     </div>
-                    <div className="text-xs text-yellow-200 max-w-[180px] leading-tight">
-                      Plus increased revenue from higher conversion.
+                  </div>
+                </motion.div>
+
+                {/* 3. The Sygil Way (Right Column) */}
+                <motion.div
+                  className="w-[85vw] lg:w-auto rounded-2xl p-6 bg-gradient-to-b from-[#111] to-[#050505] border border-purple-500/20 relative overflow-hidden flex flex-col shadow-[0_0_30px_rgba(236,72,153,0.1)]"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={slideInRight}
+                >
+                  {/* Ribbon */}
+                  <div className="absolute top-5 right-5">
+                    <span className="bg-yellow-500 text-black text-[10px] font-black uppercase py-1 px-2 rounded-full">
+                      Best Value
+                    </span>
+                  </div>
+
+                  <h3 className="text-xl font-bold mb-1 text-white">The Sygil Ecosystem</h3>
+                  <p className="text-[var(--primary)] text-xs font-bold uppercase tracking-wider mb-6">Unified & Free</p>
+
+                  <div className="space-y-6 flex-1">
+                    <div className="text-center py-6">
+                      <div className="text-base text-gray-300 mb-1">What you pay monthly:</div>
+                      <div className="text-6xl md:text-7xl font-black text-white tracking-tighter mb-3">
+                        $0
+                      </div>
+                      <p className="text-pink font-medium text-sm">No hidden monthly fees.</p>
+                    </div>
+
+                    <div className="space-y-2 bg-black/20 p-5 rounded-xl border border-white/5">
+                      {[
+                        "All-in-one Identity & Bio",
+                        "Built-in Gamified Rewards",
+                        "Perks & Shop System",
+                        "Unified Fan Database",
+                        "Keep 95% of Contributions"
+                      ].map((feat, i) => (
+                        <div key={i} className="flex items-center gap-3">
+                          <div className="w-4 h-4 rounded-full bg-green-500/20 flex items-center justify-center">
+                            <FaCheck className="text-green-500 text-[10px]" />
+                          </div>
+                          <span className="text-white font-medium text-sm">{feat}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </div>
+
+                  <div className="mt-6 pt-4 border-t border-pink-500/30 bg-pink-500/10 -mx-6 -mb-6 px-6 py-4">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+                      <div>
+                        <div className="text-xs text-primary font-medium uppercase tracking-wide mb-1">Your Savings</div>
+                        <div className="text-xl font-bold text-white">
+                          <CountUp to={371} prefix="$" suffix="" />
+                          <span className="text">/mo</span> <span className="mx-2 text-white/20">|</span>
+                          <CountUp to={4452} prefix="$" suffix="" />
+                          <span className="text-pin">/yr</span>
+                        </div>
+                      </div>
+                      <div className="text-xs text-yellow-200 max-w-[180px] leading-tight">
+                        Plus increased revenue from higher conversion.
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
               </motion.div>
 
+              {/* Savings Statement & CTA */}
+              <div className="mt-12 text-center">
+                <p className="text-lg md:text-xl text-white font-medium mb-2 max-w-2xl mx-auto">
+                  "The real savings aren’t just cost — Sygil increases your earnings through loyalty, repeat engagement, and perks fans want to redeem."
+                </p>
+
+              </div>
+
             </div>
-
-            {/* Savings Statement & CTA */}
-            <div className="mt-12 text-center">
-              <p className="text-lg md:text-xl text-white font-medium mb-2 max-w-2xl mx-auto">
-                "The real savings aren’t just cost — Sygil increases your earnings through loyalty, repeat engagement, and perks fans want to redeem."
-              </p>
-
-            </div>
-
-          </div>
-        </section>
+          </section>
+        </div>
 
         {/* ==================== FINAL CTA SECTION 7 ==================== */}
         {/* ==================== FINAL CTA SECTION 7 ==================== */}

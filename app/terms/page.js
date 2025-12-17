@@ -77,7 +77,7 @@ export default function TermsOfService() {
 
         <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">8. Refunds</h2>
         <p className="mb-6 text-base text-text/80">
-          Donations are <strong>non-refundable</strong>. In case of technical errors (duplicate payments, payment failures), users may contact our support team at <a className="underline text-secondary" href="mailto:support@sygil.app">support@sygil.app</a> for review.
+          Donations are <strong>non-refundable</strong>. In case of technical errors (duplicate payments, payment failures), users may contact our support team at <a className="underline text-secondary" href="mailto:contact@sygil.app">contact@sygil.app</a> for review.
         </p>
 
         <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">9. Intellectual Property</h2>
@@ -100,14 +100,14 @@ export default function TermsOfService() {
 
         <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">12. Governing Law</h2>
         <p className="mb-6 text-base text-text/80">
-          These Terms are governed by the laws of <strong>India</strong>, under the jurisdiction of <strong>Mumbai, Maharashtra</strong>.
+          These Terms are governed by the laws of <strong>India</strong>, under the jurisdiction of <strong>New Delhi, Maharashtra</strong>.
         </p>
 
         <h2 className="text-xl font-semibold mt-12 mb-3 text-secondary">13. Contact</h2>
         <p className="mb-3 text-base text-text/80">For questions, complaints, or legal notices, contact:</p>
         <ul className="list-none mb-6 text-base text-text/90 space-y-1 pl-4">
-          <li>Email: <a className="underline text-secondary" href="mailto:legal@sygil.app">legal@sygil.app</a></li>
-          <li>Location: Mumbai, India</li>
+          <li>Email: <a className="underline text-secondary" href="mailto:contact@sygil.app">contact@sygil.app</a></li>
+          <li>Location: New Delhi, India</li>
         </ul>
 
         <p className="mt-8 text-sm text-text/60 text-center">
