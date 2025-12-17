@@ -29,22 +29,22 @@ export async function POST(req) {
 
     // Store signup data temporarily (either update existing unverified user or create temp entry)
     let tempUser = await User.findOne({ email, emailVerified: null });
-    
+
     console.log('🔍 Signup process - existing unverified user found:', !!tempUser);
-    
+
     if (tempUser) {
       // Update existing unverified user
       tempUser.password = await hash(password, 10);
       tempUser.emailVerificationOTP = otp;
       tempUser.otpExpiry = otpExpiry;
-      
+
       console.log('🔄 Updating existing user with OTP:', {
         userId: tempUser._id,
         email: tempUser.email,
         otp: otp,
         otpExpiry: otpExpiry
       });
-      
+
       // Use $set to explicitly update the fields
       const updateResult = await User.findByIdAndUpdate(
         tempUser._id,
@@ -57,13 +57,13 @@ export async function POST(req) {
         },
         { new: true }
       );
-      
+
       console.log('✅ Updated user with $set:', {
         userId: updateResult._id,
         storedOTP: updateResult.emailVerificationOTP,
         storedExpiry: updateResult.otpExpiry
       });
-      
+
       tempUser = updateResult;
     } else {
       const hashedPassword = await hash(password, 10);
@@ -75,14 +75,14 @@ export async function POST(req) {
       });
 
       // Create temporary unverified user without username
-      tempUser = await User.create({ 
-        email, 
+      tempUser = await User.create({
+        email,
         password: hashedPassword,
         emailVerificationOTP: otp,
         otpExpiry: otpExpiry,
         emailVerified: null // Explicitly unverified
       });
-      
+
       console.log('✅ New user created with OTP:', {
         userId: tempUser._id,
         storedOTP: tempUser.emailVerificationOTP,
@@ -113,70 +113,130 @@ export async function POST(req) {
       });
 
       const htmlTemplate = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-            .otp-box { background: white; border: 2px dashed #667eea; padding: 20px; text-align: center; margin: 20px 0; border-radius: 10px; }
-            .otp-code { font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 5px; font-family: monospace; }
-            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 14px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>🎉 Welcome to Sygil!</h1>
-              <p>Verify your email to complete your account setup</p>
-            </div>
-            <div class="content">
-              <h2>Your Verification Code</h2>
-              <p>Hi there! Thanks for joining Sygil. Please use the following 6-digit code to verify your email address:</p>
-              
-              <div class="otp-box">
-                <div class="otp-code">${otp}</div>
-              </div>
-              
-              <p><strong>Important:</strong></p>
-              <ul>
-                <li>This code will expire in <strong>10 minutes</strong></li>
-                <li>Don't share this code with anyone</li>
-                <li>If you didn't request this, please ignore this email</li>
-              </ul>
-              
-              <p>Once verified, you'll be able to:</p>
-              <ul>
-                <li>✨ Create and participate in events</li>
-                <li>💰 Earn and redeem Sygil points</li>
-                <li>🎯 Connect with your favorite creators</li>
-              </ul>
-            </div>
-            <div class="footer">
-              <p>Need help? Contact us at <a href="mailto:support@sygil.app">support@sygil.app</a></p>
-              <p>© 2025 Sygil. All rights reserved.</p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `;
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #ffffff;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+      border-radius: 10px 10px 0 0;
+    }
+    .content {
+      background: #f9f9f9;
+      padding: 30px;
+      border-radius: 0 0 10px 10px;
+    }
+    .otp-box {
+      background: white;
+      border: 2px dashed #667eea;
+      padding: 20px;
+      text-align: center;
+      margin: 24px 0;
+      border-radius: 10px;
+    }
+    .otp-code {
+      font-size: 32px;
+      font-weight: bold;
+      color: #667eea;
+      letter-spacing: 6px;
+      font-family: monospace;
+      user-select: all;
+    }
+    .copy-hint {
+      font-size: 13px;
+      color: #666;
+      margin-top: 8px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+      font-size: 13px;
+    }
+    a {
+      color: #667eea;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Welcome to Sygil</h1>
+      <p>Email verification required</p>
+    </div>
+
+    <div class="content">
+      <h2>Your verification code</h2>
+
+      <p>
+        Use the code below to verify your email address and continue to Sygil.
+      </p>
+
+      <div class="otp-box">
+        <div class="otp-code">${otp}</div>
+        <div class="copy-hint">
+          Tip: Click and copy this code
+        </div>
+      </div>
+
+      <p><strong>Please note:</strong></p>
+      <ul>
+        <li>This code expires in <strong>10 minutes</strong></li>
+        <li>Do not share this code with anyone</li>
+        <li>If you didn’t request this, you can safely ignore this email</li>
+      </ul>
+
+      <p>
+        Once verified, you’ll be able to follow creators, unlock vault items,
+        and start earning FamPoints.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>
+        Need help? Contact us at
+        <a href="mailto:contact@sygil.app">contact@sygil.app</a>
+      </p>
+      <p>© 2025 Sygil</p>
+    </div>
+  </div>
+</body>
+</html>
+`;
 
       await transporter.sendMail({
         from: process.env.EMAIL_FROM,
         to: email,
-        subject: 'Verify Your Sygil Account - OTP Code',
+        subject: 'Verify Your Sygil Account',
         html: htmlTemplate,
       });
 
     } catch (emailError) {
       console.error('Email sending failed:', emailError);
-      // Don't fail the signup if email fails, user can request new OTP
+      // If email fails, we should probably inform the user instead of saying success
+      // But since we created the user (or updated), maybe we just say "Failed to send OTP".
+      // However, if we return error, the frontend might think signup failed completely.
+      // Let's return a 500 so frontend shows the error.
+      return Response.json({ error: "Failed to send verification email. Please check your email address." }, { status: 500 });
     }
 
-    return Response.json({ 
+    return Response.json({
       message: "Account created successfully! Please check your email for the verification code.",
       email: email,
       otpSent: true

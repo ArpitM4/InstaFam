@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -16,7 +16,9 @@ const CosmicBackground = dynamic(() => import("@/components/CosmicBackground"), 
 
 export default function MarketingSplash() {
   const router = useRouter();
-  const [isLogin, setIsLogin] = useState(true);
+  // We'll use 'view' state instead of isLogin now, but for backward compat/transition let's sync them or replace usage.
+  // Replacing isLogin usage with view check.
+  // const [isLogin, setIsLogin] = useState(true); 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -27,13 +29,106 @@ export default function MarketingSplash() {
   const [otp, setOtp] = useState('');
   const [showOtpInput, setShowOtpInput] = useState(false);
 
+  // Forgot Password / Resend OTP states
+  const [view, setView] = useState('LOGIN'); // 'LOGIN', 'SIGNUP', 'FORGOT_PASSWORD'
+  const [forgotStep, setForgotStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
+  const [timer, setTimer] = useState(0);
+
+  // Timer Logic
+  useEffect(() => {
+    let interval;
+    if (timer > 0) {
+      interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const startTimer = () => setTimer(60);
+
+  const handleResendOtp = async () => {
+    if (timer > 0) return;
+    setLoading(true);
+    try {
+      let endpoint = '/api/auth/signup';
+      if (view === 'FORGOT_PASSWORD') endpoint = '/api/auth/forgot-password';
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: view === 'SIGNUP' ? password : undefined }) // Password needed for signup resend (maybe not? checking api)
+        // Actually signup usually requires password to re-create/update user or just email. 
+        // Provide both for signup just in case. For forgot-password only email is needed.
+      });
+
+      if (!res.ok) throw new Error('Failed to resend OTP');
+      startTimer();
+      // toast.success('OTP Resent');
+    } catch (err) {
+      setError(err.message || 'Failed to resend OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Forgot Password Handlers
+  const handleForgotPasswordSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      if (forgotStep === 1) {
+        // Step 1: Send Email
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Something went wrong');
+
+        setForgotStep(2);
+        startTimer();
+      } else if (forgotStep === 2) {
+        // Step 2: Verify OTP
+        const res = await fetch('/api/auth/verify-reset-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, otp })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Invalid OTP');
+
+        setForgotStep(3);
+      } else if (forgotStep === 3) {
+        // Step 3: Reset Password
+        const res = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, otp, newPassword: password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to reset password');
+
+        // Success - Go to Login
+        setView('LOGIN');
+        setPassword('');
+        setError('Password reset successful! Please login.');
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleCredentialsAuth = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    if (isLogin) {
+    if (view === 'LOGIN') {
       const result = await signIn('credentials', {
         email,
         password,
@@ -41,7 +136,11 @@ export default function MarketingSplash() {
       });
 
       if (result?.error) {
-        setError(result.error);
+        if (result.error === 'CredentialsSignin') {
+          setError('Invalid email or password');
+        } else {
+          setError(result.error);
+        }
         setLoading(false);
       } else {
         // Check if setup is needed by fetching user data
@@ -55,7 +154,7 @@ export default function MarketingSplash() {
         }
         router.refresh();
       }
-    } else {
+    } else if (view === 'SIGNUP') {
       // Signup Flow
       if (!showOtpInput) {
         // Step 1: Send OTP
@@ -76,6 +175,7 @@ export default function MarketingSplash() {
 
           setShowOtpInput(true);
           setError('');
+          startTimer();
           // toast.success('OTP sent to your email!'); // Toast not imported, skipping
         } catch (err) {
           setError('Something went wrong');
@@ -106,7 +206,7 @@ export default function MarketingSplash() {
 
           if (result?.error) {
             setError('Account verified! Please login.');
-            setIsLogin(true);
+            setView('LOGIN');
           } else {
             router.push('/setup'); // Redirect to setup for new users
             router.refresh();
@@ -192,8 +292,7 @@ export default function MarketingSplash() {
               </div>
 
               {/* Auth Form */}
-              <form onSubmit={handleCredentialsAuth} className="space-y-4">
-
+              <form onSubmit={view === 'FORGOT_PASSWORD' ? handleForgotPasswordSubmit : handleCredentialsAuth} className="space-y-4">
 
                 <div>
                   <label className="block text-text text-sm font-medium mb-2">Email Address</label>
@@ -204,32 +303,59 @@ export default function MarketingSplash() {
                     placeholder="Email Address"
                     className="glass-input w-full px-4 py-3 rounded-lg text-text placeholder-text-muted"
                     required
+                    disabled={view === 'FORGOT_PASSWORD' && forgotStep > 1}
                   />
                 </div>
 
-                <div>
-                  <label className="block text-text text-sm font-medium mb-2">Password</label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Password"
-                      className="glass-input w-full px-4 py-3 pr-12 rounded-lg text-text placeholder-text-muted"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text transition-colors p-2"
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                    >
-                      {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </button>
+                {view === 'FORGOT_PASSWORD' && forgotStep === 3 && (
+                  <div>
+                    <label className="block text-text text-sm font-medium mb-2">New Password</label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="New Password"
+                        className="glass-input w-full px-4 py-3 pr-12 rounded-lg text-text placeholder-text-muted"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text transition-colors p-2"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {showOtpInput && !isLogin && (
+                {view !== 'FORGOT_PASSWORD' && (
+                  <div>
+                    <label className="block text-text text-sm font-medium mb-2">{view === 'LOGIN' ? 'Password' : 'Set Password'}</label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder={view === 'LOGIN' ? "Password" : "Set Password"}
+                        className="glass-input w-full px-4 py-3 pr-12 rounded-lg text-text placeholder-text-muted"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text transition-colors p-2"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {((showOtpInput && view === 'SIGNUP') || (view === 'FORGOT_PASSWORD' && forgotStep >= 2)) && (
                   <div>
                     <label className="block text-text text-sm font-medium mb-2">Verification Code</label>
                     <input
@@ -238,12 +364,21 @@ export default function MarketingSplash() {
                       onChange={(e) => setOtp(e.target.value)}
                       placeholder="Enter 6-digit OTP"
                       className="glass-input w-full px-4 py-3 rounded-lg text-text placeholder-text-muted tracking-widest text-center font-mono text-lg"
-                      required={showOtpInput}
+                      required
                       maxLength={6}
                     />
-                    <p className="text-xs text-text-muted mt-2 text-center">
-                      Check your email for the code
-                    </p>
+                    <div className="flex justify-between items-center mt-2">
+                      <p className="text-xs text-text-muted">
+                        Check your email for the code
+                      </p>
+                      {timer > 0 ? (
+                        <span className="text-xs text-text-muted">Resend in {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}</span>
+                      ) : (
+                        <button type="button" onClick={handleResendOtp} className="text-xs text-primary hover:underline">
+                          Resend OTP
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -256,34 +391,57 @@ export default function MarketingSplash() {
                   disabled={loading}
                   className="btn-gradient w-full py-3 rounded-lg text-white font-semibold disabled:opacity-50"
                 >
-                  {loading ? 'Please wait...' : (isLogin ? 'Login' : (showOtpInput ? 'Verify & Signup' : 'Sign Up'))}
+                  {loading ? 'Please wait...' : (
+                    view === 'LOGIN' ? 'Login' :
+                      view === 'SIGNUP' ? (showOtpInput ? 'Verify & Signup' : 'Sign Up') :
+                        (forgotStep === 1 ? 'Send Reset Code' : forgotStep === 2 ? 'Verify Code' : 'Reset Password')
+                  )}
                 </button>
               </form>
 
               {/* Forgot Password (only for login) */}
-              {isLogin && (
+              {view === 'LOGIN' && (
                 <div className="text-right mt-3">
-                  <Link href="/forgot-password" className="text-text-muted hover:text-text text-sm transition-colors">
+                  <button onClick={() => {
+                    setView('FORGOT_PASSWORD');
+                    setForgotStep(1);
+                    setError('');
+                    setOtp('');
+                    setPassword('');
+                  }}
+                    className="text-text-muted hover:text-text text-sm transition-colors"
+                  >
                     Forgot Password?
-                  </Link>
+                  </button>
+                </div>
+              )}
+
+              {/* Back to Login from Forgot Password */}
+              {view === 'FORGOT_PASSWORD' && (
+                <div className="text-center mt-3">
+                  <button onClick={() => setView('LOGIN')} className="text-text-muted hover:text-text text-sm transition-colors">
+                    Back to Login
+                  </button>
                 </div>
               )}
 
               {/* Toggle Login/Signup */}
-              <p className="text-center mt-6 text-text">
-                {isLogin ? "New User? " : "Already have an account? "}
-                <button
-                  onClick={() => {
-                    setIsLogin(!isLogin);
-                    setShowOtpInput(false);
-                    setError('');
-                    setOtp('');
-                  }}
-                  className="text-primary hover:text-primary-light font-semibold transition-colors"
-                >
-                  {isLogin ? 'Sign Up' : 'Login'}
-                </button>
-              </p>
+              {view !== 'FORGOT_PASSWORD' && (
+                <p className="text-center mt-6 text-text">
+                  {view === 'LOGIN' ? "New User? " : "Already have an account? "}
+                  <button
+                    onClick={() => {
+                      setView(view === 'LOGIN' ? 'SIGNUP' : 'LOGIN');
+                      setShowOtpInput(false);
+                      setError('');
+                      setOtp('');
+                    }}
+                    className="text-primary hover:text-primary-light font-semibold transition-colors"
+                  >
+                    {view === 'LOGIN' ? 'Sign Up' : 'Login'}
+                  </button>
+                </p>
+              )}
 
               {/* Creator Link */}
               <div className="text-center mt-6 pt-6 border-t border-card-border">

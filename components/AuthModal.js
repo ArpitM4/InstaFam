@@ -12,7 +12,8 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
     const [view, setView] = useState(initialView); // "AUTH" or "SETUP"
 
     // -- AUTH STATES --
-    const [isLogin, setIsLogin] = useState(true);
+    const [authView, setAuthView] = useState("LOGIN"); // "LOGIN", "SIGNUP", "FORGOT_PASSWORD"
+    // const [isLogin, setIsLogin] = useState(true); // Deprecated in favor of authView
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -20,6 +21,91 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
     const [password, setPassword] = useState('');
     const [otp, setOtp] = useState('');
     const [showOtpInput, setShowOtpInput] = useState(false);
+
+    // Forgot Password / Resend OTP states
+    const [forgotStep, setForgotStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
+    const [timer, setTimer] = useState(0);
+
+    // Timer Logic
+    useEffect(() => {
+        let interval;
+        if (timer > 0) {
+            interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
+        }
+        return () => clearInterval(interval);
+    }, [timer]);
+
+    const startTimer = () => setTimer(60);
+
+    const handleResendOtp = async () => {
+        if (timer > 0) return;
+        setLoading(true);
+        try {
+            let endpoint = '/api/auth/signup';
+            if (authView === 'FORGOT_PASSWORD') endpoint = '/api/auth/forgot-password';
+
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password: authView === 'SIGNUP' ? password : undefined })
+            });
+
+            if (!res.ok) throw new Error('Failed to resend OTP');
+            startTimer();
+        } catch (err) {
+            setError(err.message || 'Failed to resend OTP');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Forgot Password Handlers
+    const handleForgotPasswordSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            if (forgotStep === 1) {
+                const res = await fetch('/api/auth/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Something went wrong');
+
+                setForgotStep(2);
+                startTimer();
+            } else if (forgotStep === 2) {
+                const res = await fetch('/api/auth/verify-reset-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Invalid OTP');
+
+                setForgotStep(3);
+            } else if (forgotStep === 3) {
+                const res = await fetch('/api/auth/reset-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp, newPassword: password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Failed to reset password');
+
+                setAuthView('LOGIN'); // Go back to login
+                setPassword('');
+                setError('Password reset successful! Please login.');
+            }
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // -- SETUP STATES --
     const [name, setName] = useState("");
@@ -57,7 +143,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
         setLoading(true);
         setError('');
 
-        if (isLogin) {
+        if (authView === "LOGIN") {
             const result = await signIn('credentials', {
                 email,
                 password,
@@ -65,7 +151,11 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
             });
 
             if (result?.error) {
-                setError(result.error);
+                if (result.error === 'CredentialsSignin') {
+                    setError('Invalid email or password');
+                } else {
+                    setError(result.error);
+                }
                 setLoading(false);
             } else {
                 // Login success - check setup
@@ -81,7 +171,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                     setLoading(false);
                 }
             }
-        } else {
+        } else if (authView === "SIGNUP") {
             // Signup Flow
             if (!showOtpInput) {
                 // Send OTP
@@ -101,6 +191,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
 
                     setShowOtpInput(true);
                     setError('');
+                    startTimer();
                 } catch (err) {
                     setError('Something went wrong');
                 }
@@ -130,7 +221,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
 
                     if (result?.error) {
                         setError('Account verified! Please login.');
-                        setIsLogin(true);
+                        setAuthView("LOGIN");
                     } else {
                         // New user -> Setup
                         setView("SETUP");
@@ -293,8 +384,9 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                                     <div className="flex-1 h-px bg-white/10"></div>
                                 </div>
 
-                                <form onSubmit={handleCredentialsAuth} className="space-y-4">
+                                <form onSubmit={authView === 'FORGOT_PASSWORD' ? handleForgotPasswordSubmit : handleCredentialsAuth} className="space-y-4">
                                     <div>
+                                        <label className="block text-white text-sm font-medium mb-2">Email Address</label>
                                         <input
                                             type="email"
                                             value={email}
@@ -302,41 +394,76 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                                             placeholder="Email Address"
                                             className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-primary/50"
                                             required
+                                            disabled={authView === 'FORGOT_PASSWORD' && forgotStep > 1}
                                         />
                                     </div>
 
-                                    <div className="relative">
-                                        <input
-                                            type={showPassword ? 'text' : 'password'}
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            placeholder="Password"
-                                            className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-primary/50"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
-                                        >
-                                            {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                        </button>
-                                    </div>
+                                    {authView === 'FORGOT_PASSWORD' && forgotStep === 3 && (
+                                        <div className="relative">
+                                            <label className="block text-white text-sm font-medium mb-2">New Password</label>
+                                            <input
+                                                type={showPassword ? 'text' : 'password'}
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                placeholder="New Password"
+                                                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-primary/50"
+                                                required
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-4 top-9 text-white/50 hover:text-white"
+                                            >
+                                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                            </button>
+                                        </div>
+                                    )}
 
-                                    {showOtpInput && !isLogin && (
+                                    {authView !== 'FORGOT_PASSWORD' && (
+                                        <div className="relative">
+                                            <label className="block text-white text-sm font-medium mb-2">{authView === 'LOGIN' ? "Password" : "Set Password"}</label>
+                                            <input
+                                                type={showPassword ? 'text' : 'password'}
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                placeholder={authView === 'LOGIN' ? "Password" : "Set Password"}
+                                                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-primary/50"
+                                                required
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-4 top-9 text-white/50 hover:text-white"
+                                            >
+                                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {((showOtpInput && authView === 'SIGNUP') || (authView === 'FORGOT_PASSWORD' && forgotStep >= 2)) && (
                                         <div>
+                                            <label className="block text-white text-sm font-medium mb-2">Verification Code</label>
                                             <input
                                                 type="text"
                                                 value={otp}
                                                 onChange={(e) => setOtp(e.target.value)}
                                                 placeholder="Enter 6-digit OTP"
                                                 className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 tracking-widest text-center"
-                                                required={showOtpInput}
+                                                required
                                                 maxLength={6}
                                             />
-                                            <p className="text-xs text-white/50 mt-2 text-center">
-                                                Check your email for the code
-                                            </p>
+                                            <div className="flex justify-between items-center mt-2">
+                                                <p className="text-xs text-white/50">
+                                                    Check your email for the code
+                                                </p>
+                                                {timer > 0 ? (
+                                                    <span className="text-xs text-white/50">Resend in {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}</span>
+                                                ) : (
+                                                    <button type="button" onClick={handleResendOtp} className="text-xs text-primary hover:underline">
+                                                        Resend OTP
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     )}
 
@@ -349,32 +476,54 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                                         disabled={loading}
                                         className="w-full py-3 rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold transition-colors disabled:opacity-50"
                                     >
-                                        {loading ? 'Please wait...' : (isLogin ? 'Login' : (showOtpInput ? 'Verify & Signup' : 'Sign Up'))}
+                                        {loading ? 'Please wait...' : (
+                                            authView === 'LOGIN' ? 'Login' :
+                                                authView === 'SIGNUP' ? (showOtpInput ? 'Verify & Signup' : 'Sign Up') :
+                                                    (forgotStep === 1 ? 'Send Reset Code' : forgotStep === 2 ? 'Verify Code' : 'Reset Password')
+                                        )}
                                     </button>
                                 </form>
 
-                                {isLogin && (
+                                {authView === 'LOGIN' && (
                                     <div className="text-right mt-3">
-                                        <a href="/forgot-password" className="text-white/40 hover:text-white text-sm transition-colors">
+                                        <button onClick={() => {
+                                            setAuthView('FORGOT_PASSWORD');
+                                            setForgotStep(1);
+                                            setError('');
+                                            setOtp('');
+                                            setPassword('');
+                                        }}
+                                            className="text-white/40 hover:text-white text-sm transition-colors"
+                                        >
                                             Forgot Password?
-                                        </a>
+                                        </button>
                                     </div>
                                 )}
 
-                                <p className="text-center mt-6 text-white/80">
-                                    {isLogin ? "New User? " : "Already have an account? "}
-                                    <button
-                                        onClick={() => {
-                                            setIsLogin(!isLogin);
-                                            setShowOtpInput(false);
-                                            setError('');
-                                            setOtp('');
-                                        }}
-                                        className="text-primary hover:text-primary-light font-semibold"
-                                    >
-                                        {isLogin ? 'Sign Up' : 'Login'}
-                                    </button>
-                                </p>
+                                {authView === 'FORGOT_PASSWORD' && (
+                                    <div className="text-center mt-3">
+                                        <button onClick={() => setAuthView('LOGIN')} className="text-white/40 hover:text-white text-sm transition-colors">
+                                            Back to Login
+                                        </button>
+                                    </div>
+                                )}
+
+                                {authView !== 'FORGOT_PASSWORD' && (
+                                    <p className="text-center mt-6 text-white/80">
+                                        {authView === 'LOGIN' ? "New User? " : "Already have an account? "}
+                                        <button
+                                            onClick={() => {
+                                                setAuthView(authView === 'LOGIN' ? 'SIGNUP' : 'LOGIN');
+                                                setShowOtpInput(false);
+                                                setError('');
+                                                setOtp('');
+                                            }}
+                                            className="text-primary hover:text-primary-light font-semibold"
+                                        >
+                                            {authView === 'LOGIN' ? 'Sign Up' : 'Login'}
+                                        </button>
+                                    </p>
+                                )}
                             </div>
                         </div>
                     ) : (
