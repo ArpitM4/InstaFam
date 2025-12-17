@@ -77,6 +77,8 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
         return "Unlock Reward";
     };
 
+    const [isExpanded, setIsExpanded] = React.useState(false);
+
     return (
         <div className="rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl border border-white/10 relative group bg-[#1a1a1f] hover:border-white/20 min-w-[280px] md:min-w-0 snap-center flex-shrink-0 md:flex-shrink">
 
@@ -94,16 +96,33 @@ const VaultItemCard = ({ item, isOwner, onRedeem, onEdit, onView, isRedeemed, st
                     </div>
                 )}
 
-                <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-bold text-lg text-white mb-1 line-clamp-1 pr-2">{item.title}</h3>
+                <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className={`font-bold text-lg text-white mb-1 pr-2 leading-tight ${!isExpanded && 'line-clamp-2'}`}>
+                        {item.title}
+                    </h3>
                     {(item.pointCost !== undefined && item.pointCost !== null) && (
-                        <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs font-bold">
+                        <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-xs font-bold whitespace-nowrap flex items-center gap-1 flex-shrink-0">
                             🪙 {item.pointCost} FP
                         </span>
                     )}
                 </div>
 
-                <p className="text-white/60 text-sm line-clamp-2 min-h-[40px] text-sm leading-relaxed">{item.description}</p>
+                <div className="relative">
+                    <p
+                        className={`text-white/60 text-sm leading-relaxed transition-all duration-300 ${isExpanded ? '' : 'line-clamp-2 min-h-[40px]'}`}
+                        onClick={() => setIsExpanded(!isExpanded)}
+                    >
+                        {item.description}
+                    </p>
+                    {item.description && item.description.length > 80 && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
+                            className="text-primary text-xs font-bold mt-1 hover:underline focus:outline-none"
+                        >
+                            {isExpanded ? 'Show Less' : 'View More'}
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Stats / Limits - Fan View: Show "X Left" and "You: x/y" on same line */}

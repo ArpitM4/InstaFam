@@ -5,8 +5,8 @@ import User from "@/models/User";
 import VaultItem from "@/models/VaultItem";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-// Remove force-dynamic to allow caching
-export const revalidate = 60; // Revalidate every 60 seconds
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 await connectDb();
 
@@ -43,9 +43,8 @@ export async function GET(request, { params }) {
       }
     });
 
-    // OPTIMIZATION: Add caching headers (60 sec cache, 120 sec stale-while-revalidate)
-    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
-
+    // Disable caching for realtime updates
+    response.headers.set('Cache-Control', 'no-store, max-age=0');
     return response;
 
   } catch (error) {

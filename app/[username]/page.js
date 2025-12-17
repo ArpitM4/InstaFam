@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }) {
   const user = await fetchuser(params.username);
 
