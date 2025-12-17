@@ -141,22 +141,25 @@ const EditVaultItemModal = ({ item, onClose, onSuccess, onDelete }) => {
 
                     {/* Pricing */}
                     <div>
-                        <label className="block text-sm text-white/60 mb-1">Cost (FamPoints)</label>
+                        <label className="block text-sm text-white/60 mb-1">
+                            Cost (FamPoints)
+                            {formData.isFree ?
+                                <span className="text-green-400 ml-2 text-xs">(Free Item - Cannot change)</span> :
+                                <span className="text-white/40 ml-2 text-xs">(Paid Item - Min 1 Point)</span>
+                            }
+                        </label>
                         <div className="flex gap-2">
                             <input type="number"
-                                className={`flex-1 bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary ${formData.isFree ? 'opacity-50' : ''}`}
-                                min={0}
-                                value={formData.isFree ? 0 : formData.pointCost}
+                                className={`flex-1 bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary ${formData.isFree ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                min={formData.isFree ? 0 : 1}
+                                value={formData.pointCost}
                                 disabled={formData.isFree}
-                                onChange={e => setFormData({ ...formData, pointCost: e.target.value })}
+                                onChange={e => {
+                                    const val = parseInt(e.target.value);
+                                    if (!formData.isFree && val < 1) return; // Prevent 0 for paid items
+                                    setFormData({ ...formData, pointCost: e.target.value })
+                                }}
                             />
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm text-white/60">Is Free?</span>
-                                <input type="checkbox" checked={formData.isFree}
-                                    onChange={e => setFormData({ ...formData, isFree: e.target.checked, pointCost: e.target.checked ? 0 : (item.pointCost || 10) })}
-                                    className="w-5 h-5 accent-primary"
-                                />
-                            </div>
                         </div>
                     </div>
 
@@ -199,12 +202,57 @@ const EditVaultItemModal = ({ item, onClose, onSuccess, onDelete }) => {
                     {/* Content Fields based on Type */}
                     {formData.type === 'file' && (
                         <div>
-                            <label className="block text-sm text-white/60 mb-1">File URL</label>
+                            <label className="block text-sm text-white/60 mb-1">File</label>
+
+                            {/* File Preview */}
+                            {formData.fileUrl && (
+                                <div className="mb-3 p-3 bg-black/20 rounded-xl border border-white/5">
+                                    {/* Image Preview */}
+                                    {formData.fileUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) || formData.fileType === 'image' ? (
+                                        <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-black/50">
+                                            <img
+                                                src={formData.fileUrl}
+                                                alt="Preview"
+                                                className="w-full h-full object-contain"
+                                            />
+                                        </div>
+                                    ) : (
+                                        /* Generic File Preview */
+                                        <div className="flex items-center justify-between gap-3">
+                                            <div className="flex items-center gap-3 overflow-hidden">
+                                                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                                                    <span className="text-xl">📄</span>
+                                                </div>
+                                                <div className="truncate text-sm text-white/80">
+                                                    {formData.fileUrl.split('/').pop()}
+                                                </div>
+                                            </div>
+                                            <a
+                                                href={formData.fileUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg transition-colors whitespace-nowrap"
+                                            >
+                                                View / Download
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
                             <div className="flex gap-2">
-                                <input type="text" className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white"
-                                    value={formData.fileUrl} onChange={e => setFormData({ ...formData, fileUrl: e.target.value })} />
-                                <label className="bg-white/10 text-white px-4 py-2 rounded-lg cursor-pointer flex items-center justify-center hover:bg-white/20 whitespace-nowrap">
-                                    {uploadingFile ? '...' : 'Upload'}
+                                <input type="text"
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white text-sm text-white/50"
+                                    placeholder="File URL"
+                                    value={formData.fileUrl}
+                                    onChange={e => setFormData({ ...formData, fileUrl: e.target.value })}
+                                />
+                                <label className="bg-white/10 text-white px-4 py-2 rounded-lg cursor-pointer flex items-center justify-center hover:bg-white/20 whitespace-nowrap transition-colors">
+                                    {uploadingFile ? (
+                                        <span className="animate-pulse">...</span>
+                                    ) : (
+                                        <span>Change</span>
+                                    )}
                                     <input type="file" className="hidden" onChange={handleFileUpload} />
                                 </label>
                             </div>
