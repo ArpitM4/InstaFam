@@ -107,6 +107,9 @@ export default function AppLayout({ children }) {
   if (isPreviewMode && isCreatorPage) {
     return (
       <div className="min-h-screen bg-background">
+        <Suspense fallback={null}>
+          <PreviewModeDetector onPreviewModeChange={handlePreviewModeChange} />
+        </Suspense>
         <PublicNavbar isPreviewMode={true} />
         <main className="pt-24 md:pt-12">
           {children}
