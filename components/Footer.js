@@ -1,12 +1,7 @@
 "use client"
 import React from 'react'
-import Image from 'next/image'
 import "../app/globals.css";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faInstagram } from '@fortawesome/free-brands-svg-icons'
 import { useSession } from 'next-auth/react'
-
-
 
 const Footer = ({ forceShow = false }) => {
   const { data: session } = useSession();
@@ -18,70 +13,30 @@ const Footer = ({ forceShow = false }) => {
   }
 
   return (
-    <footer className="relative z-20 text-white py-10">
+    <footer className="relative z-20 text-white py-12 border-t border-gray-800/50">
+      <div className="max-w-screen-xl mx-auto px-6 relative z-10 flex flex-col items-center justify-center space-y-6">
 
-      <div className="max-w-screen-xl mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-
-          {/* Column 1: Brand/Logo Section */}
-          <div className="space-y-4">
-            <div className="relative w-40 h-14">
-              <Image
-                src="/SygilFull.png"
-                alt="Sygil"
-                fill
-                sizes="200px"
-                className="object-contain object-left"
-              />
-            </div>
-            <p className="text-lg text-gray-300">
-              Designed for creators. Built for connection.        </p>
-          </div>
-
-          {/* Column 2: Links Section */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-white">Quick Links</h3>
-            <ul className="space-y-2 text-gray-300">
-              <li><a href="/" className="hover:underline hover:text-white">Home</a></li>
-              <li><a href="/about" className="hover:underline hover:text-white">About Us</a></li>
-              <li><a href="/blogs" className="hover:underline hover:text-white">Creator School</a></li>
-              <li><a href="/contact" className="hover:underline hover:text-white">Contact</a></li>
-              <li><a href="/terms" className="hover:underline hover:text-white">Terms of Service</a></li>
-              <li><a href="/privacypolicy" className="hover:underline hover:text-white">Privacy Policy</a></li>
-              <li><a href="/faqs" className="hover:underline hover:text-white">FAQ</a></li>
-            </ul>
-          </div>
-
-          {/* Column 3: Social Media Links */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-white">Follow Us</h3>
-            <div className="flex space-x-6">
-              {/* <a href="#" className="text-2xl hover:underline">
-            <i className="fab fa-facebook-f"></i>
-          </a>
-          <a href="#" className="text-2xl hover:underline">
-            <i className="fab fa-twitter"></i>
-          </a> */}
-              <a target='_blank' href="https://www.instagram.com/sygil_official/" className="text-2xl hover:underline flex items-center space-x-2 text-gray-300 hover:text-white">
-                <FontAwesomeIcon icon={faInstagram} />
-                <span>Instagram</span>
-              </a>
-              {/* <a href="#" className="text-2xl hover:underline">
-            <i className="fab fa-linkedin-in"></i>
-          </a> */}
-            </div>
-          </div>
-        </div>
+        {/* Navigation Links */}
+        <nav>
+          <ul className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm font-medium text-gray-400">
+            <li><a href="/" className="hover:text-white transition-colors duration-200">Home</a></li>
+            <li><a href="/about" className="hover:text-white transition-colors duration-200">About Us</a></li>
+            <li><a href="/blogs" className="hover:text-white transition-colors duration-200">Creator School</a></li>
+            <li><a href="/contact" className="hover:text-white transition-colors duration-200">Contact</a></li>
+            <li><a href="/terms" className="hover:text-white transition-colors duration-200">Terms of Service</a></li>
+            <li><a href="/privacypolicy" className="hover:text-white transition-colors duration-200">Privacy Policy</a></li>
+            <li><a href="/faqs" className="hover:text-white transition-colors duration-200">FAQ</a></li>
+          </ul>
+        </nav>
 
         {/* Copyright Section */}
-        <div className="mt-10 border-t border-gray-700 pt-6 text-center">
-          <p className="text-sm text-gray-400">
+        <div className="text-center">
+          <p className="text-xs text-gray-600">
             &copy; {new Date().getFullYear()} Sygil. All rights reserved.
           </p>
         </div>
       </div>
     </footer>
-
   )
 }
 

@@ -1,4 +1,5 @@
 import Account from '@/components/Account'
+import Footer from '@/components/Footer'
 import { getServerSession } from "next-auth"
 import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route"
 import { fetchuser } from '@/actions/useractions'
@@ -16,7 +17,10 @@ const AccountPage = async () => {
     console.log(`Account fetch time: ${Date.now() - start}ms`);
 
     return (
-        <Account initialUser={user} />
+        <>
+            <Account initialUser={user} />
+            <Footer forceShow={true} />
+        </>
     )
 }
 

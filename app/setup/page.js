@@ -180,25 +180,26 @@ export default function SetupPage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Avatar Selection */}
                     <div className="flex flex-col items-center gap-6">
-                        <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 group cursor-pointer transition-all duration-300 hover:scale-105 shadow-lg"
-                            style={{ borderColor: 'var(--primary)' }}>
-                            {isUploading ? (
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20">
-                                    <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                </div>
-                            ) : (
-                                <Image
-                                    src={avatarUrl}
-                                    alt="Avatar"
-                                    fill
-                                    className="object-cover"
-                                    unoptimized
-                                />
-                            )}
+                        <div className="relative w-28 h-28 group cursor-pointer transition-all duration-300 hover:scale-105">
+                            <div className="w-full h-full rounded-full overflow-hidden border-4 shadow-lg relative" style={{ borderColor: 'var(--primary)' }}>
+                                {isUploading ? (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20">
+                                        <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    </div>
+                                ) : (
+                                    <Image
+                                        src={avatarUrl}
+                                        alt="Avatar"
+                                        fill
+                                        className="object-cover"
+                                        unoptimized
+                                    />
+                                )}
+                            </div>
 
-                            {/* Always visible edit icon */}
-                            <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                                <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center border border-white/20 transition-all group-hover:bg-black/50">
+                            {/* Edit Icon - Bottom Right */}
+                            <div className="absolute bottom-0 right-0 z-30 pointer-events-none">
+                                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center border-4 border-[rgb(10,10,15)] shadow-lg hover:bg-primary/90 transition-colors">
                                     <FaPen className="text-white w-4 h-4" />
                                 </div>
                             </div>

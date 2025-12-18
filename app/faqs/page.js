@@ -1,144 +1,270 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import Footer from "../../components/Footer";
+import { FaChevronDown, FaChevronUp, FaSearch } from "react-icons/fa";
 
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const toggleFAQ = (index) => {
+    // If clicking same item, close it. Otherwise open new one.
+    // Using simple string IDs like "category-index" to track open state globally if needed, 
+    // or just flattening the list. 
+    // Actually, distinct open states per category or one global state? 
+    // Let's use a unique ID for each question.
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  const faqs = [
-    // General
+  const faqCategories = [
     {
-      question: "What is Sygil?",
-      answer:
-        "Sygil is a creator support platform that lets fans directly contribute to their favorite Instagram creators through quick, secure donations. It helps creators build a sustainable income while fans get recognized for their support.",
+      title: "General",
+      items: [
+        {
+          q: "What is Sygil?",
+          a: "Sygil is a creator support and engagement platform where fans can voluntarily support creators they appreciate, and creators can engage their community from one unified space."
+        },
+        {
+          q: "Is Sygil a charity or donation platform?",
+          a: "No. Sygil is not a charity or NGO. Contributions on Sygil are voluntary fan support, similar to tipping on creator platforms."
+        },
+        {
+          q: "Is Sygil free to use?",
+          a: "Creating an account and exploring creators is free. When fans choose to contribute, a payment is involved."
+        }
+      ]
     },
     {
-      question: "Who can use Sygil?",
-      answer:
-        "Any Instagram creator — whether you’re a dancer, artist, gamer, or photographer. If you create, you belong here.",
+      title: "For Fans / Supporters",
+      items: [
+        {
+          q: "What does it mean to “contribute” on Sygil?",
+          a: "Contributing means voluntarily supporting a creator you appreciate. It is optional and not required to access the platform."
+        },
+        {
+          q: "Am I buying something when I contribute?",
+          a: "No. A contribution is not a purchase of a product or service, and it does not guarantee anything in return."
+        },
+        {
+          q: "Do I get anything in return for contributing?",
+          a: "You may receive FamPoints, which are a symbolic acknowledgment of support. FamPoints do not represent a product, service, or entitlement."
+        },
+        {
+          q: "What are FamPoints?",
+          a: "FamPoints are non-monetary loyalty acknowledgment points used to recognize supporter participation within a creator’s community."
+        },
+        {
+          q: "Do FamPoints have monetary value?",
+          a: (
+            <>
+              No. FamPoints:
+              <ul className="list-disc pl-5 mt-2 space-y-1">
+                <li>Have no monetary value</li>
+                <li>Are not redeemable for cash</li>
+                <li>Are not transferable</li>
+                <li>Are not a financial instrument</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "Can I refund a contribution?",
+          a: "Contributions are generally non-refundable because they are voluntary. Refunds, if any, depend on payment gateway policies and applicable laws."
+        },
+        {
+          q: "Do I need to pay GST on my contribution?",
+          a: "No. Fans do not pay GST on voluntary contributions made on Sygil."
+        }
+      ]
     },
     {
-      question: "Is Sygil free to use?",
-      answer:
-        "Yes! Signing up and creating your page is completely free. We only take a small service fee per transaction to cover payment processing and platform maintenance.",
-    },
-    // Donations & Payments
-    {
-      question: "How do fans donate?",
-      answer:
-        "Fans can support creators instantly using secure payment methods like UPI or PayPal. No account or complicated setup required — just name, amount, and send.",
-    },
-    {
-      question: "Where does my money go when I donate?",
-      answer:
-        "100% of your donation (minus processing fees) goes directly to the creator you choose. We’re fully transparent about all transactions.",
-    },
-    {
-      question: "Can I donate anonymously?",
-      answer:
-        "Yes! You can choose to donate as a guest without displaying your name publicly.",
-    },
-    {
-      question: "Are donations refundable?",
-      answer:
-        "Once a donation is processed, it cannot be refunded — since it goes directly to the creator. If you made a mistake, please contact us, and we’ll try to help where possible.",
-    },
-    // Creators
-    {
-      question: "How do I become a creator on Sygil?",
-      answer:
-        "Simply sign up with your Instagram profile and set up your Sygil page. You can customize your bio, add links, and start receiving support instantly.",
+      title: "For Creators",
+      items: [
+        {
+          q: "Who can become a creator on Sygil?",
+          a: "Any eligible individual or entity that complies with Sygil’s Terms of Service can become a creator."
+        },
+        {
+          q: "How do creators earn money on Sygil?",
+          a: "Creators receive voluntary contributions from fans. Sygil deducts a small platform service fee, and the remaining amount is settled to the creator."
+        },
+        {
+          q: "Does Sygil take a commission?",
+          a: "Yes. Sygil charges a small platform service fee for providing hosting, tools, and infrastructure."
+        },
+        {
+          q: "How and when do creators receive payouts?",
+          a: "Payouts are processed through the payment gateway and settled to the creator’s registered bank account, subject to standard settlement timelines."
+        },
+        {
+          q: "Is Sygil responsible for my taxes as a creator?",
+          a: "No. Creators are responsible for managing and paying their own income tax or other applicable taxes on earnings received through Sygil."
+        },
+        {
+          q: "Can creators promise rewards or guaranteed benefits?",
+          a: "No. Creators must not promise guaranteed rewards, returns, or benefits in exchange for contributions."
+        }
+      ]
     },
     {
-      question: "Can I host donation events or campaigns?",
-      answer:
-        "Yes! You can create limited-time events, goals, or milestones that appear on your profile — perfect for launches, upgrades, or challenges.",
+      title: "Payments & Security",
+      items: [
+        {
+          q: "How are payments processed?",
+          a: "Payments are processed securely through third-party payment gateways such as Razorpay."
+        },
+        {
+          q: "Does Sygil store my card or bank details?",
+          a: "No. Sygil does not store card, UPI, or bank account details. All sensitive payment data is handled by the payment gateway."
+        },
+        {
+          q: "Is Sygil safe to use?",
+          a: "Sygil uses reasonable security measures and trusted payment partners to protect users and transactions. However, no online platform can guarantee absolute security."
+        }
+      ]
     },
     {
-      question: "Can I add affiliate or favorite links?",
-      answer:
-        "Absolutely. You can showcase your social handles and favorite products — and we’ll help manage affiliate tracking transparently.",
+      title: "Legal & Compliance",
+      items: [
+        {
+          q: "Is Sygil legal in India?",
+          a: "Yes. Sygil operates as a commission-based platform facilitating voluntary creator support and complies with applicable Indian laws."
+        },
+        {
+          q: "Is there any gambling, lottery, or chance-based system on Sygil?",
+          a: "No. Sygil does not offer gambling, lotteries, contests, or games of chance."
+        },
+        {
+          q: "Is Sygil a marketplace selling digital goods?",
+          a: "No. Sygil does not sell digital goods or services to fans."
+        },
+        {
+          q: "Does Sygil operate wallets or stored-value systems?",
+          a: "No. Sygil does not operate wallets, prepaid instruments, or stored-value systems."
+        }
+      ]
     },
     {
-      question: "How do I withdraw my earnings?",
-      answer:
-        "Creators can link their payment account and withdraw funds anytime once the minimum threshold is reached. Payouts are processed quickly and securely.",
-    },
-    // Security & Transparency
-    {
-      question: "Is Sygil secure?",
-      answer:
-        "Completely. We use encrypted transactions and trusted payment gateways to keep both creators and supporters safe.",
-    },
-    {
-      question: "Does Sygil store my payment data?",
-      answer:
-        "No — all payments are handled by trusted third-party gateways. We never store sensitive payment information.",
+      title: "Account & Data",
+      items: [
+        {
+          q: "What data does Sygil collect?",
+          a: "Sygil collects only the information necessary to operate the platform, such as account details and basic usage data. For more details, please refer to our Privacy Policy."
+        },
+        {
+          q: "Can I delete my account?",
+          a: "Yes. You can request account deletion by contacting Sygil support."
+        }
+      ]
     },
     {
-      question: "How does Sygil make money?",
-      answer:
-        "We take a small service fee per transaction and earn from affiliate partnerships when applicable. This keeps Sygil running without charging creators subscription fees.",
-    },
-    // Other
-    {
-      question: "Can I contact the Sygil team for partnerships or support?",
-      answer:
-        "Yes! Head to our Contact Page for collaborations, feedback, or questions. We love hearing from creators and supporters alike.",
-    },
-    {
-      question: "Will Sygil expand beyond Instagram?",
-      answer:
-        "Definitely. While we’re starting with Instagram creators, our long-term vision is to support creators across multiple platforms — from YouTube to X to emerging creator ecosystems.",
-    },
+      title: "Support",
+      items: [
+        {
+          q: "How can I contact Sygil?",
+          a: (
+            <span>
+              You can reach us at: <a href="mailto:support@sygil.app" className="text-primary hover:underline">support@sygil.app</a>
+            </span>
+          )
+        }
+      ]
+    }
   ];
 
+  // Logic to flatten categories for rendering if needed, or map directly.
+  // Rendering logic will map categories, then items.
+
   return (
-    <div className="min-h-screen bg-background text-text pt-20 pb-10 px-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-4 text-primary">
-          Frequently Asked Questions
-        </h1>
+    <>
+      <div className="min-h-screen bg-background text-text pt-8 pb-32 px-6 font-sans">
+        <div className="max-w-3xl mx-auto">
 
-        <div className="mt-12 space-y-4">
-          {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className="border border-text/10 rounded-xl overflow-hidden shadow-sm bg-secondary/10 backdrop-blur-sm"
-            >
-              {/* Question */}
-              <button
-                onClick={() => toggleFAQ(index)}
-                className="w-full flex justify-between items-center text-left px-6 py-4 text-base md:text-lg font-semibold text-text hover:bg-text/5 transition"
-              >
-                <span>{faq.question}</span>
-                <svg
-                  className={`w-6 h-6 text-accent transform ${
-                    openIndex === index ? "rotate-180" : ""
-                  } transition-transform duration-200`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+          {/* Header */}
+          <div className="text-center space-y-4 mb-16">
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">
+              Frequently Asked <span className="text-primary">Questions</span>
+            </h1>
+            <p className="text-text/60 text-lg">
+              Everything you need to know about Sygil.
+            </p>
+          </div>
 
-              {/* Answer */}
-              {openIndex === index && (
-                <div className="px-6 py-4 bg-background/40 text-text/90 border-t border-text/10 transition-all duration-300 ease-in-out">
-                  {faq.answer}
+          {/* Search (Optional but professional) */}
+          <div className="relative max-w-xl mx-auto mb-16 hidden">
+            {/* Can implement filter logic if desired, but user didn't explicitly ask for functionality, just UI. */}
+          </div>
+
+          <div className="space-y-12">
+            {faqCategories.map((category, catIndex) => (
+              <div key={catIndex}>
+                <h2 className="text-xl font-bold text-secondary mb-6 border-b border-white/5 pb-2">
+                  {category.title}
+                </h2>
+                <div className="space-y-4">
+                  {category.items.map((item, itemIndex) => {
+                    const uniqueId = `${catIndex}-${itemIndex}`;
+                    const isOpen = openIndex === uniqueId;
+
+                    return (
+                      <div
+                        key={itemIndex}
+                        className="group border border-white/5 rounded-xl bg-white/5 hover:border-white/10 transition-colors overflow-hidden"
+                      >
+                        <button
+                          onClick={() => toggleFAQ(uniqueId)}
+                          className="w-full flex justify-between items-center p-5 text-left transition-all"
+                          aria-expanded={isOpen}
+                        >
+                          <span className={`font-medium text-lg ${isOpen ? 'text-primary' : 'text-text/90'}`}>
+                            {item.q}
+                          </span>
+                          {isOpen ? (
+                            <FaChevronUp className="text-primary w-4 h-4 shrink-0 ml-4" />
+                          ) : (
+                            <FaChevronDown className="text-text/40 group-hover:text-text/60 w-4 h-4 shrink-0 ml-4" />
+                          )}
+                        </button>
+
+                        <div
+                          className={`
+                            px-5 text-text/70 leading-relaxed overflow-hidden transition-all duration-300 ease-in-out
+                            ${isOpen ? 'max-h-96 opacity-100 pb-5 pt-0' : 'max-h-0 opacity-0'}
+                          `}
+                        >
+                          <div className="pt-2 border-t border-white/5">
+                            {item.a}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              )}
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
+
+          {/* One-Line Summary */}
+          <section className="bg-secondary/10 p-6 rounded-xl border border-secondary/20 mt-16 text-center">
+            <h2 className="text-sm font-bold text-secondary uppercase tracking-wider mb-2">Summary</h2>
+            <p className="text-text/90 italic text-lg leading-relaxed">
+              "Sygil is a platform where fans voluntarily support creators, without purchases, gambling, or financial products involved."
+            </p>
+          </section>
+
+          {/* Still have questions? */}
+          <div className="mt-16 text-center pt-8 border-t border-white/5">
+            <p className="text-text/60 mb-4">Still have questions?</p>
+            <Link href="/contact" className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-primary text-white font-semibold hover:bg-primary/90 transition-colors">
+              Contact Support
+            </Link>
+          </div>
+
         </div>
       </div>
-    </div>
+      <Footer forceShow={true} />
+    </>
   );
 }

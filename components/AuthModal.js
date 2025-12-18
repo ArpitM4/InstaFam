@@ -535,25 +535,30 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                             <form onSubmit={handleSetupSubmit} className="space-y-6 w-full">
                                 {/* Avatar Selection */}
                                 <div className="flex flex-col items-center gap-6">
-                                    <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-primary group cursor-pointer hover:scale-105 transition-transform">
-                                        {isUploading ? (
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20">
-                                                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                            </div>
-                                        ) : (
-                                            <Image
-                                                src={avatarUrl}
-                                                alt="Avatar"
-                                                fill
-                                                className="object-cover"
-                                                unoptimized
-                                            />
-                                        )}
-                                        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                                            <div className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center border border-white/20">
+                                    <div className="relative w-24 h-24 group cursor-pointer hover:scale-105 transition-transform">
+                                        <div className="w-full h-full rounded-full overflow-hidden border-2 border-primary relative">
+                                            {isUploading ? (
+                                                <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20">
+                                                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                </div>
+                                            ) : (
+                                                <Image
+                                                    src={avatarUrl}
+                                                    alt="Avatar"
+                                                    fill
+                                                    className="object-cover"
+                                                    unoptimized
+                                                />
+                                            )}
+                                        </div>
+
+                                        {/* Edit Icon - Bottom Right */}
+                                        <div className="absolute bottom-0 right-0 z-30 pointer-events-none">
+                                            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center border-2 border-[#0a0a0f] shadow-lg">
                                                 <FaPen className="text-white w-3 h-3" />
                                             </div>
                                         </div>
+
                                         <label className="absolute inset-0 cursor-pointer z-20">
                                             <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                                         </label>
