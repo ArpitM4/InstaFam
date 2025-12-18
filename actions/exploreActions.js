@@ -3,13 +3,21 @@
 import connectDb from "@/db/ConnectDb";
 import User from "@/models/User";
 
-export const getExploreCreators = async () => {
+export const getExploreCreators = async (currentUserEmail = null) => {
     try {
         await connectDb();
 
-        // Find 20 random public users
+        const matchStage = {
+            visibility: "public"
+        };
+
+        if (currentUserEmail) {
+            matchStage.email = { $ne: currentUserEmail };
+        }
+
+        // Find 20 random public users, excluding current user
         const creators = await User.aggregate([
-            { $match: { visibility: "public" } },
+            { $match: matchStage },
             { $sample: { size: 20 } },
             { $project: { username: 1, _id: 1, profilepic: 1, name: 1, accountType: 1, bio: 1, isVerified: 1 } }
         ]);

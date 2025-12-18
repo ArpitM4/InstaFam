@@ -13,12 +13,12 @@ export async function generateMetadata({ params }) {
 
   if (!user || user.visibility === 'hidden') {
     return {
-      title: 'Profile Not Found | Sygil',
+      title: 'Profile Not Found',
       description: 'The requested profile could not be found.',
     };
   }
 
-  const title = `${user.name || user.username} | Sygil`;
+  const title = `${user.name || user.username}`;
   const description = user.description || `Check out ${user.username}'s profile on Sygil. Connect, support, and get exclusive content.`;
   const image = user.profilepic || 'https://www.sygil.app/og-image.jpg';
 

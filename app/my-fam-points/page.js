@@ -6,7 +6,7 @@ import { fetchMyFamPoints, fetchMyRedemptions } from "@/actions/pointsActions";
 import MyFamPointsClient from "@/components/MyFamPointsClient";
 
 export const metadata = {
-  title: 'My FamPoints | Sygil',
+  title: 'My FamPoints',
   description: 'View your earned FamPoints and redemption history.',
 };
 

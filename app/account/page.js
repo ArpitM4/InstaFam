@@ -27,5 +27,5 @@ const AccountPage = async () => {
 export default AccountPage
 
 export const metadata = {
-    title: "Your Account - Sygil",
+    title: "Your Account",
 }

@@ -1,11 +1,15 @@
+// app/explore/page.js
 import ExploreClient from "@/components/ExploreClient";
 import { getExploreCreators } from "@/actions/exploreActions";
+import { getServerSession } from "next-auth";
+import { nextAuthConfig } from "@/app/api/auth/[...nextauth]/route";
 
 export const dynamic = 'force-dynamic';
 
 const ExplorePage = async () => {
-  // Fetch data on the server
-  const creators = await getExploreCreators();
+  const session = await getServerSession(nextAuthConfig);
+  // Pass current user email if available
+  const creators = await getExploreCreators(session?.user?.email);
 
   return <ExploreClient initialCreators={creators} />;
 };
