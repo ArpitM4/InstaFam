@@ -106,61 +106,19 @@ const PaymentInteractionSection = ({
         })()}
 
         <div className="w-full flex flex-col md:flex-row gap-6">
-          {/* Leaderboard - ONLY show when event is active - Visible to ALL users */}
-          {isEventActive && (
-            <div className="flex-1 rounded-2xl shadow-lg p-5 mx-2 md:mx-0 border border-white/10" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}>
-              <h2 className="text-2xl font-semibold text-gradient-primary mb-4">Leaderboard</h2>
-              {leaderboardData.length === 0 ? (
-                paymentsLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <FaSpinner className="animate-spin text-primary text-2xl" />
-                    <span className="ml-2 text-text/60">Loading leaderboard...</span>
-                  </div>
-                ) : (
-                  <p className="text-text/60">No payments yet</p>
-                )
-              ) : (
-                <div className="relative">
-                  {paymentsLoading && (
-                    <div className="absolute inset-0 bg-dropdown-hover/50 backdrop-blur-sm flex items-center justify-center rounded-lg z-10">
-                      <FaSpinner className="animate-spin text-primary text-xl" />
-                    </div>
-                  )}
-                  <ol className="list-decimal list-inside text-text/80 space-y-2">
-                    {leaderboardData.map((entry, i) => (
-                      <li key={`${entry.name}-${i}`} className={`flex justify-between items-center p-2 rounded-lg transition-all duration-200 ${entry.isTop3
-                        ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20'
-                        : 'bg-background/30'
-                        }`}>
-                        <div className="flex items-center space-x-2">
-                          <FaUserCircle className={`text-xl ${entry.isTop3 ? 'text-yellow-400' : 'text-yellow-500'}`} />
-                          <span className={`font-medium ${entry.isTop3 ? 'text-yellow-100' : ''}`}>
-                            {entry.rankEmoji && <span className="mr-1">{entry.rankEmoji}</span>}
-                            {entry.name}
-                          </span>
-                        </div>
-                        <span className={`font-medium ${entry.isTop3 ? 'text-yellow-100' : 'text-text'}${!isOwner ? ' blur-sm select-none' : ''}`}>${entry.total.toFixed(2)}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
-            </div>
-          )}
+
 
           {/* Donation Form - ALWAYS ACTIVE */}
-          {/* When no event: centered with max-width, When event active: flex-1 */}
-          <div className={`rounded-2xl shadow-lg p-5 mx-2 md:mx-0 border border-white/10 ${isEventActive ? 'flex-1' : 'w-full md:max-w-md md:mx-auto'}`} style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}>
+          <div className="flex-1 rounded-2xl shadow-lg p-5 mx-2 md:mx-0 border border-white/10" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}>
             <h2 className="text-2xl font-bold text-text mb-4">
               Support {currentUser?.name || "Creator"}
             </h2>
 
             {/* Info banner for contribution type */}
             {!isEventActive && (
-              <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                <p className="text-blue-300 text-xs">
-                  ❤️ Make a contribution to show your support! (No event currently active)
-                </p>
+              <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                <p className="text-yellow-300 text-xs">
+                  🪙  Get 1 FP for every ₹10 you contribute.                </p>
               </div>
             )}
 
@@ -194,11 +152,7 @@ const PaymentInteractionSection = ({
                   disabled={isPaying}
                   required
                 />
-                {!session && (
-                  <p className="text-xs text-text/50 mt-1">
-                    💡 You can contribute as a guest! Just enter your name.
-                  </p>
-                )}
+
               </div>
               <div>
                 <label className="block text-sm font-medium text-text/70 mb-1">Message</label>
@@ -277,6 +231,45 @@ const PaymentInteractionSection = ({
                 );
               })()}
             </div>
+          </div>
+          {/* Leaderboard - Visible to ALL users */}
+          <div className="flex-1 rounded-2xl shadow-lg p-5 mx-2 md:mx-0 border border-white/10" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)', backdropFilter: 'blur(10px)' }}>
+            <h2 className="text-2xl font-semibold text-yellow-500 mb-4">Recent Contributions</h2>
+            {leaderboardData.length === 0 ? (
+              paymentsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <FaSpinner className="animate-spin text-primary text-2xl" />
+                  <span className="ml-2 text-text/60">Loading Messages...</span>
+                </div>
+              ) : (
+                <p className="text-text/60">No messages yet</p>
+              )
+            ) : (
+              <div className="relative">
+                {paymentsLoading && (
+                  <div className="absolute inset-0 bg-dropdown-hover/50 backdrop-blur-sm flex items-center justify-center rounded-lg z-10">
+                    <FaSpinner className="animate-spin text-primary text-xl" />
+                  </div>
+                )}
+                <ol className="list-decimal list-inside text-text/80 space-y-2">
+                  {leaderboardData.map((entry, i) => (
+                    <li key={`${entry.name}-${i}`} className={`flex justify-between items-center p-2 rounded-lg transition-all duration-200 ${entry.isTop3
+                      ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20'
+                      : 'bg-background/30'
+                      }`}>
+                      <div className="flex items-center space-x-2">
+                        <FaUserCircle className={`text-xl ${entry.isTop3 ? 'text-yellow-400' : 'text-yellow-500'}`} />
+                        <span className={`font-medium ${entry.isTop3 ? 'text-yellow-100' : ''}`}>
+                          {entry.rankEmoji && <span className="mr-1">{entry.rankEmoji}</span>}
+                          {entry.name}
+                        </span>
+                      </div>
+                      <span className={`font-medium ${entry.isTop3 ? 'text-yellow-100' : 'text-text'}${!isOwner ? ' blur-sm select-none' : ''}`}>${entry.total.toFixed(2)}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
           </div>
         </div>
       </div>

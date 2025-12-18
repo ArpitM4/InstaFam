@@ -165,7 +165,7 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
     if (validSections.includes(section)) {
       // Force 'links' tab if user is not owner and trying to access restricted sections
       // We check isActualOwner first to avoid hydration mismatch, but effect runs on client
-      if (!isOwner && section !== 'links' && section !== 'vault') {
+      if (!isOwner && section !== 'links' && section !== 'vault' && section !== 'contribute') {
         setActiveTab('links');
       } else {
         setActiveTab(section);
@@ -1045,7 +1045,21 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
               </button>
             )}
 
-            {isOwner && visibleSections.includes('contribute') && (
+            {visibleSections.includes('vault') && (
+              <button
+                onClick={() => handleTabChange('vault')}
+                className={`relative px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 flex items-center gap-2 ${activeTab === 'vault'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
+                  }`}
+              >
+                Vault
+                {!session && (
+                  <span className="absolute top-3 -right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
+                )}
+              </button>
+            )}
+            {visibleSections.includes('contribute') && (
               <button
                 onClick={() => handleTabChange('contribute')}
                 className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'contribute'
@@ -1056,19 +1070,6 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
                 Contribute
               </button>
             )}
-
-            {visibleSections.includes('vault') && (
-              <button
-                onClick={() => handleTabChange('vault')}
-                className={`px-4 py-3 text-lg font-medium tracking-wide transition-all duration-200 ${activeTab === 'vault'
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-text/60 hover:text-text border-b-2 border-transparent'
-                  }`}
-              >
-                Vault
-              </button>
-            )}
-
 
 
             {isOwner && visibleSections.includes('community') && (
@@ -1155,20 +1156,18 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
 
         {/* Conditionally Rendered Content */}
         <div className="w-full flex flex-col items-center">
-          {/* Beta Mode Warning for Creators */}
-          {isOwner && activeTab !== 'links' && activeTab !== 'vault' && (
-            <div className="w-full max-w-5xl mb-6 px-4">
-              <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl p-4 flex items-center justify-center gap-3 backdrop-blur-sm">
-                <span className="text-xl">🚧</span>
-                <p className="text-yellow-200/90 text-sm font-medium text-center">
-                  <strong className="text-yellow-400">Beta Mode:</strong> This tab is currently visible only to you. Public users cannot see this section yet.
-                </p>
-              </div>
-            </div>
-          )}
+          {/* Beta Mode Warning Removed */}
 
           {activeTab === 'contribute' && (
             <>
+              {/* Donation info pill - Top of section */}
+              <div className="mb-6 p-1 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-full text-center max-w-sm mx-auto hover:scale-105 transition-transform">
+                <div className="flex items-center justify-center gap-2 py-2 px-4">
+                  {/* <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> */}
+                  <p className="text-green-400 text-sm font-bold tracking-wide">❤️  Make a contribution to show your support!</p>
+                </div>
+              </div>
+
               {!hasError ? (
                 <ErrorBoundary>
                   <PaymentInteractionSection
@@ -1297,21 +1296,6 @@ const PaymentPage = ({ username, initialUser, initialVaultItems, initialTab = 'l
           )}
         </div>
 
-        {/* Multiple donations info - ADMIN ONLY */}
-        {activeTab === 'contribute' && (() => {
-          const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || '').split(',').map(e => e.trim());
-          const isAdmin = session?.user?.email && adminEmails.includes(session.user.email);
-
-          if (!isAdmin) return null;
-
-          return (
-            <div className="mt-6 text-center p-4 bg-white/5 backdrop-blur-md rounded-lg shadow border border-white/10" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(225,29,72,0.10) 100%)' }}>
-              <p className="text-success text-sm font-medium">
-                💡 Multiple donations stack up! Keep contributing to climb higher on the leaderboard.
-              </p>
-            </div>
-          );
-        })()}
 
 
       </div>
