@@ -131,7 +131,7 @@ export default function CreatorsPage() {
     <>
       <SEO
         title="Sygil for Creators - The Superfan Engine"
-        description="Turn your followers into superfans. Monetize your attention with gamified rewards, exclusive perks, and 95% payouts."
+        description="Turn your followers into superfans. Monetize your attention with gamified rewards, exclusive perks, and lowest commissions."
         url="https://www.sygil.app/creators"
         image="https://www.sygil.app/og-creators.jpg"
       />
@@ -671,7 +671,7 @@ export default function CreatorsPage() {
                         "Built-in Gamified Rewards",
                         "Perks & Shop System",
                         "Unified Fan Database",
-                        "Keep 95% of Contributions"
+                        "We take only 5% Commission"
                       ].map((feat, i) => (
                         <div key={i} className="flex items-center gap-3">
                           <div className="w-4 h-4 rounded-full bg-green-500/20 flex items-center justify-center">
