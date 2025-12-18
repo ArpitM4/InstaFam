@@ -83,7 +83,7 @@ function CreatorCard({ creator, showFollowedBadge = false, famPoints = 0 }) {
 
 
 export default function HomeFeed() {
-  const { userData, accountType } = useUser();
+  const { userData, accountType, isLoading: userLoading } = useUser();
   const [followedCreators, setFollowedCreators] = useState([]);
   const [topCreators, setTopCreators] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -91,10 +91,13 @@ export default function HomeFeed() {
   const [pointsMap, setPointsMap] = useState({}); // Map of creatorId -> points
 
   const isCreator = accountType === "Creator";
+  // We can only reliably check for following if user data is loaded
   const hasFollowing = userData?.following && userData.following.length > 0;
 
   // Fetch user's FamPoints for all creators they have points with
   useEffect(() => {
+    if (userLoading) return; // Wait for user load
+
     const fetchUserPoints = async () => {
       try {
         const res = await fetch('/api/points');
@@ -117,9 +120,11 @@ export default function HomeFeed() {
     };
 
     fetchUserPoints();
-  }, []);
+  }, [userLoading]);
 
   useEffect(() => {
+    if (userLoading) return;
+
     const fetchFollowedCreators = async () => {
       if (!hasFollowing) {
         setLoading(false);
@@ -140,10 +145,12 @@ export default function HomeFeed() {
     };
 
     fetchFollowedCreators();
-  }, [hasFollowing]);
+  }, [hasFollowing, userLoading]);
 
   // Fetch top creators when user has no following
   useEffect(() => {
+    if (userLoading) return;
+
     const fetchTopCreators = async () => {
       if (hasFollowing) return; // Don't fetch if user has following
 
@@ -162,7 +169,31 @@ export default function HomeFeed() {
     };
 
     fetchTopCreators();
-  }, [hasFollowing]);
+  }, [hasFollowing, userLoading]);
+
+  if (userLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 animate-pulse">
+        {/* Your Page Skeleton */}
+        <div className="mb-10 opacity-50">
+          <div className="h-8 w-32 bg-white/10 rounded mb-2"></div>
+          <div className="h-1 w-12 bg-white/10 rounded-full mb-6"></div>
+          <div className="h-64 max-w-sm bg-white/5 rounded-2xl border border-white/5"></div>
+        </div>
+
+        {/* Grid Skeleton */}
+        <div className="mb-8 opacity-50">
+          <div className="h-8 w-48 bg-white/10 rounded mb-2"></div>
+          <div className="h-1 w-12 bg-white/10 rounded-full mb-6"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-72 bg-white/5 rounded-2xl border border-white/5"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
