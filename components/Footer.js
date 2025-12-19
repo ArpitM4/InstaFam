@@ -26,6 +26,7 @@ const Footer = ({ forceShow = false }) => {
             <li><a href="/terms" className="hover:text-white transition-colors duration-200">Terms of Service</a></li>
             <li><a href="/privacypolicy" className="hover:text-white transition-colors duration-200">Privacy Policy</a></li>
             <li><a href="/faqs" className="hover:text-white transition-colors duration-200">FAQ</a></li>
+            <li><a href="/creators" className="hover:text-white transition-colors duration-200">Become a Creator</a></li>
           </ul>
         </nav>
 
