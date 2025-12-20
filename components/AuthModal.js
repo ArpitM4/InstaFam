@@ -5,6 +5,7 @@ import Image from "next/image";
 import { signIn, useSession } from "next-auth/react";
 import { FaGoogle, FaEye, FaEyeSlash, FaCheck, FaTimes, FaMagic, FaPen } from 'react-icons/fa';
 import { emitProfileUpdate } from "@/utils/eventBus";
+import { trackEvent, GA_EVENTS } from "@/utils/analytics";
 
 export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
     const router = useRouter();
@@ -144,6 +145,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
         setError('');
 
         if (authView === "LOGIN") {
+            trackEvent(GA_EVENTS.EMAIL_LOGIN_START, { email });
             const result = await signIn('credentials', {
                 email,
                 password,
@@ -151,6 +153,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
             });
 
             if (result?.error) {
+                trackEvent(GA_EVENTS.EMAIL_LOGIN_FAIL, { email, error: result.error });
                 if (result.error === 'CredentialsSignin') {
                     setError('Invalid email or password');
                 } else {
@@ -158,6 +161,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                 }
                 setLoading(false);
             } else {
+                trackEvent(GA_EVENTS.EMAIL_LOGIN_SUCCESS, { email });
                 // Login success - check setup
                 const sessionRes = await fetch('/api/auth/session');
                 const sessionData = await sessionRes.json();
@@ -175,6 +179,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
             // Signup Flow
             if (!showOtpInput) {
                 // Send OTP
+                trackEvent(GA_EVENTS.EMAIL_SIGNUP_START, { email });
                 try {
                     const res = await fetch('/api/auth/signup', {
                         method: 'POST',
@@ -192,12 +197,14 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                     setShowOtpInput(true);
                     setError('');
                     startTimer();
+                    trackEvent(GA_EVENTS.EMAIL_SIGNUP_OTP_SENT, { email });
                 } catch (err) {
                     setError('Something went wrong');
                 }
                 setLoading(false);
             } else {
                 // Verify OTP
+                trackEvent(GA_EVENTS.EMAIL_SIGNUP_OTP_VERIFY, { email });
                 try {
                     const res = await fetch('/api/auth/verify-otp', {
                         method: 'POST',
@@ -207,6 +214,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                     const data = await res.json();
 
                     if (!res.ok) {
+                        trackEvent(GA_EVENTS.EMAIL_SIGNUP_FAIL, { email, error: data.error });
                         setError(data.error || 'Invalid OTP');
                         setLoading(false);
                         return;
@@ -223,6 +231,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                         setError('Account verified! Please login.');
                         setAuthView("LOGIN");
                     } else {
+                        trackEvent(GA_EVENTS.EMAIL_SIGNUP_SUCCESS, { email });
                         // New user -> Setup
                         setView("SETUP");
                     }
@@ -235,6 +244,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
     };
 
     const handleGoogleSignIn = () => {
+        trackEvent(GA_EVENTS.GOOGLE_SIGNIN_CLICK, { page: window.location.pathname });
         // Redirect to current page after login to allow "in-place" feel
         // AppLayout will intercept !setupCompleted and re-open this modal in SETUP mode
         signIn('google', { callbackUrl: window.location.href });
@@ -320,6 +330,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                 }
             });
 
+            trackEvent(GA_EVENTS.SETUP_COMPLETE, { username, hasCustomAvatar: !avatarUrl.includes('dicebear') });
             emitProfileUpdate({ name, username, profilepic: avatarUrl, accountType: "User" });
 
             onClose();
@@ -337,7 +348,10 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="relative w-full max-w-md bg-[#0a0a0f] rounded-2xl shadow-2xl overflow-hidden border border-white/10">
                 <button
-                    onClick={onClose}
+                    onClick={() => {
+                        trackEvent(GA_EVENTS.AUTH_MODAL_CLOSE, { view, authView });
+                        onClose();
+                    }}
                     className="absolute top-4 right-4 text-white/50 hover:text-white z-50 p-2"
                 >
                     <FaTimes />
@@ -487,6 +501,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                                 {authView === 'LOGIN' && (
                                     <div className="text-right mt-3">
                                         <button onClick={() => {
+                                            trackEvent(GA_EVENTS.FORGOT_PASSWORD_START, { email });
                                             setAuthView('FORGOT_PASSWORD');
                                             setForgotStep(1);
                                             setError('');
@@ -513,7 +528,9 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                                         {authView === 'LOGIN' ? "New User? " : "Already have an account? "}
                                         <button
                                             onClick={() => {
-                                                setAuthView(authView === 'LOGIN' ? 'SIGNUP' : 'LOGIN');
+                                                const newView = authView === 'LOGIN' ? 'SIGNUP' : 'LOGIN';
+                                                trackEvent(newView === 'LOGIN' ? GA_EVENTS.AUTH_SWITCH_TO_LOGIN : GA_EVENTS.AUTH_SWITCH_TO_SIGNUP, {});
+                                                setAuthView(newView);
                                                 setShowOtpInput(false);
                                                 setError('');
                                                 setOtp('');
@@ -566,6 +583,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                                     <button
                                         type="button"
                                         onClick={() => {
+                                            trackEvent(GA_EVENTS.SETUP_AVATAR_RANDOMIZE, {});
                                             const seed = Math.random().toString(36).substring(7);
                                             setAvatarUrl(`https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}`);
                                         }}

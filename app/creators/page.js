@@ -18,6 +18,7 @@ import {
 } from "react-icons/fa";
 import { motion, useScroll, useTransform, useInView, useSpring, useMotionValue, animate } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { trackEvent, GA_EVENTS } from "@/utils/analytics";
 
 // Animation Variants
 const fadeIn = {
@@ -80,10 +81,16 @@ export default function CreatorsPage() {
     if (!username || username.length < 3) return;
     setIsChecking(true);
     setIsAvailable(null);
+    trackEvent(GA_EVENTS.USERNAME_CHECK_START, { username, page: 'creators' });
     try {
       const res = await fetch(`/api/check-username?username=${username}`);
       const data = await res.json();
       setIsAvailable(data.available);
+      trackEvent(GA_EVENTS.USERNAME_CHECK_RESULT, {
+        username,
+        available: data.available,
+        page: 'creators'
+      });
     } catch (err) {
       console.error(err);
     } finally {
@@ -92,6 +99,11 @@ export default function CreatorsPage() {
   };
 
   const handleCreatePage = () => {
+    trackEvent(GA_EVENTS.CREATE_PAGE_CLICK, {
+      username,
+      isLoggedIn: !!session,
+      page: 'creators'
+    });
     if (!session) {
       router.push('/');
     } else if (userData?.accountType === 'Creator' || userData?.accountType === 'VCreator') {
@@ -125,6 +137,14 @@ export default function CreatorsPage() {
     checkDesktop();
     window.addEventListener('resize', checkDesktop);
     return () => window.removeEventListener('resize', checkDesktop);
+  }, []);
+
+  // Track page view on mount
+  useEffect(() => {
+    trackEvent(GA_EVENTS.CREATORS_PAGE_VIEW, {
+      referrer: document.referrer,
+      isLoggedIn: !!session
+    });
   }, []);
 
   return (
@@ -169,7 +189,9 @@ export default function CreatorsPage() {
               <motion.div variants={fadeIn} className="max-w-md">
                 {session ? (
                   <Link href={userData?.accountType === 'Creator' || userData?.accountType === 'VCreator' ? `/${session.user.name}` : '/setup'}>
-                    <button className="w-auto px-8 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold rounded-full transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:scale-[1.02] text-sm border border-white/10">
+                    <button
+                      onClick={() => trackEvent(GA_EVENTS.SETUP_PAGE_CLICK, { section: 'hero', isCreator: userData?.accountType === 'Creator' })}
+                      className="w-auto px-8 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold rounded-full transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:scale-[1.02] text-sm border border-white/10">
                       Setup Your Page <FaArrowRight size={12} />
                     </button>
                   </Link>
@@ -194,7 +216,13 @@ export default function CreatorsPage() {
                           Create Page <FaArrowRight size={12} />
                         </button>
                       ) : (
-                        <button onClick={checkUsername} disabled={isChecking || !username} className="px-5 py-3 bg-white text-black hover:bg-gray-200 disabled:opacity-50 font-semibold rounded-full transition-all min-w-[100px] flex justify-center whitespace-nowrap text-sm">
+                        <button
+                          onClick={() => {
+                            trackEvent('check_username_button_click', { section: 'hero', username });
+                            checkUsername();
+                          }}
+                          disabled={isChecking || !username}
+                          className="px-5 py-3 bg-white text-black hover:bg-gray-200 disabled:opacity-50 font-semibold rounded-full transition-all min-w-[100px] flex justify-center whitespace-nowrap text-sm">
                           {isChecking ? <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" /> : "Check"}
                         </button>
                       )}
@@ -737,7 +765,9 @@ export default function CreatorsPage() {
                 <div className="w-full max-w-md mx-auto md:mx-0">
                   {session ? (
                     <Link href={userData?.accountType === 'Creator' || userData?.accountType === 'VCreator' ? `/${session.user.name}` : '/setup'}>
-                      <button className="w-auto px-8 py-4 bg-white text-[var(--primary)] hover:bg-gray-100 font-bold rounded-full transition-all flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl hover:scale-[1.02] text-sm md:text-base mx-auto md:mx-0">
+                      <button
+                        onClick={() => trackEvent(GA_EVENTS.SETUP_PAGE_CLICK, { section: 'final_cta', isCreator: userData?.accountType === 'Creator' })}
+                        className="w-auto px-8 py-4 bg-white text-[var(--primary)] hover:bg-gray-100 font-bold rounded-full transition-all flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl hover:scale-[1.02] text-sm md:text-base mx-auto md:mx-0">
                         Setup Your Page <FaArrowRight size={12} />
                       </button>
                     </Link>
@@ -758,11 +788,22 @@ export default function CreatorsPage() {
                           onKeyDown={handleInputKeyDown}
                         />
                         {isAvailable === true ? (
-                          <button onClick={handleCreatePage} className="px-5 py-3 bg-[var(--success)] text-white font-semibold rounded-full transition-all flex items-center gap-2 whitespace-nowrap shadow-lg text-sm">
+                          <button
+                            onClick={() => {
+                              trackEvent(GA_EVENTS.RESERVE_USERNAME_CLICK, { section: 'final_cta', username });
+                              handleCreatePage();
+                            }}
+                            className="px-5 py-3 bg-[var(--success)] text-white font-semibold rounded-full transition-all flex items-center gap-2 whitespace-nowrap shadow-lg text-sm">
                             Reserve <FaArrowRight size={12} />
                           </button>
                         ) : (
-                          <button onClick={checkUsername} disabled={isChecking || !username} className="px-5 py-3 bg-white text-black hover:bg-gray-200 disabled:opacity-50 font-semibold rounded-full transition-all min-w-[100px] flex justify-center whitespace-nowrap text-sm">
+                          <button
+                            onClick={() => {
+                              trackEvent('check_username_button_click', { section: 'final_cta', username });
+                              checkUsername();
+                            }}
+                            disabled={isChecking || !username}
+                            className="px-5 py-3 bg-white text-black hover:bg-gray-200 disabled:opacity-50 font-semibold rounded-full transition-all min-w-[100px] flex justify-center whitespace-nowrap text-sm">
                             {isChecking ? <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" /> : "Check"}
                           </button>
                         )}
