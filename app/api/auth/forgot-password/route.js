@@ -3,39 +3,28 @@ import connectDB from "@/db/ConnectDb";
 import User from "@/models/User";
 import nodemailer from "nodemailer";
 
-// Configure nodemailer (reuse existing email configuration)
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_SERVER_HOST,
-  port: parseInt(process.env.EMAIL_SERVER_PORT),
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_SERVER_USER,
-    pass: process.env.EMAIL_SERVER_PASSWORD,
-  },
-});
-
 // Rate limiting storage (in production, use Redis or database)
 const rateLimitMap = new Map();
 
 function checkRateLimit(email) {
   const now = Date.now();
   const userAttempts = rateLimitMap.get(email) || { count: 0, lastAttempt: 0 };
-  
+
   // Reset count if more than 1 hour has passed
   if (now - userAttempts.lastAttempt > 60 * 60 * 1000) {
     userAttempts.count = 0;
   }
-  
+
   // Check if user has exceeded limit (3 attempts per hour)
   if (userAttempts.count >= 3) {
     return false;
   }
-  
+
   // Update attempts
   userAttempts.count++;
   userAttempts.lastAttempt = now;
   rateLimitMap.set(email, userAttempts);
-  
+
   return true;
 }
 
@@ -65,7 +54,7 @@ export async function POST(request) {
     await connectDB();
 
     // Find user with email and password (exclude OAuth-only users)
-    const user = await User.findOne({ 
+    const user = await User.findOne({
       email: email.toLowerCase(),
       password: { $exists: true, $ne: null }
     });
@@ -74,8 +63,8 @@ export async function POST(request) {
     const successMessage = "If your email exists in our system, you will receive a password reset code.";
 
     if (!user) {
-      return NextResponse.json({ 
-        message: successMessage 
+      return NextResponse.json({
+        message: successMessage
       });
     }
 
@@ -127,10 +116,21 @@ export async function POST(request) {
       `
     };
 
+    // Create transporter inside function to read env vars at runtime (not build time)
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_SERVER_HOST,
+      port: parseInt(process.env.EMAIL_SERVER_PORT),
+      secure: true,
+      auth: {
+        user: process.env.EMAIL_SERVER_USER,
+        pass: process.env.EMAIL_SERVER_PASSWORD,
+      },
+    });
+
     await transporter.sendMail(mailOptions);
 
-    return NextResponse.json({ 
-      message: successMessage 
+    return NextResponse.json({
+      message: successMessage
     });
 
   } catch (error) {

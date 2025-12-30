@@ -102,13 +102,38 @@ export async function POST(req) {
 
     // Send OTP email
     try {
+      // Validate email configuration
+      const emailHost = process.env.EMAIL_SERVER_HOST;
+      const emailPort = process.env.EMAIL_SERVER_PORT;
+      const emailUser = process.env.EMAIL_SERVER_USER;
+      const emailPass = process.env.EMAIL_SERVER_PASSWORD;
+      const emailFrom = process.env.EMAIL_FROM;
+
+      if (!emailHost || !emailPort || !emailUser || !emailPass || !emailFrom) {
+        console.error('❌ Email configuration missing:', {
+          hasHost: !!emailHost,
+          hasPort: !!emailPort,
+          hasUser: !!emailUser,
+          hasPass: !!emailPass,
+          hasFrom: !!emailFrom
+        });
+        return Response.json({ error: "Email service is not configured. Please contact support." }, { status: 500 });
+      }
+
+      console.log('📧 Attempting to send email with config:', {
+        host: emailHost,
+        port: emailPort,
+        user: emailUser ? emailUser.substring(0, 5) + '...' : 'undefined',
+        from: emailFrom
+      });
+
       const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_SERVER_HOST,
-        port: parseInt(process.env.EMAIL_SERVER_PORT),
+        host: emailHost,
+        port: parseInt(emailPort),
         secure: true,
         auth: {
-          user: process.env.EMAIL_SERVER_USER,
-          pass: process.env.EMAIL_SERVER_PASSWORD,
+          user: emailUser,
+          pass: emailPass,
         },
       });
 
@@ -199,11 +224,11 @@ export async function POST(req) {
       <ul>
         <li>This code expires in <strong>10 minutes</strong></li>
         <li>Do not share this code with anyone</li>
-        <li>If you didn’t request this, you can safely ignore this email</li>
+        <li>If you didn't request this, you can safely ignore this email</li>
       </ul>
 
       <p>
-        Once verified, you’ll be able to follow creators, unlock vault items,
+        Once verified, you'll be able to follow creators, unlock vault items,
         and start earning FamPoints.
       </p>
     </div>
@@ -221,19 +246,26 @@ export async function POST(req) {
 `;
 
       await transporter.sendMail({
-        from: process.env.EMAIL_FROM,
+        from: emailFrom,
         to: email,
         subject: 'Verify Your Sygil Account',
         html: htmlTemplate,
       });
 
+      console.log('✅ Email sent successfully to:', email);
+
     } catch (emailError) {
-      console.error('Email sending failed:', emailError);
-      // If email fails, we should probably inform the user instead of saying success
-      // But since we created the user (or updated), maybe we just say "Failed to send OTP".
-      // However, if we return error, the frontend might think signup failed completely.
-      // Let's return a 500 so frontend shows the error.
-      return Response.json({ error: "Failed to send verification email. Please check your email address." }, { status: 500 });
+      console.error('❌ Email sending failed:', {
+        message: emailError.message,
+        code: emailError.code,
+        command: emailError.command,
+        responseCode: emailError.responseCode,
+        response: emailError.response
+      });
+      // Return a more specific error message
+      return Response.json({
+        error: "Failed to send verification email. Please try again later or contact support."
+      }, { status: 500 });
     }
 
     return Response.json({
