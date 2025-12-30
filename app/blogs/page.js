@@ -34,7 +34,7 @@ function createExcerpt(content, maxLength = 150) {
     .replace(/\d+\.\s+/g, '') // Remove numbered list markers
     .replace(/\n+/g, ' ') // Replace line breaks with spaces
     .trim();
-    
+
   if (plainText.length <= maxLength) return plainText;
   return plainText.substring(0, maxLength).trim() + '...';
 }
@@ -71,7 +71,7 @@ const BlogsPage = () => {
   if (isLoading) {
     return (
       <>
-        <SEO 
+        <SEO
           title="Loading Creator School - Content Creation Education"
           description="Loading creator education content, tutorials, and strategies for content creators and influencers."
           keywords="creator education, content creation tutorials, influencer tips, loading"
@@ -88,15 +88,15 @@ const BlogsPage = () => {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Creator School - Learn Content Creation & Influencer Marketing"
-        description="Master content creation with InstaFam's Creator School. Free tutorials, proven strategies, and expert tips to grow your audience, increase engagement, and monetize your content as a successful creator."
+        description="Master content creation with Sygil's Creator School. Free tutorials, proven strategies, and expert tips to grow your audience, increase engagement, and monetize your content as a successful creator."
         keywords="creator school, content creation course, influencer marketing, social media strategy, creator education, content marketing tips, audience growth, monetization strategies, creator economy, influencer tips"
-        url="https://www.instafam.social/blogs"
-        image="https://www.instafam.social/og-creator-school.jpg"
+        url="https://www.sygil.app/blogs"
+        image="https://www.sygil.app/og-creator-school.jpg"
         type="website"
       />
-      
+
       <div className="min-h-screen bg-background pt-20 text-text py-8 px-4">
         <div className="max-w-6xl mx-auto">
           {/* Header with SEO-optimized structure */}
@@ -106,10 +106,10 @@ const BlogsPage = () => {
                 <h1 className="text-4xl font-bold text-primary mb-2">Creator School</h1>
                 <p className="text-text/70 text-lg">Learn, grow, and master the art of content creation with expert tutorials and proven strategies</p>
               </div>
-              
+
               {/* Admin Quick Access - Hidden link for admins */}
-              <Link 
-                href="/upload-blog" 
+              <Link
+                href="/upload-blog"
                 className="text-text/50 hover:text-primary text-sm transition-colors"
                 aria-label="Admin access for blog content management"
               >
@@ -127,15 +127,15 @@ const BlogsPage = () => {
                 __html: JSON.stringify({
                   "@context": "https://schema.org",
                   "@type": "Blog",
-                  "name": "InstaFam Creator School",
+                  "name": "Sygil Creator School",
                   "description": "Educational content for content creators and influencers",
-                  "url": "https://www.instafam.social/blogs",
+                  "url": "https://www.sygil.app/blogs",
                   "publisher": {
                     "@type": "Organization",
-                    "name": "InstaFam",
+                    "name": "Sygil",
                     "logo": {
                       "@type": "ImageObject",
-                      "url": "https://www.instafam.social/logo.png"
+                      "url": "https://www.sygil.app/logo.png"
                     }
                   }
                 })
@@ -146,7 +146,7 @@ const BlogsPage = () => {
               <section className="text-center py-16" aria-labelledby="coming-soon-heading">
                 <h2 id="coming-soon-heading" className="text-2xl font-bold text-primary mb-4">Coming Soon</h2>
                 <p className="text-text/70 max-w-md mx-auto">
-                  We're creating comprehensive educational content to help you become a successful creator. 
+                  We're creating comprehensive educational content to help you become a successful creator.
                   Stay tuned for expert insights, proven strategies, and actionable tutorials!
                 </p>
               </section>
@@ -156,7 +156,7 @@ const BlogsPage = () => {
                 {blogs.map((blog, index) => {
                   const blogUrl = `https://www.sygil.app/blogs/${blog.slug}`;
                   const publishDate = new Date(blog.createdAt).toISOString();
-                  
+
                   return (
                     <article
                       key={blog._id}
@@ -182,7 +182,7 @@ const BlogsPage = () => {
                             },
                             "publisher": {
                               "@type": "Organization",
-                              "name": "InstaFam",
+                              "name": "Sygil",
                               "logo": {
                                 "@type": "ImageObject",
                                 "url": "https://www.sygil.app/logo.png"
@@ -195,7 +195,7 @@ const BlogsPage = () => {
                           })
                         }}
                       />
-                      
+
                       <Link href={`/blogs/${blog.slug}`} className="block">
                         <div className="space-y-3">
                           {/* Featured Badge for First Post */}
@@ -204,36 +204,36 @@ const BlogsPage = () => {
                               ⭐ Featured Article
                             </div>
                           )}
-                          
+
                           {/* Title with proper heading hierarchy */}
-                          <h3 
+                          <h3
                             className="text-xl font-semibold text-text group-hover:text-text/80 transition-colors leading-tight"
                             itemProp="headline"
                           >
                             {blog.title}
                           </h3>
-                          
+
                           {/* Excerpt with proper semantic meaning */}
-                          <p 
-                            className="text-text/70 leading-relaxed text-sm" 
+                          <p
+                            className="text-text/70 leading-relaxed text-sm"
                             itemProp="description"
                           >
                             {createExcerpt(blog.content, 120)}
                           </p>
-                          
+
                           {/* Meta Information with structured data */}
                           <div className="flex items-center justify-between pt-3 border-text/10">
                             <div className="flex items-center gap-3 text-xs text-text/60">
-                              <span 
-                                className="font-medium" 
-                                itemProp="author" 
-                                itemScope 
+                              <span
+                                className="font-medium"
+                                itemProp="author"
+                                itemScope
                                 itemType="https://schema.org/Person"
                               >
                                 <span itemProp="name">{blog.authorId.name || blog.authorId.username}</span>
                               </span>
                               <span aria-hidden="true">•</span>
-                              <time 
+                              <time
                                 dateTime={blog.createdAt}
                                 itemProp="datePublished"
                                 title={`Published on ${formatDate(blog.createdAt)}`}
@@ -241,7 +241,7 @@ const BlogsPage = () => {
                                 {formatDate(blog.createdAt)}
                               </time>
                             </div>
-                            
+
                             <div className="flex items-center gap-4">
                               <div className="flex items-center gap-2 text-primary font-medium text-xs group-hover:gap-3 transition-all">
                                 <span>Read Article</span>
@@ -251,7 +251,7 @@ const BlogsPage = () => {
                           </div>
                         </div>
                       </Link>
-                      
+
                       {/* Admin Actions - Outside the Link */}
                       <div className="mt-4 border-text/20">
                         <AdminBlogActions blog={blog} onDelete={handleDeleteBlog} />
@@ -270,7 +270,7 @@ const BlogsPage = () => {
                 Ready to Start Your Creator Journey?
               </h2>
               <p className="text-text/70 mb-6 max-w-xl mx-auto">
-                Join thousands of creators who are building their audience and growing their income. 
+                Join thousands of creators who are building their audience and growing their income.
                 Explore our creator community and start earning today!
               </p>
               <Link

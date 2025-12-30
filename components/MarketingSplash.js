@@ -449,7 +449,7 @@ export default function MarketingSplash() {
                   href="/creators"
                   className="text-text-muted hover:text-primary text-sm transition-colors"
                 >
-                  Are you a Creator? →
+                  Join as a creator →
                 </Link>
               </div>
             </div>

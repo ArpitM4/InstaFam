@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { useUser } from "@/context/UserContext";
 import Footer from "@/components/Footer";
 import CreatorNavbar from "@/components/CreatorNavbar";
+import AuthModal from "@/components/AuthModal";
 import {
   FaRocket, FaBolt, FaCrown, FaGem, FaTrophy, FaArrowRight,
   FaYoutube, FaInstagram, FaTwitch, FaPalette, FaBrain,
@@ -75,6 +76,27 @@ export default function CreatorsPage() {
   const [username, setUsername] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [isAvailable, setIsAvailable] = useState(null); // null, true, false
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalView, setAuthModalView] = useState("AUTH"); // "AUTH" or "SETUP"
+
+  // Auto-handle logged-in users after Google OAuth redirect
+  // - Existing users: redirect to their page
+  // - New users: show setup modal
+  useEffect(() => {
+    if (session) {
+      if (session.user?.setupCompleted || session.user?.hasUsername) {
+        // Existing user - redirect to their page
+        const userUsername = session.user?.username || session.user?.name;
+        if (userUsername) {
+          router.push(`/${userUsername}`);
+        }
+      } else {
+        // New user - show the setup modal
+        setAuthModalView("SETUP");
+        setShowAuthModal(true);
+      }
+    }
+  }, [session, router]);
 
   // Check Username Logic
   const checkUsername = async () => {
@@ -105,7 +127,9 @@ export default function CreatorsPage() {
       page: 'creators'
     });
     if (!session) {
-      router.push('/');
+      // Open auth modal for non-logged-in users
+      setAuthModalView("AUTH");
+      setShowAuthModal(true);
     } else if (userData?.accountType === 'Creator' || userData?.accountType === 'VCreator') {
       router.push(`/${session.user.name}`);
     } else {
@@ -155,7 +179,7 @@ export default function CreatorsPage() {
         url="https://www.sygil.app/creators"
         image="https://www.sygil.app/og-creators.jpg"
       />
-      <CreatorNavbar />
+      <CreatorNavbar onOpenAuth={() => { setAuthModalView("AUTH"); setShowAuthModal(true); }} />
 
 
       <div className="relative min-h-screen text-white bg-[#0a0a0a]">
@@ -821,6 +845,14 @@ export default function CreatorsPage() {
 
         <Footer forceShow={true} />
       </div >
+
+      {/* Auth Modal for Creator Signup */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialView={authModalView}
+        defaultAccountType="Creator"
+      />
     </>
   );
 }

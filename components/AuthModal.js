@@ -3,11 +3,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { signIn, useSession } from "next-auth/react";
-import { FaGoogle, FaEye, FaEyeSlash, FaCheck, FaTimes, FaMagic, FaPen } from 'react-icons/fa';
+import { FaGoogle, FaEye, FaEyeSlash, FaCheck, FaTimes, FaMagic, FaPen, FaArrowRight } from 'react-icons/fa';
 import { emitProfileUpdate } from "@/utils/eventBus";
 import { trackEvent, GA_EVENTS } from "@/utils/analytics";
 
-export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
+export default function AuthModal({ isOpen, onClose, initialView = "AUTH", defaultAccountType = "User" }) {
     const router = useRouter();
     const { data: session, update } = useSession();
     const [view, setView] = useState(initialView); // "AUTH" or "SETUP"
@@ -169,6 +169,11 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                 // Skip setup if user already completed it OR has a username
                 if (sessionData?.user?.setupCompleted || sessionData?.user?.hasUsername) {
                     onClose();
+                    // Redirect to user's page
+                    const userUsername = sessionData?.user?.username || sessionData?.user?.name;
+                    if (userUsername) {
+                        router.push(`/${userUsername}`);
+                    }
                     router.refresh();
                 } else {
                     setView("SETUP");
@@ -309,7 +314,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                 body: JSON.stringify({
                     name,
                     username,
-                    accountType: "User", // Forced as requested
+                    accountType: defaultAccountType, // Uses prop - "User" or "Creator"
                     profilepic: avatarUrl
                 })
             });
@@ -330,10 +335,12 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                 }
             });
 
-            trackEvent(GA_EVENTS.SETUP_COMPLETE, { username, hasCustomAvatar: !avatarUrl.includes('dicebear') });
-            emitProfileUpdate({ name, username, profilepic: avatarUrl, accountType: "User" });
+            trackEvent(GA_EVENTS.SETUP_COMPLETE, { username, hasCustomAvatar: !avatarUrl.includes('dicebear'), accountType: defaultAccountType });
+            emitProfileUpdate({ name, username, profilepic: avatarUrl, accountType: defaultAccountType });
 
             onClose();
+            // Redirect to user's new page
+            router.push(`/${username}`);
             router.refresh();
         } catch (err) {
             setError(err.message);
@@ -346,7 +353,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
 
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="relative w-full max-w-md bg-[#0a0a0f] rounded-2xl shadow-2xl overflow-hidden border border-white/10">
+            <div className="relative w-full max-w-md max-h-[90vh] bg-[#0a0a0f] rounded-2xl shadow-2xl border border-white/10 flex flex-col overflow-y-auto custom-scrollbar">
                 <button
                     onClick={() => {
                         trackEvent(GA_EVENTS.AUTH_MODAL_CLOSE, { view, authView });
@@ -357,27 +364,33 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                     <FaTimes />
                 </button>
 
-                <div className="p-6 sm:p-8">
+                <div className="p-5 sm:p-6">
                     {view === "AUTH" ? (
                         <div className="flex flex-col items-center">
                             {/* Header Content */}
-                            <div className="text-center mb-6">
-                                <h1 className="text-2xl font-bold gradient-text tracking-wide mb-2">
-                                    Ask More From Your Favourite Creators !
+                            <div className="text-center mb-4">
+                                <h1 className="text-xl sm:text-2xl font-bold gradient-text tracking-wide mb-1">
+                                    {defaultAccountType === "Creator"
+                                        ? "Start Earning From Your Content!"
+                                        : "Ask More From Your Favourite Creators !"}
                                 </h1>
-                                <h2 className="text-lg font-semibold text-white mb-1">
-                                    Be more than just a follower.
+                                <h2 className="text-base sm:text-lg font-semibold text-white mb-1">
+                                    {defaultAccountType === "Creator"
+                                        ? "Turn followers into superfans."
+                                        : "Be more than just a follower."}
                                 </h2>
-                                <p className="text-white/50 text-xs mb-4">
-                                    Unlock exclusive drops from your favourite creators.
+                                <p className="text-white/50 text-xs mb-3">
+                                    {defaultAccountType === "Creator"
+                                        ? "Create your Sygil page and start monetizing today."
+                                        : "Unlock exclusive drops from your favourite creators."}
                                 </p>
-                                <div className="flex justify-center mb-6">
+                                <div className="flex justify-center mb-3">
                                     <Image
                                         src="/Illustration.png"
                                         alt="Sygil Characters"
-                                        width={280}
-                                        height={186}
-                                        className="w-64 h-auto object-contain"
+                                        width={180}
+                                        height={120}
+                                        className="w-36 sm:w-44 h-auto object-contain"
                                     />
                                 </div>
                             </div>
@@ -386,27 +399,27 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                             <div className="w-full">
                                 <button
                                     onClick={handleGoogleSignIn}
-                                    className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white text-gray-800 rounded-lg hover:bg-gray-100 transition-all duration-200 font-medium mb-6"
+                                    className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-white text-gray-800 rounded-lg hover:bg-gray-100 transition-all duration-200 font-medium mb-4"
                                 >
                                     <FaGoogle className="text-lg" />
                                     Continue with Google
                                 </button>
 
-                                <div className="flex items-center gap-4 mb-6">
+                                <div className="flex items-center gap-4 mb-4">
                                     <div className="flex-1 h-px bg-white/10"></div>
                                     <span className="text-white/40 text-sm">or</span>
                                     <div className="flex-1 h-px bg-white/10"></div>
                                 </div>
 
-                                <form onSubmit={authView === 'FORGOT_PASSWORD' ? handleForgotPasswordSubmit : handleCredentialsAuth} className="space-y-4">
+                                <form onSubmit={authView === 'FORGOT_PASSWORD' ? handleForgotPasswordSubmit : handleCredentialsAuth} className="space-y-3">
                                     <div>
-                                        <label className="block text-white text-sm font-medium mb-2">Email Address</label>
+                                        <label className="block text-white text-sm font-medium mb-1">Email Address</label>
                                         <input
                                             type="email"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             placeholder="Email Address"
-                                            className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-primary/50"
+                                            className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-primary/50"
                                             required
                                             disabled={authView === 'FORGOT_PASSWORD' && forgotStep > 1}
                                         />
@@ -414,19 +427,19 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
 
                                     {authView === 'FORGOT_PASSWORD' && forgotStep === 3 && (
                                         <div className="relative">
-                                            <label className="block text-white text-sm font-medium mb-2">New Password</label>
+                                            <label className="block text-white text-sm font-medium mb-1">New Password</label>
                                             <input
                                                 type={showPassword ? 'text' : 'password'}
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
                                                 placeholder="New Password"
-                                                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-primary/50"
+                                                className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-primary/50"
                                                 required
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-4 top-9 text-white/50 hover:text-white"
+                                                className="absolute right-4 top-8 text-white/50 hover:text-white"
                                             >
                                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                                             </button>
@@ -435,19 +448,19 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
 
                                     {authView !== 'FORGOT_PASSWORD' && (
                                         <div className="relative">
-                                            <label className="block text-white text-sm font-medium mb-2">{authView === 'LOGIN' ? "Password" : "Set Password"}</label>
+                                            <label className="block text-white text-sm font-medium mb-1">{authView === 'LOGIN' ? "Password" : "Set Password"}</label>
                                             <input
                                                 type={showPassword ? 'text' : 'password'}
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
                                                 placeholder={authView === 'LOGIN' ? "Password" : "Set Password"}
-                                                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-primary/50"
+                                                className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-primary/50"
                                                 required
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-4 top-9 text-white/50 hover:text-white"
+                                                className="absolute right-4 top-8 text-white/50 hover:text-white"
                                             >
                                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                                             </button>
@@ -488,7 +501,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full py-3 rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold transition-colors disabled:opacity-50"
+                                        className="w-full py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold transition-colors disabled:opacity-50"
                                     >
                                         {loading ? 'Please wait...' : (
                                             authView === 'LOGIN' ? 'Login' :
@@ -499,7 +512,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                                 </form>
 
                                 {authView === 'LOGIN' && (
-                                    <div className="text-right mt-3">
+                                    <div className="text-right mt-2">
                                         <button onClick={() => {
                                             trackEvent(GA_EVENTS.FORGOT_PASSWORD_START, { email });
                                             setAuthView('FORGOT_PASSWORD');
@@ -540,6 +553,22 @@ export default function AuthModal({ isOpen, onClose, initialView = "AUTH" }) {
                                             {authView === 'LOGIN' ? 'Sign Up' : 'Login'}
                                         </button>
                                     </p>
+                                )}
+
+                                {/* Join as Creator Link - only show for User signup */}
+                                {defaultAccountType !== "Creator" && (
+                                    <div className="text-center mt-4 pt-4 border-t border-white/10">
+                                        <button
+                                            onClick={() => {
+                                                onClose();
+                                                router.push('/creators');
+                                            }}
+                                            className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-primary transition-colors group"
+                                        >
+                                            Join as a Creator
+                                            <FaArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         </div>

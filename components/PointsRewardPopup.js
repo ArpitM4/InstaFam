@@ -106,7 +106,7 @@ const PointsRewardPopup = ({ isOpen, onClose, pointsEarned, creatorName }) => {
                             Awesome
                         </button>
 
-                        <p className="mt-4 text-[10px] uppercase tracking-widest text-white/20 font-medium">InstaFam Rewards</p>
+                        <p className="mt-4 text-[10px] uppercase tracking-widest text-white/20 font-medium">Sygil Rewards</p>
                     </div>
                 </div>
             </div>
