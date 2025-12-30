@@ -71,8 +71,23 @@ const parseColor = (colorStr) => {
 };
 
 
+// Custom SVG Icons for creator platforms
+const WishlinkIcon = () => (
+    <svg viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
+        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+    </svg>
+);
+
+const HYPDIcon = () => (
+    <svg viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
+        <path d="M19 3H5C3.89 3 3 3.9 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM9 17H7V10H9V17ZM13 17H11V7H13V17ZM17 17H15V13H17V17Z" />
+    </svg>
+);
+
 // Social Platforms Config
 const socialPlatforms = {
+    wishlink: { name: 'Wishlink', icon: <WishlinkIcon />, color: '#FF6B6B' },
+    hypd: { name: 'HYPD', icon: <HYPDIcon />, color: '#8B5CF6' },
     instagram: { name: 'Instagram', icon: <FaInstagram />, color: '#E4405F' },
     twitter: { name: 'X (Twitter)', icon: <FaXTwitter />, color: '#000000' },
     youtube: { name: 'YouTube', icon: <FaYoutube />, color: '#FF0000' },
@@ -1196,7 +1211,7 @@ const LinksSection = ({ currentUser, isOwner: isOwnerProp, onSocialsChange }) =>
                                         onClick={() => setLinkForm({ ...linkForm, tab: 'social' })}
                                         className={`pb-2 px-1 text-sm font-medium transition-colors relative ${linkForm.tab === 'social' ? 'text-primary' : 'text-white/50 hover:text-white'}`}
                                     >
-                                        Social Media
+                                        Platforms
                                         {linkForm.tab === 'social' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full" />}
                                     </button>
                                     <button
@@ -1226,10 +1241,10 @@ const LinksSection = ({ currentUser, isOwner: isOwnerProp, onSocialsChange }) =>
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-xs text-white/60 mb-1 block">Username (Optional)</label>
+                                            <label className="text-xs text-white/60 mb-1 block">Description (Optional)</label>
                                             <input
                                                 type="text"
-                                                placeholder="@username"
+                                                placeholder="@username / short description"
                                                 value={linkForm.username}
                                                 onChange={e => setLinkForm({ ...linkForm, username: e.target.value })}
                                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-primary focus:outline-none"
