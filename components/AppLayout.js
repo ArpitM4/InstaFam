@@ -124,7 +124,7 @@ export default function AppLayout({ children }) {
       return (
         <div className="min-h-screen bg-background">
           <PublicNavbar />
-          <main className="pt-16 md:pt-0">
+          <main className={`pt-16 ${isCreatorPage ? 'md:pt-0' : ''}`}>
             {children}
           </main>
         </div>
